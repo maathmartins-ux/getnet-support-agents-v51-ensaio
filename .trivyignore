@@ -1,0 +1,8 @@
+# Exceções do trivy (o CI falha em CRITICAL). Cada exceção exige, na linha de cima, o motivo e o dono, e na
+# própria linha a validade `exp:AAAA-MM-DD` (no máximo 90 dias). Vencida, o trivy volta a reprovar e
+# tests/test_supply_chain.py também. Formato:
+#
+#   # motivo: <por que não afeta este serviço ou por que não há correção ainda> — dono: <quem acompanha>
+#   CVE-AAAA-NNNNN exp:AAAA-MM-DD
+#
+# Nenhuma exceção por enquanto.

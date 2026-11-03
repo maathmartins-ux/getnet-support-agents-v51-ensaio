@@ -1,0 +1,4 @@
+{"id": "dependent-01", "split": "dependent", "user_id": "u1", "message": "Quando chega meu pedido 1002?", "expect": {"intent": "records", "replanned": true, "must_include_agents": ["records", "faq"], "must_mention": ["em separação", "dias úteis"]}}
+{"id": "dependent-02", "split": "dependent", "user_id": "u1", "message": "Meu pedido 1002 vai demorar muito?", "expect": {"intent": "records", "replanned": true, "must_include_agents": ["records", "faq"], "must_mention": ["em separação", "dias úteis"]}}
+{"id": "dependent-03", "split": "dependent", "user_id": "u1", "message": "When will my order 1002 arrive?", "expect": {"intent": "records", "replanned": true, "must_include_agents": ["records", "faq"], "must_mention": ["em separação", "dias úteis"]}}
+{"id": "dependent-04", "split": "dependent", "user_id": "u1", "message": "Quando chega meu pedido 1001?", "expect": {"intent": "records", "replanned": false, "must_include_agents": ["records"], "must_mention": ["entregue"]}}

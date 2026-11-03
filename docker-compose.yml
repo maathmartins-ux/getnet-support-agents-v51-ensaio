@@ -1,0 +1,91 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Padrão seguro: identidade só do Bearer JWT. Payload literal do enunciado ({"message","user_id"}):
+      #   docker compose -f docker-compose.yml -f docker-compose.demo.yml up   (docs/adr/0001-auth-mode-demo.md)
+      AUTH_MODE: ${AUTH_MODE:-required}
+    env_file:
+      - path: .env
+        required: false
+    # Volume nomeado: conversas, casos humanos, auditoria e revogações sobrevivem a `down`/`up` e a rebuild
+    # (sem ele o SQLite morava na camada do container e sumia). Apagar de propósito: `docker compose down -v`.
+    volumes:
+      - appdata:/app/var
+  # Painéis e alertas (opcional): `docker compose --profile observability up -d` → Grafana em http://127.0.0.1:3000
+  # (usuário admin; defina GRAFANA_ADMIN_PASSWORD no .env) e Prometheus em http://127.0.0.1:9090. Só em loopback.
+  # Imagens por tag fixa; não foram baixadas nem executadas na construção do kit (Docker Hub limita pulls).
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    profiles: ["observability"]
+    volumes:
+      - ./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ops/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - "127.0.0.1:9090:9090"
+  grafana:
+    image: grafana/grafana:12.2.0
+    profiles: ["observability"]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me-in-env}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - prometheus
+  # Vários hosts (ADR 0003): `docker compose --profile postgres up -d --build postgres api-pg lb-pg` → duas réplicas
+  # da API num Postgres compartilhado, atrás do balanceador em http://127.0.0.1:8081. Nenhum arquivo é compartilhado
+  # entre as réplicas: só a rede até o banco, que é o que muda quando cada réplica mora numa máquina. Defina
+  # POSTGRES_PASSWORD no .env. As duas rodam o laço de SLA: o SKIP LOCKED faz cada caso vencido subir uma vez só.
+  postgres:
+    # postgres:16 fixado por digest (índice multi-arquitetura lido do Docker Hub em 02/11/2026); o mesmo do CI
+    image: postgres:16@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-in-env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  api-pg:
+    build: .
+    image: ${APP_IMAGE:-app-local}
+    profiles: ["postgres"]
+    environment:
+      AUTH_MODE: ${AUTH_MODE:-required}
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-change-me-in-env}@postgres:5432/app
+    env_file:
+      - path: .env
+        required: false
+    deploy:
+      replicas: 2
+    depends_on:
+      postgres:
+        condition: service_healthy
+  lb-pg:
+    # mesmo balanceador do teste de réplicas (ops/lb.py), apontado para o serviço api-pg
+    build: .
+    image: ${APP_IMAGE:-app-local}
+    profiles: ["postgres"]
+    command: ["python", "/opt/lb.py"]
+    environment:
+      LB_BACKEND: api-pg
+    volumes:
+      - ./ops/lb.py:/opt/lb.py:ro
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      - api-pg
+volumes:
+  appdata:
+  pgdata:

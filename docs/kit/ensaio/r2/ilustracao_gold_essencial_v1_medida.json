@@ -1,0 +1,102 @@
+{
+ "bm25": {
+  "essencial": {
+   "recall@3": 0.7,
+   "mrr": 0.467,
+   "hit@3": 0.7
+  },
+  "todo_relacionado": {
+   "cases": 10,
+   "recall@3": 0.55,
+   "mrr": 0.667
+  },
+  "perguntas": 10,
+  "essenciais_por_pergunta": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "dense[multilingual-e5-large]": {
+  "essencial": {
+   "recall@3": 0.8,
+   "mrr": 0.7,
+   "hit@3": 0.8
+  },
+  "todo_relacionado": {
+   "cases": 10,
+   "recall@3": 0.633,
+   "mrr": 0.8
+  },
+  "perguntas": 10,
+  "essenciais_por_pergunta": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "dense[multilingual-e5-large]+cross[bge-reranker-v2-m3-int8@5]": {
+  "essencial": {
+   "recall@3": 0.7,
+   "mrr": 0.65,
+   "hit@3": 0.7
+  },
+  "todo_relacionado": {
+   "cases": 10,
+   "recall@3": 0.7,
+   "mrr": 0.833
+  },
+  "perguntas": 10,
+  "essenciais_por_pergunta": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "dense[multilingual-e5-large]+cross[bge-reranker-v2-m3-int8@10/600c]": {
+  "essencial": {
+   "recall@3": 0.7,
+   "mrr": 0.65,
+   "hit@3": 0.7
+  },
+  "todo_relacionado": {
+   "cases": 10,
+   "recall@3": 0.667,
+   "mrr": 0.783
+  },
+  "perguntas": 10,
+  "essenciais_por_pergunta": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ }
+}

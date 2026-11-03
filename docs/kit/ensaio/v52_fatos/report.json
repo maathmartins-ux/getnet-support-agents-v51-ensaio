@@ -1,0 +1,17 @@
+{
+  "raters": [
+    "labels_A",
+    "labels_B"
+  ],
+  "agreement": {
+    "labels_A×labels_B": {
+      "questions": 50,
+      "jaccard_mean": 0.89,
+      "identical": 34
+    }
+  },
+  "questions_labelled": 50,
+  "no_essential": [],
+  "unmatched_rules": [],
+  "gold": "/tmp/claude-0/-home-user/fcaab8c4-9c28-5f46-b6c6-1bfdc9006cfa/scratchpad/ess2/gold_fatos.jsonl"
+}

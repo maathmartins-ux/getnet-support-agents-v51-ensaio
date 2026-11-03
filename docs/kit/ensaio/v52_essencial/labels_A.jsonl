@@ -1,0 +1,50 @@
+{"qid": "q00", "essential": ["c4", "c5"], "note": "Rental price difference and Smart features; no direct comparison passage"}
+{"qid": "q01", "essential": ["c3", "c5"], "note": "Rental price difference and Smart features; no direct comparison passage"}
+{"qid": "q02", "essential": ["c5", "c0"], "note": "Smart differentials and definition (stock, orders, NF-e on terminal)"}
+{"qid": "q03", "essential": ["c3", "c1"], "note": "Smart differentials and definition"}
+{"qid": "q04", "essential": ["c3"], "note": "Pix eligibility: Santander bank domicile and active Pix key"}
+{"qid": "q05", "essential": ["c0"], "note": "Pix eligibility: Santander bank domicile and active Pix key"}
+{"qid": "q06", "essential": ["c0", "c4"], "note": "QR code on machine, instant credit; Pix available on terminals/TEF/ecommerce"}
+{"qid": "q07", "essential": ["c0", "c3"], "note": "QR code on machine, instant credit; Pix available on terminals/TEF/ecommerce"}
+{"qid": "q08", "essential": ["c0"], "note": "Only one Pix key required"}
+{"qid": "q09", "essential": ["c2"], "note": "Only one Pix key required"}
+{"qid": "q10", "essential": ["c4"], "note": "Pix free on Get Conta"}
+{"qid": "q11", "essential": ["c5"], "note": "Pix free on Get Conta"}
+{"qid": "q12", "essential": ["c1"], "note": "Definition of antecipacao de vendas"}
+{"qid": "q13", "essential": ["c5"], "note": "Definition of antecipacao de vendas"}
+{"qid": "q14", "essential": ["c5", "c2", "c0"], "note": "Channels: Santander branch/internet banking; Central/POS; app"}
+{"qid": "q15", "essential": ["c7", "c3", "c1"], "note": "Channels: Santander branch/internet banking; Central/POS; app"}
+{"qid": "q16", "essential": ["c1", "c4"], "note": "Up to 48x installments, varies by issuer"}
+{"qid": "q17", "essential": ["c1", "c3"], "note": "Up to 48x installments"}
+{"qid": "q18", "essential": ["c4", "c6"], "note": "Paid within 2 business days in one lump sum"}
+{"qid": "q19", "essential": ["c1", "c2"], "note": "Paid within 2 business days in one lump sum"}
+{"qid": "q20", "essential": ["c4"], "note": "Link can be sent via social networks, WhatsApp, email, SMS"}
+{"qid": "q21", "essential": ["c1"], "note": "Link can be sent via WhatsApp"}
+{"qid": "q22", "essential": ["c3", "c0"], "note": "Credit, debit, QR, Pix (and Wallet, boleto)"}
+{"qid": "q23", "essential": ["c2", "c0"], "note": "Credit, debit, QR, Pix (and Wallet, boleto)"}
+{"qid": "q24", "essential": ["c2", "c0"], "note": "Basic R$28, Advanced R$60 packages; initial R$1 per paid link"}
+{"qid": "q25", "essential": ["c0", "c1"], "note": "Basic R$28, Advanced R$60 packages; initial R$1 per paid link"}
+{"qid": "q26", "essential": ["c1"], "note": "No site needed; use minhaconta URL"}
+{"qid": "q27", "essential": ["c2"], "note": "No site needed; use minhaconta URL"}
+{"qid": "q28", "essential": ["c4", "c2"], "note": "Feature in Getnet app turning phone into NFC terminal"}
+{"qid": "q29", "essential": ["c4", "c1"], "note": "Feature in Getnet app turning phone into NFC terminal"}
+{"qid": "q30", "essential": ["c3", "c6"], "note": "Android 12+ and NFC"}
+{"qid": "q31", "essential": ["c0", "c4"], "note": "Android 12+ and NFC"}
+{"qid": "q32", "essential": ["c4"], "note": "Yes, internet connection required"}
+{"qid": "q33", "essential": ["c3"], "note": "Yes, internet connection required"}
+{"qid": "q34", "essential": ["c5", "c0"], "note": "Bank cancels transaction, debit to merchant; situations (fraud, goods not received)"}
+{"qid": "q35", "essential": ["c0", "c7"], "note": "Bank cancels transaction, debit to merchant; situations (fraud, goods not received)"}
+{"qid": "q36", "essential": ["c3"], "note": "Complete power on/off instructions per model"}
+{"qid": "q37", "essential": ["c6"], "note": "Complete power on/off instructions per model"}
+{"qid": "q38", "essential": ["c0", "c1"], "note": "Only by calling central 4003-4000"}
+{"qid": "q39", "essential": ["c0", "c1"], "note": "Only by calling central 4003-4000"}
+{"qid": "q40", "essential": ["c3", "c4"], "note": "Charge at least 3h, recharge at 20%"}
+{"qid": "q41", "essential": ["c1", "c2"], "note": "Charge at least 3h, recharge at 20%"}
+{"qid": "q42", "essential": ["c5"], "note": "Get Conta definition and benefits"}
+{"qid": "q43", "essential": ["c2"], "note": "Get Conta definition and benefits"}
+{"qid": "q44", "essential": ["c1", "c2", "c3"], "note": "Loja Virtual rates by installment tier"}
+{"qid": "q45", "essential": ["c0", "c2", "c4"], "note": "Loja Virtual rates by installment tier"}
+{"qid": "q46", "essential": ["c0", "c5"], "note": "Discount conditions: min revenue, adimplente; revenue window 21-20, one machine"}
+{"qid": "q47", "essential": ["c4"], "note": "Discount conditions: min revenue, adimplente, keep machine/plan"}
+{"qid": "q48", "essential": ["c1", "c6"], "note": "Online solutions: payment link, modular module, hosted checkout"}
+{"qid": "q49", "essential": ["c2", "c3", "c5"], "note": "Online solutions: payment link, modular, hosted checkout, API"}

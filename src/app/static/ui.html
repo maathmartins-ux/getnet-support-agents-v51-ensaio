@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atendimento do lojista</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#16202b;--mut:#5b6877;--line:#d9dee5;--acc:#1f5fbf;--ok:#1e7a46;--warn:#9a6700;--bad:#b3261e}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f151c;--card:#18212b;--ink:#e8eef5;--mut:#9fb0c1;--line:#2a3643;--acc:#6aa5ff;--ok:#5fd08a;--warn:#e3b341;--bad:#ff8a80}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}h1{font-size:20px;margin:8px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mut);margin:6px 0 2px}
+input,textarea,button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px}
+input,textarea{width:100%}button{cursor:pointer;background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.5}
+.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:10px 0;padding:10px;border-radius:10px;border:1px solid var(--line)}
+.me{background:color-mix(in srgb,var(--acc) 10%,var(--card))}.bot pre{white-space:pre-wrap;margin:0;font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--mut)}
+.chip.ok{color:var(--ok);border-color:var(--ok)}.chip.warn{color:var(--warn);border-color:var(--warn)}.chip.bad{color:var(--bad);border-color:var(--bad)}
+.src a{color:var(--acc);font-size:13px}.who{font-size:12px;color:var(--mut)}
+.fb{display:flex;gap:6px;margin-top:8px}.fb button{background:var(--card);color:var(--ink);border-color:var(--line);padding:4px 10px}
+.fb button[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+</style>
+</head>
+<body>
+<main>
+<h1>Atendimento do lojista</h1>
+<form class="card" id="login">
+  <div class="row"><div><label for="luser">Usuário</label><input id="luser" autocomplete="username" value="cliente1988"></div>
+  <div><label for="lpass">Senha</label><input id="lpass" type="password" autocomplete="current-password"></div></div>
+  <div class="row" style="margin-top:8px"><button id="enter" type="submit">Entrar</button><button id="leave" type="button">Sair</button></div>
+  <div class="who" id="lstatus"></div>
+</form>
+<div class="card">
+  <label for="token">Token (JWT) — preenchido ao entrar; fica só nesta aba, nunca é gravado</label>
+  <input id="token" type="password" autocomplete="off" placeholder="vazio = modo demo, usa o campo abaixo">
+  <label for="uid">user_id (só no modo demo)</label>
+  <input id="uid" value="cliente1988">
+</div>
+<div id="log" aria-live="polite"></div>
+<form class="card" id="form">
+  <label for="text">Sua mensagem</label>
+  <textarea id="text" rows="2" required placeholder="Ex.: Quando cai o dinheiro das vendas de ontem?"></textarea>
+  <div class="row" style="margin-top:8px"><button id="send" type="submit">Enviar</button></div>
+</form>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let conv = null, shown = 0, timer = null;
+const headers = () => ({"Content-Type": "application/json", ...($("token").value ? {Authorization: "Bearer " + $("token").value} : {})});
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+function chip(text, kind) { return `<span class="chip ${kind || ""}">${esc(text)}</span>`; }
+function add(cls, who, html) { const d = document.createElement("div"); d.className = "msg " + cls; d.innerHTML = `<div class="who">${who}</div>${html}`; $("log").appendChild(d); d.scrollIntoView({block: "end"}); }
+function details(r) {
+  const c = [chip("intenção: " + r.intent), chip("rota: " + (r.route || []).join(" → "))];
+  (r.tool_calls || []).forEach((t) => c.push(chip("ferramenta: " + t.name, t.ok ? "ok" : "bad")));
+  if (r.handoff && r.handoff.required) c.push(chip("humano: " + (r.handoff.ticket_id || r.handoff.reason), "warn"));
+  else if (r.handoff && r.handoff.ticket_id) c.push(chip("caso aberto " + r.handoff.ticket_id, "warn"));
+  if (r.case_state) c.push(chip("caso: " + r.case_state, r.case_state === "resolved" ? "ok" : ""));
+  if (r.pending_action) c.push(chip("aguardando sua confirmação", "warn"));
+  if (r.numbers_action && r.numbers_action !== "none") c.push(chip("números: " + r.numbers_action, "warn"));
+  (r.risk_flags || []).forEach((f) => c.push(chip("risco: " + f, "bad")));
+  const src = (r.sources || []).slice(0, 3).map((s) => `<a href="${esc(s.url || "#")}" target="_blank" rel="noopener">${esc(s.title || s.id)}</a>`).join(" · ");
+  return `<div class="chips">${c.join("")}</div>${src ? `<div class="src">Fontes: ${src}</div>` : ""}`;
+}
+async function poll() {  // a resposta do operador chega na conversa: mostra o que ainda não foi exibido
+  if (!conv) return;
+  const q = $("token").value ? "" : "?user_id=" + encodeURIComponent($("uid").value);
+  const res = await fetch("/conversations/" + conv + q, {headers: headers()});
+  if (!res.ok) return;
+  const msgs = (await res.json()).messages || [];
+  msgs.slice(shown).forEach((m) => { if (m.role === "assistant" && shown > 0) add("bot", "Atendente / sistema", `<pre>${esc(m.content)}</pre>`); });
+  shown = msgs.length;
+}
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = $("text").value.trim(); if (!text) return;
+  $("send").disabled = true; add("me", "Você", `<pre>${esc(text)}</pre>`); $("text").value = "";
+  const body = {message: text, ...(conv ? {conversation_id: conv} : {}), ...($("token").value ? {} : {user_id: $("uid").value})};
+  try {
+    const res = await fetch("/chat", {method: "POST", headers: headers(), body: JSON.stringify(body)});
+    const r = await res.json();
+    if (!res.ok) { add("bot", "Erro", `<pre>${esc(r.detail || res.status)}</pre>`); return; }
+    conv = r.conversation_id;
+    const fb = $("token").value ? `<div class="fb" data-trace="${esc(r.trace_id)}"><button type="button" data-r="1" aria-pressed="false" aria-label="Resposta boa">👍</button><button type="button" data-r="-1" aria-pressed="false" aria-label="Resposta ruim">👎</button></div>` : "";
+    add("bot", "Assistente", `<pre>${esc(r.answer)}</pre>${details(r)}${fb}`);
+    shown += 2; clearInterval(timer); timer = setInterval(poll, 5000);
+  } finally { $("send").disabled = false; }
+});
+$("log").addEventListener("click", async (e) => {  // 👍/👎: o 👎 vira candidato a caso de teste (revisão humana)
+  const b = e.target.closest(".fb button"); if (!b) return;
+  const box = b.parentElement, rating = Number(b.dataset.r);
+  let comment = null;
+  if (rating < 0) comment = prompt("O que estava errado? (opcional)") || null;
+  const res = await fetch("/feedback", {method: "POST", headers: headers(), body: JSON.stringify({trace_id: box.dataset.trace, rating, comment})});
+  if (res.ok) box.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+});
+$("login").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const res = await fetch("/auth/login", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({user_id: $("luser").value, password: $("lpass").value})});
+  const r = await res.json(); $("lpass").value = "";
+  if (!res.ok) { $("lstatus").textContent = r.detail || String(res.status); return; }
+  $("token").value = r.access_token; $("lstatus").textContent = "Conectado como " + $("luser").value;
+});
+$("leave").addEventListener("click", async () => {
+  if ($("token").value) await fetch("/auth/logout", {method: "POST", headers: headers()});
+  $("token").value = ""; conv = null; $("lstatus").textContent = "Você saiu.";
+});
+</script>
+</body>
+</html>

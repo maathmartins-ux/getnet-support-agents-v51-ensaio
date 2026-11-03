@@ -1,0 +1,202 @@
+{
+  "_doc": "gerado por `python -m evals.run_evals --choose-retriever --apply`; não edite à mão",
+  "chosen_at": "2026-11-02T14:49:16+00:00",
+  "git_sha": null,
+  "gold": "retrieval.jsonl",
+  "criterion": "maior MRR com p95 <= 1500 ms e RAM <= 4096 MB (empate: Recall@3, depois p95)",
+  "latency_budget_ms": 1500.0,
+  "ram_budget_mb": 4096.0,
+  "chosen": "dense+cross",
+  "choice": {
+    "retriever": "dense",
+    "embed_model": "intfloat/multilingual-e5-large",
+    "rerank": "cross",
+    "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+    "rerank_pool": 10,
+    "rerank_chars": 600,
+    "gate": {
+      "min_score": 6.084,
+      "min_cosine": 0.863
+    }
+  },
+  "rejected": {},
+  "measured": {
+    "bm25": {
+      "cases": 50,
+      "recall@3": 0.543,
+      "mrr": 0.617,
+      "hit@3": 0.74,
+      "hit@3_ci": {
+        "k": 37,
+        "n": 50,
+        "lo": 60.4,
+        "hi": 84.1
+      },
+      "ndcg@3": 0.53,
+      "page": {
+        "recall@3": 0.75,
+        "mrr": 0.807,
+        "hit@3": 0.86,
+        "hit@3_ci": {
+          "k": 43,
+          "n": 50,
+          "lo": 73.8,
+          "hi": 93.0
+        }
+      },
+      "latency_ms": {
+        "p50": 1.0,
+        "p95": 1.8,
+        "mean": 1.2
+      },
+      "memory_mb": 43.0,
+      "dedupe_aliases": 29,
+      "fallback": "",
+      "config": {
+        "retriever": "bm25"
+      },
+      "gate": {
+        "min_score": 9.284,
+        "min_cosine": 2.0,
+        "pos_answered": 0.74,
+        "neg_refused": 0.938,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 37,
+          "n": 50,
+          "lo": 60.4,
+          "hi": 84.1
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 16,
+          "lo": 71.7,
+          "hi": 98.9
+        },
+        "positives": 50,
+        "negatives": 16,
+        "neg_refusal_min": 0.85
+      }
+    },
+    "dense": {
+      "cases": 50,
+      "recall@3": 0.703,
+      "mrr": 0.92,
+      "hit@3": 0.94,
+      "hit@3_ci": {
+        "k": 47,
+        "n": 50,
+        "lo": 83.8,
+        "hi": 97.9
+      },
+      "ndcg@3": 0.751,
+      "page": {
+        "recall@3": 0.847,
+        "mrr": 0.93,
+        "hit@3": 0.94,
+        "hit@3_ci": {
+          "k": 47,
+          "n": 50,
+          "lo": 83.8,
+          "hi": 97.9
+        }
+      },
+      "latency_ms": {
+        "p50": 81.2,
+        "p95": 110.8,
+        "mean": 84.1
+      },
+      "memory_mb": 1541.3,
+      "dedupe_aliases": 29,
+      "fallback": "",
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large"
+      },
+      "gate": {
+        "min_score": 9.335,
+        "min_cosine": 0.863,
+        "pos_answered": 0.9,
+        "neg_refused": 1.0,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 45,
+          "n": 50,
+          "lo": 78.6,
+          "hi": 95.7
+        },
+        "neg_ci": {
+          "k": 16,
+          "n": 16,
+          "lo": 80.6,
+          "hi": 100.0
+        },
+        "positives": 50,
+        "negatives": 16,
+        "neg_refusal_min": 0.85
+      }
+    },
+    "dense+cross": {
+      "cases": 50,
+      "recall@3": 0.754,
+      "mrr": 0.947,
+      "hit@3": 0.98,
+      "hit@3_ci": {
+        "k": 49,
+        "n": 50,
+        "lo": 89.5,
+        "hi": 99.6
+      },
+      "ndcg@3": 0.794,
+      "page": {
+        "recall@3": 0.903,
+        "mrr": 0.96,
+        "hit@3": 0.98,
+        "hit@3_ci": {
+          "k": 49,
+          "n": 50,
+          "lo": 89.5,
+          "hi": 99.6
+        }
+      },
+      "latency_ms": {
+        "p50": 984.0,
+        "p95": 1251.4,
+        "mean": 1005.0
+      },
+      "memory_mb": 2313.1,
+      "dedupe_aliases": 29,
+      "fallback": "",
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large",
+        "rerank": "cross",
+        "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+        "rerank_pool": 10,
+        "rerank_chars": 600
+      },
+      "gate": {
+        "min_score": 6.084,
+        "min_cosine": 0.863,
+        "pos_answered": 0.96,
+        "neg_refused": 0.875,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 48,
+          "n": 50,
+          "lo": 86.5,
+          "hi": 98.9
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 16,
+          "lo": 64.0,
+          "hi": 96.5
+        },
+        "positives": 50,
+        "negatives": 16,
+        "neg_refusal_min": 0.85
+      }
+    }
+  }
+}

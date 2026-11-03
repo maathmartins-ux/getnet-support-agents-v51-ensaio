@@ -1,0 +1,842 @@
+{
+ "rows": [
+  {
+   "id": "official-01",
+   "run": 0,
+   "judge_grounded": true,
+   "sentences": 12,
+   "checkable": 10,
+   "lexical_flags": 4,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "They only partly cover the comparison.",
+    "You can control stock, place orders, close tabs, embed menus and issue invoices on the device.",
+    "**Monthly fee if you don't reach the revenue target:** Get Clássica costs R$ 79,90 per month."
+   ]
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "judge_grounded": false,
+   "sentences": 10,
+   "checkable": 6,
+   "lexical_flags": 1,
+   "offer_cuts": 0,
+   "number_flags": 3,
+   "flagged_examples": [
+    "For live updates, see:"
+   ]
+  },
+  {
+   "id": "official-03",
+   "run": 0,
+   "judge_grounded": false,
+   "sentences": 15,
+   "checkable": 6,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-04",
+   "run": 0,
+   "judge_grounded": true,
+   "sentences": 7,
+   "checkable": 5,
+   "lexical_flags": 1,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "It must be linked to the receiving account you want to use [sup-duvidas-79]."
+   ]
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "judge_grounded": false,
+   "sentences": 17,
+   "checkable": 13,
+   "lexical_flags": 5,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "Turn it off, open the back cover and check that the chip is in the SIM1 or SIM2 slot with the metal side facing down.",
+    "Then close the cover, turn it on and wait for the data network to connect. [sup-duvidas-05]",
+    "When the display shows a network (2G or 3G), the terminal is ready."
+   ]
+  },
+  {
+   "id": "official-06",
+   "run": 0,
+   "judge_grounded": true,
+   "sentences": 11,
+   "checkable": 9,
+   "lexical_flags": 2,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "This covers both single-payment and installment sales.",
+    "**Authorization:** Under the new rules, you must authorize Getnet to query your schedule at the Registradora."
+   ]
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "judge_grounded": false,
+   "sentences": 9,
+   "checkable": 5,
+   "lexical_flags": 1,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "The page was listed as updated today (01/11/2026)."
+   ]
+  },
+  {
+   "id": "official-08",
+   "run": 0,
+   "judge_grounded": true,
+   "sentences": 13,
+   "checkable": 9,
+   "lexical_flags": 2,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "TX1008 (debit, R$ 75,00): code 05, the issuing bank did not authorize it.",
+    "I found no Getnet source with troubleshooting steps for this error."
+   ]
+  },
+  {
+   "id": "official-09",
+   "run": 0,
+   "judge_grounded": true,
+   "sentences": 3,
+   "checkable": 2,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-10",
+   "run": 0,
+   "judge_grounded": true,
+   "sentences": 4,
+   "checkable": 4,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-01",
+   "run": 1,
+   "judge_grounded": true,
+   "sentences": 11,
+   "checkable": 8,
+   "lexical_flags": 2,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "The sources I found only compare the two machines on rental fees.",
+    "**Revenue that doesn't count:** Voucher (VA/VR) and Crediário sales don't count toward these thresholds."
+   ]
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "judge_grounded": false,
+   "sentences": 5,
+   "checkable": 4,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 2,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-03",
+   "run": 1,
+   "judge_grounded": false,
+   "sentences": 11,
+   "checkable": 6,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-04",
+   "run": 1,
+   "judge_grounded": true,
+   "sentences": 7,
+   "checkable": 4,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "judge_grounded": false,
+   "sentences": 18,
+   "checkable": 14,
+   "lexical_flags": 5,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "With the machine off, open the back cover and check the chip.",
+    "It goes in the slot marked SIM1 or SIM2, metal side facing down.",
+    "Close the cover, turn the machine on, and wait for the network (2G or 3G) to connect."
+   ]
+  },
+  {
+   "id": "official-06",
+   "run": 1,
+   "judge_grounded": true,
+   "sentences": 12,
+   "checkable": 10,
+   "lexical_flags": 4,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "This covers both single-payment and installment sales.",
+    "**Timing:** You can advance a sale from D+1 (one business day after the sale).",
+    "**Authorization:** Under the new rules, you must consent to Getnet querying your schedule at the Registradora."
+   ]
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "judge_grounded": false,
+   "sentences": 7,
+   "checkable": 4,
+   "lexical_flags": 1,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "Ria Money Transfer: https://www.riamoneytransfer.com/en-us/rates-conversion/?From=EUR&To=USD&Amount=1"
+   ]
+  },
+  {
+   "id": "official-08",
+   "run": 1,
+   "judge_grounded": true,
+   "sentences": 16,
+   "checkable": 10,
+   "lexical_flags": 3,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "Code 05, not authorized by the issuer.",
+    "These declines came from the cards or issuers, not from a fault in your machine.",
+    "Ask those customers to try another card or call their bank."
+   ]
+  },
+  {
+   "id": "official-09",
+   "run": 1,
+   "judge_grounded": true,
+   "sentences": 3,
+   "checkable": 2,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-10",
+   "run": 1,
+   "judge_grounded": true,
+   "sentences": 4,
+   "checkable": 3,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-01",
+   "run": 2,
+   "judge_grounded": true,
+   "sentences": 9,
+   "checkable": 6,
+   "lexical_flags": 2,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "Either machine is free above R$ 40mil [1].",
+    "**Sales that don't count** toward the waiver: Voucher (VA/VR) and Crediário [1]."
+   ]
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "judge_grounded": false,
+   "sentences": 5,
+   "checkable": 4,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 2,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-03",
+   "run": 2,
+   "judge_grounded": false,
+   "sentences": 10,
+   "checkable": 6,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-04",
+   "run": 2,
+   "judge_grounded": true,
+   "sentences": 8,
+   "checkable": 5,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-05",
+   "run": 2,
+   "judge_grounded": false,
+   "sentences": 18,
+   "checkable": 14,
+   "lexical_flags": 7,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "Turn it off and open the back cover.",
+    "Put the chip in the SIM1 or SIM2 slot with the metal side facing down.",
+    "Close the cover and turn it on."
+   ]
+  },
+  {
+   "id": "official-06",
+   "run": 2,
+   "judge_grounded": true,
+   "sentences": 10,
+   "checkable": 8,
+   "lexical_flags": 2,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "This covers sales paid in full or in installments.",
+    "**Authorization:** Under the new rules, you must authorize Getnet to query your schedule at the Registradora (registry)."
+   ]
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "judge_grounded": false,
+   "sentences": 9,
+   "checkable": 5,
+   "lexical_flags": 1,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "These are the figures the sources gave:"
+   ]
+  },
+  {
+   "id": "official-08",
+   "run": 2,
+   "judge_grounded": true,
+   "sentences": 18,
+   "checkable": 11,
+   "lexical_flags": 2,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": [
+    "Code 05, the issuer did not authorize it.",
+    "If your error is on this one, the lost connection is probably the cause."
+   ]
+  },
+  {
+   "id": "official-09",
+   "run": 2,
+   "judge_grounded": true,
+   "sentences": 4,
+   "checkable": 3,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  },
+  {
+   "id": "official-10",
+   "run": 2,
+   "judge_grounded": true,
+   "sentences": 5,
+   "checkable": 5,
+   "lexical_flags": 0,
+   "offer_cuts": 0,
+   "number_flags": 0,
+   "flagged_examples": []
+  }
+ ],
+ "labels": [
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "mist, 19°C",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "thundery outbreaks nearby, 29°C",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "light rain shower, 24°C",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "31°C / 88°F",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "AccuWeather also shows rain and a thunderstorm",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-03",
+   "run": 0,
+   "sentence": "Pix is normally deposited the same day",
+   "expect": "keep",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-03",
+   "run": 0,
+   "sentence": "You would need to confirm it, and an operator would then approve it",
+   "expect": "keep",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "sentence": "Turn it off and on again",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "sentence": "near a window and away from metal or thick walls",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "sentence": "I can propose a remote restart of T1988B",
+   "expect": "keep",
+   "type": "offered_unavailable_action",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "1 EUR = 1.11838091 USD",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "€1 = 1.116 USD",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "The page gave no clear timestamp",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "check the Banco Central do Brasil (PTAX)",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "sentence": "minimum 20°C, maximum 31°C",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "sentence": "many clouds, with a chance of isolated rain",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "sentence": "many clouds, with isolated showers",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-03",
+   "run": 1,
+   "sentence": "Deposits follow business days",
+   "expect": "keep",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-03",
+   "run": 1,
+   "sentence": "A request to anticipate needs your confirmation and an operator's approval",
+   "expect": "keep",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "sentence": "away from thick walls and metal",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "sentence": "Turn it off and on again",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "sentence": "I can also propose a remote restart of T1988B",
+   "expect": "keep",
+   "type": "offered_unavailable_action",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "sentence": "lists 1.00 EUR = 1.11838091 USD",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "sentence": "similar figure of €1 = 1.116 USD",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "sentence": "check the Banco Central do Brasil (PTAX)",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "sentence": "minimum 20°C, maximum 31°C",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "sentence": "cloudy, with a chance of isolated rain",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "sentence": "cloudy, with isolated showers",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-03",
+   "run": 2,
+   "sentence": "tell me and I can start a request",
+   "expect": "keep",
+   "type": "offered_unavailable_action",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-03",
+   "run": 2,
+   "sentence": "You would have to confirm it, and an operator would then approve it",
+   "expect": "keep",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 2,
+   "sentence": "near a window and away from thick walls",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-05",
+   "run": 2,
+   "sentence": "I can also propose a remote restart of the T1988B",
+   "expect": "keep",
+   "type": "offered_unavailable_action",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "1 EUR = 1.11838091 USD, dated 11/01/2026",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "1 EUR = 1.116 USD",
+   "expect": "catch",
+   "type": "invented_number",
+   "found_sentence": true,
+   "numbers": true,
+   "lexical": false,
+   "offer": false,
+   "lexical_no_card": false
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "Neither page showed a timestamp",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "check the Banco Central do Brasil.",
+   "expect": "catch",
+   "type": "unsupported_claim",
+   "found_sentence": true,
+   "numbers": false,
+   "lexical": true,
+   "offer": false,
+   "lexical_no_card": true
+  }
+ ],
+ "summary": {
+  "official_answers": 30,
+  "judge_rejected": 12,
+  "judge_accepted": 18,
+  "cited_catch": 27,
+  "caught_by_numbers": 11,
+  "caught_by_lexical": 19,
+  "caught_by_offer": 0,
+  "caught_any_deterministic": 27,
+  "cited_non_number": 15,
+  "non_number_caught_by_lexical": 15,
+  "cited_keep": 9,
+  "keep_flagged_with_card": 0,
+  "keep_flagged_without_card": 5,
+  "rejected_other_sentences_lexical_flags": 21,
+  "accepted_answers_with_lexical_flag": 10,
+  "accepted_lexical_flags": 24,
+  "accepted_checkable_sentences": 114,
+  "accepted_answers_cut_by_offer_check": 0,
+  "accepted_number_flags": 0,
+  "labels_without_sentence": 0
+ }
+}

@@ -1,0 +1,142 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+# Só leitura: o gitleaks lista os commits do PR (sem pull-requests: read, 403 "Resource not accessible by
+# integration" no evento pull_request, visto em 01/11/2026).
+permissions:
+  contents: read
+  pull-requests: read
+
+# Toda action fixada pelo SHA do commit, com a versão em comentário (scripts/pin_actions.sh resolve; o
+# tests/test_supply_chain.py reprova `uses:` sem SHA). Tag é móvel: em 03/2026 tags de actions populares
+# foram reescritas para código malicioso.
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    # o eval do gate usa o buscador escolhido (padrão do kit: denso + cross): sem fastembed e modelos ele cairia no
+    # BM25 e o CI mediria outro produto (ensaio v5.4: 3/10 oficiais no fallback contra 9/10 com o buscador do kit)
+    env:
+      FASTEMBED_CACHE_PATH: /home/runner/.cache/fastembed
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0  # histórico inteiro: o gitleaks varre todos os commits, não só o último
+      # segredo vazado no histórico (chave de API, token): falha antes de qualquer outra etapa
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: /home/runner/.cache/fastembed
+          key: fastembed-${{ hashFiles('data/retriever.json', 'requirements-hybrid.lock') }}
+      # vetores do corpus e medida da busca entre execuções: a chave interna é o conteúdo (modelo + texto; gold +
+      # código), então o que vier de uma execução anterior só é usado se ainda vale. Sem isto, cada push vetorizava o
+      # corpus de novo no eval e no build da imagem (2–4 min de CPU cada).
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            var/embeddings
+            var/retrieval_cache.json
+          key: vectors-${{ hashFiles('data/**', 'evals/retrieval*', 'evals/retrieval.d/**', 'src/app/rag.py', 'src/app/ingest.py') }}
+          restore-keys: vectors-
+      - run: pip install -r requirements-dev.lock -r requirements-hybrid.lock && pip install --no-deps -e .
+      - run: python scripts/fetch_models.py
+      # Mesmo comando que roda localmente: o CI não pode ter regra que a máquina não tem. Inclui a imagem
+      # subindo com --network none (scripts/smoke_network_none.py).
+      - run: python scripts/check.py --docker --scale
+
+  # A suíte inteira com a rede CORTADA: nada de download, chave ou serviço externo escondido nos testes.
+  offline-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.lock && pip install --no-deps -e .
+      # unshare sem root é bloqueado pelo AppArmor do Ubuntu 24.04; o script cai para `sudo unshare -n` e
+      # confere dentro do namespace que 1.1.1.1 e 8.8.8.8 estão inalcançáveis antes de rodar o pytest
+      - run: scripts/offline_tests.sh
+
+  # Store em Postgres (ADR 0003): os testes marcados `postgres` (store, HITL, retomada, privacidade, réplicas
+  # disputando o mesmo banco) contra um Postgres 16 de verdade. Sem TEST_DATABASE_URL essas variantes são puladas
+  # nos outros jobs; aqui elas não podem pular (o grep reprova "skipped" nas variantes postgres).
+  postgres:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        # postgres:16 fixado por digest (índice multi-arquitetura lido do Docker Hub em 02/11/2026)
+        image: postgres:16@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a
+        env:
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:ci-only-password@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.lock && pip install --no-deps -e .
+      - shell: bash  # explícito = -eo pipefail: o `tee` não esconde a falha do pytest
+        run: |
+          python -m pytest -q -n 4 -m postgres -rs | tee pg.log
+          ! grep -q "SKIPPED" pg.log
+      # 2 processos da API sobre o mesmo Postgres, sem arquivo compartilhado: continuidade, um caso, resposta na outra
+      # réplica, SLA uma vez, limite compartilhado e latência offline
+      - run: python scripts/pg_replicas_smoke.py
+
+  # Retrieval medido de verdade: instala o fastembed (extra hybrid), baixa os modelos da escolha gravada e refaz o
+  # comparativo. --verify reprova se a escolha ou o MRR dela divergirem de data/retriever.json (fonte do README).
+  # Sem data/retriever.json (kit antes do desafio) mede e passa. Modelos em cache entre execuções (GBs).
+  retrieval:
+    runs-on: ubuntu-24.04
+    env:
+      FASTEMBED_CACHE_PATH: /home/runner/.cache/fastembed
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: /home/runner/.cache/fastembed
+          key: fastembed-${{ hashFiles('data/retriever.json', 'requirements-hybrid.lock') }}
+      - run: pip install -r requirements-dev.lock -r requirements-hybrid.lock && pip install --no-deps -e .
+      - run: python scripts/fetch_models.py
+      - run: python -m evals.run_evals --choose-retriever --verify
+
+  # Cadeia de suprimento: SBOM da imagem (artefato do run) e trivy reprovando CRITICAL com correção disponível.
+  supply-chain:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: docker build -t app:ci .
+      - uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          image: app:ci
+          format: spdx-json
+          output-file: sbom.spdx.json
+          artifact-name: sbom.spdx.json
+          upload-release-assets: false
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.76.1
+          image-ref: app:ci
+          # só vulnerabilidade: o scanner de segredos do trivy acusou CRITICAL num docstring do SDK da Anthropic
+          # (`{*****}` em site-packages, CI de 01/11/2026). Segredo do repositório é do gitleaks (job `check`).
+          scanners: vuln
+          severity: CRITICAL
+          # sem correção publicada não há o que fazer no PR; o Dependabot troca o digest da base quando sair
+          ignore-unfixed: true
+          exit-code: "1"
+          trivyignores: .trivyignore
+      - run: docker compose -f docker-compose.yml -f docker-compose.hardened.yml config -q

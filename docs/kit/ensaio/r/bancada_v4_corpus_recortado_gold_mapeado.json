@@ -1,0 +1,3380 @@
+{
+  "recorded_at": "2026-11-02T11:29:03+00:00",
+  "gold": "retrieval_mapped.jsonl",
+  "k": 3,
+  "results": {
+    "bm25": {
+      "cases": 50,
+      "positives": 50,
+      "negatives": 16,
+      "recall@3": 0.553,
+      "mrr": 0.66,
+      "hit@3": 0.76,
+      "hit@3_ci": {
+        "k": 38,
+        "n": 50,
+        "lo": 62.6,
+        "hi": 85.7
+      },
+      "ndcg@3": 0.556,
+      "page": {
+        "recall@3": 0.747,
+        "mrr": 0.85,
+        "hit@3": 0.86,
+        "hit@3_ci": {
+          "k": 43,
+          "n": 50,
+          "lo": 73.8,
+          "hi": 93.0
+        }
+      },
+      "latency_ms": {
+        "p50": 2.0,
+        "p95": 2.2,
+        "mean": 1.9
+      },
+      "gate": {
+        "min_score": 9.48,
+        "min_cosine": null,
+        "pos_answered": 0.76,
+        "neg_refused": 0.938,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 38,
+          "n": 50,
+          "lo": 62.6,
+          "hi": 85.7
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 16,
+          "lo": 71.7,
+          "hi": 98.9
+        },
+        "positives": 50,
+        "negatives": 16,
+        "neg_refusal_min": 0.85
+      },
+      "gold_unresolved": [],
+      "dedupe_aliases": 31,
+      "retriever": "bm25",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "Quais as diferenças entre a maquininha Get Clássica e a Get Smart?",
+          "passages": 5,
+          "top3": [
+            "sup-get-smart-16",
+            "maq-todas-as-maquininhas-03",
+            "maq-todas-as-maquininhas-11"
+          ],
+          "latency_ms": 2.2,
+          "recall": 0.2,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.296,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do the Get Clássica and Get Smart card machines differ?",
+          "passages": 5,
+          "top3": [
+            "en-restaurants-07",
+            "sup-get-smart-08",
+            "maq-todas-as-maquininhas-03"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.6,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que a Get Smart faz de diferente de uma máquina de cartão comum?",
+          "passages": 3,
+          "top3": [
+            "en-restaurants-07",
+            "en-in-person-payments-04",
+            "sup-get-smart-02"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What makes the Get Smart different from a regular card machine?",
+          "passages": 3,
+          "top3": [
+            "en-restaurants-07",
+            "en-in-person-payments-04",
+            "sup-get-smart-08"
+          ],
+          "latency_ms": 2.2,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Para receber por Pix preciso ter conta em banco?",
+          "passages": 3,
+          "top3": [
+            "sup-get-conta-05",
+            "sup-duvidas-60",
+            "sup-duvidas-43"
+          ],
+          "latency_ms": 2.1,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 0.333,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "To get paid through Pix, is a bank account required?",
+          "passages": 3,
+          "top3": [
+            "sup-pix-mais-respostas-28",
+            "sup-pix-mais-respostas-29",
+            "sup-duvidas-62"
+          ],
+          "latency_ms": 2.1,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Como funciona o Pix na maquininha da Getnet?",
+          "passages": 3,
+          "top3": [
+            "prod-pix-na-maquininha-02",
+            "sup-pix-07",
+            "en-restaurants-07"
+          ],
+          "latency_ms": 2.2,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does Pix on the Getnet card machine work?",
+          "passages": 3,
+          "top3": [
+            "en-restaurants-07",
+            "sup-operacional-01",
+            "prod-home-02"
+          ],
+          "latency_ms": 2.3,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Quantas chaves Pix preciso cadastrar na Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-62",
+            "sup-duvidas-82",
+            "sup-pix-07"
+          ],
+          "latency_ms": 2.2,
+          "recall": 0.5,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.387,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How many Pix keys do I have to register with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-62",
+            "sup-duvidas-82",
+            "sup-pix-mais-respostas-02"
+          ],
+          "latency_ms": 2.3,
+          "recall": 0.5,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.387,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Existe tarifa para fazer Pix pela Get Conta?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-62",
+            "sup-get-conta-14",
+            "sup-get-conta-15"
+          ],
+          "latency_ms": 2.1,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Are there fees for Pix transfers using the Get Conta?",
+          "passages": 1,
+          "top3": [
+            "sup-get-conta-14",
+            "sup-get-conta-15",
+            "sup-pix-mais-respostas-19"
+          ],
+          "latency_ms": 2.0,
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a antecipação de vendas e como ela funciona?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-15",
+            "prod-antecipacao-03",
+            "en-large-enterprises-05"
+          ],
+          "latency_ms": 1.9,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is the sales advance and how does it work at Getnet?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "en-restaurants-11",
+            "prod-antecipacao-01"
+          ],
+          "latency_ms": 2.1,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por quais canais consigo antecipar minhas vendas?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "sup-app-getnet-07",
+            "sup-app-getnet-05"
+          ],
+          "latency_ms": 2.2,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Which channels can I use to anticipate my sales?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "en-value-added-solutions-02",
+            "en-online-payments-05"
+          ],
+          "latency_ms": 1.7,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Em até quantas vezes o cliente parcela no Crediário?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-37",
+            "prod-crediario-09",
+            "sup-duvidas-74"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "With the Crediário, up to how many installments can the shopper pay?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-37",
+            "prod-crediario-01",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Em quanto tempo recebo as vendas feitas no Crediário?",
+          "passages": 3,
+          "top3": [
+            "prod-crediario-05",
+            "sup-duvidas-28",
+            "sup-link-de-pagamento-12"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How long until I receive the money from Crediário sales?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-28",
+            "sup-crediario-04",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 2.1,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.48,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dá pra mandar o Link de Pagamento pelo WhatsApp?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-12",
+            "en-online-payments-02",
+            "prod-vender-pelo-whatsapp-12"
+          ],
+          "latency_ms": 2.1,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Is it possible to send the Payment Link over WhatsApp?",
+          "passages": 2,
+          "top3": [
+            "en-online-payments-02",
+            "prod-link-de-pagamento-02",
+            "sup-link-de-pagamento-12"
+          ],
+          "latency_ms": 2.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais formas de pagamento o Link de Pagamento aceita?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-09",
+            "en-online-payments-02",
+            "sup-link-de-pagamento-10"
+          ],
+          "latency_ms": 2.1,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Which payment methods does the Payment Link accept?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-09",
+            "prod-link-de-pagamento-04",
+            "prod-link-de-pagamento-05"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quanto custa o Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-12",
+            "sup-link-de-pagamento-08",
+            "en-online-payments-02"
+          ],
+          "latency_ms": 1.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How much does the Payment Link cost?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-08",
+            "sup-link-de-pagamento-12",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 1.7,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter um site para usar o Link de Pagamento?",
+          "passages": 1,
+          "top3": [
+            "sup-link-de-pagamento-07",
+            "sup-link-de-pagamento-09",
+            "sup-duvidas-54"
+          ],
+          "latency_ms": 2.1,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need an active website to use the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "sup-link-de-pagamento-07",
+            "sup-link-de-pagamento-05",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 1.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Get Tap e como ele funciona?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-duvidas-47",
+            "sup-get-tap-10"
+          ],
+          "latency_ms": 1.6,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is Get Tap and how does it work?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-get-tap-10",
+            "sup-duvidas-47"
+          ],
+          "latency_ms": 1.8,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os requisitos do celular para usar o Get Tap?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-get-tap-15",
+            "sup-duvidas-47"
+          ],
+          "latency_ms": 1.7,
+          "recall": 0.333,
+          "rr": 0.333,
+          "hit": true,
+          "ndcg": 0.19,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What phone requirements are there to use Get Tap?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-04",
+            "sup-duvidas-49",
+            "sup-get-tap-01"
+          ],
+          "latency_ms": 1.6,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso de internet para vender com o Get Tap?",
+          "passages": 1,
+          "top3": [
+            "sup-get-tap-12",
+            "sup-duvidas-47",
+            "sup-get-tap-02"
+          ],
+          "latency_ms": 1.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Does Get Tap need an internet connection to sell?",
+          "passages": 1,
+          "top3": [
+            "sup-get-tap-12",
+            "sup-get-tap-01",
+            "sup-duvidas-47"
+          ],
+          "latency_ms": 1.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é chargeback e quando ele acontece?",
+          "passages": 3,
+          "top3": [
+            "prod-chargeback-02",
+            "prod-chargeback-03",
+            "prod-antecipacao-02"
+          ],
+          "latency_ms": 1.7,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.333,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is a chargeback and when does it happen?",
+          "passages": 3,
+          "top3": [
+            "en-restaurants-10",
+            "en-travel-06",
+            "prod-antecipacao-02"
+          ],
+          "latency_ms": 1.8,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Como ligar ou desligar minha maquininha?",
+          "passages": 3,
+          "top3": [
+            "sup-operacional-01",
+            "sup-duvidas-68",
+            "sup-operacional-02"
+          ],
+          "latency_ms": 1.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do I turn my card machine on or off?",
+          "passages": 3,
+          "top3": [
+            "sup-operacional-01",
+            "sup-duvidas-68",
+            "sup-operacional-02"
+          ],
+          "latency_ms": 2.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como cancelar uma venda da Get Smart feita em outro dia?",
+          "passages": 2,
+          "top3": [
+            "sup-cancelamento-03",
+            "sup-get-conta-13",
+            "sup-pix-mais-respostas-21"
+          ],
+          "latency_ms": 2.0,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "How can I cancel a Get Smart sale made on a previous day?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-01",
+            "sup-cancelamento-03",
+            "sup-duvidas-28"
+          ],
+          "latency_ms": 2.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço a bateria da Get Smart durar mais?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-03",
+            "sup-duvidas-03",
+            "sup-pix-mais-respostas-26"
+          ],
+          "latency_ms": 1.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do I keep the Get Smart battery lasting longer?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-03",
+            "sup-duvidas-03",
+            "en-in-person-payments-02"
+          ],
+          "latency_ms": 1.7,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Conta e quais as vantagens?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-60",
+            "en-in-person-payments-04",
+            "en-in-person-payments-03"
+          ],
+          "latency_ms": 1.7,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is the Get Conta digital account and what are its benefits?",
+          "passages": 3,
+          "top3": [
+            "prod-conta-digital-02",
+            "en-large-enterprises-07",
+            "prod-conta-digital-01"
+          ],
+          "latency_ms": 2.1,
+          "recall": 0.333,
+          "rr": 0.333,
+          "hit": true,
+          "ndcg": 0.235,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais são as taxas da Loja Virtual?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-55",
+            "sup-duvidas-102",
+            "sup-taxas-13"
+          ],
+          "latency_ms": 1.8,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.48,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What are the online store (Loja Virtual) fees?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-55",
+            "sup-duvidas-102",
+            "sup-taxas-16"
+          ],
+          "latency_ms": 1.7,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.48,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como funciona o desconto no aluguel da maquininha?",
+          "passages": 3,
+          "top3": [
+            "prod-get-tap-08",
+            "sup-aluguel-04",
+            "sup-aluguel-03"
+          ],
+          "latency_ms": 1.7,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does the card machine rent discount work?",
+          "passages": 3,
+          "top3": [
+            "en-restaurants-07",
+            "sup-get-conta-04",
+            "prod-maquininha-de-cartao-05"
+          ],
+          "latency_ms": 1.8,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Quais soluções de pagamento online a Getnet oferece?",
+          "passages": 3,
+          "top3": [
+            "prod-home-13",
+            "prod-home-09",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 1.9,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "What online payment solutions does Getnet offer?",
+          "passages": 3,
+          "top3": [
+            "en-online-payments-01",
+            "en-online-payments-02",
+            "en-health-and-beauty-05"
+          ],
+          "latency_ms": 1.9,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        }
+      ],
+      "config": {
+        "retriever": "bm25"
+      }
+    },
+    "dense": {
+      "cases": 50,
+      "positives": 50,
+      "negatives": 16,
+      "recall@3": 0.673,
+      "mrr": 0.88,
+      "hit@3": 0.92,
+      "hit@3_ci": {
+        "k": 46,
+        "n": 50,
+        "lo": 81.2,
+        "hi": 96.8
+      },
+      "ndcg@3": 0.714,
+      "page": {
+        "recall@3": 0.86,
+        "mrr": 0.91,
+        "hit@3": 0.94,
+        "hit@3_ci": {
+          "k": 47,
+          "n": 50,
+          "lo": 83.8,
+          "hi": 97.9
+        }
+      },
+      "latency_ms": {
+        "p50": 124.2,
+        "p95": 144.0,
+        "mean": 124.3
+      },
+      "gate": {
+        "min_score": 6.884,
+        "min_cosine": 0.865,
+        "pos_answered": 0.92,
+        "neg_refused": 0.938,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 46,
+          "n": 50,
+          "lo": 81.2,
+          "hi": 96.8
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 16,
+          "lo": 71.7,
+          "hi": 98.9
+        },
+        "positives": 50,
+        "negatives": 16,
+        "neg_refusal_min": 0.85
+      },
+      "gold_unresolved": [],
+      "dedupe_aliases": 31,
+      "retriever": "dense",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "Quais as diferenças entre a maquininha Get Clássica e a Get Smart?",
+          "passages": 5,
+          "top3": [
+            "sup-get-smart-08",
+            "sup-get-smart-10",
+            "maq-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 113.7,
+          "recall": 0.4,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do the Get Clássica and Get Smart card machines differ?",
+          "passages": 5,
+          "top3": [
+            "sup-get-smart-10",
+            "sup-get-smart-08",
+            "maq-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 105.1,
+          "recall": 0.4,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que a Get Smart faz de diferente de uma máquina de cartão comum?",
+          "passages": 3,
+          "top3": [
+            "sup-get-smart-10",
+            "sup-get-smart-08",
+            "maq-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 140.0,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What makes the Get Smart different from a regular card machine?",
+          "passages": 3,
+          "top3": [
+            "sup-get-smart-10",
+            "sup-get-smart-08",
+            "maq-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 117.1,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Para receber por Pix preciso ter conta em banco?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-60",
+            "sup-pix-mais-respostas-09",
+            "sup-pix-mais-respostas-29"
+          ],
+          "latency_ms": 100.2,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "To get paid through Pix, is a bank account required?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-60",
+            "sup-pix-mais-respostas-09",
+            "sup-pix-mais-respostas-18"
+          ],
+          "latency_ms": 129.8,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Como funciona o Pix na maquininha da Getnet?",
+          "passages": 3,
+          "top3": [
+            "prod-pix-na-maquininha-03",
+            "prod-pix-na-maquininha-06",
+            "sup-duvidas-85"
+          ],
+          "latency_ms": 144.0,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does Pix on the Getnet card machine work?",
+          "passages": 3,
+          "top3": [
+            "prod-pix-na-maquininha-03",
+            "prod-pix-na-maquininha-02",
+            "sup-duvidas-85"
+          ],
+          "latency_ms": 125.3,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quantas chaves Pix preciso cadastrar na Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-duvidas-62",
+            "sup-pix-mais-respostas-10"
+          ],
+          "latency_ms": 111.2,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How many Pix keys do I have to register with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-duvidas-62",
+            "sup-pix-mais-respostas-10"
+          ],
+          "latency_ms": 120.7,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Existe tarifa para fazer Pix pela Get Conta?",
+          "passages": 1,
+          "top3": [
+            "sup-pix-mais-respostas-19",
+            "sup-duvidas-43",
+            "sup-pix-mais-respostas-18"
+          ],
+          "latency_ms": 104.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Are there fees for Pix transfers using the Get Conta?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-60",
+            "sup-pix-mais-respostas-19",
+            "sup-pix-mais-respostas-09"
+          ],
+          "latency_ms": 117.2,
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a antecipação de vendas e como ela funciona?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-14",
+            "sup-antecipacao-de-vendas-05",
+            "sup-duvidas-117"
+          ],
+          "latency_ms": 121.4,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is the sales advance and how does it work at Getnet?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-05",
+            "sup-antecipacao-de-vendas-15",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 115.0,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.531,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por quais canais consigo antecipar minhas vendas?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "sup-duvidas-14",
+            "sup-antecipacao-de-vendas-12"
+          ],
+          "latency_ms": 118.6,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Which channels can I use to anticipate my sales?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "sup-antecipacao-de-vendas-12",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 110.5,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Em até quantas vezes o cliente parcela no Crediário?",
+          "passages": 3,
+          "top3": [
+            "prod-crediario-09",
+            "sup-duvidas-37",
+            "prod-crediario-01"
+          ],
+          "latency_ms": 113.1,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "With the Crediário, up to how many installments can the shopper pay?",
+          "passages": 3,
+          "top3": [
+            "prod-crediario-09",
+            "prod-crediario-01",
+            "sup-duvidas-79"
+          ],
+          "latency_ms": 125.2,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Em quanto tempo recebo as vendas feitas no Crediário?",
+          "passages": 3,
+          "top3": [
+            "sup-crediario-04",
+            "sup-duvidas-40",
+            "sup-duvidas-56"
+          ],
+          "latency_ms": 128.4,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How long until I receive the money from Crediário sales?",
+          "passages": 3,
+          "top3": [
+            "sup-crediario-04",
+            "sup-duvidas-40",
+            "sup-duvidas-39"
+          ],
+          "latency_ms": 137.4,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dá pra mandar o Link de Pagamento pelo WhatsApp?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-12",
+            "sup-link-de-pagamento-07",
+            "en-online-payments-02"
+          ],
+          "latency_ms": 118.2,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Is it possible to send the Payment Link over WhatsApp?",
+          "passages": 2,
+          "top3": [
+            "en-online-payments-02",
+            "sup-link-de-pagamento-12",
+            "sup-link-de-pagamento-08"
+          ],
+          "latency_ms": 106.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais formas de pagamento o Link de Pagamento aceita?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-10",
+            "sup-link-de-pagamento-12",
+            "prod-link-de-pagamento-05"
+          ],
+          "latency_ms": 114.4,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Which payment methods does the Payment Link accept?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-10",
+            "sup-link-de-pagamento-09",
+            "en-online-payments-02"
+          ],
+          "latency_ms": 120.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quanto custa o Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-12",
+            "sup-link-de-pagamento-08",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 114.2,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How much does the Payment Link cost?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-08",
+            "sup-link-de-pagamento-12",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 124.2,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter um site para usar o Link de Pagamento?",
+          "passages": 1,
+          "top3": [
+            "sup-link-de-pagamento-07",
+            "sup-link-de-pagamento-12",
+            "prod-link-de-pagamento-07"
+          ],
+          "latency_ms": 124.4,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need an active website to use the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "sup-link-de-pagamento-07",
+            "sup-link-de-pagamento-12",
+            "sup-duvidas-54"
+          ],
+          "latency_ms": 116.6,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Get Tap e como ele funciona?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-duvidas-46",
+            "sup-get-tap-10"
+          ],
+          "latency_ms": 114.0,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is Get Tap and how does it work?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-get-tap-10",
+            "sup-duvidas-46"
+          ],
+          "latency_ms": 121.3,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os requisitos do celular para usar o Get Tap?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-04",
+            "sup-get-tap-11",
+            "sup-duvidas-47"
+          ],
+          "latency_ms": 129.6,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.95,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What phone requirements are there to use Get Tap?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-04",
+            "sup-get-tap-12",
+            "sup-duvidas-49"
+          ],
+          "latency_ms": 147.3,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso de internet para vender com o Get Tap?",
+          "passages": 1,
+          "top3": [
+            "sup-get-tap-12",
+            "prod-get-tap-09",
+            "sup-get-tap-02"
+          ],
+          "latency_ms": 130.5,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Does Get Tap need an internet connection to sell?",
+          "passages": 1,
+          "top3": [
+            "sup-get-tap-12",
+            "prod-get-tap-09",
+            "sup-get-tap-02"
+          ],
+          "latency_ms": 135.1,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é chargeback e quando ele acontece?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-69",
+            "sup-operacional-02",
+            "prod-chargeback-01"
+          ],
+          "latency_ms": 128.5,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is a chargeback and when does it happen?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-69",
+            "sup-operacional-02",
+            "prod-chargeback-02"
+          ],
+          "latency_ms": 137.7,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como ligar ou desligar minha maquininha?",
+          "passages": 3,
+          "top3": [
+            "sup-operacional-01",
+            "sup-duvidas-68",
+            "sup-operacional-02"
+          ],
+          "latency_ms": 126.6,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do I turn my card machine on or off?",
+          "passages": 3,
+          "top3": [
+            "sup-operacional-01",
+            "sup-duvidas-68",
+            "sup-duvidas-97"
+          ],
+          "latency_ms": 128.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como cancelar uma venda da Get Smart feita em outro dia?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-01",
+            "sup-duvidas-03",
+            "sup-get-smart-02"
+          ],
+          "latency_ms": 120.6,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How can I cancel a Get Smart sale made on a previous day?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-01",
+            "sup-duvidas-03",
+            "sup-get-smart-02"
+          ],
+          "latency_ms": 148.4,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço a bateria da Get Smart durar mais?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-03",
+            "sup-duvidas-03",
+            "sup-get-smart-04"
+          ],
+          "latency_ms": 139.6,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do I keep the Get Smart battery lasting longer?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-03",
+            "sup-duvidas-03",
+            "sup-get-smart-10"
+          ],
+          "latency_ms": 102.5,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Conta e quais as vantagens?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-43",
+            "prod-conta-digital-02",
+            "sup-get-conta-04"
+          ],
+          "latency_ms": 114.5,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is the Get Conta digital account and what are its benefits?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-43",
+            "prod-conta-digital-02",
+            "sup-get-conta-04"
+          ],
+          "latency_ms": 132.8,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais são as taxas da Loja Virtual?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-taxas-16",
+            "sup-taxas-18"
+          ],
+          "latency_ms": 142.1,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What are the online store (Loja Virtual) fees?",
+          "passages": 3,
+          "top3": [
+            "sup-taxas-16",
+            "sup-duvidas-102",
+            "sup-taxas-13"
+          ],
+          "latency_ms": 136.9,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.48,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como funciona o desconto no aluguel da maquininha?",
+          "passages": 3,
+          "top3": [
+            "prod-get-tap-08",
+            "sup-aluguel-07",
+            "sup-aluguel-06"
+          ],
+          "latency_ms": 138.4,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does the card machine rent discount work?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-97",
+            "sup-aluguel-07",
+            "prod-get-tap-08"
+          ],
+          "latency_ms": 132.8,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.531,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Quais soluções de pagamento online a Getnet oferece?",
+          "passages": 3,
+          "top3": [
+            "prod-home-05",
+            "prod-home-06",
+            "prod-link-de-pagamento-01"
+          ],
+          "latency_ms": 132.2,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "What online payment solutions does Getnet offer?",
+          "passages": 3,
+          "top3": [
+            "en-about-us-02",
+            "en-online-payments-06",
+            "en-about-us-01"
+          ],
+          "latency_ms": 138.7,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        }
+      ],
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large"
+      }
+    },
+    "dense+cross": {
+      "cases": 50,
+      "positives": 50,
+      "negatives": 16,
+      "recall@3": 0.727,
+      "mrr": 0.907,
+      "hit@3": 0.96,
+      "hit@3_ci": {
+        "k": 48,
+        "n": 50,
+        "lo": 86.5,
+        "hi": 98.9
+      },
+      "ndcg@3": 0.76,
+      "page": {
+        "recall@3": 0.89,
+        "mrr": 0.947,
+        "hit@3": 0.96,
+        "hit@3_ci": {
+          "k": 48,
+          "n": 50,
+          "lo": 86.5,
+          "hi": 98.9
+        }
+      },
+      "latency_ms": {
+        "p50": 620.7,
+        "p95": 1003.0,
+        "mean": 659.6
+      },
+      "gate": {
+        "min_score": 6.884,
+        "min_cosine": 0.865,
+        "pos_answered": 0.94,
+        "neg_refused": 0.938,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 47,
+          "n": 50,
+          "lo": 83.8,
+          "hi": 97.9
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 16,
+          "lo": 71.7,
+          "hi": 98.9
+        },
+        "positives": 50,
+        "negatives": 16,
+        "neg_refusal_min": 0.85
+      },
+      "gold_unresolved": [],
+      "dedupe_aliases": 31,
+      "retriever": "dense+cross",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "Quais as diferenças entre a maquininha Get Clássica e a Get Smart?",
+          "passages": 5,
+          "top3": [
+            "sup-get-smart-08",
+            "sup-get-smart-10",
+            "maq-todas-as-maquininhas-03"
+          ],
+          "latency_ms": 1222.4,
+          "recall": 0.6,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do the Get Clássica and Get Smart card machines differ?",
+          "passages": 5,
+          "top3": [
+            "sup-get-smart-08",
+            "sup-get-smart-10",
+            "maq-todas-as-maquininhas-03"
+          ],
+          "latency_ms": 876.2,
+          "recall": 0.6,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que a Get Smart faz de diferente de uma máquina de cartão comum?",
+          "passages": 3,
+          "top3": [
+            "sup-get-smart-10",
+            "sup-get-smart-08",
+            "maq-todas-as-maquininhas-03"
+          ],
+          "latency_ms": 1018.4,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What makes the Get Smart different from a regular card machine?",
+          "passages": 3,
+          "top3": [
+            "sup-get-smart-08",
+            "sup-get-smart-10",
+            "maq-todas-as-maquininhas-03"
+          ],
+          "latency_ms": 838.1,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Para receber por Pix preciso ter conta em banco?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-60",
+            "sup-pix-mais-respostas-29",
+            "prod-pix-na-maquininha-03"
+          ],
+          "latency_ms": 705.2,
+          "recall": 0.333,
+          "rr": 0.333,
+          "hit": true,
+          "ndcg": 0.235,
+          "page_recall": 0.333,
+          "page_rr": 0.333,
+          "page_hit": true
+        },
+        {
+          "question": "To get paid through Pix, is a bank account required?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-60",
+            "sup-duvidas-63",
+            "sup-pix-mais-respostas-09"
+          ],
+          "latency_ms": 641.3,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Como funciona o Pix na maquininha da Getnet?",
+          "passages": 3,
+          "top3": [
+            "prod-pix-na-maquininha-03",
+            "sup-duvidas-85",
+            "sup-pix-mais-respostas-18"
+          ],
+          "latency_ms": 997.7,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does Pix on the Getnet card machine work?",
+          "passages": 3,
+          "top3": [
+            "prod-pix-na-maquininha-03",
+            "prod-pix-na-maquininha-02",
+            "sup-duvidas-85"
+          ],
+          "latency_ms": 1003.0,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quantas chaves Pix preciso cadastrar na Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-pix-mais-respostas-09",
+            "sup-duvidas-62"
+          ],
+          "latency_ms": 914.2,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How many Pix keys do I have to register with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-pix-mais-respostas-09",
+            "sup-duvidas-62"
+          ],
+          "latency_ms": 756.0,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Existe tarifa para fazer Pix pela Get Conta?",
+          "passages": 1,
+          "top3": [
+            "sup-pix-mais-respostas-19",
+            "sup-pix-mais-respostas-18",
+            "sup-duvidas-43"
+          ],
+          "latency_ms": 620.7,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Are there fees for Pix transfers using the Get Conta?",
+          "passages": 1,
+          "top3": [
+            "sup-pix-mais-respostas-19",
+            "sup-duvidas-63",
+            "sup-pix-mais-respostas-09"
+          ],
+          "latency_ms": 611.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a antecipação de vendas e como ela funciona?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-14",
+            "sup-antecipacao-de-vendas-08",
+            "sup-antecipacao-de-vendas-05"
+          ],
+          "latency_ms": 608.7,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is the sales advance and how does it work at Getnet?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-14",
+            "sup-antecipacao-de-vendas-15",
+            "sup-antecipacao-de-vendas-05"
+          ],
+          "latency_ms": 557.9,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por quais canais consigo antecipar minhas vendas?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "sup-duvidas-14",
+            "sup-app-getnet-05"
+          ],
+          "latency_ms": 648.3,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Which channels can I use to anticipate my sales?",
+          "passages": 3,
+          "top3": [
+            "sup-antecipacao-de-vendas-14",
+            "sup-duvidas-17",
+            "sup-app-getnet-05"
+          ],
+          "latency_ms": 491.6,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Em até quantas vezes o cliente parcela no Crediário?",
+          "passages": 3,
+          "top3": [
+            "prod-crediario-01",
+            "prod-crediario-09",
+            "sup-duvidas-78"
+          ],
+          "latency_ms": 587.7,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.48,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "With the Crediário, up to how many installments can the shopper pay?",
+          "passages": 3,
+          "top3": [
+            "prod-crediario-01",
+            "prod-crediario-09",
+            "sup-duvidas-79"
+          ],
+          "latency_ms": 605.3,
+          "recall": 0.667,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.48,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Em quanto tempo recebo as vendas feitas no Crediário?",
+          "passages": 3,
+          "top3": [
+            "sup-crediario-04",
+            "sup-duvidas-40",
+            "prod-crediario-03"
+          ],
+          "latency_ms": 509.5,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.95,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How long until I receive the money from Crediário sales?",
+          "passages": 3,
+          "top3": [
+            "sup-crediario-04",
+            "prod-crediario-03",
+            "sup-duvidas-40"
+          ],
+          "latency_ms": 702.5,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dá pra mandar o Link de Pagamento pelo WhatsApp?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-12",
+            "en-online-payments-02",
+            "sup-link-de-pagamento-07"
+          ],
+          "latency_ms": 589.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Is it possible to send the Payment Link over WhatsApp?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-12",
+            "en-online-payments-02",
+            "prod-link-de-pagamento-02"
+          ],
+          "latency_ms": 626.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais formas de pagamento o Link de Pagamento aceita?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-10",
+            "sup-link-de-pagamento-12",
+            "prod-link-de-pagamento-05"
+          ],
+          "latency_ms": 720.3,
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Which payment methods does the Payment Link accept?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-10",
+            "sup-link-de-pagamento-09",
+            "en-online-payments-02"
+          ],
+          "latency_ms": 472.2,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quanto custa o Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-08",
+            "prod-link-de-pagamento-04",
+            "sup-link-de-pagamento-12"
+          ],
+          "latency_ms": 601.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How much does the Payment Link cost?",
+          "passages": 2,
+          "top3": [
+            "sup-link-de-pagamento-08",
+            "prod-link-de-pagamento-04",
+            "sup-link-de-pagamento-12"
+          ],
+          "latency_ms": 586.9,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter um site para usar o Link de Pagamento?",
+          "passages": 1,
+          "top3": [
+            "sup-link-de-pagamento-07",
+            "sup-duvidas-54",
+            "sup-link-de-pagamento-12"
+          ],
+          "latency_ms": 705.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need an active website to use the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "sup-link-de-pagamento-07",
+            "sup-duvidas-54",
+            "prod-link-de-pagamento-07"
+          ],
+          "latency_ms": 579.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Get Tap e como ele funciona?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-duvidas-46",
+            "sup-duvidas-47"
+          ],
+          "latency_ms": 721.9,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is Get Tap and how does it work?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-01",
+            "sup-duvidas-46",
+            "sup-duvidas-49"
+          ],
+          "latency_ms": 440.5,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os requisitos do celular para usar o Get Tap?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-04",
+            "sup-duvidas-47",
+            "sup-get-tap-11"
+          ],
+          "latency_ms": 655.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What phone requirements are there to use Get Tap?",
+          "passages": 3,
+          "top3": [
+            "sup-get-tap-04",
+            "sup-duvidas-47",
+            "sup-duvidas-49"
+          ],
+          "latency_ms": 697.3,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso de internet para vender com o Get Tap?",
+          "passages": 1,
+          "top3": [
+            "sup-get-tap-02",
+            "sup-get-tap-12",
+            "sup-duvidas-46"
+          ],
+          "latency_ms": 635.7,
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Does Get Tap need an internet connection to sell?",
+          "passages": 1,
+          "top3": [
+            "sup-get-tap-12",
+            "sup-get-tap-02",
+            "sup-duvidas-46"
+          ],
+          "latency_ms": 633.3,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é chargeback e quando ele acontece?",
+          "passages": 3,
+          "top3": [
+            "prod-chargeback-02",
+            "sup-operacional-02",
+            "sup-duvidas-69"
+          ],
+          "latency_ms": 459.8,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is a chargeback and when does it happen?",
+          "passages": 3,
+          "top3": [
+            "prod-chargeback-02",
+            "sup-duvidas-69",
+            "sup-operacional-02"
+          ],
+          "latency_ms": 454.3,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.765,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como ligar ou desligar minha maquininha?",
+          "passages": 3,
+          "top3": [
+            "sup-operacional-01",
+            "sup-duvidas-06",
+            "sup-duvidas-68"
+          ],
+          "latency_ms": 550.4,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.95,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do I turn my card machine on or off?",
+          "passages": 3,
+          "top3": [
+            "sup-operacional-01",
+            "sup-operacional-02",
+            "maq-todas-as-maquininhas-07"
+          ],
+          "latency_ms": 535.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como cancelar uma venda da Get Smart feita em outro dia?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-01",
+            "sup-duvidas-01",
+            "sup-get-smart-02"
+          ],
+          "latency_ms": 477.8,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How can I cancel a Get Smart sale made on a previous day?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-01",
+            "sup-duvidas-01",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 581.3,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço a bateria da Get Smart durar mais?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-03",
+            "sup-duvidas-03",
+            "sup-get-smart-04"
+          ],
+          "latency_ms": 765.1,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How do I keep the Get Smart battery lasting longer?",
+          "passages": 2,
+          "top3": [
+            "sup-get-smart-03",
+            "sup-duvidas-03",
+            "sup-get-smart-10"
+          ],
+          "latency_ms": 506.0,
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Conta e quais as vantagens?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-43",
+            "prod-conta-digital-02",
+            "sup-get-conta-04"
+          ],
+          "latency_ms": 632.8,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What is the Get Conta digital account and what are its benefits?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-43",
+            "prod-conta-digital-02",
+            "prod-conta-digital-01"
+          ],
+          "latency_ms": 628.5,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.704,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais são as taxas da Loja Virtual?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-taxas-16",
+            "sup-taxas-18"
+          ],
+          "latency_ms": 579.7,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "What are the online store (Loja Virtual) fees?",
+          "passages": 3,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-taxas-16",
+            "sup-duvidas-55"
+          ],
+          "latency_ms": 584.4,
+          "recall": 0.667,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.76,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como funciona o desconto no aluguel da maquininha?",
+          "passages": 3,
+          "top3": [
+            "prod-get-tap-08",
+            "prod-get-tap-07",
+            "sup-aluguel-06"
+          ],
+          "latency_ms": 770.5,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does the card machine rent discount work?",
+          "passages": 3,
+          "top3": [
+            "prod-get-tap-08",
+            "sup-cancelamento-01",
+            "sup-aluguel-06"
+          ],
+          "latency_ms": 818.1,
+          "recall": 0.333,
+          "rr": 1.0,
+          "hit": true,
+          "ndcg": 0.469,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais soluções de pagamento online a Getnet oferece?",
+          "passages": 3,
+          "top3": [
+            "prod-home-05",
+            "prod-home-06",
+            "prod-link-de-pagamento-01"
+          ],
+          "latency_ms": 552.8,
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "What online payment solutions does Getnet offer?",
+          "passages": 3,
+          "top3": [
+            "en-online-payments-06",
+            "en-online-payments-01",
+            "en-about-us-01"
+          ],
+          "latency_ms": 501.2,
+          "recall": 0.333,
+          "rr": 0.5,
+          "hit": true,
+          "ndcg": 0.296,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        }
+      ],
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large",
+        "rerank": "cross",
+        "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+        "rerank_pool": 5
+      }
+    }
+  },
+  "diff_vs_baseline": {
+    "dense": {
+      "improved": [
+        {
+          "question": "Quais as diferenças entre a maquininha Get Clássica e a Get Smart?",
+          "recall": [
+            0.2,
+            0.4
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "O que a Get Smart faz de diferente de uma máquina de cartão comum?",
+          "recall": [
+            0.333,
+            0.667
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Como funciona o Pix na maquininha da Getnet?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How does Pix on the Getnet card machine work?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quantas chaves Pix preciso cadastrar na Getnet?",
+          "recall": [
+            0.5,
+            0.5
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "How many Pix keys do I have to register with Getnet?",
+          "recall": [
+            0.5,
+            0.5
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Existe tarifa para fazer Pix pela Get Conta?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Are there fees for Pix transfers using the Get Conta?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            0.5
+          ]
+        },
+        {
+          "question": "O que é a antecipação de vendas e como ela funciona?",
+          "recall": [
+            0.0,
+            0.333
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What is the sales advance and how does it work at Getnet?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Em quanto tempo recebo as vendas feitas no Crediário?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How long until I receive the money from Crediário sales?",
+          "recall": [
+            0.667,
+            0.667
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Which payment methods does the Payment Link accept?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais os requisitos do celular para usar o Get Tap?",
+          "recall": [
+            0.333,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "What is a chargeback and when does it happen?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Como cancelar uma venda da Get Smart feita em outro dia?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é a Get Conta e quais as vantagens?",
+          "recall": [
+            0.0,
+            0.333
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What is the Get Conta digital account and what are its benefits?",
+          "recall": [
+            0.333,
+            0.333
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais são as taxas da Loja Virtual?",
+          "recall": [
+            0.667,
+            0.667
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "How does the card machine rent discount work?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        }
+      ],
+      "regressed": [
+        {
+          "question": "How do the Get Clássica and Get Smart card machines differ?",
+          "recall": [
+            0.6,
+            0.4
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Para receber por Pix preciso ter conta em banco?",
+          "recall": [
+            0.333,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Por quais canais consigo antecipar minhas vendas?",
+          "recall": [
+            0.667,
+            0.333
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais formas de pagamento o Link de Pagamento aceita?",
+          "recall": [
+            1.0,
+            0.5
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é chargeback e quando ele acontece?",
+          "recall": [
+            0.667,
+            0.333
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What online payment solutions does Getnet offer?",
+          "recall": [
+            0.667,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        }
+      ],
+      "same": 24
+    },
+    "dense+cross": {
+      "improved": [
+        {
+          "question": "Quais as diferenças entre a maquininha Get Clássica e a Get Smart?",
+          "recall": [
+            0.2,
+            0.6
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "O que a Get Smart faz de diferente de uma máquina de cartão comum?",
+          "recall": [
+            0.333,
+            0.667
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Como funciona o Pix na maquininha da Getnet?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How does Pix on the Getnet card machine work?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quantas chaves Pix preciso cadastrar na Getnet?",
+          "recall": [
+            0.5,
+            0.5
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "How many Pix keys do I have to register with Getnet?",
+          "recall": [
+            0.5,
+            0.5
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Existe tarifa para fazer Pix pela Get Conta?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Are there fees for Pix transfers using the Get Conta?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é a antecipação de vendas e como ela funciona?",
+          "recall": [
+            0.0,
+            0.333
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What is the sales advance and how does it work at Getnet?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Which channels can I use to anticipate my sales?",
+          "recall": [
+            0.333,
+            0.667
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Em quanto tempo recebo as vendas feitas no Crediário?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How long until I receive the money from Crediário sales?",
+          "recall": [
+            0.667,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Which payment methods does the Payment Link accept?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais os requisitos do celular para usar o Get Tap?",
+          "recall": [
+            0.333,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "What phone requirements are there to use Get Tap?",
+          "recall": [
+            0.667,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What is a chargeback and when does it happen?",
+          "recall": [
+            0.0,
+            0.667
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Como cancelar uma venda da Get Smart feita em outro dia?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é a Get Conta e quais as vantagens?",
+          "recall": [
+            0.0,
+            0.333
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What is the Get Conta digital account and what are its benefits?",
+          "recall": [
+            0.333,
+            0.667
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais são as taxas da Loja Virtual?",
+          "recall": [
+            0.667,
+            0.667
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "What are the online store (Loja Virtual) fees?",
+          "recall": [
+            0.667,
+            0.667
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "How does the card machine rent discount work?",
+          "recall": [
+            0.0,
+            0.333
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        }
+      ],
+      "regressed": [
+        {
+          "question": "Para receber por Pix preciso ter conta em banco?",
+          "recall": [
+            0.333,
+            0.333
+          ],
+          "rr": [
+            1.0,
+            0.333
+          ]
+        },
+        {
+          "question": "Em até quantas vezes o cliente parcela no Crediário?",
+          "recall": [
+            0.667,
+            0.667
+          ],
+          "rr": [
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "question": "With the Crediário, up to how many installments can the shopper pay?",
+          "recall": [
+            0.667,
+            0.667
+          ],
+          "rr": [
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Quais formas de pagamento o Link de Pagamento aceita?",
+          "recall": [
+            1.0,
+            0.5
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Preciso de internet para vender com o Get Tap?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Como funciona o desconto no aluguel da maquininha?",
+          "recall": [
+            0.667,
+            0.333
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "What online payment solutions does Getnet offer?",
+          "recall": [
+            0.667,
+            0.333
+          ],
+          "rr": [
+            1.0,
+            0.5
+          ]
+        }
+      ],
+      "same": 20
+    }
+  }
+}

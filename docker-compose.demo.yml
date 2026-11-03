@@ -1,0 +1,10 @@
+# Modo demo: aceita o payload LITERAL do enunciado, {"message": "...", "user_id": "..."}, sem Bearer token.
+#   docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d --build
+#   curl -s localhost:8000/chat -H 'content-type: application/json' -d '{"message":"Qual o prazo?","user_id":"u1"}'
+# A resposta sai com identity_verified=false e o limite de uso conta por IP (trocar o user_id não zera o limite).
+# Bearer válido continua vencendo; Bearer inválido continua 401. Só para demonstração: o compose padrão segue
+# AUTH_MODE=required. Decisão e riscos: docs/adr/0001-auth-mode-demo.md.
+services:
+  api:
+    environment:
+      AUTH_MODE: demo

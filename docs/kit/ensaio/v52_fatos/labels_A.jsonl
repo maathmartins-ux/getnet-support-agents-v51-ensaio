@@ -1,0 +1,50 @@
+{"qid": "q000", "essential": [["c1", "c8", "c11", "c14"], ["c16", "c6", "c5"]], "note": "Monthly fees Classica 79.90 vs Smart 129.90; Smart is smart terminal with management"}
+{"qid": "q001", "essential": [["c0", "c6", "c7", "c12"], ["c5", "c10", "c13"]], "note": "Monthly fees Classica 79.90 vs Smart 129.90; Smart is smart terminal with management"}
+{"qid": "q002", "essential": [["c6", "c13", "c8"]], "note": "Get Smart: integrated management (stock, orders, invoices) on terminal, replaces PC/printer"}
+{"qid": "q003", "essential": [["c1", "c4", "c6", "c7"]], "note": "Get Smart: Android smart terminal with integrated management, stock, orders, invoices"}
+{"qid": "q004", "essential": [["c6", "c16"]], "note": "Pix needs bank domicile (Santander) and active Pix key"}
+{"qid": "q005", "essential": [["c14", "c6"]], "note": "Pix needs bank domicile (Santander) and active Pix key"}
+{"qid": "q006", "essential": [["c14", "c7", "c9"]], "note": "Customer scans QR code generated on machine, pays via bank app, instant credit"}
+{"qid": "q007", "essential": [["c6", "c11", "c0"]], "note": "Customer scans QR code generated on machine, pays via bank app, instant credit"}
+{"qid": "q008", "essential": [["c9"]], "note": "Only one Pix key, linked to receiving account, must be informed"}
+{"qid": "q009", "essential": [["c18"]], "note": "Only one Pix key, linked to receiving account, must be informed"}
+{"qid": "q010", "essential": [["c15"]], "note": "No fees; Pix via Get Conta is totally free"}
+{"qid": "q011", "essential": [["c15"]], "note": "No fees; Pix via Get Conta is totally free"}
+{"qid": "q012", "essential": [["c16"]], "note": "Receive credit sales early without waiting compensation deadline"}
+{"qid": "q013", "essential": [["c2"]], "note": "Receive credit sales early without waiting compensation deadline"}
+{"qid": "q014", "essential": [["c8"], ["c4"], ["c15", "c18", "c11"]], "note": "Santander holders: branch/internet banking/empresarial; others: Central/POS; Getnet app"}
+{"qid": "q015", "essential": [["c13"], ["c9"], ["c15", "c4"]], "note": "Santander holders: branch/internet banking/empresarial; others: Central/POS; Getnet app"}
+{"qid": "q016", "essential": [["c0", "c6"], ["c16"]], "note": "Crediario up to 48x; each card issuer sets installment limit"}
+{"qid": "q017", "essential": [["c6", "c9"], ["c13"]], "note": "Crediario up to 48x; each card issuer sets installment limit"}
+{"qid": "q018", "essential": [["c3", "c12"]], "note": "Crediario paid in up to 2 business days, lump sum, regardless of installments"}
+{"qid": "q019", "essential": [["c4", "c9"]], "note": "Crediario paid in up to 2 business days, lump sum, regardless of installments"}
+{"qid": "q020", "essential": [["c8", "c14", "c13"]], "note": "Payment link can be sent via WhatsApp, social media, email, SMS"}
+{"qid": "q021", "essential": [["c2", "c4", "c5"]], "note": "Payment link can be sent via WhatsApp, social media, email, SMS"}
+{"qid": "q022", "essential": [["c10", "c5", "c16", "c15"]], "note": "Link accepts credit, debit, Pix, QR Code (also wallet, boleto)"}
+{"qid": "q023", "essential": [["c2", "c5", "c10"]], "note": "Link accepts credit, debit, Pix, QR Code (also wallet, boleto)"}
+{"qid": "q024", "essential": [["c11", "c13"], ["c11"], ["c2"]], "note": "Basic R$28/mo 60 tx; Advanced R$60/mo 150 tx; Inicial R$1 per paid link"}
+{"qid": "q025", "essential": [["c13", "c7"], ["c13"], ["c2"]], "note": "Basic R$28/mo 60 tx; Advanced R$60/mo 150 tx; Inicial R$1 per paid link"}
+{"qid": "q026", "essential": [["c1"]], "note": "No site needed; enter minhaconta.getnet.com.br as url"}
+{"qid": "q027", "essential": [["c3"]], "note": "No site needed; enter minhaconta.getnet.com.br as url"}
+{"qid": "q028", "essential": [["c7", "c8"], ["c2"]], "note": "Get Tap turns phone into NFC reader in Getnet app; request on site, enable in app"}
+{"qid": "q029", "essential": [["c9", "c11"], ["c12"]], "note": "Get Tap turns phone into NFC reader in Getnet app; request on site, enable in app"}
+{"qid": "q030", "essential": [["c4", "c8", "c18", "c17"]], "note": "Android 12 or higher plus NFC"}
+{"qid": "q031", "essential": [["c0"]], "note": "Android 12 or higher plus NFC"}
+{"qid": "q032", "essential": [["c9"]], "note": "Yes, Get Tap requires internet connection"}
+{"qid": "q033", "essential": [["c3"]], "note": "Yes, Get Tap requires internet connection"}
+{"qid": "q034", "essential": [["c11", "c13", "c15", "c16"], ["c7", "c12", "c15", "c1"]], "note": "Chargeback = card purchase cancelled via bank dispute, debited; occurs for fraud, goods issues"}
+{"qid": "q035", "essential": [["c13", "c17", "c12"], ["c14", "c1", "c10"]], "note": "Chargeback = card purchase cancelled via bank dispute, debited; occurs for fraud, goods issues"}
+{"qid": "q036", "essential": [["c18", "c6"]], "note": "Power on/off instructions depend on model (green key, plug, etc.)"}
+{"qid": "q037", "essential": [["c5", "c10"]], "note": "Power on/off instructions depend on model (green key, plug, etc.)"}
+{"qid": "q038", "essential": [["c13"]], "note": "Only by calling central de atendimento 4003-4000"}
+{"qid": "q039", "essential": [["c0"]], "note": "Only by calling central de atendimento 4003-4000"}
+{"qid": "q040", "essential": [["c13"]], "note": "Charge at least 3 hours, recharge at around 20%, avoid full discharge"}
+{"qid": "q041", "essential": [["c0"]], "note": "Charge at least 3 hours, recharge at around 20%, avoid full discharge"}
+{"qid": "q042", "essential": [["c10", "c12"]], "note": "Free digital business account (Dock IP) with free card, Pix, transfers, payments, withdrawals"}
+{"qid": "q043", "essential": [["c8", "c3"]], "note": "Free digital business account (Dock IP) with free card, Pix, transfers, payments, withdrawals"}
+{"qid": "q044", "essential": [["c7", "c14", "c2"]], "note": "Loja Virtual single plan: credit 2.80% to 3.15% by installments plus antifraud fee per tx"}
+{"qid": "q045", "essential": [["c15", "c13", "c16"]], "note": "Loja Virtual single plan: credit 2.80% to 3.15% by installments plus antifraud fee per tx"}
+{"qid": "q046", "essential": [["c0", "c11"], ["c3"], ["c10", "c7"]], "note": "Discount scales with monthly revenue; cycle 21-20, one machine; miss month loses discount only"}
+{"qid": "q047", "essential": [["c1", "c11", "c3"], ["c10"], ["c17"]], "note": "Discount scales with monthly revenue; cycle 21-20, one machine; miss month loses discount only"}
+{"qid": "q048", "essential": [["c19", "c15", "c3", "c9", "c11"], ["c10", "c1"]], "note": "Payment Link (WhatsApp/social) and Get Checkout e-commerce solution"}
+{"qid": "q049", "essential": [["c3", "c15"], ["c8"], ["c17", "c1", "c16"]], "note": "Payment Link; Get Checkout hosted; gateway API for ecommerce"}

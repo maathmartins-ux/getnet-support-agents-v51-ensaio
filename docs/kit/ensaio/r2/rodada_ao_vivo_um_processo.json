@@ -1,0 +1,74 @@
+{
+ "nota": "rodada ao vivo da R2 na bancada da v4: live_eval.sh --splits official,replan,parallel,approval,memory --repeat 1 --max-usd 3 --workers 4 --no-judge; todos os splits num processo; dense e5-large + bge-m3-int8 pool 10/600",
+ "inicio_utc": "2026-11-02T14:14:05Z",
+ "fim_ao_vivo_utc": "2026-11-02T14:16:46Z",
+ "parede_ao_vivo_s": 161,
+ "parede_script_s": 371.9,
+ "pico_rss_mb": {
+  "processo_ao_vivo": 4821,
+  "eval_offline_no_fim": 2888
+ },
+ "splits": {
+  "official": {
+   "status": "complete",
+   "casos": 10,
+   "intent_acc": 100.0,
+   "pass_at_1": 0.9,
+   "p95_ms": 31740.8,
+   "gasto_usd": 0.252728,
+   "cota_usd": 0.48,
+   "llm_errors": 0.0,
+   "cassete_pedidos": 70,
+   "git_sha": null
+  },
+  "replan": {
+   "status": "complete",
+   "casos": 20,
+   "intent_acc": 100.0,
+   "pass_at_1": 0.9,
+   "p95_ms": 20538.7,
+   "gasto_usd": 0.421109,
+   "cota_usd": 0.48,
+   "llm_errors": 0.0,
+   "cassete_pedidos": 128,
+   "git_sha": null
+  },
+  "parallel": {
+   "status": "complete",
+   "casos": 8,
+   "intent_acc": 100.0,
+   "pass_at_1": 0.875,
+   "p95_ms": 23995.4,
+   "gasto_usd": 0.309339,
+   "cota_usd": 0.48,
+   "llm_errors": 0.0,
+   "cassete_pedidos": 64,
+   "git_sha": null
+  },
+  "approval": {
+   "status": "complete",
+   "casos": 8,
+   "intent_acc": 100.0,
+   "pass_at_1": 1.0,
+   "p95_ms": 12393.4,
+   "gasto_usd": 0.276104,
+   "cota_usd": 0.48,
+   "llm_errors": 0.0,
+   "cassete_pedidos": 64,
+   "git_sha": null
+  },
+  "memory": {
+   "status": "complete",
+   "casos": 13,
+   "intent_acc": 100.0,
+   "pass_at_1": 0.9231,
+   "p95_ms": 58282.5,
+   "gasto_usd": 0.372021,
+   "cota_usd": 0.48,
+   "llm_errors": 0.0,
+   "cassete_pedidos": 179,
+   "git_sha": null
+  }
+ },
+ "gasto_total_usd": 1.6313
+}

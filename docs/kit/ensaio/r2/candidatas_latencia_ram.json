@@ -1,0 +1,315 @@
+{
+ "recorded_at": "2026-11-02T14:02:45+00:00",
+ "gold": "retrieval.jsonl",
+ "nota": "compare() da R2 na bancada da v4; máquina compartilhada (load 2,3–7,6); RAM = estimativa (processo antes do 1º modelo + modelos)",
+ "results": {
+  "bm25": {
+   "recall@3": 0.543,
+   "mrr": 0.617,
+   "hit@3": 0.74,
+   "ndcg@3": 0.53,
+   "page": {
+    "recall@3": 0.75,
+    "mrr": 0.807,
+    "hit@3": 0.86,
+    "hit@3_ci": {
+     "k": 43,
+     "n": 50,
+     "lo": 73.8,
+     "hi": 93.0
+    }
+   },
+   "latency_ms": {
+    "p50": 1.1,
+    "p95": 1.3,
+    "mean": 1.1
+   },
+   "memory_mb": 16.1,
+   "gate": {
+    "min_score": 9.284,
+    "min_cosine": 2.0,
+    "pos_answered": 0.74,
+    "neg_refused": 0.938,
+    "meets_floor": true,
+    "pos_ci": {
+     "k": 37,
+     "n": 50,
+     "lo": 60.4,
+     "hi": 84.1
+    },
+    "neg_ci": {
+     "k": 15,
+     "n": 16,
+     "lo": 71.7,
+     "hi": 98.9
+    },
+    "positives": 50,
+    "negatives": 16,
+    "neg_refusal_min": 0.85
+   },
+   "config": {
+    "retriever": "bm25"
+   }
+  },
+  "dense[multilingual-e5-large]": {
+   "recall@3": 0.703,
+   "mrr": 0.92,
+   "hit@3": 0.94,
+   "ndcg@3": 0.751,
+   "page": {
+    "recall@3": 0.847,
+    "mrr": 0.93,
+    "hit@3": 0.94,
+    "hit@3_ci": {
+     "k": 47,
+     "n": 50,
+     "lo": 83.8,
+     "hi": 97.9
+    }
+   },
+   "latency_ms": {
+    "p50": 78.7,
+    "p95": 98.1,
+    "mean": 80.5
+   },
+   "memory_mb": 1516.1,
+   "gate": {
+    "min_score": 9.335,
+    "min_cosine": 0.863,
+    "pos_answered": 0.9,
+    "neg_refused": 1.0,
+    "meets_floor": true,
+    "pos_ci": {
+     "k": 45,
+     "n": 50,
+     "lo": 78.6,
+     "hi": 95.7
+    },
+    "neg_ci": {
+     "k": 16,
+     "n": 16,
+     "lo": 80.6,
+     "hi": 100.0
+    },
+    "positives": 50,
+    "negatives": 16,
+    "neg_refusal_min": 0.85
+   },
+   "config": {
+    "retriever": "dense",
+    "embed_model": "intfloat/multilingual-e5-large"
+   }
+  },
+  "dense[multilingual-e5-large]+cross[bge-reranker-v2-m3-int8@5]": {
+   "recall@3": 0.734,
+   "mrr": 0.937,
+   "hit@3": 0.96,
+   "ndcg@3": 0.78,
+   "page": {
+    "recall@3": 0.867,
+    "mrr": 0.95,
+    "hit@3": 0.96,
+    "hit@3_ci": {
+     "k": 48,
+     "n": 50,
+     "lo": 86.5,
+     "hi": 98.9
+    }
+   },
+   "latency_ms": {
+    "p50": 672.7,
+    "p95": 895.9,
+    "mean": 685.7
+   },
+   "memory_mb": 2358.8,
+   "gate": {
+    "min_score": 6.084,
+    "min_cosine": 0.863,
+    "pos_answered": 0.94,
+    "neg_refused": 0.875,
+    "meets_floor": true,
+    "pos_ci": {
+     "k": 47,
+     "n": 50,
+     "lo": 83.8,
+     "hi": 97.9
+    },
+    "neg_ci": {
+     "k": 14,
+     "n": 16,
+     "lo": 64.0,
+     "hi": 96.5
+    },
+    "positives": 50,
+    "negatives": 16,
+    "neg_refusal_min": 0.85
+   },
+   "config": {
+    "retriever": "dense",
+    "embed_model": "intfloat/multilingual-e5-large",
+    "rerank": "cross",
+    "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+    "rerank_pool": 5
+   }
+  },
+  "dense[multilingual-e5-large]+cross[bge-reranker-v2-m3-int8@10/600c]": {
+   "recall@3": 0.754,
+   "mrr": 0.947,
+   "hit@3": 0.98,
+   "ndcg@3": 0.794,
+   "page": {
+    "recall@3": 0.903,
+    "mrr": 0.96,
+    "hit@3": 0.98,
+    "hit@3_ci": {
+     "k": 49,
+     "n": 50,
+     "lo": 89.5,
+     "hi": 99.6
+    }
+   },
+   "latency_ms": {
+    "p50": 947.9,
+    "p95": 1129.7,
+    "mean": 971.6
+   },
+   "memory_mb": 2358.8,
+   "gate": {
+    "min_score": 6.084,
+    "min_cosine": 0.863,
+    "pos_answered": 0.96,
+    "neg_refused": 0.875,
+    "meets_floor": true,
+    "pos_ci": {
+     "k": 48,
+     "n": 50,
+     "lo": 86.5,
+     "hi": 98.9
+    },
+    "neg_ci": {
+     "k": 14,
+     "n": 16,
+     "lo": 64.0,
+     "hi": 96.5
+    },
+    "positives": 50,
+    "negatives": 16,
+    "neg_refusal_min": 0.85
+   },
+   "config": {
+    "retriever": "dense",
+    "embed_model": "intfloat/multilingual-e5-large",
+    "rerank": "cross",
+    "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+    "rerank_pool": 10,
+    "rerank_chars": 600
+   }
+  },
+  "dense[multilingual-e5-large]+cross[bge-reranker-v2-m3-int8@20/600c]": {
+   "recall@3": 0.777,
+   "mrr": 0.957,
+   "hit@3": 0.98,
+   "ndcg@3": 0.819,
+   "page": {
+    "recall@3": 0.93,
+    "mrr": 0.98,
+    "hit@3": 1.0,
+    "hit@3_ci": {
+     "k": 50,
+     "n": 50,
+     "lo": 92.9,
+     "hi": 100.0
+    }
+   },
+   "latency_ms": {
+    "p50": 1979.2,
+    "p95": 4665.8,
+    "mean": 2376.8
+   },
+   "memory_mb": 2358.8,
+   "gate": {
+    "min_score": 6.084,
+    "min_cosine": 0.863,
+    "pos_answered": 0.98,
+    "neg_refused": 0.875,
+    "meets_floor": true,
+    "pos_ci": {
+     "k": 49,
+     "n": 50,
+     "lo": 89.5,
+     "hi": 99.6
+    },
+    "neg_ci": {
+     "k": 14,
+     "n": 16,
+     "lo": 64.0,
+     "hi": 96.5
+    },
+    "positives": 50,
+    "negatives": 16,
+    "neg_refusal_min": 0.85
+   },
+   "config": {
+    "retriever": "dense",
+    "embed_model": "intfloat/multilingual-e5-large",
+    "rerank": "cross",
+    "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+    "rerank_pool": 20,
+    "rerank_chars": 600
+   }
+  },
+  "hybrid[multilingual-e5-large]+cross[bge-reranker-v2-m3-int8@20/600c]": {
+   "recall@3": 0.774,
+   "mrr": 0.927,
+   "hit@3": 0.94,
+   "ndcg@3": 0.81,
+   "page": {
+    "recall@3": 0.897,
+    "mrr": 0.95,
+    "hit@3": 0.96,
+    "hit@3_ci": {
+     "k": 48,
+     "n": 50,
+     "lo": 86.5,
+     "hi": 98.9
+    }
+   },
+   "latency_ms": {
+    "p50": 5006.8,
+    "p95": 6092.4,
+    "mean": 4172.7
+   },
+   "memory_mb": 2358.8,
+   "gate": {
+    "min_score": 8.377,
+    "min_cosine": 0.862,
+    "pos_answered": 0.92,
+    "neg_refused": 0.875,
+    "meets_floor": true,
+    "pos_ci": {
+     "k": 46,
+     "n": 50,
+     "lo": 81.2,
+     "hi": 96.8
+    },
+    "neg_ci": {
+     "k": 14,
+     "n": 16,
+     "lo": 64.0,
+     "hi": 96.5
+    },
+    "positives": 50,
+    "negatives": 16,
+    "neg_refusal_min": 0.85
+   },
+   "config": {
+    "retriever": "hybrid",
+    "embed_model": "intfloat/multilingual-e5-large",
+    "rerank": "cross",
+    "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+    "rerank_pool": 20,
+    "rerank_chars": 600
+   }
+  }
+ }
+}

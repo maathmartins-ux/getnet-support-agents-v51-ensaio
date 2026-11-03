@@ -1,0 +1,50 @@
+{"qid":"q000","essential":[["c1","c8","c11","c14","c7","c0"],["c16","c6","c9"]],"note":"rent price/exemption tiers; Smart Android features"}
+{"qid":"q001","essential":[["c0","c6","c7","c12","c3","c9"],["c5","c10","c13"]],"note":"rent price/exemption tiers; Smart features"}
+{"qid":"q002","essential":[["c13","c6","c8"]],"note":"Get Smart smart features: stock, orders, NF, integration"}
+{"qid":"q003","essential":[["c6","c7","c4","c1"]],"note":"Get Smart smart features; English POS pages"}
+{"qid":"q004","essential":[["c6","c16"],["c12"]],"note":"bank domicile + Pix key required; Get Conta alternative sends/receives Pix"}
+{"qid":"q005","essential":[["c14","c6"]],"note":"Pix needs bank domicile (Santander) and active key"}
+{"qid":"q006","essential":[["c14","c9","c7","c13"]],"note":"QR Code on machine, customer pays in bank app, instant"}
+{"qid":"q007","essential":[["c6","c0","c4","c11","c14"]],"note":"QR Code on machine, instant payment, terminals/TEF/ecommerce"}
+{"qid":"q008","essential":[["c9"]],"note":"only one Pix key needed for Getnet"}
+{"qid":"q009","essential":[["c18"]],"note":"only one Pix key needed for Getnet"}
+{"qid":"q010","essential":[["c15"]],"note":"Pix via Get Conta is totally free"}
+{"qid":"q011","essential":[["c15"]],"note":"Pix via Get Conta is totally free"}
+{"qid":"q012","essential":[["c16"],["c4","c5"]],"note":"definition of advance; how to request (app/POS/central)"}
+{"qid":"q013","essential":[["c2","c5"],["c1","c9","c4","c10"]],"note":"definition; how/when/where to request advance"}
+{"qid":"q014","essential":[["c8","c4"],["c18","c15","c11"]],"note":"Santander/central/POS channels; Getnet app channel"}
+{"qid":"q015","essential":[["c13","c9"],["c4","c15"]],"note":"Santander/central/POS channels; Getnet app channel"}
+{"qid":"q016","essential":[["c0","c6"],["c16"]],"note":"up to 48x; limit set by card issuer"}
+{"qid":"q017","essential":[["c9","c6"],["c13"]],"note":"up to 48x; limit set by card issuer"}
+{"qid":"q018","essential":[["c3","c12"]],"note":"Crediário paid in up to 2 business days, lump sum"}
+{"qid":"q019","essential":[["c4","c9"]],"note":"Crediário paid in up to 2 business days, lump sum"}
+{"qid":"q020","essential":[["c8","c14","c13"]],"note":"link can be sent via WhatsApp, social, email, SMS"}
+{"qid":"q021","essential":[["c2","c4","c5"]],"note":"link can be sent via WhatsApp, social, email, SMS"}
+{"qid":"q022","essential":[["c10","c5","c16","c15","c11"]],"note":"Link accepts credit, debit, Pix, QR/wallet, boleto"}
+{"qid":"q023","essential":[["c2","c10","c5","c6"]],"note":"Link accepts credit, debit, Pix, QR/wallet, boleto"}
+{"qid":"q024","essential":[["c11","c13","c9"],["c2"]],"note":"Básico R$28/Avançado R$60 plans plus MDR; Inicial R$1 per paid link"}
+{"qid":"q025","essential":[["c13","c7","c8"],["c2"]],"note":"Básico R$28/Avançado R$60 plans plus MDR; Inicial R$1 per paid link"}
+{"qid":"q026","essential":[["c1"]],"note":"No site needed; use minhaconta.getnet.com.br as url"}
+{"qid":"q027","essential":[["c3"]],"note":"No site needed; use minhaconta.getnet.com.br as url"}
+{"qid":"q028","essential":[["c7","c8"],["c2"]],"note":"Get Tap = phone as NFC reader in app; how to request/enable"}
+{"qid":"q029","essential":[["c9","c11"],["c12"]],"note":"Get Tap = phone as NFC reader in app; how to request/enable"}
+{"qid":"q030","essential":[["c4","c8","c18","c17"]],"note":"Android 12+ with NFC; device analysis"}
+{"qid":"q031","essential":[["c0"]],"note":"Android 12+ with NFC; device analysis"}
+{"qid":"q032","essential":[["c9"]],"note":"Yes, Get Tap requires internet connection"}
+{"qid":"q033","essential":[["c3"]],"note":"Yes, Get Tap requires internet connection"}
+{"qid":"q034","essential":[["c11","c16","c15","c13"],["c7","c15","c1","c12"]],"note":"chargeback definition; situations that trigger it"}
+{"qid":"q035","essential":[["c13","c1","c12","c17"],["c14","c1","c10"]],"note":"chargeback definition; situations that trigger it"}
+{"qid":"q036","essential":[["c18","c6"]],"note":"key sequences per machine model for on/off"}
+{"qid":"q037","essential":[["c5","c10"]],"note":"key sequences per machine model for on/off"}
+{"qid":"q038","essential":[["c13"]],"note":"only via central de atendimento 4003-4000"}
+{"qid":"q039","essential":[["c0"]],"note":"only via central de atendimento 4003-4000"}
+{"qid":"q040","essential":[["c13"]],"note":"charge 3h+, recharge at ~20%, do not fully drain"}
+{"qid":"q041","essential":[["c0"]],"note":"charge 3h+, recharge at ~20%, do not fully drain"}
+{"qid":"q042","essential":[["c10","c11","c12"]],"note":"free digital account, card, Pix, transfers, 2-day receipt"}
+{"qid":"q043","essential":[["c8","c3"]],"note":"free digital account, card, Pix, transfers, 2-day receipt"}
+{"qid":"q044","essential":[["c7","c14","c2"]],"note":"Loja Virtual MDR 2,80/3,00/3,15% plus antifraud per transaction"}
+{"qid":"q045","essential":[["c15","c13","c16"]],"note":"Loja Virtual MDR 2,80/3,00/3,15% plus antifraud per transaction"}
+{"qid":"q046","essential":[["c0","c3","c2"],["c10","c7","c11","c12"]],"note":"discount scales with monthly revenue, 21-20 period; conditions, 24 months, exclusions"}
+{"qid":"q047","essential":[["c1","c10","c3","c11"],["c17","c7"]],"note":"discount scales with monthly revenue, 21-20 period; conditions, 24 months, exclusions"}
+{"qid":"q048","essential":[["c19","c9","c16","c3","c18","c14"],["c10","c1"]],"note":"Link de Pagamento; Get Checkout e-commerce solution"}
+{"qid":"q049","essential":[["c3","c15"],["c8","c17","c1"]],"note":"payment links; Get Checkout/API gateway online solutions"}

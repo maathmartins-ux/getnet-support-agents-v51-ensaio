@@ -1,0 +1,165 @@
+{
+  "engine": "depois (kit v51/m)",
+  "git_sha": null,
+  "modo": "offline (LLM_PROVIDER=offline, sem API)",
+  "v4_13_casos": {
+    "n": 13,
+    "pass_at_1": 84.6,
+    "routing_acc": 92.3,
+    "memory_acc": 100.0,
+    "facts_acc": null,
+    "facts_n": 0,
+    "numbers_acc": 100.0,
+    "numbers_n": 13,
+    "only_routing_fails": [
+      "q-mem-04"
+    ],
+    "only_memory_fails": [],
+    "both_fail": [],
+    "intent_acc": 100.0,
+    "tools_acc": 83.3,
+    "tools_n": 6
+  },
+  "v4_13_mais_3_bench": {
+    "n": 16,
+    "pass_at_1": 87.5,
+    "routing_acc": 93.8,
+    "memory_acc": 100.0,
+    "facts_acc": 100.0,
+    "facts_n": 1,
+    "numbers_acc": 100.0,
+    "numbers_n": 16,
+    "only_routing_fails": [
+      "q-mem-04"
+    ],
+    "only_memory_fails": [],
+    "both_fail": [],
+    "intent_acc": 100.0,
+    "tools_acc": 88.9,
+    "tools_n": 9
+  },
+  "por_caso": {
+    "q-mem-01": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    },
+    "q-mem-02": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    },
+    "q-mem-03": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    },
+    "q-mem-04": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": false,
+      "numbers": true
+    },
+    "q-mem-05": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "numbers": true
+    },
+    "q-mem-06": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": false,
+      "numbers": true
+    },
+    "q-mem-07": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "numbers": true
+    },
+    "q-mem-08": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "numbers": true
+    },
+    "q-mem-09": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    },
+    "q-mem-10": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    },
+    "q-mem-11": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "numbers": true
+    },
+    "q-mem-12": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "numbers": true
+    },
+    "q-mem-13": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "numbers": true
+    },
+    "bench-mem-decline-near": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true,
+      "memory": true
+    },
+    "bench-mem-chargeback-near": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    },
+    "bench-mem-chargeback-far": {
+      "intent": true,
+      "handoff": true,
+      "handoff_outcome": true,
+      "language": true,
+      "tools": true,
+      "numbers": true
+    }
+  }
+}

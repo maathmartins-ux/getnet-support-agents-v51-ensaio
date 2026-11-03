@@ -1,0 +1,1 @@
+{"dense+llm": {"recall@3": 0.82, "mrr": 0.883, "hit@3": 0.94, "latency_ms": {"p50": 1068.5, "p95": 1955.7, "mean": 1129.0}}, "dense+cross+llm": {"recall@3": 0.83, "mrr": 0.897, "hit@3": 0.94, "latency_ms": {"p50": 2023.4, "p95": 2505.9, "mean": 1961.8}}}
