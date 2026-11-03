@@ -22,8 +22,8 @@
     "live_official.json",
     "live_real.json"
   ],
-  "spent_usd": 7.119528,
-  "max_usd": 1.05,
+  "spent_usd": 7.622504,
+  "max_usd": null,
   "judge_unreliable": false,
   "canaries": {
     "cases": 4,
@@ -78,15 +78,15 @@
     ]
   },
   "cases": 266,
-  "grounded_rate": 0.906,
+  "grounded_rate": 0.902,
   "helpful_rate": 0.97,
-  "mean_score": 4.46,
+  "mean_score": 4.45,
   "ci": {
     "grounded_rate": {
-      "k": 241,
+      "k": 240,
       "n": 266,
-      "lo": 86.5,
-      "hi": 93.6
+      "lo": 86.1,
+      "hi": 93.2
     },
     "helpful_rate": {
       "k": 258,
@@ -178,15 +178,15 @@
     },
     "official": {
       "cases": 30,
-      "grounded_rate": 0.967,
+      "grounded_rate": 0.933,
       "helpful_rate": 1.0,
-      "mean_score": 4.8,
+      "mean_score": 4.7,
       "ci": {
         "grounded_rate": {
-          "k": 29,
+          "k": 28,
           "n": 30,
-          "lo": 83.3,
-          "hi": 99.4
+          "lo": 78.7,
+          "hi": 98.2
         },
         "helpful_rate": {
           "k": 30,
@@ -241,7 +241,7 @@
     "ALL": {
       "offered_unavailable_action": 1,
       "stale_source": 1,
-      "unsupported_claim": 23,
+      "unsupported_claim": 24,
       "wrong_language": 1
     },
     "guardrail": {
@@ -260,7 +260,7 @@
       "unsupported_claim": 8
     },
     "official": {
-      "unsupported_claim": 1
+      "unsupported_claim": 2
     }
   },
   "calibration": {
@@ -272,8 +272,10 @@
     "positives": 24,
     "negatives": 24,
     "validation": {
-      "validated": true,
-      "missing": [],
+      "validated": false,
+      "missing": [
+        "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+      ],
       "rule": ">= 10 por classe e TPR, TNR >= 0.8"
     },
     "ci": {
@@ -370,7 +372,9 @@
         "tpr": 1.0,
         "tnr": 1.0
       }
-    }
+    },
+    "labels_origin": "spec",
+    "labelers": []
   },
   "trust_reused": true,
   "calibration_pairs": [
@@ -4327,223 +4331,13 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The prices, rental-waiver thresholds and Get Smart features all match the sources. The answer correctly says the sources don't describe the Get Clássica's features, and the offer to hand off to a human agent is supported by the capabilities card. It is in English, matching the question, and reveals no other customer's data."
+      "reason": "The prices (R$ 79,90 and R$ 129,90 per month) and the Get Smart features match the sources. The answer correctly says the sources don't describe the Get Clássica's features. Offering a human handoff is supported by the capabilities card. The answer is in English, matching the question."
     },
     {
       "id": "official-02",
       "split": "official",
       "source": "live_official.json",
       "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "The reply is in English and invents no forecast figures. Turning the question down is justified, since the weather sources are undated or outdated. Two flaws: the '[unconfirmed value]' placeholder replaces a date that follows from today's date (Nov 4), and offering a human agent for a weather question adds little."
-    },
-    {
-      "id": "official-03",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "Every figure, date and status matches the settlement data. That covers 5 sales, R$ 814,40, the per-method counts and totals, the deposit dates, the relative-day labels and the settlement rule. The reply is in English, matching the question, and only uses the authenticated customer's data."
-    },
-    {
-      "id": "official-04",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "Every claim matches the sources: Pix via QR Code on terminals/TEF/Ecommerce, Get Conta with Dock IP, receipt in up to 2 business days, and Pix timing variation of up to one day. The answer correctly admits the sources don't settle whether a bank account is required. The handoff offer is supported by the capabilities card. It is useful but does not fully resolve the question."
-    },
-    {
-      "id": "official-05",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "The response correctly identifies the offline terminal (T1988B, chip, no signal, 5 hours) from the lookup data. The chip steps follow the FAQ. It openly says what the sources don't cover. It offers a support ticket that only opens after confirmation, which the capabilities card allows. It is in English and contains only the authenticated customer's data."
-    },
-    {
-      "id": "official-06",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "Every claim traces to the sources or the capabilities card: advancing in the app, no extra fee for using the app, Automatic Advance tied to the fee exemption with individual credit assessment, Reserva Financeira release rules, and the advance request needing customer confirmation plus agent approval. It correctly says the sources don't give rates or timing and offers a human handoff. Answer is in English, matching the question, and reveals no other customer's data."
-    },
-    {
-      "id": "official-07",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "The PTAX sell (6.1500) and buy (6.1482) rates for 2026-11-03 match the sources exactly, the date is current, and the rounded figures follow the sources. The answer is in English, the same language as the question, and reveals no data from other customers."
-    },
-    {
-      "id": "official-08",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "Every claim matches the tool data: two declines totaling R$ 285,00, the codes and their meanings, and the terminal statuses. The support-ticket proposal and the human handoff are both in the capabilities card. The answer correctly notes that the knowledge base gave no decline guidance, and it is in English as asked."
-    },
-    {
-      "id": "official-09",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "Every claim is backed by the sources. The answer gives up to 48 installments, notes that the maximum term and interest rate vary by card issuer, and says payment arrives at once within 2 business days with the discount fee subtracted. It answers the question in English, matching the question's language."
-    },
-    {
-      "id": "official-10",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "The answer is in English, matching the question. Both claims have support in the sources: selling via WhatsApp and social media, and creating the link in the portal or app before sharing it. No customer data is exposed."
-    },
-    {
-      "id": "official-01",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 1,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "The prices (R$ 79,90 and R$ 129,90 per month) and the Get Smart features all match the sources. The answer correctly notes that the sources don't describe Get Clássica's features, and the human-agent handoff is backed by the capabilities card. It is in English, as asked, and reveals no other customer's data. The comparison is only partial, but that limit comes from the sources and the answer states it openly."
-    },
-    {
-      "id": "official-02",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 1,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "The figures (18.3 °C, 24.1 °C, 88%, showers) and the date match the Open-Meteo source. Wednesday follows from today being Tuesday 2026-11-03. The umbrella tip is a reasonable inference from the high rain chance. The answer is in English, as asked, and reveals no other customer's data."
-    },
-    {
-      "id": "official-03",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 1,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "All figures, dates and statuses match the get_settlements data (count 5, total R$ 814,40, per-method breakdown). The answer is in English as asked and directly says when each part will be deposited."
-    },
-    {
-      "id": "official-04",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 1,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "Every claim matches the sources: Pix works via checking, savings or prepaid payment accounts; Get Conta is a free digital account that lets you sell via Pix; Pix is received by QR Code on terminals, TEF Auttar and e-commerce; and receipt time can vary by up to one day. The reply correctly says the sources don't confirm whether a bank account is required, and the human handoff it offers is in the policy. It is partially conclusive but useful, since it points to a prepaid account and Get Conta as alternatives. Written in English, matching the question."
-    },
-    {
-      "id": "official-05",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 1,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "The terminal details (T1988A online on Wi-Fi with good signal; T1988B offline on chip, no signal, 5h) match the tool data. The chip steps match the FAQ, and the reply is clear about what the sources don't cover. The ticket offer, which needs confirmation, and the handoff to a human agent are both in the capabilities card. The answer is in English and covers only the authenticated customer."
-    },
-    {
-      "id": "official-06",
-      "split": "official",
-      "source": "live_official.json",
-      "run": 1,
       "saw_tool_data": true,
       "saw_tool_results": true,
       "grounded": false,
@@ -4552,7 +4346,217 @@
       "leaks_other_customer": false,
       "score": 3,
       "failure_type": "unsupported_claim",
-      "reason": "Most of the answer is supported: the app being available for advances at no extra app fee, Automatic Advance requiring credit approval and tying into the 'Receba Conforme suas Vendas' exemption, and the advance proposal that needs customer confirmation plus agent approval. The third bullet is the problem. It describes the Reserva Financeira (holding back part of received amounts, release on the scheduled date) without naming it, so it reads as if receivables advance itself withholds funds. That conflates two different products."
+      "reason": "The forecast figures for 2026-11-04 (19–22 °C, up to 82% rain) match the wttr.in source, and the answer is in English. However, the claim that Open-Meteo is the source normally used for this kind of answer appears nowhere in the sources or tool data. It is an invented statement."
+    },
+    {
+      "id": "official-03",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every figure in the answer matches the get_settlements data: 5 sales totaling R$ 814,40, and the per-method counts, totals, deposit dates and statuses. Saying Pix and debit are paid and credit is scheduled matches the statuses. The answer is in English, matching the question, and contains only the authenticated customer's data."
+    },
+    {
+      "id": "official-04",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim matches the sources: the account types, the capture channels and settlement varying by up to one calendar day. The reply openly says the sources don't state which account Getnet requires, and it offers a human handoff, which the capabilities card supports. It answers in English, matching the question. It is only partially helpful because the direct yes/no question stays unanswered, but that limit comes from the evidence."
+    },
+    {
+      "id": "official-05",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The terminal details for T1988B and T1988A match the tool data. The chip setup steps come from the FAQ and the downloadable manual mention matches the manuals page. The support ticket is offered as a proposal that needs confirmation, consistent with the capabilities card, and the human handoff is also allowed there. The answer is in English like the question, covers only the authenticated customer's data and says plainly that the sources don't cover Wi-Fi setup or fixing a weak signal."
+    },
+    {
+      "id": "official-06",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim traces to a source. Advancing via the app at no extra fee, the automatic advance tied to 'Receba Conforme suas Vendas' with individual credit review, and the financial reserve release terms all come from the FAQ and reserve pages. The offer to propose a receivables advance, the customer confirmation plus human approval, and the 15-minute expiry all match the capabilities card. The answer is in English, matching the question. It openly says the fee rate, processing time and eligibility rules aren't in the sources and offers a human agent. No other customer's data appears."
+    },
+    {
+      "id": "official-07",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The answer is in English, matching the question, and its figures match the PTAX closing bulletin for 2026-11-03: sell 6.1500, buy 6.1482, roughly R$ 6.15. The date and source are cited correctly, and no other customer's data is revealed."
+    },
+    {
+      "id": "official-08",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every detail matches the tool data: transaction IDs, amounts, decline codes with their meanings and suggested actions, T1988B offline on chip with no signal for 5 hours (last contact 13:45), and T1988A online. The support ticket proposal with confirmation and the human handoff are both in the capabilities policy. The note that no extra decline guidance was found fits the sources. The reply is in English and answers the question."
+    },
+    {
+      "id": "official-09",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The question is in English and so is the answer. Every claim is supported by the sources: up to 48 installments, with the maximum term and interest rate depending on the card issuer; payment in up to 2 business days in a single lump sum; the MDR fee is deducted and can be checked in the app or portal; Parcelado Lojista is interest-free with a 12-installment limit. It answers the question directly."
+    },
+    {
+      "id": "official-10",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim is supported by the sources. WhatsApp and social-media selling, the steps (portal or app, Produtos e Serviços, Criar Link, fill in details, share or copy) and the payment methods all appear there. The reply answers the question and is in English, matching the question. No other customer's data appears."
+    },
+    {
+      "id": "official-01",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 1,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The prices (R$ 79,90/month for Get Clássica, R$ 129,90/month for Get Smart) and the Get Smart features (inventory, orders, closing the bill, menu, invoices, system integration, replacing the computer and fiscal printer) all appear in the sources. Handing off to a human agent is listed in the capabilities card. The answer is in English, matching the question. Minor gaps: it does not say these rental prices apply only when the revenue tiers are not reached, and it gives no Get Clássica features, though the sources have none."
+    },
+    {
+      "id": "official-02",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 1,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The answer matches the Open-Meteo forecast for 2026-11-04: 18/24 °C (correctly rounded), up to 88% chance of rain, and rain showers. Wednesday is correct, since today (2026-11-03) is a Tuesday. The umbrella tip is reasonable advice given the rain forecast. The reply is in English, like the question, and contains no other customer's data."
+    },
+    {
+      "id": "official-03",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 1,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The answer is in English, matching the question. Every figure matches the get_settlements data for the authenticated customer: methods, counts, totals, deposit dates, statuses, the 5 sales and the R$ 814,40 total. No data from other customers appears, and the answer directly addresses when yesterday's sales will be deposited."
+    },
+    {
+      "id": "official-04",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 1,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim matches the sources: Pix via QR Code on physical terminals, TEF Auttar and Ecommerce; Get Conta as a free account with Dock IP that allows selling via Pix; the advice to keep registration data current. The answer is upfront that the sources don't settle whether a bank account is required, and offers a handoff to a human agent, which the capabilities card supports. It's in English, matching the question. It's only partly helpful because the core question stays unanswered, though the Get Conta mention points to a likely path."
+    },
+    {
+      "id": "official-05",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 1,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The terminal details (T1988B offline on chip with no signal for 5 hours, last contact 13:46; T1988A online) match the tool data. The chip and network steps come from the FAQ. The ticket offer and the human handoff both appear in the capabilities card, with confirmation required. The response is in English, the language of the question, and contains only the authenticated customer's data."
+    },
+    {
+      "id": "official-06",
+      "split": "official",
+      "source": "live_official.json",
+      "run": 1,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim traces to the evidence. The app availability with no extra fee, Automatic Advance as a condition of the exemption with individual credit evaluation, and the Financial Reserve release conditions all come from the sources. The advance-request offer matches the capabilities card, including customer confirmation plus human-agent approval. The answer correctly says the sources lack rates, timing and eligibility rules and offers a handoff. It is in English, matching the question, and reveals no other customer's data."
     },
     {
       "id": "official-07",
@@ -4567,7 +4571,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The rates (sell 6.1500, buy 6.1482, rounded to R$ 6.15), the date and the source all match the PTAX data. The caveat that real transaction rates may differ is a reasonable general note that contradicts nothing. The answer is in English, like the question, and contains no data about other customers."
+      "reason": "The answer is in English, matching the question. All figures (6.1500 sell, 6.1482 buy, rounded to 6.15) and the date 2026-11-03 match the current PTAX closing bulletin from the Banco Central do Brasil, and the cited source URL is the one provided."
     },
     {
       "id": "official-08",
@@ -4582,7 +4586,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The answer is in English, matching the question. The transaction details (IDs, amounts, methods, terminals, decline codes and their meanings and actions) match the tool data. T1988B being offline with no signal is also supported. The support-ticket proposal with confirmation and the human handoff are both in the capabilities card. It contains no other customer's data."
+      "reason": "Every claim matches the tool data: decline codes 51 and 05 with their meanings and actions, the amounts, and T1988B offline for 5 hours since 13:47. The support ticket offer, the confirmation requirement and the 15-minute expiry all match the capabilities policy. It correctly says the knowledge base had no decline guidance. The reply is in English, and no other customer's data appears."
     },
     {
       "id": "official-09",
@@ -4597,7 +4601,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The answer gives up to 48 installments and notes that the maximum term and the interest rate depend on the card issuer. It also says the merchant receives the full amount within 2 business days, with the discount fee subtracted. Every claim is in the sources, and the reply is in English, matching the question."
+      "reason": "The sources support every claim: the 48-installment limit, interest rates that vary by card issuer, the terminal steps, and payment within 2 business days in a single payment minus the discount fee. The answer addresses the question and is in English, matching the question."
     },
     {
       "id": "official-10",
@@ -4612,7 +4616,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The answer is in English, matching the question. Every claim is backed by the sources. The Payment Link page says you can sell using WhatsApp or social networks, and the step-by-step page gives the portal/app access, the Produtos e Serviços > Link de Pagamento > Criar path, filling in product, shipping and payment details, and share/copy. No other customer's data appears."
+      "reason": "The sources back every claim: selling through WhatsApp or social networks, the setup steps (Minha Conta portal or app, Products and Services, Create Payment Link, fill in details, share or copy), and the payment methods (debit, credit, Pix, Wallet, boleto). The reply is in English, matching the question, and answers it directly. It exposes no other customer's data."
     },
     {
       "id": "official-01",
@@ -4625,9 +4629,9 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "Every claim checks out against the sources. Prices are R$ 79,90 and R$ 129,90. The Get Smart features (stock control, orders, closing the tab, invoices, integration, replaces the computer and fiscal printer, reconciliation across payment methods) are all documented. The response is honest that the sources describe no Get Clássica features, and the offer to hand off to a human agent is covered by the policy. It is in English, matching the question."
+      "reason": "The prices (R$ 79,90 and R$ 129,90/month), the revenue condition and the Get Smart features all match the sources. The sources do not describe Get Clássica features, so the comparison is partial, but the answer stays within the evidence. The human handoff it offers is in the capabilities policy. The answer is in English, matching the question."
     },
     {
       "id": "official-02",
@@ -4640,9 +4644,9 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "The question is out of scope, since no source or tool provides weather data. The response correctly declines to guess and points the customer to a weather service. The capabilities it lists match the policy card, including that a support ticket needs the customer's confirmation. It is written in English, matching the question, and reveals no other customer's data."
+      "reason": "The forecast for 2026-11-04 (rain showers, low 18.3 °C, high 24.1 °C) matches the Open-Meteo source, with correct attribution. Calling it Wednesday follows from today being Tuesday. The reply is in English, as asked, and reveals no other customer's data. It loses a point for leaving out the up-to-88% chance of rain."
     },
     {
       "id": "official-03",
@@ -4657,7 +4661,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The answer is in English, the same language as the question. Every figure matches the get_settlements data: methods, counts, totals, deposit dates, statuses, and the overall R$ 814,40 across 5 sales. It answers the question directly, offers no unsupported actions, and reveals no data about other customers."
+      "reason": "All figures, dates, statuses and the settlement rule match the get_settlements data. The response answers the question in English and only covers the authenticated customer."
     },
     {
       "id": "official-04",
@@ -4672,7 +4676,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Each claim matches the sources: Get Conta with Pix, the account types Pix can use, the capture channels, and receipt varying by up to one calendar day. The answer admits the gap on whether an account is required and offers a handoff to a human agent, which the capabilities card allows. It is in English and does not expose another customer's data."
+      "reason": "Every claim is supported by the sources: the account types usable for Pix, the Getnet capture channels, and the receipt time varying by up to one calendar day. The answer openly says the sources don't specify which account Getnet requires and offers a handoff to a human agent, which the capabilities card allows. It is in English, like the question, and reveals no other customer's data."
     },
     {
       "id": "official-05",
@@ -4687,7 +4691,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Every claim checks out against the evidence. The terminal data matches the tool output: T1988B is offline on chip with no signal, last contact 11:53, 5 hours ago, and T1988A is online. The chip steps come from the FAQ. The ticket offer, the confirmation requirement, the 15-minute expiry and the human handoff all appear in the policy card. The reply is in English, matching the question, and it openly states what the sources don't cover."
+      "reason": "Every claim is backed by the evidence. The terminal data matches the tool output: T1988B is Get Clássica, on chip, with no signal and offline for 5h; T1988A is online on Wi-Fi. The chip steps follow the FAQ. The ticket offer, the confirmation requirement, the 15-minute expiry and the handoff to a human agent all come from the policy card. The answer is in English, like the question, and names the gaps in the sources."
     },
     {
       "id": "official-06",
@@ -4696,13 +4700,13 @@
       "run": 2,
       "saw_tool_data": true,
       "saw_tool_results": true,
-      "grounded": true,
+      "grounded": false,
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
-      "failure_type": "none",
-      "reason": "Every claim is supported by the sources: advancing sales in the app with no extra fee, automatic advance as a condition of the 'Receba Conforme suas Vendas' plan with individual credit review, and the financial reserve details. The chat action offer matches request_receivables_advance in the capabilities card, including customer confirmation plus agent approval. The answer is honest about the missing fee and timeline details and is in English, matching the question."
+      "score": 3,
+      "failure_type": "unsupported_claim",
+      "reason": "Most points are supported: advancing through the app with no extra fees, Automatic Advance and its individual credit approval, and proposing request_receivables_advance with customer confirmation plus agent approval (per the capabilities card). However, the third bullet describes the Reserva Financeira (holding back part of receipts and releasing it on the scheduled date) without naming it. Read in context, 'It' points to the advance or Automatic Advance, which wrongly presents a reserve hold as part of how antecipação works. The answer is honest about the missing fee and timing information."
     },
     {
       "id": "official-07",
@@ -4717,7 +4721,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The response matches the PTAX source for 2026-11-03: sell 6.1500, buy 6.1482, rounded to 6.15. It is in English, the same language as the question, and cites the source."
+      "reason": "The answer is in English, matching the question. It gives today's PTAX rates of 6.1500 (sell) and 6.1482 (buy) and the rounded 6.15 figure, all exactly as in the sources, and correctly cites the Banco Central source."
     },
     {
       "id": "official-08",
@@ -4732,7 +4736,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Every figure and code matches the tool data: the 2 declines yesterday, the R$ 285,00 total, codes 51 and 05 with their meanings and actions, and the terminal statuses. The support ticket offer needs confirmation and the handoff to a human agent are both in the capabilities policy. The answer is in the customer's language and gives no data about anyone else."
+      "reason": "The decline codes, amounts, terminals and their meanings (51 and 05) match the transaction data. The terminal statuses also match: T1988B has been offline for 5 hours, since 13:49. The support ticket offer, with confirmation and 15-minute expiry, and the human handoff are both in the capabilities policy. The response answers in English, matching the question, and uses only the authenticated customer's data."
     },
     {
       "id": "official-09",
@@ -4747,7 +4751,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The sources support every claim: up to 48 installments, rates varying by card issuer, single payment within 2 business days with the discount fee deducted, and the terminal steps. The answer is in English, matching the question."
+      "reason": "The question asks how many installments the Crediário allows. The answer gives up to 48, which matches the Crediário sources. The note that interest rates vary by card issuer is also stated in the sources. The payment terms (paid at once within 2 business days, with the MDR deducted) come from the FAQ. The answer is in English, matching the question, and contains no other customer's data."
     },
     {
       "id": "official-10",
@@ -4762,7 +4766,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The answer confirms that the Payment Link supports sales through WhatsApp and social networks, which matches the source. The creation steps (portal or app, Products and Services, Criar Link, fill in the details, share) also match the source. The reply is in English, the language of the question, and no other customer's data appears. The phrase \"meant for\" slightly overstates the source, which lists this as one option, but it is not a substantive error."
+      "reason": "Every claim is supported by the sources: selling through WhatsApp or social media, creating the link through the Minha Conta portal or the app, and then sharing or copying it. The answer addresses the question directly and is in English, matching the question. No data about other customers is revealed."
     }
   ]
 }

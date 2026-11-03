@@ -270,31 +270,31 @@ Ao vivo: status `complete` · gasto US$ 0.221442 (teto 0.33369) · erros de LLM 
 
 ### Split `official` — `live_official.json`
 
-Provedor `anthropic` · status `complete` · gasto US$ 0.910835 (teto 1.95)
+Provedor `anthropic` · status `complete` · gasto US$ 0.871115 (teto 2.0)
 
-**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **100.0%** [IC95 82.4–100.0; n=18] · pass^3 100%.
+**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **96.7%** [IC95 83.3–99.4; n=30] · pass^3 90% (não resolvidos: official-04).
 | Métrica | official | ALL |
 |---|---:|---:|
 | cases | 30 | 30 |
-| resolved_acc | 100.0 (n=18) | 100.0 (n=18) |
-| facts_acc | 100.0 (n=18) | 100.0 (n=18) |
+| resolved_acc | 96.7 (n=30) | 96.7 (n=30) |
+| facts_acc | 100.0 (n=30) | 100.0 (n=30) |
 | intent_acc | 100.0 (n=30) | 100.0 (n=30) |
 | handoff_acc | 100.0 (n=30) | 100.0 (n=30) |
 | handoff_outcome_acc | 100.0 (n=30) | 100.0 (n=30) |
 | language_acc | 100.0 (n=30) | 100.0 (n=30) |
 | tools_acc | 100.0 (n=9) | 100.0 (n=9) |
 | completed_acc | 100.0 (n=3) | 100.0 (n=3) |
-| numbers_acc | 96.7 (n=30) | 96.7 (n=30) |
+| numbers_acc | 100.0 (n=30) | 100.0 (n=30) |
 | claims_acc | 100.0 (n=30) | 100.0 (n=30) |
 | language_undetected | 0 | 0 |
-| p50_ms | 14776.5 | 14776.5 |
-| p95_ms | 29954.7 | 29954.7 |
-| cost_usd | 0.910835 | 0.910835 |
+| p50_ms | 11091.9 | 11091.9 |
+| p95_ms | 16851.5 | 16851.5 |
+| cost_usd | 0.871115 | 0.871115 |
 | crashes | 0 | 0 |
 
 Gate (splits official): intent 100.0% [IC95 88.6–100.0; n=30] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
 
-Falhas por checagem × split: numbers official 1
+Falhas por checagem × split: resolved official 1
 
 Matriz de confusão do router (todos os splits):
 
@@ -305,9 +305,9 @@ Matriz de confusão do router (todos os splits):
 | support | · | · | **3** | · | 100% |
 | troubleshoot | · | · | · | **6** | 100% |
 
-Estabilidade (3 rodadas): pass@1 96.7% [IC95 83.3–99.4; n=30] · pass^3 90.0% [IC95 59.6–98.2; n=10] · instáveis: official-02
+Estabilidade (3 rodadas): pass@1 96.7% [IC95 83.3–99.4; n=30] · pass^3 90.0% [IC95 59.6–98.2; n=10] · instáveis: official-04
 
-Ao vivo: status `complete` · gasto US$ 0.910835 (teto 1.95) · erros de LLM 0
+Ao vivo: status `complete` · gasto US$ 0.871115 (teto 2.0) · erros de LLM 0
 
 ### Split `parallel` — `live_parallel.json`
 
@@ -394,7 +394,7 @@ Ao vivo: status `complete` · gasto US$ 1.534212 (teto 1.112299) · erros de LLM
 ## Juiz LLM sobre as respostas ao vivo
 
 <!-- judge:begin -->
-Modelo `claude-opus-5-5` · status `ran` · arquivos live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_real.json · gasto US$ 7.119528
+Modelo `claude-opus-5-5` · status `ran` · arquivos live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_real.json · gasto US$ 7.622504
 
 | split | casos | grounded | helpful | nota média |
 |---|---:|---:|---:|---:|
@@ -402,10 +402,10 @@ Modelo `claude-opus-5-5` · status `ran` · arquivos live_guardrail.json, live_h
 | hard | 5 | 1.0 [IC95 56.6–100.0; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 4.8 |
 | heldout | 79 | 0.873 [IC95 78.2–93.0; n=79] | 0.937 [IC95 86.0–97.3; n=79] | 4.35 |
 | memory | 66 | 0.864 [IC95 76.1–92.7; n=66] | 0.985 [IC95 91.9–99.7; n=66] | 4.32 |
-| official | 30 | 0.967 [IC95 83.3–99.4; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.8 |
+| official | 30 | 0.933 [IC95 78.7–98.2; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.7 |
 | official-var | 12 | 1.0 [IC95 75.8–100.0; n=12] | 1.0 [IC95 75.8–100.0; n=12] | 4.92 |
 | real | 40 | 0.925 [IC95 80.1–97.4; n=40] | 1.0 [IC95 91.2–100.0; n=40] | 4.38 |
-| ALL | 266 | 0.906 [IC95 86.5–93.6; n=266] | 0.97 [IC95 94.2–98.5; n=266] | 4.46 |
+| ALL | 266 | 0.902 [IC95 86.1–93.2; n=266] | 0.97 [IC95 94.2–98.5; n=266] | 4.45 |
 
 Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): 48 rótulos · concordância **1.0** [IC95 92.6–100.0; n=48] · kappa de Cohen **1.0** · TPR 1.0 [IC95 86.2–100.0; n=24] (24 grounded) · TNR 1.0 [IC95 86.2–100.0; n=24] (24 não grounded) · discordâncias: —
 - official: concordância 1.0 [IC95 92.6–100.0; n=48] · kappa 1.0 (48 rótulos)

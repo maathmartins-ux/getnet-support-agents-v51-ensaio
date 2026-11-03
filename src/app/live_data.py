@@ -330,7 +330,9 @@ def weather_backup(city: str, offset: int) -> LiveResult | None:
                f"{rain_en}. Source: wttr.in.")
     flat = f"date {day.isoformat()}; mintempC {d['mintempC']}; maxtempC {d['maxtempC']}; chanceofrain_max {rain}"
     return LiveResult("weather", "wttr.in", "https://wttr.in/", day.isoformat(), text_pt, text_en,
-                      evidence=[f"wttr.in (API) para {city}: {flat}"])
+                      evidence=[f"wttr.in (API) para {city}: {flat}",
+                                "A fonte principal (Open-Meteo) não respondeu agora; esta previsão vem da segunda "
+                                "fonte, wttr.in."])
 
 
 def followup_query(text: str, previous: str | None) -> str | None:

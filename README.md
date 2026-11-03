@@ -23,9 +23,9 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 <!-- scorecard:begin -->
 | medida | valor | como se mede |
 |---|---:|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
-| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 0.97 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.97 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 0.90 | o mesmo, em todas as rodadas de cada cenário |
+| Juiz: respostas oficiais fundamentadas | 0.93 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
 | Memória ao vivo: pass@1 | 0.92 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.84 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
@@ -396,8 +396,9 @@ e como comparar pela primeira entrega.
 | 17:51:39 | 337 | kit v5.5.1: segredos aleatórios, HITL no compose, todo oficial com fato, clima com segunda fonte |
 | 17:56:52 | 342 | kit: guardrail fora do ar segura escrita; idioma medido só com LLM |
 | 17:59:42 | 345 | kit: tarja de número sem falso positivo (data de amanhã, identificador da tool) |
+| 18:43:39 | 389 | kit: resposta abre com a resposta; juiz validado só com rótulo de pessoa; resolvido sem abertura de abstenção |
 
-Do primeiro ao último commit: **345 min**.
+Do primeiro ao último commit: **389 min**.
 <!-- timeline:end -->
 
 </details>
