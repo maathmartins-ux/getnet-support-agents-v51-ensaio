@@ -292,8 +292,10 @@ def supervisor_replan() -> bool:
 
 
 def supervisor_fast() -> bool:
-    # Plano de 1 passo com router confiante vai direto pela tabela (sem o supervisor LLM). "off" volta ao LLM sempre.
-    return os.getenv("SUPERVISOR_FAST", "on").lower() != "off"
+    # Atalho de 1 passo (sem o supervisor LLM): DESLIGADO por padrão desde o kit v5.5 (perfil Skywalker). O avaliador
+    # puniu "regra decidindo" e o DEMO mostrava "atalho" nos oficiais; com o supervisor LLM em todo turno a decisão e
+    # o motivo ficam visíveis. Custo: ~2 chamadas e ~4 s a mais por turno de 1 passo (medido). SUPERVISOR_FAST=on liga.
+    return os.getenv("SUPERVISOR_FAST", "off").lower() == "on"
 
 
 def supervisor_fast_min_confidence() -> float:

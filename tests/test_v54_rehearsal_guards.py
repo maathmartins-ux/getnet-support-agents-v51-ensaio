@@ -76,3 +76,24 @@ def test_check_and_live_eval_refuse_a_retriever_in_fallback():
     assert "buscador = o configurado (sem fallback)" in check and "requirements-hybrid.lock" in check
     sh = (ROOT / "scripts" / "live_eval.sh").read_text(encoding="utf-8")
     assert "LIVE_EVAL_ALLOW_FALLBACK" in sh and "fallback" in sh
+
+
+def test_supervisor_llm_decides_every_turn_by_default(monkeypatch):
+    """Kit v5.5 (perfil Skywalker): sem atalho de tabela por padrão; o supervisor LLM decide e o DEMO mostra."""
+    from app import config
+
+    monkeypatch.delenv("SUPERVISOR_FAST", raising=False)
+    assert config.supervisor_fast() is False
+    monkeypatch.setenv("SUPERVISOR_FAST", "on")
+    assert config.supervisor_fast() is True
+
+
+def test_readme_headline_has_no_self_targets(tmp_path):
+    """Kit v5.5 (perfil Skywalker): manchete do README sem meta própria nem status "abaixo"."""
+    import json
+
+    from scripts import scorecard
+
+    (tmp_path / "latest.json").write_text(json.dumps({"retrieval": {"recall@3": 0.84, "mrr": 0.82}}), encoding="utf-8")
+    md = scorecard.headline_markdown(tmp_path)
+    assert "Busca: Recall@3 | 0.84" in md and "abaixo" not in md and "referência" not in md

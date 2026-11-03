@@ -1,8 +1,15 @@
 """Atalho do supervisor: plano de 1 passo com router confiante não chama o supervisor LLM (2 chamadas a menos)."""
+import pytest
 from fakes import fake_llm, resp, text, tool_use
 
 from app import supervisor
 from app.agents import AgentResult, Context
+
+
+@pytest.fixture(autouse=True)
+def _fast_path_on(monkeypatch):
+    """Estes testes cobrem o atalho de 1 passo, desligado por padrão desde o kit v5.5 (perfil Skywalker)."""
+    monkeypatch.setenv("SUPERVISOR_FAST", "on")
 
 
 def ctx(text_, intent="knowledge", **facts):

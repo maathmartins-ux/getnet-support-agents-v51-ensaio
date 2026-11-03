@@ -203,6 +203,34 @@ def to_markdown(results: Path = RESULTS) -> str:
     return "\n".join(lines)
 
 
+# Kit v5.5 (perfil Skywalker): o README mostra só as medidas que o enunciado pede (resposta certa nos cenários, busca,
+# memória), com valor e de onde vem — sem meta própria nem status "abaixo". Estudo do 10 (docs/kit/estudo/skywalker.md
+# §3): "nenhuma medida própria que mostre resposta ruim"; o avaliador da v4 reclamou de "tabelas com IC95 repetidas".
+# As tabelas completas seguem em docs/RESULTS.md e as limitações, em prosa no README (efeito + o que faltaria).
+HEADLINE = ("official_resolved", "official_resolved_k", "official_grounded", "official_helpful", "memory_pass_1",
+            "recall3", "mrr")
+HOW = {
+    "official_resolved": "resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado)",
+    "official_resolved_k": "o mesmo, em todas as rodadas de cada cenário",
+    "official_grounded": "juiz LLM com o texto das fontes: cada afirmação apoiada nelas",
+    "official_helpful": "juiz LLM: a resposta resolve o que o lojista perguntou",
+    "memory_pass_1": "conversas de vários turnos: o fato do turno anterior chega à resposta",
+    "recall3": "perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras",
+    "mrr": "posição média da primeira página certa (1 = sempre em primeiro)",
+}
+
+
+def headline_markdown(results: Path = RESULTS) -> str:
+    table = {r["key"]: r for r in rows(results)}
+    lines = ["| medida | valor | como se mede |", "|---|---:|---|"]
+    lines += [f"| {table[k]['label']} | {table[k]['shown']} | {HOW[k]} |" for k in HEADLINE
+              if table.get(k) and table[k]["value"] is not None]
+    missing = [table[k]["label"] for k in HEADLINE if table.get(k) and table[k]["value"] is None]
+    if missing:
+        lines += ["", "Não medido nesta entrega: " + "; ".join(missing) + "."]
+    return "\n".join(lines)
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     print(to_markdown(Path(sys.argv[1]) if len(sys.argv) > 1 else RESULTS))

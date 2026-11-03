@@ -320,8 +320,8 @@ def missing_headings(text: str) -> list[str]:
 
 
 def scorecard_block(results: Path) -> str:
-    """Placar com meta e status, os ruins junto com os bons (scripts/scorecard.py)."""
-    return scorecard.to_markdown(results)
+    """Manchete do README: só as medidas do enunciado, valor e método (scripts/scorecard.headline_markdown)."""
+    return scorecard.headline_markdown(results)
 
 
 # "Desde a última avaliação": cada lacuna que a correção formal da v4 citou (nas palavras dela) → o que o kit mudou →

@@ -72,4 +72,4 @@ def test_scorecard_measures_heldout_by_the_human_and_shows_intent_as_diagnostic(
     weak = md.split("Abaixo da referência ou sem medida")[1]
     assert "intenção (diagnóstico)" not in weak and "ponta a ponta (humano passa) (0.79)" in weak
     msg = delivery_message.render("https://x.test/r", None, tmp_path, None)
-    assert "intenção (diagnóstico)" in msg.split("Onde ainda está abaixo")[0]
+    assert "intenção (diagnóstico)" not in msg  # kit v5.5: só as medidas do enunciado vão à entrega

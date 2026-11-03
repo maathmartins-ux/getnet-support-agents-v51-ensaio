@@ -12,6 +12,12 @@ from app.llm import get_llm
 from app.observability import new_trace_id, record_llm_usage
 
 
+@pytest.fixture(autouse=True)
+def _fast_path_on(monkeypatch):
+    """Estes testes cobrem o atalho de 1 passo, desligado por padrão desde o kit v5.5 (perfil Skywalker)."""
+    monkeypatch.setenv("SUPERVISOR_FAST", "on")
+
+
 def ctx(text_="Qual a taxa do débito?", intent="faq", **facts):
     c = Context(text=text_, language="pt", user_id="u1", conversation_id="c-r53", intent=intent)
     c.facts.update(facts)

@@ -42,7 +42,9 @@ def head_sha(root: Path = ROOT) -> str:
 
 
 def render(repo: str, video: str | None, results: Path, mins: int | None) -> str:
-    table = scorecard.rows(results)
+    # kit v5.5 (perfil Skywalker): só as medidas que o enunciado pede (scorecard.HEADLINE); as de diagnóstico do kit
+    # ficam em docs/RESULTS.md. Os ruins entre ELAS continuam listados (regra do dono: nada de esconder número ruim).
+    table = [r for r in scorecard.rows(results) if r["key"] in scorecard.HEADLINE]
     good = [r for r in table if r["status"] == "atinge"]
     weak = [r for r in table if r["status"] not in ("atinge", "diagnóstico")]
     lines = [
@@ -55,10 +57,9 @@ def render(repo: str, video: str | None, results: Path, mins: int | None) -> str
         "",
         "Resultados medidos (todos gerados de evals/results/, no README):",
         *[f"- {r['label']}: {r['shown']} (referência {r['goal']})" for r in good],
-        *[f"- {r['label']}: {r['shown']} (sem meta: explica outro número)" for r in table
-          if r["status"] == "diagnóstico"],
         "",
-        "Onde ainda está abaixo da referência, ou não foi medido:",
+        "Onde ainda está abaixo da referência, ou não foi medido (as limitações, com o efeito e o que faltaria, estão "
+        "na seção de limitações do README):",
         *([f"- {r['label']}: {r['shown']} (referência {r['goal']})" for r in weak] or ["- nenhuma métrica"]),
         "",
         "Procedência: o primeiro commit traz um kit próprio, que evoluiu a partir das correções das minhas entregas "
