@@ -425,8 +425,9 @@ e como comparar pela primeira entrega.
 | 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
 | 21:09:29 | 534 | domínio: 'preciso de conta?' responde com a Get Conta; clima sempre com temperaturas |
 | 21:12:12 | 537 | readme: números e linha do tempo (fill_readme, último passo) |
+| 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
 
-Do primeiro ao último commit: **537 min**.
+Do primeiro ao último commit: **546 min**.
 <!-- timeline:end -->
 
 </details>
