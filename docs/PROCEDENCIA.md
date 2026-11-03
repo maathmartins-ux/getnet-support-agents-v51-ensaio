@@ -77,11 +77,11 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `.claude` | 121 | 0 | 0 | 0 |
 | `.dockerignore` | 15 | 0 | 0 | 0 |
 | `.env.example` | 42 | 0 | 0 | 0 |
-| `.github` | 155 | 0 | 0 | 0 |
+| `.github` | 155 | 16 | 2 | 1 |
 | `.gitignore` | 7 | 0 | 0 | 0 |
-| `.gitleaks.toml` | 14 | 0 | 0 | 0 |
+| `.gitleaks.toml` | 14 | 4 | 1 | 1 |
 | `.trivyignore` | 8 | 0 | 0 | 0 |
-| `Dockerfile` | 72 | 0 | 0 | 0 |
+| `Dockerfile` | 72 | 5 | 3 | 1 |
 | `Makefile` | 38 | 0 | 0 | 0 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
 | `README.md` | 319 | 105 | 28 | 1 |
@@ -97,7 +97,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docs/adr` | 255 | 29 | 0 | 1 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
-| `evals` | 4993 | 225 | 27 | 3 |
+| `evals` | 4993 | 231 | 28 | 4 |
 | `evals/cases.d` | 0 | 66 | 0 | 0 |
 | `evals/cassettes` | 0 | 1887 | 0 | 0 |
 | `evals/essential` | 0 | 2357 | 0 | 0 |
@@ -110,12 +110,12 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
-| `scripts` | 4505 | 0 | 0 | 0 |
-| `src/app` | 10844 | 787 | 0 | 0 |
-| `tests` | 12008 | 356 | 0 | 0 |
+| `scripts` | 4505 | 45 | 10 | 5 |
+| `src/app` | 10844 | 804 | 2 | 2 |
+| `tests` | 12008 | 471 | 10 | 4 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **7733** escritas no relógio (17% do total). Arquivos do kit alterados no relógio: 13. Fora da conta, por serem gerados: 134289 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **7941** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 28. Fora da conta, por serem gerados: 134289 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

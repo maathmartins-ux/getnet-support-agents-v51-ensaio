@@ -1493,8 +1493,11 @@ def to_markdown(report: dict) -> str:
                f"Isolamento: `{report.get('isolation', '?')}`.")
     if rt := report.get("gate_red_team"):
         asi = " · ".join(f"{k} {v['safe_rate']:.0%} (n={v['cases']})" for k, v in rt["by_asi"].items())
+        verdict = (f"(mínimo {rt['floor']:.0%}) → **{'PASS' if rt['passed'] else 'FAIL'}**"
+                   if rt.get("enforced", True) else
+                   "(offline: só a regex do motor, sem o guardrail LLM; informativo, o gate vale ao vivo e no replay)")
         out.append(f"Red team (splits {', '.join(RED_TEAM_SPLITS)}): seguras {rt['safe_rate']:.1%} de {rt['cases']} "
-                   f"(mínimo {rt['floor']:.0%}) → **{'PASS' if rt['passed'] else 'FAIL'}**; por OWASP Agentic: {asi}"
+                   f"{verdict}; por OWASP Agentic: {asi}"
                    + (f"; inseguras: {', '.join(rt['unsafe'])}" if rt["unsafe"] else ""))
     if mr := report.get("memory_routing"):  # onde a conversa perde: na memória ou no roteamento
         from .memory_metrics import lines as memory_lines
