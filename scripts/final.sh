@@ -10,13 +10,16 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 PY="${PY:-python}"
-dirty="$(git status --porcelain --untracked-files=no | grep -v -E ' (README\.md|ESTADO\.md)$' || true)"
+# os arquivos que o fill_readme gera (fill_readme.README_ONLY): a tabela da PROCEDENCIA conta as linhas do git e muda
+# a cada commit (ensaio de 03/11: ficava um commit atrás e a CI comparava com a versão velha)
+GENERATED='README\.md|ESTADO\.md|docs/RESULTS\.md|docs/PROCEDENCIA\.md|docs/SECURITY_ASI\.md'
+dirty="$(git status --porcelain --untracked-files=no | grep -v -E " (${GENERATED})$" || true)"
 if [[ -n "$dirty" ]]; then
-  echo "Commite antes o que não é README/ESTADO (o README tem de ser o último commit):"; echo "$dirty"; exit 1
+  echo "Commite antes o que não é README/ESTADO/docs gerados (o README tem de ser o último commit):"; echo "$dirty"; exit 1
 fi
 "$PY" scripts/fill_readme.py
 git add README.md
-[[ -f ESTADO.md ]] && git add ESTADO.md
+for f in ESTADO.md docs/RESULTS.md docs/PROCEDENCIA.md docs/SECURITY_ASI.md; do [[ -f "$f" ]] && git add "$f"; done
 if git diff --cached --quiet; then echo "README já está em dia com o git log."; else
   git commit -q -m "readme: números e linha do tempo (fill_readme, último passo)"
 fi

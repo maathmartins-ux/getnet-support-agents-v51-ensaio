@@ -65,3 +65,6 @@ def test_delivery_clock_starts_at_scaffold_and_names_the_commit(tmp_path, monkey
     assert delivery_message.minutes(tmp_path) == 47
     final = (ROOT / "scripts" / "final.sh").read_text(encoding="utf-8")
     assert "var/ENTREGA_final.md" in final and final.index("git push") < final.index("ENTREGA_final")
+    from scripts import fill_readme  # tudo o que o fill_readme gera entra no commit final (PROCEDENCIA conta o git)
+
+    assert all(f in final for f in fill_readme.README_ONLY)
