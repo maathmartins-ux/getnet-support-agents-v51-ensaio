@@ -324,6 +324,8 @@ def cited_tests_pass(junit: Path) -> tuple[str, bool, float, str]:
         bad = tc.find("failure") is not None or tc.find("error") is not None
         status[key] = status.get(key, True) and not bad
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    cov = ROOT / "docs" / "COBERTURA.md"  # tabela completa da §3: as provas citadas lá também precisam passar
+    readme += cov.read_text(encoding="utf-8") if cov.exists() else ""
     cited = sorted(set(re.findall(r"tests/(test_\w+)\.py::(\w+)", readme)))
     bad = [f"{f}::{t} ({'falha' if f'{f}::{t}' in status else 'não existe'})" for f, t in cited
            if not status.get(f"{f}::{t}", False)]

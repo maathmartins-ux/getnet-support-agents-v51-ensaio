@@ -1,4 +1,5 @@
-"""A §3 do README (cobertura da régua) só cita o que existe: arquivo citado existe, teste citado está definido.
+"""A §3 do README e a tabela completa dela (docs/COBERTURA.md) só citam o que existe: arquivo citado existe,
+teste citado está definido.
 
 Quem lê o README nem sempre roda o código: um caminho quebrado no mapa de evidências custa exatamente a
 confiança que o mapa deveria dar.
@@ -28,8 +29,10 @@ def missing_citations(section: str, root: Path = ROOT) -> list[str]:
 
 def test_every_cited_path_and_test_exists():
     section = coverage_section((ROOT / "README.md").read_text(encoding="utf-8"))
-    assert len(CITED.findall(section)) >= 20, "mapa de evidências quase vazio"
+    full = (ROOT / "docs" / "COBERTURA.md").read_text(encoding="utf-8")  # a tabela completa da §3
+    assert len(CITED.findall(section)) >= 12 and len(CITED.findall(full)) >= 20, "mapa de evidências quase vazio"
     assert not missing_citations(section), f"README §3 cita o que não existe: {missing_citations(section)}"
+    assert not missing_citations(full), f"docs/COBERTURA.md cita o que não existe: {missing_citations(full)}"
 
 
 def test_broken_citation_is_caught():

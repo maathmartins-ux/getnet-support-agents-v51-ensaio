@@ -190,3 +190,23 @@ def test_render_thin_keeps_existing_ids_and_drops_lines_already_in_the_corpus(tm
     assert all("79,90" not in r["text"] for r in out["ofertas"][1:])  # linha que já existia não se repete
     saved = [_json.loads(x) for x in (tmp_path / "ofertas.jsonl").read_text(encoding="utf-8").splitlines()]
     assert [r["id"] for r in saved] == ids
+
+
+def test_readme_timeline_shows_milestones_and_points_to_the_full_timesheet(tmp_path):
+    import subprocess as _sp
+    import sys as _sys
+    from pathlib import Path as _P
+
+    _sys.path.insert(0, str(_P(__file__).resolve().parents[1] / "scripts"))
+    import fill_readme as _fr
+
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+    _sp.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subjects = ["chore: scaffold"] + [f"feat: passo {i}" for i in range(30)] + ["eval: bateria", "readme: fim"]
+    for subj in subjects:
+        _sp.run(["git", "commit", "-q", "--allow-empty", "-m", subj], cwd=tmp_path, check=True,
+                env={**__import__("os").environ, **env})
+    text = _fr.timeline(tmp_path)
+    rows = [ln for ln in text.splitlines() if ln.startswith("| ") and "commit |" not in ln]
+    assert len(rows) <= _fr.TIMELINE_MAX_ROWS and "docs/TIMESHEET.md" in text and "33 commits" in text
+    assert "chore: scaffold" in text and "eval: bateria" in text and "readme: fim" in text

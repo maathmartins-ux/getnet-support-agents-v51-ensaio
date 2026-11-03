@@ -45,6 +45,12 @@ def safe_subject(subject: str) -> str:
     return subject.replace("{{", "{ {").replace("}}", "} }").replace("|", "\\|")
 
 
+# Linha do tempo no README: com muitos commits, só os marcos (scaffold, spec, eval, entrega) e o 1º e o último;
+# a lista inteira já é o docs/TIMESHEET.md (gerado do mesmo git log). 90 linhas de commit escondiam o resto.
+TIMELINE_MAX_ROWS = 20
+MILESTONES = ("chore: scaffold", "preflight", "spec", "eval", "entrega", "final")
+
+
 def timeline(root: Path = ROOT) -> str:
     r = subprocess.run(["git", "log", "--reverse", "--format=%aI|%s"], cwd=root, check=False, text=True,
                        capture_output=True, encoding="utf-8")
@@ -53,10 +59,18 @@ def timeline(root: Path = ROOT) -> str:
         return "_Sem commits ainda._"
     first, last = datetime.fromisoformat(rows[0][0]), datetime.fromisoformat(rows[-1][0])
     lines = ["| hora (UTC; Brasília = UTC−3) | min | commit |", "|---|---:|---|"]
-    for ts, subject in rows:
+    shown = rows
+    if len(rows) > TIMELINE_MAX_ROWS:  # no README só os marcos; a lista inteira fica em docs/TIMESHEET.md
+        keep = {0, len(rows) - 1} | {i for i, (_, subj) in enumerate(rows) if subj.startswith(MILESTONES)}
+        shown = [rows[i] for i in sorted(keep)][-TIMELINE_MAX_ROWS:]
+        if rows[0] not in shown:
+            shown = [rows[0], *shown[1:]]
+    for ts, subject in shown:
         t = datetime.fromisoformat(ts)
         lines.append(f"| {t:%H:%M:%S} | {(t - first).total_seconds() / 60:.0f} | {safe_subject(subject)} |")
-    lines.append(f"\nDo primeiro ao último commit: **{(last - first).total_seconds() / 60:.0f} min**.")
+    lines.append(f"\nDo primeiro ao último commit: **{(last - first).total_seconds() / 60:.0f} min**, "
+                 f"{len(rows)} commits" + ("" if shown is rows else
+                                          f" (aqui os {len(shown)} marcos; todos em `docs/TIMESHEET.md`)") + ".")
     return "\n".join(lines)
 
 
