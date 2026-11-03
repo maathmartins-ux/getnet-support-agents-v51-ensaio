@@ -83,3 +83,13 @@ Cada AC vira um caso `official-NN` em `evals/cases.jsonl`. Respostas no idioma d
 
 Ver OWNERSHIP.json. Contrato: `src/app/schemas.py` (inclui `RouterDecision` e `AgentName`), assinatura de
 `pipeline.handle(req, user_id, identity_verified)` e status `ok|partial|insufficient|error` dos agentes.
+
+## Dados do cliente de teste (contrato da frente T; os casos citam estes ids)
+`cliente1988`: terminais `T1988A` (Get Smart, online, Wi-Fi) e `T1988B` (Get Clássica, offline, chip, sem sinal);
+vendas de ontem em débito, crédito e Pix com agenda de depósito; recusas `TX1007` (crédito, R$ 210,00, código 51)
+e `TX1008` (débito, R$ 75,00, código 05). Segundo cliente `cliente2024` (isolamento: o dado de um nunca aparece ao
+outro; registro alheio = "não encontrado"). Datas relativas a hoje.
+
+## Casos além dos oficiais (evals/cases.jsonl)
+replan 20 (12 sem fonte → humano; 8 terminal/recusa → manual), dependent 11 (records + faq), parallel 4,
+approval 4 (escrita fica pendente de confirmação), memory 16 (com `standalone` e `expects_fact`).
