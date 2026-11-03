@@ -1,7 +1,7 @@
 # Procedência: o que veio do kit e o que foi feito no relógio
 
 Este documento existe para que a comparação com quem entregou uma vez só seja justa. Ele diz o que já estava
-pronto antes do relógio, de onde veio e o que os {{MINUTOS}} minutos medem.
+pronto antes do relógio, de onde veio e o que os 58 minutos medem.
 
 ## 1. O kit e a sua história
 
@@ -57,7 +57,7 @@ correspondente no kit e se ela foi feita **antes** do relógio (kit) ou **no** r
 para medir as correções antes de usá-las; o resultado está no histórico do kit (`KIT_CHANGELOG.md`). Os números
 deste repositório vêm só das medidas feitas aqui, no relógio, sobre o corpus e os casos deste enunciado.
 
-## 2. O que os {{MINUTOS}} minutos medem, e o que não medem
+## 2. O que os 58 minutos medem, e o que não medem
 
 - **Medem:** a especialização do kit para este enunciado, no relógio: spec, base de conhecimento, ferramentas do
   domínio, casos de avaliação (incluindo o held-out cego e as perguntas reais), prompts, regras do router e do
@@ -93,9 +93,10 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docker-compose.hardened.yml` | 37 | 0 | 0 | 0 |
 | `docker-compose.scale.yml` | 28 | 0 | 0 | 0 |
 | `docker-compose.yml` | 91 | 0 | 0 | 0 |
-| `docs` | 429 | 344 | 16 | 2 |
+| `docs` | 429 | 1319 | 16 | 4 |
 | `docs/adr` | 255 | 29 | 0 | 1 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
+| `docs/video` | 0 | 174 | 0 | 0 |
 | `evals` | 4993 | 225 | 27 | 3 |
 | `evals/cases.d` | 0 | 66 | 0 | 0 |
 | `evals/cassettes` | 0 | 1887 | 0 | 0 |
@@ -105,6 +106,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `evals/retrieval.d` | 0 | 81 | 0 | 0 |
 | `ops` | 669 | 0 | 0 | 0 |
 | `pyproject.toml` | 51 | 0 | 0 | 0 |
+| `reports` | 0 | 16 | 0 | 0 |
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
@@ -113,7 +115,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 356 | 0 | 0 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **6465** escritas no relógio (15% do total). Arquivos do kit alterados no relógio: 11. Fora da conta, por serem gerados: 134289 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **7630** escritas no relógio (17% do total). Arquivos do kit alterados no relógio: 13. Fora da conta, por serem gerados: 134289 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).
