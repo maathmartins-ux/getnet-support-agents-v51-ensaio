@@ -20,7 +20,7 @@
 {"text": "O cartão do cliente não passa no terminal", "intent": "troubleshoot"}
 {"text": "The card machine screen shows a communication failure", "intent": "troubleshoot"}
 {"text": "My terminal keeps dropping the signal", "intent": "troubleshoot"}
-{"text": "Quero falar com um atendente", "intent": "human_request"}
+{"text": "Prefiro ser atendido por uma pessoa da equipe", "intent": "human_request"}
 {"text": "Me transfere para uma pessoa, por favor", "intent": "human_request"}
 {"text": "I want to talk to a human agent", "intent": "human_request"}
-{"text": "Get me a real person on the line", "intent": "human_request"}
+{"text": "I would rather have a staff member handle this", "intent": "human_request"}
