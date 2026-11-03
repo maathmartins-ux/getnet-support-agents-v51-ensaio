@@ -404,8 +404,9 @@ e como comparar pela primeira entrega.
 | 18:53:14 | 398 | readme: números e linha do tempo (fill_readme, último passo) |
 | 18:54:48 | 400 | eval: juiz dos oficiais re-medido sobre a rodada de 1fa7c26 (fundamentadas 0,933, úteis 1,00) |
 | 18:54:49 | 400 | readme: números e linha do tempo (fill_readme, último passo) |
+| 19:08:13 | 413 | kit: segurança (token fora do log, compartilhado só sem chave pessoal, /metrics com token); README por tema e sem número digitado divergente |
 
-Do primeiro ao último commit: **400 min**.
+Do primeiro ao último commit: **413 min**.
 <!-- timeline:end -->
 
 </details>

@@ -76,7 +76,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 |---|---:|---:|---:|---:|
 | `.claude` | 121 | 0 | 0 | 0 |
 | `.dockerignore` | 15 | 0 | 0 | 0 |
-| `.env.example` | 42 | 11 | 7 | 1 |
+| `.env.example` | 42 | 16 | 7 | 1 |
 | `.github` | 155 | 17 | 3 | 1 |
 | `.gitignore` | 7 | 0 | 0 | 0 |
 | `.gitleaks.toml` | 14 | 4 | 1 | 1 |
@@ -84,7 +84,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 7 | 5 | 1 |
 | `Makefile` | 38 | 2 | 2 | 1 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 155 | 58 | 1 |
+| `README.md` | 319 | 164 | 66 | 1 |
 | `data` | 34 | 45 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
 | `data/intent_examples.d` | 0 | 26 | 0 | 0 |
@@ -97,7 +97,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docs/adr` | 255 | 50 | 34 | 2 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
-| `evals` | 4993 | 424 | 151 | 16 |
+| `evals` | 4993 | 425 | 151 | 16 |
 | `evals/cases.d` | 0 | 66 | 0 | 0 |
 | `evals/cassettes` | 0 | 1703 | 0 | 0 |
 | `evals/essential` | 0 | 2357 | 0 | 0 |
@@ -111,11 +111,11 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
 | `scripts` | 4505 | 321 | 331 | 25 |
-| `src/app` | 10844 | 1032 | 36 | 18 |
-| `tests` | 12008 | 936 | 213 | 89 |
+| `src/app` | 10844 | 1048 | 42 | 20 |
+| `tests` | 12008 | 961 | 213 | 90 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **8976** escritas no relógio (20% do total). Arquivos do kit alterados no relógio: 167. Fora da conta, por serem gerados: 145592 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **9032** escritas no relógio (20% do total). Arquivos do kit alterados no relógio: 170. Fora da conta, por serem gerados: 145592 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).
