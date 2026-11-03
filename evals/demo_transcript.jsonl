@@ -1,6 +1,6 @@
 {"user": "cliente1988"}
 {"say": "Quando cai o dinheiro das vendas de ontem?"}
 {"say": "E as vendas recusadas, o que aconteceu?"}
-{"say": "Quero contestar a cobrança de aluguel da maquininha T1988B deste mês, acho que não devia ter sido cobrada.", "operator": "Verifiquei o contrato: o aluguel da T1988B deste mês foi cobrado por engano e o estorno de R$ 79,90 entra na próxima fatura.", "wait_s": 20, "operator_after_s": 4}
+{"say": "Quero contestar a cobrança de aluguel da maquininha T1988B deste mês. Pode passar para um atendente analisar?", "operator": "Verifiquei o contrato: o aluguel da T1988B deste mês foi cobrado por engano e o estorno de R$ 79,90 entra na próxima fatura.", "wait_s": 20, "operator_after_s": 4}
 {"say": "A maquininha T1988B continua sem sinal. Pode abrir um chamado?"}
 {"confirm": true}
