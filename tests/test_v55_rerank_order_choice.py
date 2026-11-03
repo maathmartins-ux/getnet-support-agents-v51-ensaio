@@ -88,6 +88,20 @@ def test_choose_breaks_a_ranking_tie_by_gate_coverage_before_latency():
     assert rv.choose(results, budget_ms=1500)["name"] == "dense"
 
 
+def test_choose_ranks_by_what_the_writer_reads_before_mrr():
+    """Números do domínio Getnet (03/11/2026): a ordem do cross tem MRR maior, mas põe menos trechos certos entre
+    os 5 que o redator lê; a escolha não pode depender de qual das duas passou do p95 por ruído (fazem a mesma
+    conta no cross-encoder)."""
+    cross = {**_row(0.859, 0.873, 1400, gate=COS, rerank_gate=NOTE, rerank="cross"), "recall@5": 0.907}
+    base = {**_row(0.842, 0.898, 1450, gate=COS, rerank_gate=NOTE, rerank="cross", rerank_order="base"),
+            "recall@5": 0.915}
+    for budget in (1500, 99999):
+        picked = rv.choose({"dense+cross": cross, "dense+cross:base": base}, budget_ms=budget)
+        assert picked["name"] == "dense+cross:base" and picked["reason"].startswith("maior Recall@5")
+    tie = {**base, "recall@5": 0.907}  # mesmo Recall@5: o MRR desempata
+    assert rv.choose({"dense+cross": cross, "dense+cross:base": tie}, budget_ms=99999)["name"] == "dense+cross"
+
+
 def test_choose_checks_the_floor_of_the_gate_the_app_uses():
     """Com cross-encoder o app decide pela nota: um portão de cosseno sem piso não reprova a configuração se a nota
     recusa o bastante (e uma nota sem piso reprova, mesmo com o cosseno bom)."""
@@ -122,8 +136,10 @@ def test_readme_block_tolerates_a_choice_without_budget_and_shows_the_gate(tmp_p
     (tmp_path / "retriever.json").write_text(json.dumps({
         "_doc": "ordem do denso medida no gold do domínio", "gold": "g", "chosen_at": "t", "git_sha": "abc",
         "chosen": "dense+cross:base", "choice": {"retriever": "dense", "gate": {"min_rerank": -5.5017}},
-        "measured": {"dense+cross:base": {"recall@3": 0.898, "mrr": 0.842, "rerank_gate": NOTE}}}), encoding="utf-8")
+        "measured": {"dense+cross:base": {"recall@3": 0.898, "recall@5": 0.915, "mrr": 0.842, "rerank_gate": NOTE}}}),
+        encoding="utf-8")
     block = retrieval_block(tmp_path, data=tmp_path)
     assert "Escolha do domínio: ordem do denso" in block and "nota do cross-encoder >= -5.5017" in block
-    assert "dense+cross:base **← escolhida** | 0.898 | 0.842" in block and "98% / 86% (nota do cross)" in block
+    assert "dense+cross:base **← escolhida** | 0.915 | 0.898 | 0.842" in block and "98% / 86% (nota do cross)" in block
+    assert "Recall@5 (o redator lê)" in block
     assert "`:base` = a ordem fica a do buscador base" in block

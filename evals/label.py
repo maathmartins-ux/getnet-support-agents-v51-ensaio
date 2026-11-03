@@ -32,12 +32,22 @@ evals/human_divergences.md; os dois conversam ~3 min e a sessão grava o resulta
 Veredito automático de uma linha = todas as checagens True. Passa humano = a resposta é correta, fundamentada e no
 idioma da pergunta (decisão do dono, sem ver a nota automática). Relatório: concordância, kappa de Cohen, e onde
 humano e automático divergem (esses casos mostram o que a checagem automática não enxerga).
+
+Adulteradas de propósito (evals/perturb.py; `scripts/label_page.py --perturb N`): respostas reais com um defeito
+declarado (número trocado, afirmação sem base, fato removido), em evals/results/perturbed.json, entram na página
+misturadas às reais; com elas, TODO id da página é cego (page_id), e a importação volta ao id do caso. Sem elas o
+TNR do juiz contra pessoas não se mede (quase toda resposta real passa). O relatório separa: humano × automático e
+humano × humano só nas reais (a adulterada não é resposta do sistema nem passou pelas checagens); juiz × humano no
+total, só nas reais e só nas adulteradas, com a mesma regra de validação; e quanto cada pessoa e o juiz reprovaram
+das adulteradas (o juiz no conjunto todo, sem depender de rótulo). Rótulo de adulterada cuja resposta não bate com a
+de perturbed.json (arquivo regerado depois) fica fora da conta, listado.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import random
 import sys
@@ -65,6 +75,13 @@ def csv_path(rater: str | None = None, base: Path = HERE) -> Path:
     if not rater.replace("-", "").replace("_", "").isalnum():
         raise ValueError(f"nome de rotulador inválido: {rater!r} (use letras, números, - ou _)")
     return base / f"human_labels.{rater.lower()}.csv"
+
+
+def page_id(case_id: str) -> str:
+    """Id cego da página com adulteradas: real e adulterada ganham o mesmo formato (nada no id, nem no texto de
+    "Copiar minhas respostas", diz qual é qual) e a importação volta ao id do caso pelo mesmo cálculo, sem tabela
+    guardada fora do repositório."""
+    return "r" + hashlib.sha256(f"rotulagem:{case_id}".encode()).hexdigest()[:10]
 
 
 def tool_names(row: dict) -> list[str]:
@@ -198,17 +215,23 @@ def mark(pairs: list[str], path: Path = CSV_PATH) -> int:
 def import_page(dump: Path, n: int | None = None, seed: int = 7, results: Path = RESULTS, base: Path = HERE) -> dict:
     """Fichas da página de rotulagem (scripts/label_page.py; a sessão lê `rotulos` com ArtifactData) → um CSV por
     pessoa, pelo mesmo caminho do --mark. Aceita a lista de documentos como vier ({"documents": [...]}, lista de
-    {"data": {...}} ou de fichas). Nota: "fail:<tipo> <comentário>", como no --mark."""
+    {"data": {...}} ou de fichas). Nota: "fail:<tipo> <comentário>", como no --mark. Id cego (página com
+    adulteradas) volta ao id do caso; a adulterada entra no CSV com a resposta adulterada, a que a pessoa viu."""
+    from evals import perturb
+
     raw = json.loads(dump.read_text(encoding="utf-8"))
     docs = raw.get("documents", raw.get("docs", [])) if isinstance(raw, dict) else raw
     done: dict[str, int] = {}
+    live = {r["id"]: r for r in load_rows(results)}
+    live.update({r["id"]: r for r in perturb.load(results)})
+    blind = {page_id(i): i for i in live}
     for doc in docs:
         data = doc.get("data", doc) if isinstance(doc, dict) else {}
         rater, marks = str(data.get("rater") or "").strip(), data.get("marks") or {}
         if not rater or not marks:
             continue
+        marks = {blind.get(k, k): m for k, m in marks.items()}
         path = csv_path(rater, base)
-        live = {r["id"]: r for r in load_rows(results)}
         if not path.exists():  # o CSV nasce das linhas que a página mostrou (com --splits a amostra é outra)
             _write_csv(path, [live[i] for i in marks if i in live])
         else:  # 2ª página da mesma pessoa: as respostas novas entram no CSV dela (antes eram ignoradas)
@@ -370,9 +393,13 @@ def between_humans(by_rater: dict[str, dict[str, bool]], answers: dict[str, dict
     return out
 
 
-def divergences(base: Path = HERE, out: Path | None = None) -> list[dict]:
+def divergences(base: Path = HERE, out: Path | None = None, results: Path = RESULTS) -> list[dict]:
     """O que os dois primeiros rotuladores marcaram diferente (veredito ou qualquer pergunta), para a rodada de
-    consenso; grava evals/human_divergences.md legível para quem não é da área, com o modelo das linhas de volta."""
+    consenso; grava evals/human_divergences.md legível para quem não é da área, com o modelo das linhas de volta.
+    Com adulterada entre as divergências, o arquivo usa o id cego da página para todas (page_id): o rótulo combinado
+    entra no juiz × humano, e o "~p" no título diria às duas qual resposta foi plantada antes de elas decidirem."""
+    from evals import perturb
+
     files = label_files(base)
     names = sorted(files)[:2]
     if len(names) < 2:
@@ -387,25 +414,36 @@ def divergences(base: Path = HERE, out: Path | None = None) -> list[dict]:
             found.append({"id": i, "pergunta": a[i]["pergunta"], "resposta": a[i]["resposta"],
                           "veredito": {names[0]: a[i]["humano"], names[1]: b[i]["humano"]}, "perguntas": qs})
     word = {"pass": "certa", "fail": "errada", "sim": "sim", "nao": "não"}
+    planted = {r["id"] for r in perturb.load(results)}
+    blind = any(d["id"] in planted for d in found)
+
+    def shown(case_id: str) -> str:
+        return page_id(case_id) if blind else case_id
+
     lines = [f"# Rodada de consenso ({names[0]} × {names[1]})", "",
              f"{len(found)} situações com marcação diferente. Leiam juntos cada uma (~20 s cada) e digam o rótulo "
              "combinado. Se continuarem discordando, tudo bem: escrevam `diverge`.", ""]
     for d in found:
-        lines += [f"## {d['id']}", f"- Cliente: {d['pergunta'][:300]}", f"- Assistente: {d['resposta'][:400]}",
+        lines += [f"## {shown(d['id'])}", f"- Cliente: {d['pergunta'][:300]}", f"- Assistente: {d['resposta'][:400]}",
                   "- Veredito: " + " · ".join(f"{n}: {word.get(v, v)}" for n, v in d["veredito"].items())]
         lines += [f"- Pergunta \"{QUESTIONS[q]}\": " + " · ".join(f"{n}: {word.get(v, v)}" for n, v in vs.items())
                   for q, vs in d["perguntas"].items()]
         lines.append("")
     lines += ["Respostas de volta (uma linha por situação):", "", "```", "CONSENSO",
-              *[f"{d['id']}=pass|fail|diverge" for d in found], "```"]
+              *[f"{shown(d['id'])}=pass|fail|diverge" for d in found], "```"]
     target = out or base / DIVERGENCES.name
     target.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return found
 
 
-def import_consensus(text: str, base: Path = HERE) -> dict:
+def import_consensus(text: str, base: Path = HERE, results: Path = RESULTS) -> dict:
     """Linhas `id=pass|fail[:tipo]` ou `id=diverge` (a linha "CONSENSO" e o resto são ignorados) →
-    evals/human_consensus.json, que o --report usa no "depois do consenso"."""
+    evals/human_consensus.json, que o --report usa no "depois do consenso". Id cego (divergências com adulterada)
+    volta ao id do caso."""
+    from evals import perturb
+
+    known = [r["id"] for r in load_rows(results)] + [r["id"] for r in perturb.load(results)]
+    alias = {page_id(i): i for i in known}
     got: dict[str, dict] = {}
     for line in text.splitlines():
         line = line.strip().strip("`")
@@ -415,7 +453,7 @@ def import_consensus(text: str, base: Path = HERE) -> dict:
         verdict, _, kind = rest.partition(":")
         verdict = verdict.strip().lower()
         if verdict in ("pass", "fail", "diverge") and case_id.strip():
-            got[case_id.strip()] = {"v": verdict, "tipo": kind.strip()}
+            got[alias.get(case_id.strip(), case_id.strip())] = {"v": verdict, "tipo": kind.strip()}
     path = base / CONSENSUS.name
     path.write_text(json.dumps(got, ensure_ascii=False, indent=1), encoding="utf-8")
     return {"itens": len(got), "resolvidas": sum(v["v"] != "diverge" for v in got.values()), "arquivo": str(path)}
@@ -450,66 +488,189 @@ def _load_consensus(base: Path) -> dict | None:
         return None
 
 
-def judge_vs_humans(by_rater: dict[str, dict[str, bool]], consensus: dict | None,
-                    results: Path = RESULTS) -> dict | None:
-    """Juiz × humanos em RESPOSTAS REAIS (método do rótulo em trace real): o veredito completo do juiz (fundamentada,
-    idioma, vazamento) contra o humano — o consenso quando houver, senão a concordância dos dois, senão o 1º rotulador.
-    Complementa a calibração em casos construídos (judge.json `calibration`), que mede outra coisa: casos escritos à
-    mão, com a evidência escrita à mão. Mesma regra de validação, fixada antes de medir (evals.judge.validation)."""
-    from evals.judge import tpr_tnr, validation, verdict_fails
+JUDGE_FILE, JUDGE_PERTURBED = "judge.json", "judge_perturbed.json"
+JUDGE_VERDICT = "fundamentada, útil, no idioma da pergunta e sem vazamento — as 3 perguntas da página"
 
+
+def judge_passes(v: dict) -> bool:
+    """O juiz aprova pela mesma régua da pessoa. A página reprova se qualquer pergunta sai ruim: não responde ao
+    pedido (c1), algo sem base (c2), idioma diferente (c3). O juiz responde as mesmas três em `helpful`, `grounded` e
+    `language_ok` (mais o vazamento); deixar `helpful` de fora faria a resposta fundamentada que não atende ao pedido
+    (ex.: fato_removido) aparecer como erro do juiz, quando é só critério diferente. Campo ausente não reprova."""
+    from evals.judge import verdict_fails
+
+    return not verdict_fails(v) and v.get("helpful", True) is not False
+
+
+def _first_run(path: Path) -> dict[str, dict] | None:
+    """Veredito da 1ª rodada de cada caso (a amostra rotulada é a 1ª rodada); None se o arquivo não abre."""
     try:
-        verdicts = json.loads((results / "judge.json").read_text(encoding="utf-8")).get("verdicts") or []
+        verdicts = json.loads(path.read_text(encoding="utf-8")).get("verdicts") or []
     except (OSError, ValueError):
         return None
-    judge = {}
-    for v in verdicts:  # 1ª rodada de cada caso (a amostra rotulada é a 1ª rodada)
-        if v.get("run", 0) == 0 and v["id"] not in judge:
-            judge[v["id"]] = not verdict_fails(v)
+    out: dict[str, dict] = {}
+    for v in verdicts:
+        if v.get("run", 0) == 0 and v["id"] not in out:
+            out[v["id"]] = v
+    return out
+
+
+def perturbed_verdicts(results: Path, perturbed: dict[str, dict]) -> tuple[dict[str, dict], str | None]:
+    """Vereditos do juiz nas adulteradas (judge_perturbed.json), só se ele julgou ESTA versão de perturbed.json
+    (`perturbed_sha`): veredito de outra versão diria respeito a outra resposta. Devolve (vereditos, aviso)."""
+    from evals import perturb
+
+    path = results / JUDGE_PERTURBED
+    if not perturbed or not path.exists():
+        return {}, None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}, None
+    if data.get("status") in ("skipped", "error"):
+        return {}, f"o juiz das adulteradas não rodou ({JUDGE_PERTURBED}: status `{data['status']}`)"
+    if data.get("perturbed_sha") != perturb.rows_sha(list(perturbed.values())):
+        return {}, (f"{JUDGE_PERTURBED} julgou outra versão de {perturb.FILE}: "
+                    "rode `python -m evals.judge --perturbed` de novo")
+    return {i: v for i, v in (_first_run(path) or {}).items() if i in perturbed}, None
+
+
+def _human_labels(by_rater: dict[str, dict[str, bool]], consensus: dict | None) -> dict[str, bool]:
+    """Rótulo humano de cada id: o do consenso quando houver, senão o das pessoas que concordam (1 basta)."""
     resolved = {k: (c or {}).get("v") == "pass" for k, c in (consensus or {}).items()
                 if isinstance(c, dict) and (c or {}).get("v") in ("pass", "fail")}
-    names = sorted(by_rater)
     human: dict[str, bool] = {}
     for i in set().union(*(set(r) for r in by_rater.values())) if by_rater else set():
         if i in resolved:
             human[i] = resolved[i]
         else:
-            votes = {by_rater[n][i] for n in names if i in by_rater[n]}
+            votes = {r[i] for r in by_rater.values() if i in r}
             if len(votes) == 1:
                 human[i] = votes.pop()
-    pairs = [(judge[i], h) for i, h in sorted(human.items()) if i in judge]
+    return human
+
+
+def judge_vs_humans(by_rater: dict[str, dict[str, bool]], consensus: dict | None,
+                    results: Path = RESULTS, perturbed: dict[str, dict] | None = None) -> dict | None:
+    """Juiz × humanos em respostas reais (método do rótulo em trace real) e nas adulteradas declaradas: o veredito
+    do juiz pela régua da pessoa (judge_passes) contra o humano — o consenso quando houver, senão a concordância dos
+    dois, senão o 1º rotulador. Complementa a calibração em casos construídos (judge.json `calibration`), que mede
+    outra coisa: casos escritos à mão, com a evidência escrita à mão. Mesma regra de validação, fixada antes de medir
+    (evals.judge.validation), no total, só nas reais e só nas adulteradas (`perturbed`: {id: linha de
+    perturbed.json}; o juiz delas vem de judge_perturbed.json, nunca do judge.json da manchete)."""
+    from evals.judge import tpr_tnr, validation
+
+    pert = perturbed or {}
+    judge = {i: judge_passes(v) for i, v in (_first_run(results / JUDGE_FILE) or {}).items() if i not in pert}
+    fake, stale = perturbed_verdicts(results, pert)
+    judge.update({i: judge_passes(v) for i, v in fake.items()})
+    human = _human_labels(by_rater, consensus)
+    pairs = {i: (judge[i], h) for i, h in sorted(human.items()) if i in judge}
     if not pairs:
         return None
-    stats = tpr_tnr(pairs)
-    return {"casos": len(pairs), "concordancia": round(sum(a == b for a, b in pairs) / len(pairs), 3), **stats,
-            "validacao": validation(stats)}
+
+    def block(ids: list[str]) -> dict | None:
+        ps = [pairs[i] for i in ids]
+        if not ps:
+            return None
+        stats = tpr_tnr(ps)
+        return {"casos": len(ps), "concordancia": round(sum(a == b for a, b in ps) / len(ps), 3), **stats,
+                "validacao": validation(stats)}
+
+    out = {**block(list(pairs)), "veredito_do_juiz": JUDGE_VERDICT}
+    if pert:
+        ids = [i for i in pairs if i in pert]
+        out["reais"] = block([i for i in pairs if i not in pert])
+        out["adulteradas"] = block(ids)
+        if out["adulteradas"]:
+            kinds: dict[str, list[tuple[bool, bool]]] = defaultdict(list)
+            for i in ids:
+                kinds[str(pert[i].get("perturbation"))].append(pairs[i])
+            out["adulteradas"]["por_tipo"] = {
+                k: {"casos": len(ps), "humano_reprova": sum(not h for _, h in ps),
+                    "juiz_reprova": sum(not j for j, _ in ps)} for k, ps in sorted(kinds.items())}
+        if stale:
+            out["aviso"] = stale
+    return out
+
+
+def perturbed_summary(pert: dict[str, dict], by_rater: dict[str, dict[str, bool]], dropped: list[str],
+                      results: Path = RESULTS) -> dict | None:
+    """Quantas adulteradas existem e quantas entraram na rotulagem, de que tipos; quanto cada pessoa reprovou (a
+    adulterada é também conferência de atenção de quem rotula) e quanto o juiz reprovou no conjunto inteiro, sem
+    depender de rótulo (é o canário em resposta real, com a evidência real). `dropped`: rótulos de adulterada cuja
+    resposta não é mais a de perturbed.json."""
+    from evals.perturb import FILE, TYPES
+
+    if not pert:
+        return None
+    labeled = set().union(*(set(r) for r in by_rater.values())) if by_rater else set()
+
+    def kinds(ids) -> dict[str, int]:
+        return {t: sum(pert[i].get("perturbation") == t for i in ids) for t in TYPES}
+
+    fake, stale = perturbed_verdicts(results, pert)
+    judge = None
+    if fake:
+        per = {t: {"julgadas": 0, "reprovou": 0} for t in TYPES}
+        for i, v in fake.items():
+            k = per.setdefault(str(pert[i].get("perturbation")), {"julgadas": 0, "reprovou": 0})
+            k["julgadas"] += 1
+            k["reprovou"] += not judge_passes(v)
+        judge = {"julgadas": len(fake), "reprovou": sum(not judge_passes(v) for v in fake.values()), "por_tipo": per}
+    return {"arquivo": FILE, "geradas": len(pert), "por_tipo": kinds(pert), "rotuladas": len(labeled),
+            "rotuladas_por_tipo": kinds(labeled),
+            "humano": {n: {"rotuladas": len(r), "reprovou": sum(not ok for ok in r.values())}
+                       for n, r in sorted(by_rater.items())},
+            "juiz": judge, "fora_da_conta": sorted(dropped), "aviso": stale}
+
+
+def _same_text(a: str | None, b: str | None) -> bool:
+    return " ".join((a or "").split()) == " ".join((b or "").split())
 
 
 def report(results: Path = RESULTS, path: Path | None = None, out: Path = OUT, base: Path = HERE) -> dict:
+    from evals import perturb
+
     live = {r["id"]: r for r in load_rows(results)}
     auto = {i: auto_pass(r) for i, r in live.items()}
+    pert = {r["id"]: r for r in perturb.load(results)}
     files = {"dono": path} if path else label_files(base)
     by_rater: dict[str, dict[str, bool]] = {}
+    fake_by_rater: dict[str, dict[str, bool]] = {}
+    dropped: set[str] = set()
     answers: dict[str, dict[str, dict]] = {}
     per: dict[str, dict] = {}
     held: dict[str, dict | None] = {}
     for name, f in files.items():
-        labeled = [r for r in read_labels(f) if r["humano"] in ("pass", "fail") and r["id"] in auto]
+        marked = [r for r in read_labels(f) if r["humano"] in ("pass", "fail")]
+        labeled = [r for r in marked if r["id"] in auto]
         if labeled:
             by_rater[name] = {r["id"]: r["humano"] == "pass" for r in labeled}
             answers[name] = {r["id"]: {q: r.get(q, "") for q in QUESTIONS} for r in labeled}
             per[name] = _vs_auto(labeled, auto)
             held[name] = heldout_e2e(labeled, live)
+        # adulterada: só vale o rótulo da resposta que está em perturbed.json (a que o juiz julgou)
+        fake = [r for r in marked if r["id"] in pert]
+        old = {r["id"] for r in fake if not _same_text(r["resposta"], pert[r["id"]].get("answer"))}
+        dropped |= old
+        fake = [r for r in fake if r["id"] not in old]
+        if fake:
+            fake_by_rater[name] = {r["id"]: r["humano"] == "pass" for r in fake}
     first = per[sorted(per)[0]] if per else _vs_auto([], auto)
+    consensus = _load_consensus(base)
+    every = {n: {**by_rater.get(n, {}), **fake_by_rater.get(n, {})} for n in sorted({*by_rater, *fake_by_rater})}
     rep = {
-        **first,  # campos de sempre: o 1º rotulador (ordem alfabética) × automático
+        **first,  # campos de sempre: o 1º rotulador (ordem alfabética) × automático, só nas respostas reais
         "rotuladores": len(per),
         "por_rotulador": {k: {x: v[x] for x in ("rotulos", "concordancia", "kappa")} | {"heldout": held.get(k)}
                           for k, v in per.items()},
         # held-out ponta a ponta do 1º rotulador (o dono): a medida; a intenção vira linha de diagnóstico
         "heldout": held.get(sorted(per)[0]) if per else None,
-        "entre_humanos": between_humans(by_rater, answers, _load_consensus(base)),
-        "juiz_x_humano": judge_vs_humans(by_rater, _load_consensus(base), results),
+        # humano × humano só nas reais: negativo plantado (fácil de concordar) inflaria a concordância medida
+        "entre_humanos": between_humans(by_rater, answers, consensus),
+        "juiz_x_humano": judge_vs_humans(every, consensus, results, pert),
+        "adulteradas": perturbed_summary(pert, fake_by_rater, sorted(dropped), results),
         "aviso": None if first["rotulos"] >= 20 else f"só {first['rotulos']} rótulos: abaixo de 20 não dá para confiar",
     }
     out.parent.mkdir(parents=True, exist_ok=True)

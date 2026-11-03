@@ -17,6 +17,10 @@ afirma sem evidência, idioma errado, vaza dado de outro cliente) e TEM de repro
 o relatório sai com `judge_unreliable: true` e o README diz isso. Juiz de outra família: JUDGE_PROVIDER=openai_compat
 com JUDGE_BASE_URL, JUDGE_MODEL e JUDGE_API_KEY (qualquer /chat/completions compatível); juiz da mesma família do
 gerador é declarado no relatório (`same_family`), porque modelo tende a aprovar texto da própria família.
+
+Adulteradas (`python -m evals.judge --perturbed`): julga evals/results/perturbed.json (evals/perturb.py; gera se
+faltar) e grava evals/results/judge_perturbed.json, nunca o judge.json: resposta adulterada de propósito não entra
+em taxa nenhuma da manchete. É o que o relatório humano compara com as pessoas nas adulteradas (evals.label).
 """
 from __future__ import annotations
 
@@ -32,6 +36,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "src"))
 RESULTS_DIR = HERE / "results"
 OUT = RESULTS_DIR / "judge.json"
+PERTURBED_OUT = "judge_perturbed.json"  # ao lado do judge.json, nunca dentro dele
 CALIBRATION = HERE / "judge_calibration.jsonl"
 # Custo estimado por chamada antes da 1ª medida. Smoke ao vivo de 31/10/2026: 10 chamadas do Opus custaram
 # US$ 0,0653 (0,0065 cada); 0,02 travou a rodada com saldo sobrando. 0,01 mantém ~50% de folga.
@@ -481,6 +486,48 @@ def judge_into(llm, path: Path, out: Path = OUT, max_usd: float | None = None,
         return report
 
 
+def _read(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def judge_perturbed(llm, results: Path | None = None, out: Path | None = None, max_usd: float | None = None,
+                    calibration: Path | None = None) -> dict:
+    """Julga as adulteradas (perturbed.json; gera se faltar) e grava judge_perturbed.json, à parte da manchete.
+
+    Mesmo prompt e mesma evidência da original: o juiz vê a adulterada como veria qualquer resposta ao vivo.
+    Confiança: com judge_perturbed.json da MESMA versão das adulteradas (`perturbed_sha`), continua dele (só julga o
+    que faltou); senão começa dos canários e da calibração do judge.json, que o run reaproveita quando o modelo e o
+    gabarito são os mesmos (como entre splits no judge_into) — pagar de novo não mediria nada novo. Veredito de
+    outra versão nunca é reaproveitado: o mesmo id pode ser outra resposta.
+    """
+    from evals import perturb
+
+    results = results or RESULTS_DIR
+    out = out or results / PERTURBED_OUT
+    rows = perturb.ensure(results)
+    if not (results / perturb.FILE).exists():  # sem linha ao vivo para adulterar: nada a julgar, e isso fica dito
+        report = {"status": "skipped", "reason": f"sem {perturb.FILE}: nenhuma linha ao vivo para adulterar"}
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+        return report
+    sha = perturb.rows_sha(rows)
+    old = _read(out)
+    if old and old.get("perturbed_sha") == sha and old.get("status") not in ("skipped", "error"):
+        previous = old
+    else:
+        head = _read(results / OUT.name) or {}
+        previous = {k: head[k] for k in ("canaries", "calibration_pairs", "model") if k in head} or None
+    report = run(llm, [results / perturb.FILE], calibration, max_usd, previous=previous, reuse_trust=True)
+    report["perturbed_sha"] = sha
+    report["perturbed_file"] = perturb.FILE
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8")
@@ -491,7 +538,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="continua um judge.json interrompido (aborted_*): não paga de novo o que já foi julgado")
     ap.add_argument("--revalidate", action="store_true",
                     help="reaplica a regra de validação (origem dos rótulos) ao judge.json existente, sem chamar o LLM")
+    ap.add_argument("--perturbed", action="store_true",
+                    help="julga evals/results/perturbed.json (gera se faltar) → judge_perturbed.json, fora da manchete")
     args = ap.parse_args(argv)
+    if args.perturbed:
+        return _main_perturbed(args.max_usd)
     if args.revalidate:
         report = json.loads(OUT.read_text(encoding="utf-8"))
         cal = report.get("calibration") or {}
@@ -525,6 +576,28 @@ def main(argv: list[str] | None = None) -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({k: v for k, v in report.items() if k != "verdicts"}, ensure_ascii=False))
+    return 0
+
+
+def _main_perturbed(max_usd: float | None) -> int:
+    """`--perturbed`: grava sempre judge_perturbed.json (no modo offline, `skipped`), nunca o judge.json."""
+    from app.config import llm_provider
+    from app.llm import LLMError, get_judge_llm
+
+    out = RESULTS_DIR / PERTURBED_OUT
+    if llm_provider() != "anthropic" and os.getenv("JUDGE_PROVIDER", "anthropic") != "openai_compat":
+        report = {"status": "skipped", "reason": "LLM_PROVIDER != anthropic (sem juiz no modo offline)"}
+    else:
+        try:
+            report = judge_perturbed(get_judge_llm(), RESULTS_DIR, out, max_usd=max_usd)
+        except LLMError as exc:
+            report = {"status": "error", "reason": str(exc)}
+    if report.get("status") in ("skipped", "error"):
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    # contagens só: quem roda pode ser quem rotula, e nada aqui diz qual resposta da página é adulterada
+    keep = ("status", "reason", "model", "spent_usd", "judge_unreliable", "trust_reused", "cases", "perturbed_sha")
+    print(json.dumps({k: report[k] for k in keep if k in report}, ensure_ascii=False))
     return 0
 
 

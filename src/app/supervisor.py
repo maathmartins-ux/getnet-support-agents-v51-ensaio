@@ -40,6 +40,11 @@ Paralelismo: threads (os agentes fazem I/O — SQLite, HTTP do LLM). Cada thread
 contextvars (trace_id, custo do request, span OTel pai). O resultado entra SEMPRE na ordem do plano
 (ou dos blocos tool_use), nunca na ordem de término: rota, resposta e eval ficam determinísticos.
 Todo desvio do plano vai para `replans`.
+
+Quem decidiu cada passo (`decided_by` na árvore de passos, `step_view`): "llm" quando o passo veio de uma tool call
+do supervisor LLM; "code" quando uma regra do código o pôs no turno, com a regra em `why` (CODE_WHY). A marca é
+gravada onde o passo é registrado (`_record`, com o motivo de cada chamada), não deduzida depois dos replanos: o
+leitor do trace separa o que o modelo escolheu do que o código impôs.
 """
 from __future__ import annotations
 
@@ -93,6 +98,18 @@ MAX_TURN_USD = 0.25
 NODE_TIMEOUT_S = 60.0  # agente com LLM e 3 rodadas de tool leva ~10–25 s ao vivo
 BUDGET_REASON = "budget_exhausted"
 REPLAN_MODES = ("on", "no_needs", "off")
+# Quem decidiu o passo: DECIDED_LLM = tool call do supervisor LLM; senão a regra do código que o pôs no turno (why):
+#   needs       achado de um especialista aceito por accept_need (o modelo não precisou pedir o passo);
+#   escalation  escalada garantida por _enforce_escalation (faltou fonte, dado ou registro e ninguém respondeu);
+#   table       motor determinístico: plano do router, FALLBACK do domínio ou router incerto (LOW_CONFIDENCE);
+#   fast_path   o passo único do atalho (`fast_path`), rodado sem consultar o supervisor LLM;
+#   operator    a resposta do humano (passo "human"), na retomada (`prior`) ou na espera síncrona;
+#   budget      orçamento do turno esgotado (_exhaust, inclui NODE_TIMEOUT_S): o caso vai ao humano;
+#   lead        1º passo do plano rodado antes da 1ª volta do supervisor LLM (lead_step, SUPERVISOR_LEAD=on);
+#   hold        aviso de caso aberto na conversa (_hold): o turno fica em espera.
+DECIDED_LLM = "llm"
+DECIDED_CODE = "code"
+CODE_WHY = ("needs", "escalation", "table", "fast_path", "operator", "budget", "lead", "hold")
 TOOLS = [
     {"name": "faq_agent", "strict": True,
      "description": "Responde dúvidas sobre produto e políticas com RAG e fonte citada. "
@@ -163,6 +180,9 @@ class Outcome:
     budget: str | None = None  # teto que parou o turno (model_calls | usd | node_timeout)
     deferred: list[str] = field(default_factory=list)  # passos do plano que ficaram para depois do humano
     handover: str | None = None  # atalho: agente cujo insufficient a tabela passou ao supervisor LLM
+    # fila do motor determinístico: a regra de CODE_WHY que pôs cada agente nela (plano, achado, FALLBACK). A fila
+    # guarda só nomes (next_batch); o motivo vai ao passo quando ele roda (_table_loop → _record).
+    queued_by: dict[str, str] = field(default_factory=dict)
 
 
 # --- execução de um agente --------------------------------------------------------------------------------
@@ -212,9 +232,25 @@ def _invoke(name: str, ctx: Context) -> AgentResult:
 PREVIEW_CHARS = 200
 
 
+def _decide(result: AgentResult, by: str | None) -> AgentResult:
+    """Grava no passo quem o decidiu: `by` = DECIDED_LLM ou uma regra de CODE_WHY; None não marca nada.
+
+    A decisão é do supervisor, não do especialista: vai num atributo próprio do AgentResult (`decided`), fora de
+    `facts` (que acumulam no contexto dos agentes) e de `for_supervisor` (o que o modelo lê). Marcar não muda
+    contexto, rota nem resposta; só `step_view` lê a marca.
+    """
+    if by == DECIDED_LLM:
+        result.decided = {"decided_by": DECIDED_LLM}
+    elif by is not None:
+        result.decided = {"decided_by": DECIDED_CODE, "why": by}
+    return result
+
+
 def step_view(result: AgentResult, mask=lambda text: text) -> dict:
     """Um passo da árvore de passos (o trace legível por caso): agente → status/motivo → ms →
-    ferramentas com args, ok e prévia do resultado (mascarada por `mask`) → antes/depois de escrita executada."""
+    ferramentas com args, ok e prévia do resultado (mascarada por `mask`) → antes/depois de escrita executada →
+    quem decidiu o passo (`decided_by`, e `why` quando foi o código). Passo sem marca sai sem os dois campos: quem
+    lê conta "não registrado", nunca uma decisão presumida."""
     evidence = result.evidence if len(result.evidence) == len(result.tool_calls) else []
     tools = []
     for i, call in enumerate(result.tool_calls):
@@ -223,7 +259,7 @@ def step_view(result: AgentResult, mask=lambda text: text) -> dict:
             tool["preview"] = mask(" ".join(str(evidence[i]).split()))[:PREVIEW_CHARS]
         tools.append(tool)
     view = {"agent": result.agent, "status": result.status, "reason": result.reason, "ms": result.ms,
-            "tools": tools}
+            "tools": tools, **(getattr(result, "decided", None) or {})}
     for key in ("operator", "answered_live", "from_memory"):
         if result.facts.get(key):
             view[key] = result.facts[key]
@@ -264,7 +300,10 @@ def run_batch(names: list[str], ctx: Context) -> list[AgentResult]:
         return [f.result() for f in futures]
 
 
-def _record(name: str, result: AgentResult, ctx: Context, out: Outcome) -> None:
+def _record(name: str, result: AgentResult, ctx: Context, out: Outcome, by: str | None = None) -> None:
+    """Registra o passo no turno. `by`: quem o decidiu (DECIDED_LLM ou a regra de CODE_WHY), vindo de quem chama:
+    cada caminho do laço sabe por que o passo entrou."""
+    _decide(result, by)
     out.route.append(name)
     out.results.append(result)
     if result.status in ANSWERED and result.text and name != "escalation":  # quem já respondeu algo no turno
@@ -332,7 +371,7 @@ def _exhaust(what: str, pending: list[str], ctx: Context, out: Outcome) -> None:
         return
     ctx.handoff_reason = BUDGET_REASON
     ctx.facts["escalation_note"] = f"orçamento do turno esgotado ({what}); pendente: {out.deferred or '[]'}"
-    _record("escalation", _invoke("escalation", ctx), ctx, out)
+    _record("escalation", _invoke("escalation", ctx), ctx, out, "budget")
 
 
 # --- motor determinístico ----------------------------------------------------------------------------------
@@ -341,9 +380,12 @@ def run_table(plan: list[str], ctx: Context, confidence: float = 1.0, handover: 
     e fica em `out.handover` para o supervisor LLM decidir (ver `_run`)."""
     out = Outcome()
     queue = list(plan)
+    # no atalho (handover) o passo único do plano roda sem consultar o supervisor LLM; fora dele, pela tabela
+    out.queued_by.update(dict.fromkeys(queue, "fast_path" if handover else "table"))
     if confidence < LOW_CONFIDENCE and queue and "escalation" not in queue \
             and not no_escalation(ctx) and supervisor_replan():
         queue.append("escalation")
+        out.queued_by["escalation"] = "table"
         ctx.handoff_reason = "low_confidence"
         out.replans.append(f"router:low_confidence({confidence:.2f})->escalation")
     return _table_loop(queue, ctx, out, handover)
@@ -357,7 +399,7 @@ def _table_loop(queue: list[str], ctx: Context, out: Outcome, handover: bool = F
         batch = next_batch(queue, MAX_STEPS - len(out.route))
         results = run_batch(batch, ctx)
         for name, result in zip(batch, results, strict=True):
-            _record(name, result, ctx, out)
+            _record(name, result, ctx, out, out.queued_by.pop(name, "table"))
         timed_out = [n for n, r in zip(batch, results, strict=True) if r.reason == "node_timeout"]
         if timed_out:
             _exhaust("node_timeout", timed_out + queue, ctx, out)
@@ -366,6 +408,7 @@ def _table_loop(queue: list[str], ctx: Context, out: Outcome, handover: bool = F
             accepted = [a for need in result.needs if (a := accept_need(name, need, ctx, out, queue))]
             for agent in reversed(accepted):  # o passo pedido roda logo a seguir
                 queue.insert(0, agent)
+                out.queued_by[agent] = "needs"
             if result.status in ANSWERED or accepted:  # achado atendido substitui o fallback da falha
                 continue
             if handover and result.status == "insufficient" and not queue and _fallback_of(name, result, ctx, out):
@@ -389,6 +432,7 @@ def _apply_fallback(name: str, result: AgentResult, ctx: Context, out: Outcome, 
     if nxt == "escalation":
         _defer_dependents(name, queue, out)
     queue.insert(0, nxt)
+    out.queued_by[nxt] = "table"
     out.replans.append(f"{name}:{result.reason or result.status}->{nxt}")
     METRICS.inc("replans_total", agent=name, reason=result.reason or result.status, engine="table")
 
@@ -469,7 +513,7 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                  f"Não chame {last}_agent de novo.")
     if lead:
         result = run_batch([lead], ctx)[0]
-        _record(lead, result, ctx, out)
+        _record(lead, result, ctx, out, "lead")
         last = lead
         if result.reason == "node_timeout":
             _exhaust("node_timeout", [p for p in plan if p not in out.route], ctx, out)
@@ -481,7 +525,7 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                  "resultado.")
         for agent in [a for need in result.needs if (a := accept_need(lead, need, ctx, out, []))]:
             inserted = run_batch([agent], ctx)[0]
-            _record(agent, inserted, ctx, out)
+            _record(agent, inserted, ctx, out, "needs")
             last = agent
             user += f"\n[supervisor] passo inserido por achado: {agent}_agent → {inserted.for_supervisor()}"
     messages: list = [{"role": "user", "content": user}]
@@ -533,7 +577,7 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                     METRICS.inc("replans_total", agent=last or "start", reason="llm_decision", engine="llm")
             results = run_batch([name for _, name in batch], ctx)
             for (block, name), result in zip(batch, results, strict=True):
-                _record(name, result, ctx, out)
+                _record(name, result, ctx, out, DECIDED_LLM)  # o modelo pediu a tool; o código só aprovou
                 verdicts[block.id] = {"type": "tool_result", "tool_use_id": block.id,
                                       "content": result.for_supervisor()}
                 last = name
@@ -551,7 +595,7 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                              if need["agent"] not in called and (a := accept_need(name, need, ctx, out, inserted))]
             if inserted:
                 for agent, result in zip(inserted, run_batch(inserted, ctx), strict=True):
-                    _record(agent, result, ctx, out)
+                    _record(agent, result, ctx, out, "needs")
                     last = agent
                     notes.append({"type": "text", "text": f"[supervisor] passo inserido por achado: {agent}_agent "
                                                           f"→ {result.for_supervisor()}"})
@@ -576,8 +620,9 @@ def _hold(ctx: Context, ticket: dict, out: Outcome) -> None:
     # required=False de propósito: `required` diz "ESTE turno escalou". Caso aberto de turno anterior é só aviso
     # (reason + ticket_id). Com True, toda pergunta depois de uma escalação virava "handoff" e inflava a taxa de
     # escalonamento: medido, split memory, handoff 92,3% → 76,9%.
-    out.results.append(AgentResult("hold", "ok", text=text, evidence=[text],
-                                   handoff=Handoff(required=False, reason="case_open", ticket_id=ticket["id"])))
+    notice = AgentResult("hold", "ok", text=text, evidence=[text],
+                         handoff=Handoff(required=False, reason="case_open", ticket_id=ticket["id"]))
+    out.results.append(_decide(notice, "hold"))
     if out.answer is not None:
         out.answer = f"{out.answer}\n\n{text}"
 
@@ -597,12 +642,13 @@ def run(plan: list[str], ctx: Context, confidence: float = 1.0, prior: list[Agen
     """Um turno. Caso aberto na conversa → modo espera (_hold); caso aberto NESTE turno → guarda o que faltou.
 
     `prior`: resultados que já existem antes do plano (retomada: o AgentResult "human" com a resposta do operador).
-    Os fatos deles entram no contexto dos agentes e eles abrem a rota e os resultados do Outcome.
+    Os fatos deles entram no contexto dos agentes e eles abrem a rota e os resultados do Outcome; na árvore de
+    passos são do código com `why` "operator" (a resposta humana chega pronta, nenhum modelo a escolheu).
     """
     held = cases.open_case(ctx.conversation_id)
     seeded = Outcome()
     for result in prior or []:
-        _record(result.agent, result, ctx, seeded)
+        _record(result.agent, result, ctx, seeded, "operator")
     out = _run(plan, ctx, confidence)
     if seeded.results:
         out.route[:0], out.results[:0] = seeded.route, seeded.results
@@ -644,7 +690,7 @@ def _continue_with_operator(plan: list[str], ctx: Context, out: Outcome) -> Outc
     esc.text = CONSULTED[lang].format(ticket=ticket["id"])
     esc.evidence = [esc.text]
     esc.facts = {**esc.facts, "answered_live": True, "operator": operator}  # o DEMO e o eval leem daqui
-    _record("human", human, ctx, out)
+    _record("human", human, ctx, out, "operator")
     out.replans.append(f"escalation->human (resposta em {hitl_sync.wait_s():g}s de espera)")
     steps = out.deferred or [p for p in plan if p != "escalation" and p in AGENTS and p not in out.route]
     out.deferred = []
@@ -716,7 +762,7 @@ def _enforce_escalation(out: Outcome, ctx: Context) -> Outcome:
         return out
     ctx.handoff_reason = f"{failed.agent}_{failed.reason}"
     result = run_batch(["escalation"], ctx)[0]
-    _record("escalation", result, ctx, out)
+    _record("escalation", result, ctx, out, "escalation")
     out.replans.append(f"{failed.agent}:{failed.reason}->escalation (código: ninguém respondeu)")
     METRICS.inc("replans_total", agent=failed.agent, reason="enforced_escalation", engine=out.engine)
     if out.answer is not None:

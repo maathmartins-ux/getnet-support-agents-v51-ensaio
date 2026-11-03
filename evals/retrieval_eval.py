@@ -496,10 +496,16 @@ def gate_in_use(res: dict) -> dict | None:
 
 def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
            ram_budget_mb: float | None = RAM_BUDGET_MB) -> dict:
-    """Maior MRR entre as configurações com p95 <= orçamento de latência, RAM <= orçamento de memória e portão que
-    recusa >= NEG_REFUSAL_MIN das perguntas sem fonte (calibrado por configuração; com cross-encoder, o da nota);
-    empate → maior Recall@3 → portão que responde mais perguntas com fonte no piso de recusa → menor p95 → mais
-    simples. RAM não medida (sem /proc) não reprova; `ram_budget_mb` None desliga o teto.
+    """Maior Recall@K_GEN (os trechos que o redator lê) entre as configurações com p95 <= orçamento de latência,
+    RAM <= orçamento de memória e portão que recusa >= NEG_REFUSAL_MIN das perguntas sem fonte (calibrado por
+    configuração; com cross-encoder, o da nota); empate → maior MRR → maior Recall@3 → portão que responde mais
+    perguntas com fonte no piso de recusa → menor p95 → mais simples. RAM não medida (sem /proc) não reprova;
+    `ram_budget_mb` None desliga o teto.
+
+    Por que o recall do redator vem antes do MRR: o redator lê os K_GEN trechos juntos, então a resposta depende de
+    o trecho certo estar entre eles, não da posição; e o recall não oscila entre medições, ao contrário do p95. No
+    domínio Getnet a ordem do cross tinha MRR 0,859 × 0,842 mas Recall@5 0,907 × 0,915, e a escolha por MRR
+    dependia de 3,7 ms de p95 (as duas variantes fazem a mesma conta no cross-encoder).
 
     Nenhuma dentro do orçamento → bm25 (sem dependência e sem modelo). Devolve {name, config, reason, rejected}.
     """
@@ -528,7 +534,10 @@ def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
     def coverage(r: dict) -> float:  # perguntas com fonte que o portão em uso responde no piso de recusa
         return (gate_in_use(r) or {}).get("pos_answered") or 0.0
 
-    name, res = max(ok, key=lambda x: (x[1]["mrr"], x[1][f"recall@{K}"], coverage(x[1]),
+    def reader_recall(r: dict) -> float:  # comparativo antigo sem Recall@K_GEN: o Recall@K
+        return r.get(f"recall@{K_GEN}", r[f"recall@{K}"])
+
+    name, res = max(ok, key=lambda x: (reader_recall(x[1]), x[1]["mrr"], x[1][f"recall@{K}"], coverage(x[1]),
                                        -(x[1]["latency_ms"]["p95"] or 0), -len(x[0])))
     gate = res.get("gate") or {}
     off = {"min_score": BM25_OFF, "min_cosine": COSINE_OFF}  # null de um comparativo antigo = caminho desligado
@@ -539,13 +548,14 @@ def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
         config.pop("gate")
     ram = f" e RAM <= {ram_budget_mb:g} MB" if ram_budget_mb is not None else ""
     return {"name": name, "config": config, "rejected": rejected,
-            "reason": f"maior MRR com p95 <= {budget_ms:g} ms{ram} (empate: Recall@3, depois cobertura do portão, "
-                      "depois p95)"}
+            "reason": f"maior Recall@{K_GEN} (o que o redator lê) com p95 <= {budget_ms:g} ms{ram} (empate: MRR, "
+                      f"Recall@{K}, cobertura do portão, p95)"}
 
 
 def summary(res: dict) -> dict:
     """Linha enxuta de uma configuração (sem as perguntas): o que vai para data/retriever.json e o README."""
-    keys = ("cases", f"recall@{K}", "mrr", f"hit@{K}", f"hit@{K}_ci", f"ndcg@{K}", "page", "latency_ms",
+    keys = ("cases", f"recall@{K}", f"recall@{K_GEN}", "mrr", f"hit@{K}", f"hit@{K}_ci", f"ndcg@{K}", "page",
+            "latency_ms",
             "memory_mb", "dedupe_aliases", "fallback", "config", "gate", "rerank_gate", "separation",
             "separation_rerank")
     return {k: res[k] for k in keys if k in res} if res.get("status") != "unavailable" else dict(res)
@@ -567,12 +577,12 @@ def apply_choice(report: dict, picked: dict, target: Path, budget_ms: float, git
 
 def markdown(measured: dict[str, dict], chosen: str | None = None) -> str:
     """Tabela das configurações medidas (README e saída do CLI), com a cobertura do portão em uso de cada uma."""
-    lines = ["| configuração | Recall@3 | MRR | hit@3 | nDCG@3 | URL hit@3 | p50 ms | p95 ms | RAM MB "
-             "| portão: com fonte respondidas / sem fonte recusadas |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
+    lines = [f"| configuração | Recall@{K_GEN} (o redator lê) | Recall@{K} | MRR | hit@{K} | nDCG@{K} | URL hit@{K} "
+             "| p50 ms | p95 ms | RAM MB | portão: com fonte respondidas / sem fonte recusadas |",
+             "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     for name, r in measured.items():
         if r.get("status") == "unavailable":
-            lines.append(f"| {name} | indisponível: {r['reason'][:80]} | | | | | | | | |")
+            lines.append(f"| {name} | indisponível: {r['reason'][:80]} | | | | | | | | | |")
             continue
         lat = r.get("latency_ms") or {}
         mark = " **← escolhida**" if name == chosen else ""
@@ -581,7 +591,8 @@ def markdown(measured: dict[str, dict], chosen: str | None = None) -> str:
         kind = "nota do cross" if r.get("rerank_gate") else "BM25/cosseno"
         gate_cell = (f"{gate['pos_answered']:.0%} / {gate['neg_refused']:.0%} ({kind})"
                      if gate.get("pos_answered") is not None and gate.get("neg_refused") is not None else "—")
-        lines.append(f"| {name}{mark} | {r.get(f'recall@{K}', '—')} | {r.get('mrr', '—')} | {r.get(f'hit@{K}', '—')} "
+        lines.append(f"| {name}{mark} | {r.get(f'recall@{K_GEN}', '—')} | {r.get(f'recall@{K}', '—')} "
+                     f"| {r.get('mrr', '—')} | {r.get(f'hit@{K}', '—')} "
                      f"| {r.get(f'ndcg@{K}', '—')} | {(r.get('page') or {}).get(f'hit@{K}', '—')} "
                      f"| {lat.get('p50', '—')} | {lat.get('p95', '—')} | {'—' if mem is None else mem} | {gate_cell} |")
     if any(name.endswith(":base") for name in measured):

@@ -185,11 +185,67 @@ def human_block(results: Path) -> str:
                      f"({ho['taxa']}){' ' + fmt_ci(ho['ci']) if ho.get('ci') else ''}; diagnóstico: intenção certa "
                      f"em {ho['diagnostico_intencao']} das mesmas linhas; intenção errada com resposta aprovada: "
                      f"{', '.join(ho['intencao_errada_humano_passa']) or '—'}.")
+    lines += _perturbed_lines(h.get("adulteradas")) + _judge_human_lines(h.get("juiz_x_humano"))
     if h.get("aviso"):
         lines.append(f"Aviso: {h['aviso']}.")
     lines += [f"- `{d['id']}`: humano {d['humano']} × automático {d['automatico']} {d['nota']}".rstrip()
               for d in h.get("divergencias", [])[:8]]
     return "\n".join(lines)
+
+
+def _kinds(counts: dict | None) -> str:
+    return ", ".join(f"{k} {v}" for k, v in (counts or {}).items() if v) or "—"
+
+
+def _perturbed_lines(ad: dict | None) -> list[str]:
+    """Adulteradas de propósito declaradas: quantas entraram na rotulagem e de que tipos, quanto cada pessoa e o
+    juiz reprovaram. Relatório sem o bloco (antigo, ou sem adulteradas): nada."""
+    if not ad:
+        return []
+    src = f"`evals/results/{ad.get('arquivo', 'perturbed.json')}`, geradas por `evals/perturb.py`"
+    if ad.get("rotuladas"):
+        who = "; ".join(f"`{n}` reprovou {r['reprovou']}/{r['rotuladas']}" for n, r in (ad.get("humano") or {}).items())
+        kinds = _kinds(ad.get("rotuladas_por_tipo"))
+        out = [f"Adulteradas de propósito: **{ad['rotuladas']}** respostas erradas em relação à própria evidência "
+               f"entraram na rotulagem misturadas às reais, sem marca na página ({kinds}; declaradas em {src}). "
+               f"Quem rotulou: {who}."]
+    else:
+        out = [f"Adulteradas de propósito: {ad.get('geradas', 0)} geradas ({_kinds(ad.get('por_tipo'))}; {src}), "
+               "ainda não rotuladas."]
+    if jd := ad.get("juiz"):
+        per = ", ".join(f"{k} {v['reprovou']}/{v['julgadas']}" for k, v in (jd.get("por_tipo") or {}).items()
+                        if v.get("julgadas"))
+        out.append(f"- juiz em todas as {jd['julgadas']} adulteradas (sem depender de rótulo): reprovou "
+                   f"**{jd['reprovou']}/{jd['julgadas']}** ({per}).")
+    if ad.get("fora_da_conta"):
+        out.append(f"- fora da conta (resposta rotulada ≠ a de hoje em perturbed.json): "
+                   f"{', '.join(ad['fora_da_conta'])}.")
+    if ad.get("aviso"):
+        out.append(f"- {ad['aviso']}.")
+    return out
+
+
+def _judge_human_lines(jx: dict | None) -> list[str]:
+    """Juiz × humano com a regra fixada antes de medir: no total e, com adulteradas, só nas reais e só nelas."""
+    if not jx:
+        return []
+
+    def one(b: dict) -> str:
+        v = b.get("validacao") or {}
+        verdict = "**validado**" if v.get("validated") else f"não validado (falta: {'; '.join(v.get('missing', []))})"
+        return (f"{b['casos']} respostas (a pessoa aprova {b['positives']} e reprova {b['negatives']}) · "
+                f"concordância {b['concordancia']} · TPR {b['tpr']} · TNR {b['tnr']} → {verdict}")
+
+    rule = (jx.get("validacao") or {}).get("rule", "")
+    head = f"veredito do juiz: {jx['veredito_do_juiz']}; " if jx.get("veredito_do_juiz") else ""
+    out = [f"Juiz × humano ({head}regra fixada antes: {rule}): {one(jx)}."]
+    # sem adulterada rotulada, "só reais" repetiria o total
+    for key, name in (("reais", "só reais"), ("adulteradas", "só adulteradas")) if jx.get("adulteradas") else ():
+        if b := jx.get(key):
+            kinds = "; ".join(f"{k}: a pessoa reprovou {t['humano_reprova']}/{t['casos']}, o juiz "
+                              f"{t['juiz_reprova']}/{t['casos']}" for k, t in (b.get("por_tipo") or {}).items())
+            out.append(f"- {name}: {one(b)}" + (f" ({kinds})" if kinds else "") + ".")
+    return out  # o aviso de juiz das adulteradas velho ou não rodado já sai nas linhas das adulteradas
 
 
 def replan_block(results: Path) -> str:

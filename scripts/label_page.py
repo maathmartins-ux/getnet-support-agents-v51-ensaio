@@ -3,6 +3,10 @@
   python scripts/label_page.py --n 10 --raters Matheus,Bianca [--out var/rotulagem.html]
 
 `--heldout`: só o held-out cego (o passa/falha humano é a medida ponta a ponta; `evals.label --report` dá `heldout`).
+`--perturb N`: além das `--n` reais, N respostas adulteradas de propósito (evals/results/perturbed.json, de
+evals/perturb.py; gera se faltar), equilibradas por tipo, embaralhadas com as reais e nunca ao lado da própria
+original. Com elas, todo id da página vira cego (evals.label.page_id): nem a tela, nem o HTML, nem o texto de
+"Copiar minhas respostas" dizem qual é adulterada; a saída do script dá só quantas entraram, por tipo.
 A amostra é a MESMA de `python -m evals.label --export N` (mesma função, mesma seed): pergunta, resposta, o que o
 redator consultou (`context`) e os links das fontes; nunca a nota automática nem o veredito do juiz. A sessão publica
 com `capabilities: {db: {rules: RULES}, user: {}, sample: {}}` (regras abaixo: cada pessoa grava e lê só a própria
@@ -16,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import random
 import re
 import sys
 from pathlib import Path
@@ -158,20 +163,39 @@ def answer_lang(row: dict) -> str:
     return row.get("language_detected") or detect_text_language(row.get("answer") or "", 1) or ""
 
 
+def mix_perturbed(picked: list[dict], k: int, seed: int, results: Path, splits: set[str] | None,
+                  fresh: bool) -> list[dict]:
+    """As reais sorteadas + até k adulteradas (evals.perturb.pick), embaralhadas. A amostra real não muda (a mesma
+    do `--export`); a adulterada nunca vem de uma original que já está na página, e prefere original que ninguém
+    rotulou ainda (quem viu a resposta certa reconheceria a diferença de memória)."""
+    from evals import label, perturb
+
+    pool = [r for r in perturb.ensure(results) if not splits or r.get("original_split") in splits]
+    seen = label.labeled_ids()
+    extra = perturb.pick(pool, k, seed, exclude_originals={r["id"] for r in picked},
+                         exclude=seen if fresh else frozenset(), avoid_originals=seen)
+    out = picked + extra
+    random.Random(f"{seed}:mistura").shuffle(out)
+    return out
+
+
 def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] | None = None,
-          suspects: int = 0, fresh: bool = False) -> list[dict]:
+          suspects: int = 0, fresh: bool = False, perturb: int = 0) -> list[dict]:
     """Mesma amostra do `evals.label --export` (com `splits`, a mesma função sobre as linhas desses splits).
     `suspects`: até N casos com falha suspeita na amostra (negativos para medir o TNR do juiz); `fresh`: sem os já
-    rotulados."""
+    rotulados; `perturb`: mais até N adulteradas declaradas (mix_perturbed), e então todo id é cego."""
     from evals import label
 
-    rows = label.load_rows(results or label.RESULTS)
+    results = results or label.RESULTS
+    rows = label.load_rows(results)
     if splits:
         rows = [r for r in rows if r.get("split") in splits]
     before = _before()
     out = []
     picked = (label.enriched_sample(rows, n, seed, suspects, label.labeled_ids() if fresh else None)
               if suspects or fresh else label.sample(rows, n, seed))
+    if perturb:
+        picked = mix_perturbed(picked, perturb, seed, results, splits, fresh)
     for r in picked:
         seen, sources = set(), []
         for s in r.get("sources") or []:
@@ -180,8 +204,10 @@ def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] |
                 sources.append({"title": s.get("title") or s["url"], "url": s["url"]})
         ctx = r.get("context") or "\n".join(r.get("evidence") or [])
         ids = {str(s.get("id")): s.get("url") for s in r.get("sources") or [] if isinstance(s, dict) and s.get("id")}
-        out.append({"id": r["id"], "question": r.get("message") or "", "answer": r.get("answer") or "",
-                    "before": before.get(r["id"], []), "source_urls": ids,
+        # adulterada: os turnos anteriores são os da original (é a mesma conversa, com a resposta trocada)
+        out.append({"id": label.page_id(r["id"]) if perturb else r["id"], "question": r.get("message") or "",
+                    "answer": r.get("answer") or "", "before": before.get(r.get("original_id") or r["id"], []),
+                    "source_urls": ids,
                     "evidence": str(ctx)[:EVIDENCE_CHARS], "blocks": evidence_blocks(r), "sources": sources,
                     # pergunta 3 da página: o idioma da pergunta e o da resposta lado a lado (sem os dois à vista,
                     # quem rotula marca resposta em inglês certa como idioma errado)
@@ -229,6 +255,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--suspects", type=int, default=0,
                     help="até N casos com falha suspeita (checagem ou juiz) na amostra: negativos para o TNR do juiz")
     ap.add_argument("--fresh", action="store_true", help="sem os casos já rotulados (human_labels*.csv)")
+    ap.add_argument("--perturb", type=int, default=0, metavar="N",
+                    help="mais N respostas adulteradas de propósito (evals/results/perturbed.json; gera se faltar), "
+                         "sem marca na página: negativos conhecidos para validar o juiz contra pessoas")
     ap.add_argument("--raters", required=True, help="nomes separados por vírgula (ex.: Matheus,Bianca)")
     ap.add_argument("--out", type=Path, default=ROOT / "var" / "rotulagem.html")
     args = ap.parse_args(argv)
@@ -236,14 +265,26 @@ def main(argv: list[str] | None = None) -> int:
     if len(raters) < 2:
         ap.error("a avaliação independente pede 2+ pessoas")
     splits = {"heldout"} if args.heldout else ({x.strip() for x in args.splits.split(",")} if args.splits else None)
-    rows = items(args.n, args.seed, splits=splits, suspects=args.suspects, fresh=args.fresh)
+    rows = items(args.n, args.seed, splits=splits, suspects=args.suspects, fresh=args.fresh, perturb=args.perturb)
     if args.heldout and not rows:
         ap.error("sem linhas do held-out em evals/results/live_heldout.json: rode o held-out ao vivo antes")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(rows, raters), encoding="utf-8")
-    print(json.dumps({"out": str(args.out), "items": len(rows), "raters": raters,
-                      "capabilities": {"db": {"rules": RULES}, "user": {}, "sample": {}}}, ensure_ascii=False))
+    info = {"out": str(args.out), "items": len(rows), "raters": raters,
+            "capabilities": {"db": {"rules": RULES}, "user": {}, "sample": {}}}
+    if args.perturb:
+        info["adulteradas"] = _perturbed_counts(rows)
+    print(json.dumps(info, ensure_ascii=False))
     return 0
+
+
+def _perturbed_counts(rows: list[dict]) -> dict:
+    """Quantas adulteradas entraram, por tipo (nunca quais: quem roda o script pode ser quem rotula)."""
+    from evals import label, perturb
+
+    kinds = {label.page_id(r["id"]): r.get("perturbation") for r in perturb.load(label.RESULTS)}
+    got = [kinds[r["id"]] for r in rows if r["id"] in kinds]
+    return {"total": len(got), "por_tipo": {t: got.count(t) for t in perturb.TYPES}}
 
 
 if __name__ == "__main__":

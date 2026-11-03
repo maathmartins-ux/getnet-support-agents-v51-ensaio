@@ -9,19 +9,25 @@ evals/results/live_<split>.json (1ª rodada de cada caso) e escreve, por cenári
 agentes, ferramentas, fontes, números sem base, resposta e custo. O cabeçalho carimba o commit e a data.
 
 Árvore de passos (o trace legível por caso): quando a linha traz `steps` (a resposta do /chat), cada cenário mostra
-agente → status/motivo → ms → ferramenta com args → prévia do resultado.
+agente → status/motivo → ms → ferramenta com args → prévia do resultado → quem decidiu o passo ("decidido por:
+supervisor LLM" ou "código (regra)", lido de `decided_by`/`why`; passo gravado sem o campo sai "não registrado").
 `--transcript`: roda NO PROCESSO (o LLM que o ambiente tiver; sem chave, o modo offline) uma conversa multi-turno
 descrita em JSONL — {"user": "u1"} na 1ª linha; depois {"say": "..."}, {"confirm": true} (confirma a última ação
-proposta e mostra o antes/depois da escrita) e {"say": "...", "operator": "resposta", "wait_s": 5} (um operador
-simulado responde o caso durante a espera síncrona, app/hitl_sync.py) — e escreve a transcrição com a árvore.
+proposta e mostra o antes/depois da escrita) e {"say": "...", "operator": "resposta", "wait_s": 5} (a operadora
+simulada responde o caso durante a espera síncrona, app/hitl_sync.py, com chave pessoal: o nome dela vai para o
+passo e para a auditoria) — e escreve a transcrição com a árvore.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
+import secrets
 import subprocess
 import sys
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -66,8 +72,43 @@ def _short(value, limit: int = 140) -> str:
     return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
+DECIDED_LABEL = {"llm": "supervisor LLM", "code": "código"}
+# A regra do código que pôs o passo no turno (supervisor.CODE_WHY), dita para quem lê o DEMO sem abrir o código.
+WHY_LABEL = {
+    "needs": "achado `needs` de outro especialista",
+    "escalation": "escalada garantida: ninguém resolveu",
+    "table": "motor determinístico",
+    "fast_path": "atalho de 1 passo",
+    "operator": "resposta do operador",
+    "budget": "orçamento do turno esgotado",
+    "lead": "1º passo do plano, antes do supervisor LLM",
+    "hold": "caso aberto: modo espera",
+}
+
+
+DECIDED_LEGEND = ("Em cada passo, **decidido por** diz quem o pôs no turno: o supervisor LLM (pediu a tool) ou o "
+                  "código, com a regra entre parênteses (`supervisor.CODE_WHY`); \"não registrado\" = passo gravado "
+                  "antes do campo `decided_by`.")
+
+
+def decided(st: dict) -> str:
+    """Quem decidiu o passo: o supervisor LLM (tool call) ou o código, com a regra entre parênteses.
+
+    Passo gravado antes do campo `decided_by` sai "não registrado": a decisão não é deduzida dos replanos nem do
+    motor do turno, porque um mesmo turno mistura passos dos dois.
+    """
+    who = st.get("decided_by")
+    if not who:
+        return "decidido por: não registrado"
+    if who == "code":
+        why = st.get("why")
+        return f"decidido por: código ({WHY_LABEL.get(why) or _short(why or 'sem regra', 40)})"
+    return f"decidido por: {DECIDED_LABEL.get(who) or _short(who, 40)}"
+
+
 def step_tree(steps: list[dict]) -> list[str]:
-    """Linhas markdown da árvore de passos: um item por agente, sub-itens por ferramenta."""
+    """Linhas markdown da árvore de passos: um item por agente (terminando em quem decidiu o passo), sub-itens por
+    ferramenta."""
     out = []
     for n, st in enumerate(steps, 1):
         extra = [f"motivo `{st['reason']}`"] if st.get("reason") else []
@@ -83,7 +124,8 @@ def step_tree(steps: list[dict]) -> list[str]:
             extra.append("do livro de fatos")
         if st.get("pending_action"):
             extra.append(f"ação proposta `{st['pending_action']}`")
-        out.append(f"{n}. **{st.get('agent')}** · {st.get('status')}" + (" · " + " · ".join(extra) if extra else ""))
+        extra.append(decided(st))
+        out.append(f"{n}. **{st.get('agent')}** · {st.get('status')} · " + " · ".join(extra))
         for t in st.get("tools") or []:
             proposed = '"needs_confirmation": true' in (t.get("preview") or "")
             state = "proposta (aguarda a confirmação do cliente)" if proposed else "ok" if t.get("ok") else "falhou"
@@ -123,6 +165,8 @@ def render(report: dict, split: str, sha: str, when: str) -> str:
             f"pass^{stab.get('runs')} {stab.get('pass_hat_k')}; instáveis: {unstable}.",
             "",
         ]
+    if any(r.get("steps") for r in rows):
+        out += [DECIDED_LEGEND, ""]
     out += ["| caso | intenção | rota | ferramentas | handoff | veredito automático |", "|---|---|---|---|---|---|"]
     for r in rows:
         out.append(
@@ -159,15 +203,43 @@ def render(report: dict, split: str, sha: str, when: str) -> str:
     return "\n".join(out) + "\n"
 
 
-def _operator_thread(answer: str, after_s: float, seen: set[str]):
-    """Operador simulado: responde, pelo endpoint do console, o 1º caso de atendimento novo da fila."""
+DEMO_OPERATOR = "operadora_demo"
+
+
+def demo_operator_key() -> tuple[str, str]:
+    """Chave pessoal da operadora de demonstração, nova a cada transcrição: (chave, entrada do OPERATOR_KEYS).
+
+    O servidor guarda só o sha256 da chave (app.auth.operator_name) e grava o NOME de quem respondeu na auditoria e
+    no passo "human"; pelo token compartilhado, os dois diriam "admin", sem dono. A chave vive só na memória deste
+    processo: nada a imprime nem grava.
+    """
+    key = secrets.token_urlsafe(24)
+    return key, f"{DEMO_OPERATOR}:{hashlib.sha256(key.encode()).hexdigest()}"
+
+
+@contextmanager
+def _env(name: str, value: str):
+    """`name`=`value` só durante o bloco; o ambiente do processo volta ao que era, com erro ou sem."""
+    prev = os.environ.get(name)
+    os.environ[name] = value
+    try:
+        yield
+    finally:
+        if prev is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = prev
+
+
+def _operator_thread(answer: str, after_s: float, seen: set[str], key: str):
+    """Operadora simulada: responde, pelo endpoint do console e com a chave pessoal `key`, o 1º caso de atendimento
+    novo da fila."""
     import threading
     import time
 
     from fastapi.testclient import TestClient
 
     from app.api import app
-    from app.config import operator_token
     from app.store import get_store
 
     def run() -> None:
@@ -177,7 +249,7 @@ def _operator_thread(answer: str, after_s: float, seen: set[str]):
             if fresh:
                 time.sleep(after_s)
                 client.post(f"/handoffs/{fresh[0]['id']}/reply", json={"answer": answer},
-                            headers={"X-Operator-Token": operator_token()})
+                            headers={"X-Operator-Token": key})
                 return
             time.sleep(0.05)
 
@@ -186,10 +258,29 @@ def _operator_thread(answer: str, after_s: float, seen: set[str]):
     return thread
 
 
-def transcript(path: Path, sha: str, when: str) -> str:
-    """Roda a conversa descrita em `path` pelo /chat no processo e devolve a transcrição em markdown."""
-    import os
+def _audit_line(ticket: str) -> list[str]:
+    """Quem a auditoria registrou como autor da resposta ao caso (lido do banco, não do roteiro da conversa)."""
+    from app.store import get_store
 
+    rows = get_store().audit_for(ticket, "handoff_reply")
+    if not rows:
+        return []
+    who = ", ".join(f"`{r['actor']}` (canal {r['detail'].get('channel', '?')})" for r in rows)
+    return [f"*(auditoria do caso {ticket}: `handoff_reply` registrado por {who})*", ""]
+
+
+def transcript(path: Path, sha: str, when: str) -> str:
+    """Roda a conversa descrita em `path` pelo /chat no processo e devolve a transcrição em markdown.
+
+    A operadora simulada responde com a chave pessoal de `demo_operator_key`, somada às chaves que o ambiente já
+    tiver só enquanto a transcrição roda (com chave pessoal configurada, o token compartilhado deixa de valer).
+    """
+    key, entry = demo_operator_key()
+    with _env("OPERATOR_KEYS", ",".join(filter(None, [os.environ.get("OPERATOR_KEYS", ""), entry]))):
+        return _transcript(path, sha, when, key)
+
+
+def _transcript(path: Path, sha: str, when: str, operator_key: str) -> str:
     sys.path[:0] = [str(ROOT), str(ROOT / "src")]
     from fastapi.testclient import TestClient
 
@@ -203,8 +294,10 @@ def transcript(path: Path, sha: str, when: str) -> str:
     client, headers = TestClient(app), {"Authorization": f"Bearer {issue_token(user)}"}
     out = ["# Transcrição multi-turno (memória, ação com antes/depois, humano)", "",
            f"Gerada por `scripts/demo_md.py --transcript {path.as_posix()}` no commit `{sha}` em {when}, rodando o "
-           f"`POST /chat` no processo (LLM: `{os.getenv('LLM_PROVIDER', 'padrão do ambiente')}`). Nada escrito à mão.",
-           ""]
+           f"`POST /chat` no processo (LLM: `{os.getenv('LLM_PROVIDER', 'padrão do ambiente')}`). Nada escrito à mão. "
+           f"Quem responde o caso é a operadora simulada `{DEMO_OPERATOR}`, com chave pessoal gerada nesta execução "
+           "(o `OPERATOR_KEYS` do processo guarda só o sha256 dela), pelo mesmo endpoint do console.",
+           "", DECIDED_LEGEND, ""]
     conv, pending, n = None, None, 0
     for turn in turns:
         if turn.get("confirm"):
@@ -225,7 +318,7 @@ def transcript(path: Path, sha: str, when: str) -> str:
             os.environ["HITL_SYNC_WAIT_S"] = str(turn.get("wait_s", 5))
             os.environ.setdefault("HITL_SYNC_POLL_S", "0.2")
             seen = {t["id"] for t in get_store().list_tickets("open")}
-            thread = _operator_thread(turn["operator"], float(turn.get("operator_after_s", 0.3)), seen)
+            thread = _operator_thread(turn["operator"], float(turn.get("operator_after_s", 0.3)), seen, operator_key)
         try:
             got = client.post("/chat", json={"message": turn["say"], "conversation_id": conv}, headers=headers).json()
         finally:
@@ -240,10 +333,14 @@ def transcript(path: Path, sha: str, when: str) -> str:
         pending = got.get("pending_action") or pending
         out += [f"### Turno {n}", "", f"**Cliente:** {turn['say']}", ""]
         if turn.get("operator"):
-            out += [f"*(operador simulado responde durante a espera: \"{turn['operator']}\")*", ""]
+            out += [f"*(a operadora simulada `{DEMO_OPERATOR}` responde pelo console, com chave pessoal, durante a "
+                    f"espera: \"{turn['operator']}\")*", ""]
         out += [f"**Intenção:** {got.get('intent')} · **rota:** {' → '.join(got.get('route') or [])}", "",
                 "**Passos:**", "", *step_tree(got.get("steps") or []), "", "**Resposta:**", "",
                 *[f"> {ln}" if ln.strip() else ">" for ln in (got.get("answer") or "").splitlines()], ""]
+        ticket = (got.get("handoff") or {}).get("ticket_id")
+        if turn.get("operator") and ticket:
+            out += _audit_line(ticket)
     return "\n".join(out) + "\n"
 
 
