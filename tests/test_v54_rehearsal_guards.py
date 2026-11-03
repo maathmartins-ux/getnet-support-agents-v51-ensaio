@@ -68,3 +68,11 @@ def test_delivery_clock_starts_at_scaffold_and_names_the_commit(tmp_path, monkey
     from scripts import fill_readme  # tudo o que o fill_readme gera entra no commit final (PROCEDENCIA conta o git)
 
     assert all(f in final for f in fill_readme.README_ONLY)
+
+
+def test_check_and_live_eval_refuse_a_retriever_in_fallback():
+    """Ensaio de 03/11: só [dev] instalado → BM25 do fallback na tentativa × denso + cross no CI/docker."""
+    check = (ROOT / "scripts" / "check.py").read_text(encoding="utf-8")
+    assert "buscador = o configurado (sem fallback)" in check and "requirements-hybrid.lock" in check
+    sh = (ROOT / "scripts" / "live_eval.sh").read_text(encoding="utf-8")
+    assert "LIVE_EVAL_ALLOW_FALLBACK" in sh and "fallback" in sh

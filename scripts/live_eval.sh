@@ -42,6 +42,14 @@ MIN_GB="${LIVE_EVAL_MIN_FREE_GB:-5}"  # os testes do script zeram (o disco do CI
 if (( DRY == 0 && FREE_GB < MIN_GB )); then  # disco cheio no meio da bateria derruba o sqlite (ensaio v5.4)
   echo "Disco com ${FREE_GB} GB livres (mínimo ${MIN_GB}). Libere antes: rm -rf /tmp/eval-* e caches." >&2; exit 1
 fi
+# Buscador: a evidência ao vivo tem de ser do MESMO produto que o CI e o docker servem (ensaio de 03/11: sem
+# fastembed na tentativa, a bateria rodou no BM25 do fallback e o CI, no denso + cross, discordou dos resultados).
+if (( DRY == 0 )) && [[ "${LIVE_EVAL_ALLOW_FALLBACK:-0}" != "1" ]]; then
+  FB="$("$PY" -c "import sys; sys.path.insert(0, 'src'); from app.rag import get_retriever; print(getattr(get_retriever(), 'fallback', '') or '')" 2>/dev/null | tail -1)"
+  if [[ -n "$FB" ]]; then
+    echo "Buscador em fallback ($FB): instale requirements-hybrid.lock e rode scripts/fetch_models.py antes." >&2; exit 1
+  fi
+fi
 # Memória: cada processo com o buscador do kit carrega o e5-large + cross (~3 GB). Ensaio v5.4: eval aquecido + check +
 # ablação + rodada 1 juntos = OOM no meio da bateria (3 de 12 splits salvos, 8 min perdidos). Espere os outros acabarem.
 MIN_RAM="${LIVE_EVAL_MIN_RAM_GB:-6}"

@@ -97,6 +97,18 @@ def _token() -> str:
     return r.stdout.strip()
 
 
+RETRIEVER_PROBE = """
+import sys
+sys.path.insert(0, "src")
+from app.rag import get_retriever
+r = get_retriever()
+fb = getattr(r, "fallback", "")
+print(r.name, "|", fb or "sem fallback")
+if fb:
+    print("instale: pip install -r requirements-dev.lock -r requirements-hybrid.lock && pip install --no-deps -e . ;"
+          " depois python scripts/fetch_models.py")
+    sys.exit(1)
+"""
 CLOUD_CA = Path("/root/.ccr/ca-bundle.crt")  # proxy de saída das sessões da nuvem (claude.ai/code)
 
 
@@ -314,6 +326,9 @@ def main() -> int:
     results = [
         step("venv aponta para este repo", [PY, "-c", VENV_PROBE, str(ROOT)]),
         step("ruff", [PY, "-m", "ruff", "check", "."]),
+        # ensaio de 03/11: a tentativa instalou só [dev] (sem fastembed) e mediu tudo com o BM25 do fallback, enquanto
+        # CI e docker serviam denso + cross: evidência commitada de outro produto (oficiais 33% × 83% no CI)
+        step("buscador = o configurado (sem fallback)", [PY, "-c", RETRIEVER_PROBE]),
         step("pytest", [PY, "-m", "pytest", "-q", f"--junitxml={junit}", *pytest_workers()]),
         cited_tests_pass(junit),
         # o gate grava num arquivo à parte: evals/results/ só muda quando alguém decide commitar a medida

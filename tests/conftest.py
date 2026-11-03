@@ -10,8 +10,10 @@ os.environ["DOMAIN"] = "example"
 # Buscador BM25 também para fixtures de módulo/sessão (rodam antes do isolated_env): o padrão do app é o denso + cross
 # (config.KIT_RETRIEVER, ~2,8 GB de modelos) e o servidor do test_mcp montava os dois na subida.
 os.environ["RETRIEVER"] = "bm25"
+# guardas do live_eval.sh (disco, RAM, buscador em fallback) fora dos testes do script
 os.environ.setdefault("LIVE_EVAL_MIN_FREE_GB", "0")
-os.environ.setdefault("LIVE_EVAL_MIN_RAM_GB", "0")  # guarda de disco do live_eval.sh fora dos testes
+os.environ.setdefault("LIVE_EVAL_MIN_RAM_GB", "0")
+os.environ.setdefault("LIVE_EVAL_ALLOW_FALLBACK", "1")
 os.environ.setdefault("RETRIEVAL_CACHE", "off")  # testes trocam buscador/embedder por monkeypatch
 os.environ.setdefault("JUDGE_WORKERS", "1")  # ordem determinística nos testes de teto; o paralelo tem teste próprio
 
