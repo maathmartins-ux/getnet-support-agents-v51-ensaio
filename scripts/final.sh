@@ -22,4 +22,9 @@ if git diff --cached --quiet; then echo "README já está em dia com o git log."
 fi
 "$PY" scripts/fill_readme.py --check
 git push -q origin HEAD
+# A mensagem que vai ao dono sai DEPOIS do último commit (o relógio dela conta até ele); fora do git (não cria commit).
+mkdir -p var
+REPO_URL="$(git remote get-url origin 2>/dev/null | sed -E 's#^git@github.com:#https://github.com/#; s#\.git$##; s#https://[^@/]*@#https://#')"
+"$PY" scripts/delivery_message.py --repo "${REPO_URL:-<url do repo>}" --out var/ENTREGA_final.md > /dev/null \
+  && echo "Mensagem ao dono (relógio até o último commit): var/ENTREGA_final.md"
 echo "OK: último commit $(git log -1 --format='%h %aI') enviado. Confira a CI na aba Actions."

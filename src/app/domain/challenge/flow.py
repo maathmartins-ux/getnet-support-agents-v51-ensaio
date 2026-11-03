@@ -41,7 +41,8 @@ _ACTION = re.compile(r"\b(quero antecipar|antecip[ae] (os )?meus|antecipar (os )
                      r"|abr\w* (um )?chamado|chamado t[eé]cnico|open (a )?(support |technical )?ticket)\b", _I)
 # Desempate 1: sintoma (conexão ou recusa/erro) → troubleshoot, mesmo com "minha".
 _SYMPTOM = re.compile(r"(n[aã]o (conecta|liga|funciona|passa|pega)|sem (sinal|internet|conex\w*)|\boffline\b"
-                      r"|fora do ar|desconect\w*|perd\w* (a )?conex\w*|perd\w* (o )?sinal|losing (the )?connection|won'?t (connect|work)"
+                      r"|fora do ar|desconect\w*|perd\w* (a )?conex\w*|perd\w* (o )?sinal"
+                      r"|losing (the )?connection|won'?t (connect|work)"
                       r"|can'?t connect|not connecting|no signal|keeps? disconnect\w*|reconect\w*|reconnect\w*"
                       r"|recusad\w*|recus[ao]u?\b|refused|declin\w*|negad\w*|\berros?\b|\berror\b|c[oó]digo \d{2}\b"
                       r"|code \d{2}\b)", _I)

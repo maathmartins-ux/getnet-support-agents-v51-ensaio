@@ -19,16 +19,26 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts import scorecard  # noqa: E402
-from scripts.timesheet import commits, tag_time  # noqa: E402
+from scripts.timesheet import commits, scaffold_time, tag_time  # noqa: E402
 
 
 def minutes(root: Path = ROOT) -> int | None:
+    """Do scaffold (ou clock-start) ao último commit QUE JÁ EXISTE. Ensaio de 03/11: a mensagem gerada no T+41 dizia
+    "41 min do primeiro ao último commit" e o relógio fechou no T+47; o texto que vai ao dono sai do `make final`
+    (var/ENTREGA_final.md), DEPOIS do último commit."""
     rows = commits(root)
     if not rows:
         return None
-    start = tag_time("clock-start", root) or rows[0]["t"]
+    start = tag_time("clock-start", root) or scaffold_time(rows) or rows[0]["t"]
     end = tag_time("clock-end", root) or rows[-1]["t"]
     return round((end - start).total_seconds() / 60)
+
+
+def head_sha(root: Path = ROOT) -> str:
+    import subprocess
+
+    out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=root, capture_output=True, text=True)
+    return out.stdout.strip()
 
 
 def render(repo: str, video: str | None, results: Path, mins: int | None) -> str:
@@ -54,7 +64,7 @@ def render(repo: str, video: str | None, results: Path, mins: int | None) -> str
         "Procedência: o primeiro commit traz um kit próprio, que evoluiu a partir das correções das minhas entregas "
         "anteriores deste desafio. O que veio do kit, o que foi feito no relógio e como comparar pela primeira "
         "entrega estão em docs/PROCEDENCIA.md."
-        + (f" Relógio: {mins} min do primeiro ao último commit (tags clock-start/clock-end)." if mins else ""),
+        + (f" Relógio: {mins} min do commit de scaffold ao commit {head_sha() or 'atual'}." if mins else ""),
         "",
         "Obrigado!",
     ]

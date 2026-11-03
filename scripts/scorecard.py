@@ -60,9 +60,12 @@ TARGETS = (
     Target("heldout_intent", "Held-out cego: intenção (diagnóstico)", 85.0, "%", "latest.json metrics.heldout",
            diagnostic=True),
     Target("raters", "Rotuladores humanos independentes", 2, "n", "human_review.json"),
-    Target("judge_kappa", "Juiz × humano: kappa", 0.80, "frac", "judge.json calibration"),
+    # Ensaio v5.4: o rótulo dizia "humano" para o gabarito de calibração escrito pela frente Q (agente) e a ENTREGA
+    # saiu com "juiz × humano kappa 1,00" sem nenhum humano. Concordância com pessoas é o juiz_x_humano do label.py.
+    Target("judge_kappa", "Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa", 0.80, "frac",
+           "judge.json calibration"),
     # regra fixada antes de medir (nelsondell): 1 = validado (>= 10 por classe, TPR e TNR >= 0,8); 0 = só regressão
-    Target("judge_validated", "Juiz validado contra humanos (1 = sim, regra fixada antes)", 1, "n",
+    Target("judge_validated", "Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes)", 1, "n",
            "judge.json calibration.validation"),
     # custo de operação medido, não suposto: gasto total ao vivo ÷ turnos resolvidos sem humano (todos os splits
     # completos), e a fração resolvida (método do nelsondell: "custo por turno resolvido" no README)

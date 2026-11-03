@@ -61,7 +61,9 @@ def test_readme_template_has_every_heading_the_challenge_asks_for():
     assert fill_readme.missing_headings(readme) == []
     old = "# P\n## 1. Como rodar\n## 2. Arquitetura\n## 4. Decisões e trade-offs\n"
     assert fill_readme.missing_headings(old) == list(fill_readme.REQUIRED_HEADINGS)
-    assert fill_readme.quickstart_block() in readme  # o exemplo commitado é o do 1º caso oficial do kit
+    if "{{" in readme:  # README ainda modelo (kit): o exemplo é o do 1º caso oficial do kit. Preenchido na tentativa,
+        # o exemplo é o caso oficial do DESAFIO e o conftest troca os casos pela fixture (ensaio v5.4: CI vermelha)
+        assert fill_readme.quickstart_block() in readme
 
 
 def test_timeline_neutralizes_template_markers_and_pipes(tmp_path):

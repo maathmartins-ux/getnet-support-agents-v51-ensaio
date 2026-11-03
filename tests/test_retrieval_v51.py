@@ -96,7 +96,7 @@ def test_e5_gets_role_prefixes(monkeypatch):
             seen.extend(texts)
             return [[1.0, 0.0] for _ in texts]
 
-    import fastembed
+    fastembed = pytest.importorskip("fastembed")
 
     monkeypatch.setattr(fastembed, "TextEmbedding", FakeTE)
     e = rag.FastEmbedEmbedder("intfloat/multilingual-e5-large")
@@ -452,7 +452,7 @@ class RecordingTE:
 
 
 def test_corpus_embedding_uses_small_length_sorted_batches_without_arena(monkeypatch):
-    import fastembed
+    fastembed = pytest.importorskip("fastembed")
 
     monkeypatch.setattr(fastembed, "TextEmbedding", RecordingTE)
     e = rag.FastEmbedEmbedder("m")
@@ -466,7 +466,7 @@ def test_corpus_embedding_uses_small_length_sorted_batches_without_arena(monkeyp
 
 
 def test_query_vectors_are_memoized_in_process_and_on_disk(monkeypatch, tmp_path):
-    import fastembed
+    fastembed = pytest.importorskip("fastembed")
 
     monkeypatch.setattr(fastembed, "TextEmbedding", RecordingTE)
     e = rag.FastEmbedEmbedder("m")
@@ -483,7 +483,7 @@ def test_query_vectors_are_memoized_in_process_and_on_disk(monkeypatch, tmp_path
 
 
 def test_cross_scores_only_new_pairs(monkeypatch, tmp_path):
-    from fastembed.rerank import cross_encoder
+    cross_encoder = pytest.importorskip("fastembed.rerank.cross_encoder")
 
     class FakeCross:
         def __init__(self, name, **kw):
@@ -513,7 +513,7 @@ def test_numpy_and_python_cosines_rank_the_same():
 
 def test_latency_measurement_never_reads_the_memo(monkeypatch, tmp_path):
     """O comparativo mede várias configurações com o MESMO embedder: memo lido faria a 2ª parecer mais rápida."""
-    import fastembed
+    fastembed = pytest.importorskip("fastembed")
 
     monkeypatch.setenv("EMBED_CACHE_DIR", str(tmp_path))
 
@@ -580,8 +580,8 @@ def test_fast_choice_measures_only_the_preselected_configs(tmp_path, monkeypatch
 
 def test_fetch_models_fast_downloads_what_the_fast_choice_measures(monkeypatch, capsys):
     """T+0 do relógio: o fetch_models --fast baixa em 2º plano os modelos que o --choose-retriever --fast vai medir."""
-    import fastembed
-    from fastembed.rerank import cross_encoder
+    fastembed = pytest.importorskip("fastembed")
+    cross_encoder = pytest.importorskip("fastembed.rerank.cross_encoder")
 
     from scripts import fetch_models
 

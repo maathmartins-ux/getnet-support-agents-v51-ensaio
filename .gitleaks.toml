@@ -6,7 +6,10 @@ useDefault = true
 
 [allowlist]
 description = "segredos de TESTE do kit"
-paths = ['''^tests/''']
+# evals/cassettes/: gravações das respostas do LLM (chave = hash do pedido, assinaturas do thinking) acusadas como
+# generic-api-key (ensaio v5.4: 1492 achados, CI vermelha); nenhuma credencial entra nelas, e o teste
+# test_v54_cassettes_have_no_credentials varre essas gravações atrás de chave de API de verdade.
+paths = ['''^tests/''', '''^evals/cassettes/''']
 regexes = [
   '''check-secret-only-for-the-container-smoke''',
   '''scale-secret-only-for-the-replica-smoke''',

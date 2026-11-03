@@ -87,8 +87,13 @@ def _slash_values(a: str, b: str, year: str | None) -> set[str]:
     return out
 
 
+# Data e hora ISO das tools ("2026-11-03T09:16:00"): o "T" colava na hora e o "09" não era lido como número; a resposta
+# "às 09:16" virava "às [valor não confirmado]:16" (ensaio pré-produção de 03/11, memory-07/08 nas 3 rodadas).
+_ISO_T = re.compile(r"(\d{4}-\d{2}-\d{2})T(?=\d)")
+
+
 def _items(text: str) -> list[_Item]:
-    text = _LIST_MARK.sub(" ", _CITATION.sub(" ", text))
+    text = _ISO_T.sub(r"\1 ", _LIST_MARK.sub(" ", _CITATION.sub(" ", text)))
     items: list[_Item] = []
 
     def take_date(m: re.Match, values: set[str]) -> str:

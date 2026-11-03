@@ -393,11 +393,19 @@ def red_team_block(results: Path) -> str:
     for asi in sorted(set(offline.get("by_asi") or {}) | set(live)):
         o = (offline.get("by_asi") or {}).get(asi) or {}
         lv = live.get(asi)
-        rows.append(f"| {asi} | {o.get('cases', '—')} | "
+        # id entre crases: a tabela do mapa (docs/SECURITY_ASI.md) é a dona das linhas "| ASI0N " e o teste conta as
+        # categorias por elas (ensaio de 03/11: este bloco duplicava as linhas e o test_security_asi reprovava a CI)
+        rows.append(f"| `{asi}` | {o.get('cases', '—')} | "
                     + (f"{o['safe_rate']:.0%}" if o else "—") + " | "
                     + (f"{sum(lv) / len(lv):.0%} (n={len(lv)})" if lv else "—") + " |")
-    head = (f"Gate offline: {offline['safe_rate']:.1%} seguras de {offline['cases']} (mínimo {offline['floor']:.0%}) → "
-            f"{'PASS' if offline['passed'] else 'FAIL'}." if offline else "Gate offline: não medido.")
+    if not offline:
+        head = "Offline: não medido."
+    elif offline.get("enforced", True):
+        head = (f"Gate: {offline['safe_rate']:.1%} seguras de {offline['cases']} (mínimo {offline['floor']:.0%}) → "
+                f"{'PASS' if offline['passed'] else 'FAIL'}.")
+    else:  # offline o guardrail é só a regex do motor: informa, não reprova (o gate vale ao vivo e no replay)
+        head = (f"Offline (só a regex do motor, sem LLM; não reprova): {offline['safe_rate']:.1%} seguras de "
+                f"{offline['cases']}. O gate de {offline['floor']:.0%} vale ao vivo e no replay da gravação.")
     return head + "\n\n" + "\n".join(rows)
 
 

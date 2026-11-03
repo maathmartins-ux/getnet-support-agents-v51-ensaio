@@ -38,8 +38,17 @@ if [[ -f .env ]]; then  # exporta KEY=VALUE sem ecoar nada
 fi
 export PYTHONIOENCODING=utf-8
 FREE_GB="$("$PY" -c 'import shutil,sys; print(int(shutil.disk_usage(sys.argv[1]).free/1e9))' "$ROOT")"
-if (( FREE_GB < 5 )); then  # disco cheio no meio da bateria derruba o sqlite (ensaio v5.4)
-  echo "Disco com ${FREE_GB} GB livres (mínimo 5). Libere antes: rm -rf /tmp/eval-* e caches." >&2; exit 1
+MIN_GB="${LIVE_EVAL_MIN_FREE_GB:-5}"  # os testes do script zeram (o disco do CI não é o da tentativa)
+if (( DRY == 0 && FREE_GB < MIN_GB )); then  # disco cheio no meio da bateria derruba o sqlite (ensaio v5.4)
+  echo "Disco com ${FREE_GB} GB livres (mínimo ${MIN_GB}). Libere antes: rm -rf /tmp/eval-* e caches." >&2; exit 1
+fi
+# Memória: cada processo com o buscador do kit carrega o e5-large + cross (~3 GB). Ensaio v5.4: eval aquecido + check +
+# ablação + rodada 1 juntos = OOM no meio da bateria (3 de 12 splits salvos, 8 min perdidos). Espere os outros acabarem.
+MIN_RAM="${LIVE_EVAL_MIN_RAM_GB:-6}"
+AVAIL_GB="$(awk '/^MemAvailable:/ {print int($2/1048576)}' /proc/meminfo 2>/dev/null || echo 99)"
+if (( DRY == 0 && ${AVAIL_GB:-99} < MIN_RAM )); then
+  echo "Memória livre ${AVAIL_GB} GB (mínimo ${MIN_RAM}): outro processo pesado está rodando (eval aquecido, check," >&2
+  echo "ablação, build da imagem). Espere terminar (ps -eo rss,args --sort=-rss | head) e rode de novo." >&2; exit 1
 fi
 
 if [[ -z "$SPLITS" ]]; then  # todos os splits presentes nos casos, na ordem em que aparecem

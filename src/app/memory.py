@@ -386,4 +386,13 @@ def fact_present(fact: str, answer: str) -> bool:
         want = numbers(fact)
         return bool(want) and want <= numbers(answer)
     fold = lambda s: re.sub(r"\s+", " ", s).casefold()  # noqa: E731
-    return fold(fact) in fold(answer)
+    if fold(fact) in fold(answer):
+        return True
+    # Regex, como em `expect.facts` (ensaio pré-produção de 03/11: a frente Q escreveu "129[,.]90" e "whats ?app"; a
+    # resposta tinha "R$ 129,90" e o check literal reprovava 6 casos certos nas 3 rodadas: memória 0,67 em vez de 0,94)
+    if re.search(r"[\[\]()?*+|\\{}^]", fact):
+        try:
+            return re.search(fact, answer, re.IGNORECASE) is not None
+        except re.error:
+            return False
+    return False
