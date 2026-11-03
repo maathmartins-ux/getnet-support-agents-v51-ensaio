@@ -23,7 +23,7 @@ números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
 |---|---|---|
 | Respostas oficiais: fundamentadas 60%, números 80%, pass^3 70% | manchete **oficiais resolvidas** (sem humano + todo fato + fonte); toda frase e todo número conferidos contra fonte, ferramenta e pergunta; juiz no mesmo processo | Oficiais resolvidas (sem humano + todo fato + fonte) **1.00** · Juiz: respostas oficiais fundamentadas **1.00** · Oficiais: números com base na evidência **100.0%** · Oficiais: pass^k (todas as rodadas passam) **1.00**; `tests/test_e53_resolved.py` |
 | Busca: Recall@3 0,49, MRR 0,61 | denso + cross-encoder decidido por medida antes do relógio; tabelas inteiras; placar no caminho do agente | Busca: Recall@3 **0.84** · Busca: Recall@5 (o que o redator lê) **0.89** · Busca: MRR **0.82**; `tests/test_v54_retrieval_method.py` |
-| Memória: pass@1 54%, números 64% | especialistas sem estado (pergunta reescrita pelo router + livro de fatos); rota medida pelo resultado | Memória ao vivo: pass@1 **0.67** · Memória ao vivo: números com base **93.9%**; `tests/test_v54_stateless_specialists.py` |
+| Memória: pass@1 54%, números 64% | especialistas sem estado (pergunta reescrita pelo router + livro de fatos); rota medida pelo resultado | Memória ao vivo: pass@1 **0.92** · Memória ao vivo: números com base **100.0%**; `tests/test_v54_stateless_specialists.py` |
 | A resposta do humano era só a próxima mensagem; operação (especialidade, Postgres, JWKS) | a resposta do operador vira evidência e os passos pendentes do plano rodam (no turno, com espera curta, ou na retomada); fila por especialidade; Postgres atrás da mesma interface; JWKS | Turnos resolvidos sem humano (ao vivo, todos os splits) **0.88**; `tests/test_v54_hitl_sync.py` |
 | Avaliação independente: um rotulador, held-out de 24 | 2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes | Rotuladores humanos independentes **não medido** · Held-out cego: casos **80** · Held-out cego: ponta a ponta (humano passa) **não medido** · Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) **1** · Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa **1.00**; `tests/test_v54_judge_validation_real.py` |
 <!-- since:end -->
@@ -45,8 +45,8 @@ cenários oficiais: [docs/DEMO.md](docs/DEMO.md). O que veio do kit: [docs/PROCE
 | Juiz: respostas oficiais fundamentadas | 1.00 | 0.90 | na referência | `judge.json by_split.official` |
 | Oficiais: números com base na evidência | 100.0% | 95.0% | na referência | `live_official.json numbers_acc` |
 | Oficiais: pass^k (todas as rodadas passam) | 1.00 | 0.90 | na referência | `live_official.json` |
-| Memória ao vivo: pass@1 | 0.67 | 0.85 | abaixo da referência (causa nos limites) | `live_memory.json stability` |
-| Memória ao vivo: números com base | 93.9% | 95.0% | abaixo da referência (causa nos limites) | `live_memory.json numbers_acc` |
+| Memória ao vivo: pass@1 | 0.92 | 0.85 | na referência | `live_memory.json stability` |
+| Memória ao vivo: números com base | 100.0% | 95.0% | na referência | `live_memory.json numbers_acc` |
 | Busca: Recall@3 | 0.84 | 0.85 | abaixo da referência (causa nos limites) | `latest.json retrieval` |
 | Busca: MRR | 0.82 | 0.80 | na referência | `latest.json retrieval` |
 | Busca: Recall@5 (o que o redator lê) | 0.89 | — | diagnóstico | `latest.json retrieval` |
@@ -56,10 +56,10 @@ cenários oficiais: [docs/DEMO.md](docs/DEMO.md). O que veio do kit: [docs/PROCE
 | Rotuladores humanos independentes | não medido | 2 | não medido | `human_review.json` |
 | Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa | 1.00 | 0.80 | na referência | `judge.json calibration` |
 | Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) | 1 | 1 | na referência | `judge.json calibration.validation` |
-| Custo por turno resolvido sem humano (ao vivo) | US$ 0.0334 | — | diagnóstico | `live_*.json spent_usd ÷ linhas sem handoff` |
+| Custo por turno resolvido sem humano (ao vivo) | US$ 0.0339 | — | diagnóstico | `live_*.json spent_usd ÷ linhas sem handoff` |
 | Turnos resolvidos sem humano (ao vivo, todos os splits) | 0.88 | — | diagnóstico | `live_*.json linhas sem handoff` |
 
-**Abaixo da referência ou sem medida (5 de 19), com a causa nos limites:** Memória ao vivo: pass@1 (0.67); Memória ao vivo: números com base (93.9%); Busca: Recall@3 (0.84); Held-out cego: ponta a ponta (humano passa) (não medido); Rotuladores humanos independentes (não medido).
+**Abaixo da referência ou sem medida (3 de 19), com a causa nos limites:** Busca: Recall@3 (0.84); Held-out cego: ponta a ponta (humano passa) (não medido); Rotuladores humanos independentes (não medido).
 <!-- scorecard:end -->
 
 Uma rodada ao vivo só (a 2ª não coube no relógio; `docs/JUDGE_DIFF.md` não medido). Oficiais: todas resolvidas sem humano, com o fato de referência e fonte, e o juiz (com o texto das fontes) as dá por fundamentadas. Abaixo da referência: memória (o seguimento cita o valor do turno anterior em metade dos casos com `expects_fact`), Recall@3 logo abaixo da meta e a validação humana, que não houve. Causas em §7.
@@ -388,8 +388,10 @@ e como comparar pela primeira entrega.
 | 15:39:32 | 205 | confirmação: resultados offline com o código corrigido (gate intenção 90,5%, memória 90,9%) e docs gerados |
 | 15:39:33 | 205 | readme: números e linha do tempo (fill_readme, último passo) |
 | 15:41:47 | 207 | confirmação: final.sh do kit (commit final com os docs gerados) |
+| 15:41:48 | 207 | readme: números e linha do tempo (fill_readme, último passo) |
+| 15:57:49 | 223 | eval: confirmação ao vivo — memory repeat 3 complete (pass@1 0,92, fato da conversa 86,1%, números 100%); replan e dependent abortaram por cota (16/20 e 8/11), fora; juiz re-rodado (US$ 6,61) |
 
-Do primeiro ao último commit: **207 min**.
+Do primeiro ao último commit: **223 min**.
 <!-- timeline:end -->
 
 </details>

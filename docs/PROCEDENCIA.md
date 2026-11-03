@@ -93,13 +93,13 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docker-compose.hardened.yml` | 37 | 0 | 0 | 0 |
 | `docker-compose.scale.yml` | 28 | 0 | 0 | 0 |
 | `docker-compose.yml` | 91 | 0 | 0 | 0 |
-| `docs` | 429 | 1323 | 18 | 4 |
+| `docs` | 429 | 1326 | 18 | 4 |
 | `docs/adr` | 255 | 29 | 0 | 1 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
 | `evals` | 4993 | 235 | 29 | 4 |
 | `evals/cases.d` | 0 | 66 | 0 | 0 |
-| `evals/cassettes` | 0 | 1887 | 0 | 0 |
+| `evals/cassettes` | 0 | 1895 | 0 | 0 |
 | `evals/essential` | 0 | 2357 | 0 | 0 |
 | `evals/judge_calibration.d` | 0 | 48 | 0 | 0 |
 | `evals/proxy` | 286 | 0 | 0 | 0 |
@@ -115,7 +115,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 474 | 10 | 4 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **7959** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 28. Fora da conta, por serem gerados: 133658 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **7970** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 28. Fora da conta, por serem gerados: 132147 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).
