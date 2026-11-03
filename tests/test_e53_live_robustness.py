@@ -145,3 +145,13 @@ def test_measured_cost_from_a_timed_out_run_does_not_shrink_the_share(monkeypatc
         {"rows": [{}] * 4, "spent_usd": 0.0016}), encoding="utf-8")
     monkeypatch.setenv("LIVE_USD_PER_TURN", "0.025")
     assert run_evals.split_weights(["official"], {})["official"] == 4.0
+
+
+def test_first_wave_uses_the_measured_cost_so_the_cap_holds(monkeypatch):
+    """Split caro: a 1ª leva é projetada com o custo medido na rodada anterior; o gasto não passa do teto."""
+    run_evals.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    (run_evals.RESULTS_DIR / "live_official.json").write_text(json.dumps(
+        {"rows": [{}] * 4, "spent_usd": 0.8}), encoding="utf-8")  # US$ 0,20 por caso medido
+    rep = run_evals.run(split="official", live=True, client=PerTurnClient(0.2), max_usd=0.5, workers=4,
+                        usd_per_case=0.01)
+    assert rep["spent_usd"] <= 0.5 + 1e-9 and rep["status"] == "aborted_max_usd"

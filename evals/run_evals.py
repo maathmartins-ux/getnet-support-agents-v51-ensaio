@@ -714,10 +714,13 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
         status, spent, auth_before = "complete", 0.0, _llm_errors("auth")
         quota_before = _llm_errors("quota")
         start = 0
+        # 1ª leva projetada com o custo medido na rodada anterior do split (antes de haver linha nesta): com o
+        # custo padrão por caso, um split caro (approval, parallel: US$ 0,04 por caso) passava do teto na 1ª leva
+        prev_case = (_measured_usd_per_case(split) or 0.0) if split and live else 0.0
         while start < len(todo):
             size = min(max(1, workers), len(todo) - start)
             if max_usd is not None:  # projeta a leva: lançar e só depois somar estourava o teto
-                est = max(usd_per_case, spent / len(rows) if rows else 0.0)
+                est = max(usd_per_case, spent / len(rows) if rows else prev_case)
                 limit = budget.limit(key, spent, est * size) if budget is not None else max_usd
                 size = min(size, int((limit - spent) / est + 1e-9))
                 if size <= 0:

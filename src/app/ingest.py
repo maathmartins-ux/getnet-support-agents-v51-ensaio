@@ -455,6 +455,8 @@ def records(slug: str, url: str, title: str, chunks: list[str], fetched_at: str,
 
 
 def fetch(url: str, allowed_hosts: set[str] | list[str]) -> str:
+    """HTML estático da página. Página montada por JavaScript (casca vazia) é renderizada por
+    scripts/ingest_render.py, que chama `build` com outro `fetcher` (o app não abre processo)."""
     if not is_allowed(url, allowed_hosts):
         raise ValueError(f"domínio fora da lista de sources.json: {url}")
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (support-agents ingest)"})

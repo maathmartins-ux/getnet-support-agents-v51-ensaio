@@ -149,3 +149,44 @@ def test_second_label_page_appends_new_answers(tmp_path):
         label.import_page(dump, results=res, base=tmp_path)
     got = {r["id"]: r["humano"] for r in label.read_labels(tmp_path / "human_labels.ana.csv")}
     assert got == {"c0": "pass", "c1": "pass", "c2": "fail", "c3": "pass"}
+
+
+def test_ingest_renders_only_the_javascript_shell_pages():
+    """Página com texto no HTML estático não chama o navegador; casca vazia é renderizada e o texto entra."""
+    import importlib.util as _u
+    from pathlib import Path as _P
+
+    script = _P(__file__).resolve().parents[1] / "scripts" / "ingest_render.py"
+    spec = _u.spec_from_file_location("ingest_render", script)
+    mod = _u.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    rich = "<html><body><main><h1>Pix</h1><p>" + "Pix cai na hora para o lojista. " * 30 + "</p></main></body></html>"
+    shell = "<html><body><div id='app'></div></body></html>"
+    rendered = "<html><body><main><h1>Zap</h1><p>" + "Venda pelo WhatsApp com o link. " * 30 + "</p></main></body>"
+    calls = []
+    static = lambda url, hosts: rich if "pix" in url else shell  # noqa: E731
+    fetch = mod.make_fetcher("auto", static=static, renderer=lambda url, hosts: calls.append(url) or rendered)
+    assert fetch("https://site.x/pix/", ["site.x"]) == rich and calls == []
+    assert "WhatsApp" in fetch("https://site.x/zap/", ["site.x"]) and calls == ["https://site.x/zap/"]
+    assert mod.make_fetcher("never", static=static)("https://site.x/zap/", ["site.x"]) == shell
+
+
+def test_render_thin_keeps_existing_ids_and_drops_lines_already_in_the_corpus(tmp_path):
+    import importlib.util as _u
+    import json as _json
+    from pathlib import Path as _P
+
+    script = _P(__file__).resolve().parents[1] / "scripts" / "ingest_render.py"
+    spec = _u.spec_from_file_location("ingest_render2", script)
+    mod = _u.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    old = {"ofertas": [{"id": "prod-ofertas-01", "text": "Get Clássica custa R$ 79,90 por mês no plano."}]}
+    page = ("<html><body><main><h1>Ofertas</h1><p>Get Clássica custa R$ 79,90 por mês no plano.</p>"
+            "<p>" + "A oferta vale por 12 meses a partir da contratação da maquininha. " * 8 + "</p></main></body>")
+    out = mod.render_thin({"ofertas": "https://site.x/ofertas"}, tmp_path, ["site.x"], "prod",
+                          corpus=old["ofertas"][0]["text"], existing=old, renderer=lambda url, hosts: page)
+    ids = [r["id"] for r in out["ofertas"]]
+    assert ids[0] == "prod-ofertas-01" and ids[1] == "prod-ofertas-02"
+    assert all("79,90" not in r["text"] for r in out["ofertas"][1:])  # linha que já existia não se repete
+    saved = [_json.loads(x) for x in (tmp_path / "ofertas.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [r["id"] for r in saved] == ids
