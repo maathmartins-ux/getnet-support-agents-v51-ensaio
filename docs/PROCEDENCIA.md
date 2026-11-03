@@ -72,6 +72,48 @@ Linhas do kit no commit de scaffold × linhas escritas no relógio, por pasta (g
 arquivos gerados, como `evals/results/`, ficam fora da conta):
 
 <!-- kit:begin -->
+| pasta | linhas do kit | + no relógio | − no relógio | arquivos do kit alterados |
+|---|---:|---:|---:|---:|
+| `.claude` | 121 | 0 | 0 | 0 |
+| `.dockerignore` | 15 | 0 | 0 | 0 |
+| `.env.example` | 42 | 0 | 0 | 0 |
+| `.github` | 155 | 0 | 0 | 0 |
+| `.gitignore` | 7 | 0 | 0 | 0 |
+| `.gitleaks.toml` | 14 | 0 | 0 | 0 |
+| `.trivyignore` | 8 | 0 | 0 | 0 |
+| `Dockerfile` | 72 | 0 | 0 | 0 |
+| `Makefile` | 38 | 0 | 0 | 0 |
+| `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
+| `README.md` | 319 | 6 | 6 | 1 |
+| `data` | 34 | 45 | 32 | 4 |
+| `data/crm` | 0 | 30 | 0 | 0 |
+| `data/intent_examples.d` | 0 | 26 | 0 | 0 |
+| `data/knowledge` | 0 | 178 | 0 | 0 |
+| `docker-compose.demo.yml` | 10 | 0 | 0 | 0 |
+| `docker-compose.hardened.yml` | 37 | 0 | 0 | 0 |
+| `docker-compose.scale.yml` | 28 | 0 | 0 | 0 |
+| `docker-compose.yml` | 91 | 0 | 0 | 0 |
+| `docs` | 429 | 344 | 16 | 2 |
+| `docs/adr` | 255 | 29 | 0 | 1 |
+| `docs/changelog.d` | 806 | 0 | 0 | 0 |
+| `evals` | 4993 | 225 | 27 | 3 |
+| `evals/cases.d` | 0 | 66 | 0 | 0 |
+| `evals/cassettes` | 0 | 1887 | 0 | 0 |
+| `evals/essential` | 0 | 2357 | 0 | 0 |
+| `evals/judge_calibration.d` | 0 | 48 | 0 | 0 |
+| `evals/proxy` | 286 | 0 | 0 | 0 |
+| `evals/retrieval.d` | 0 | 81 | 0 | 0 |
+| `ops` | 669 | 0 | 0 | 0 |
+| `pyproject.toml` | 51 | 0 | 0 | 0 |
+| `requirements-dev.lock` | 252 | 0 | 0 | 0 |
+| `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
+| `requirements.lock` | 149 | 0 | 0 | 0 |
+| `scripts` | 4505 | 0 | 0 | 0 |
+| `src/app` | 10844 | 787 | 0 | 0 |
+| `tests` | 12008 | 356 | 0 | 0 |
+| `tests/fixtures` | 70 | 0 | 0 | 0 |
+
+Total: **36679** linhas do kit (commit `16ecd02`) e **6465** escritas no relógio (15% do total). Arquivos do kit alterados no relógio: 11. Fora da conta, por serem gerados: 134289 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

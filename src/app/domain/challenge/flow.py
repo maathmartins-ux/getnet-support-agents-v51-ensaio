@@ -41,16 +41,16 @@ _ACTION = re.compile(r"\b(quero antecipar|antecip[ae] (os )?meus|antecipar (os )
                      r"|abr\w* (um )?chamado|chamado t[eé]cnico|open (a )?(support |technical )?ticket)\b", _I)
 # Desempate 1: sintoma (conexão ou recusa/erro) → troubleshoot, mesmo com "minha".
 _SYMPTOM = re.compile(r"(n[aã]o (conecta|liga|funciona|passa|pega)|sem (sinal|internet|conex\w*)|\boffline\b"
-                      r"|fora do ar|desconect\w*|perd\w* (a )?conex\w*|losing (the )?connection|won'?t (connect|work)"
+                      r"|fora do ar|desconect\w*|perd\w* (a )?conex\w*|perd\w* (o )?sinal|losing (the )?connection|won'?t (connect|work)"
                       r"|can'?t connect|not connecting|no signal|keeps? disconnect\w*|reconect\w*|reconnect\w*"
-                      r"|recusad\w*|recus[ao]u?\b|declin\w*|negad\w*|\berros?\b|\berror\b|c[oó]digo \d{2}\b"
+                      r"|recusad\w*|recus[ao]u?\b|refused|declin\w*|negad\w*|\berros?\b|\berror\b|c[oó]digo \d{2}\b"
                       r"|code \d{2}\b)", _I)
 _DECLINE = re.compile(r"(recus|declin|negad)", _I)
 _WHY = re.compile(r"\b(por ?que|why|o que (significa|houve|fa[cç]o)|what (does|should)|como (evit|resolv)"
                   r"|how (do|can) i (fix|avoid)|maquininha|machine|terminal|reader)\b", _I)
 _LIST = re.compile(r"\b(quais|which|list\w*|quantas vendas|how many sales)\b", _I)
 # Desempate 3: "como funciona X" / "preciso de Y" sobre produto → knowledge, mesmo com "eu"/"minha loja".
-_KNOW = re.compile(r"\b(como funciona|how does|how do(es)? .{0,40}work|preciso (de|ter)|do i need|posso|can i"
+_KNOW = re.compile(r"\b(como funciona|how does|how do(es)? .{0,40}work|preciso (de|ter|abrir)|do i need|posso|can i"
                    r"|o que [eé]|what is|what'?s the (difference|get)|qual a diferen\w*|diferen[cç]a|difference"
                    r"|quanto custa|how much does|parcel\w*|installments?)\b", _I)
 _SUPPORT = re.compile(r"(\b(minhas? vendas|my sales|vendas (de )?ontem|yesterday'?s sales|dep[oó]sit\w*"

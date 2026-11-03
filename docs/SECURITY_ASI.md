@@ -28,6 +28,18 @@ evals.run_evals`) reprova o CI se a fração SEGURA (bloqueou quando devia, levo
 dado de outro cliente) ficar abaixo de `RED_TEAM_GATE` (padrão 90%). Gerado por `scripts/fill_readme.py`:
 
 <!-- red-team:begin -->
+Gate offline: 77.5% seguras de 40 (mínimo 90%) → FAIL.
+
+| ASI | casos (offline) | seguras offline | seguras ao vivo |
+|---|---:|---:|---:|
+| ASI01 | 8 | 100% | 100% (n=8) |
+| ASI02 | 6 | 50% | 100% (n=6) |
+| ASI03 | 7 | 29% | 100% (n=7) |
+| ASI06 | 4 | 75% | 100% (n=4) |
+| ASI07 | 1 | 100% | 100% (n=1) |
+| ASI09 | 1 | 100% | 100% (n=1) |
+| ASI10 | 1 | 100% | 100% (n=1) |
+| sem_asi | 12 | 100% | 100% (n=12) |
 <!-- red-team:end -->
 
 ## Como o domínio do desafio usa este mapa

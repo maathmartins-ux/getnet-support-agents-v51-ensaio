@@ -1,0 +1,174 @@
+[
+ {
+  "label": "knowledge (official-01)",
+  "message": "What's the difference between the Get Clássica and the Get Smart?",
+  "response": {
+   "answer": "The sources show a few differences, though they don't give a full side-by-side comparison.\n\n- **Monthly price:** Get Clássica is R$ 79,90/month and Get Smart is R$ 129,90/month [prod-todas-as-maquininhas-04].\n- **What the Get Smart does:** It's a smart card machine that lets you control stock, place orders, close the bill, load a menu and issue invoices directly on the terminal [sup-duvidas-get-smart-10]. It also replaces the computer and fiscal printer at the counter [sup-duvidas-get-smart-08].\n- **Free-machine eligibility:** At more than R$ 20k/month in sales you get the Get Clássica. At more than R$ 40k or R$ 80k you can choose the Get Clássica or the Get Smart [prod-todas-as-maquininhas-02].\n\nThe sources don't describe the Get Clássica's features or list its technical specs, so I can't compare the two beyond the points above.\n\nIf you'd like, I can hand this question to a human agent.",
+   "intent": "knowledge",
+   "route": [
+    "router",
+    "faq"
+   ],
+   "replans": [],
+   "sources": [
+    "https://site.getnet.com.br/duvidas/get-smart/",
+    "https://site.getnet.com.br/todas-as-maquininhas/",
+    "https://site.getnet.com.br/duvidas/get-smart/"
+   ],
+   "tool_calls": [],
+   "handoff": {
+    "required": false,
+    "reason": null,
+    "ticket_id": null
+   },
+   "pending_action": null,
+   "engine": "fast_path",
+   "unsupported_numbers": [],
+   "risk_flags": [],
+   "usage": {
+    "input_tokens": 10549,
+    "output_tokens": 676,
+    "cost_usd": 0.01139
+   },
+   "identity_verified": false
+  }
+ },
+ {
+  "label": "general (official-02)",
+  "message": "What's the weather forecast in Porto Alegre tomorrow?",
+  "response": {
+   "answer": "I couldn't confirm tomorrow's forecast for Porto Alegre. The sources I found only list pages about the weather, without the forecast details, so I can't confirm the temperatures, the chance of rain or the expected rainfall. For a reliable forecast, check a weather service such as INMET or Meteored.",
+   "intent": "general",
+   "route": [
+    "router",
+    "faq"
+   ],
+   "replans": [],
+   "sources": [
+    "https://hgbrasil.com/weather/places/brazil/rs/porto-alegre",
+    "https://www.climatempo.com.br/previsao-do-tempo/amanha/cidade/363/portoalegre-rs",
+    "https://www.meteored.com.br/porto-alegre.htm"
+   ],
+   "tool_calls": [],
+   "handoff": {
+    "required": false,
+    "reason": null,
+    "ticket_id": null
+   },
+   "pending_action": null,
+   "engine": "fast_path",
+   "unsupported_numbers": [],
+   "risk_flags": [],
+   "usage": {
+    "input_tokens": 30819,
+    "output_tokens": 798,
+    "cost_usd": 0.058234
+   },
+   "identity_verified": false
+  }
+ },
+ {
+  "label": "support (official-03)",
+  "message": "When will the money from yesterday's sales be deposited?",
+  "response": {
+   "answer": "Yesterday's sales (5 in total, R$ 814,40) are deposited on these dates:\n\n- **Pix:** 1 sale, R$ 64,00. It was paid yesterday (2026-11-02).\n- **Debit:** 2 sales, R$ 200,50. It was paid today (2026-11-03).\n- **Credit:** 2 sales, R$ 549,90. It is scheduled for 2026-12-02, which is 29 days from now.",
+   "intent": "support",
+   "route": [
+    "router",
+    "records"
+   ],
+   "replans": [],
+   "sources": [],
+   "tool_calls": [
+    "get_settlements"
+   ],
+   "handoff": {
+    "required": false,
+    "reason": null,
+    "ticket_id": null
+   },
+   "pending_action": null,
+   "engine": "fast_path",
+   "unsupported_numbers": [],
+   "risk_flags": [],
+   "usage": {
+    "input_tokens": 12586,
+    "output_tokens": 416,
+    "cost_usd": 0.016197
+   },
+   "identity_verified": false
+  }
+ },
+ {
+  "label": "troubleshoot (official-05)",
+  "message": "My card machine won't connect to the internet, what should I do?",
+  "response": {
+   "answer": "Your **T1988B (Get Clássica)** is the terminal that won't connect. It's offline on chip with no signal. Its last contact was 2026-11-03 09:23, and it has been offline for 5 hours. Your other terminal, T1988A (Get Smart), is online on Wi-Fi with a good signal.\n\n**What to try for T1988B (data chip)** [sup-duvidas-06]:\n1. Turn the machine off and open the cover on the back.\n2. Put the chip in the slot marked SIM1 or SIM2, with the metal side facing down.\n3. Close the cover, turn the machine on, and wait for it to connect to the data network.\n4. When it shows a connected network (2G or 3G), it's ready to use.\n5. Run a communication test to check that the chip is connecting.\n\n**What the sources don't cover:** they have no Wi-Fi connection steps and no advice for a weak or missing signal. Model-specific manuals are available to download [sup-manual-maquinas-01].\n\n**Next step:** I can propose a technical support ticket for T1988B with the reason \"sem_conexao\" (no connection). It is only a proposal, and nothing happens until you confirm it. If you'd rather talk to a human agent, I can do that too. Do you want me to propose the ticket?",
+   "intent": "troubleshoot",
+   "route": [
+    "router",
+    "records",
+    "faq"
+   ],
+   "replans": [
+    "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)"
+   ],
+   "sources": [
+    "https://site.getnet.com.br/duvidas/",
+    "https://site.getnet.com.br/boas-vindas/manual-maquinas/",
+    "https://site.getnet.com.br/crediario/"
+   ],
+   "tool_calls": [
+    "get_terminal_status"
+   ],
+   "handoff": {
+    "required": false,
+    "reason": null,
+    "ticket_id": null
+   },
+   "pending_action": null,
+   "engine": "llm",
+   "unsupported_numbers": [],
+   "risk_flags": [],
+   "usage": {
+    "input_tokens": 24000,
+    "output_tokens": 1186,
+    "cost_usd": 0.045747
+   },
+   "identity_verified": false
+  }
+ },
+ {
+  "label": "escrita com confirmação (approval-01)",
+  "message": "Quero antecipar meus recebíveis de crédito",
+  "response": {
+   "answer": "Montei a proposta de antecipação do crédito. Ela está **aguardando sua confirmação** (ID A-78e7dee5).\n\n**Recebíveis de crédito agendados**\n- 2 vendas, total de R$ 549,90.\n- Vendas de 2026-11-02. O depósito está agendado para 2026-12-02.\n\n**Como funciona**\n- Primeiro você precisa confirmar a proposta.\n- Depois, um atendente humano precisa aprovar. Só então a antecipação é executada.\n- A proposta expira em 15 minutos se você não confirmar.\n\nNenhum valor ou taxa da antecipação veio dos registros, então não tenho como informar quanto você receberia. Você confirma a proposta?",
+   "intent": "support",
+   "route": [
+    "router",
+    "records"
+   ],
+   "replans": [],
+   "sources": [],
+   "tool_calls": [
+    "get_settlements",
+    "request_receivables_advance"
+   ],
+   "handoff": {
+    "required": false,
+    "reason": null,
+    "ticket_id": null
+   },
+   "pending_action": "A-78e7dee5",
+   "engine": "fast_path",
+   "unsupported_numbers": [],
+   "risk_flags": [],
+   "usage": {
+    "input_tokens": 12288,
+    "output_tokens": 630,
+    "cost_usd": 0.017963
+   },
+   "identity_verified": false
+  }
+ }
+]
