@@ -1,0 +1,37 @@
+# Overlay de produção endurecido. Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.hardened.yml up -d --build
+# Exige AUTH_SECRET e OPERATOR_TOKEN fortes no .env: APP_ENV=production recusa subir com segredo padrão.
+# Prova: tests/test_hardening.py (estrutura) e `docker compose ... config` no CI.
+services:
+  api:
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+    # sistema de arquivos raiz só leitura: código e dados não mudam em execução; grava só no volume e no tmpfs
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    # nenhuma capability do kernel (o uvicorn escuta em porta alta, não precisa de NET_BIND_SERVICE)
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    user: "10001:10001"  # o mesmo appuser da imagem, explícito: overlay não volta a root por engano
+    # limites: um loop de requisição ou de agente não derruba o host
+    mem_limit: 1g
+    cpus: 1.0
+    pids_limit: 256
+    # só a máquina local alcança a API; a exposição pública passa por proxy reverso com TLS na frente
+    ports: !override
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    # pronto (não só vivo): índice carregado, banco gravável, chave ou modo offline declarado
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+# Busca híbrida (EXTRAS=hybrid): o fastembed grava índice no cache do modelo em /opt/models; com rootfs só
+# leitura, monte esse caminho como volume ou tmpfs antes de ligar RETRIEVER=hybrid.

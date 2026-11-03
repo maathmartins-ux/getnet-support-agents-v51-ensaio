@@ -1,0 +1,21 @@
+# Prometheus do perfil `observability` do compose: raspa o /metrics de CADA réplica e carrega os alertas com runbook.
+# Por quê: as métricas são do processo; raspar o nome do serviço (o balanceador do Docker) pegaria uma réplica
+# diferente a cada coleta e os contadores pulariam. A descoberta por DNS devolve um alvo por contêiner (o nome do
+# serviço resolve para o IP de cada réplica) e o painel soma entre elas com `sum(...)`.
+# Serviços da API: `api` (padrão e docker-compose.scale.yml, 2 réplicas) e `api-pg` (perfil postgres, 2 réplicas).
+global:
+  scrape_interval: 15s
+rule_files:
+  - /etc/prometheus/alerts.yml
+scrape_configs:
+  - job_name: app
+    metrics_path: /metrics
+    dns_sd_configs:
+      - names: ["api", "api-pg"]
+        type: A
+        port: 8000
+        refresh_interval: 15s
+    relabel_configs:
+      # qual serviço (api | api-pg) além do IP:porta da réplica em `instance`
+      - source_labels: [__meta_dns_name]
+        target_label: service

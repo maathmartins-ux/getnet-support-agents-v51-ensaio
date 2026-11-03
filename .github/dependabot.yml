@@ -1,0 +1,13 @@
+# Atualizações propostas por PR: actions (lê a versão no comentário ao lado do SHA), imagem base por digest
+# (Dockerfile) e lockfiles do pip. Semanal: cabe na revisão sem virar ruído.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: {interval: weekly}
+  - package-ecosystem: docker
+    directory: /
+    schedule: {interval: weekly}
+  - package-ecosystem: pip
+    directory: /
+    schedule: {interval: weekly}

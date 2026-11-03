@@ -1,0 +1,560 @@
+<title>Conferência de respostas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: uma situação por tela, coluna de leitura (~44rem), conversa em balões, "em mãos" em tabelas, 3 perguntas
+   de sim/não e o resultado calculado; barra de progresso fixa no topo. */
+:root {
+  --bg: #f5f6f2;
+  --surface: #ffffff;
+  --fg: #1c231f;
+  --muted: #5b6660;
+  --line: #d7ddd7;
+  --accent: #1d5875;
+  --client: #e3eee7;
+  --bot: #ffffff;
+  --ok: #1b7546;
+  --ok-soft: #dff1e6;
+  --bad: #b2352a;
+  --bad-soft: #f8e2df;
+  --quote: #edf0eb;
+  --on-strong: #ffffff;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131816; --surface: #1b221f; --fg: #e5eae6; --muted: #9ba79f; --line: #2e3732; --accent: #82bcd9;
+    --client: #20322a; --bot: #1b221f; --ok: #72d39b; --ok-soft: #1b3226; --bad: #f2897c; --bad-soft: #3b2220;
+    --quote: #212925; --on-strong: #10150f; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131816; --surface: #1b221f; --fg: #e5eae6; --muted: #9ba79f; --line: #2e3732; --accent: #82bcd9;
+  --client: #20322a; --bot: #1b221f; --ok: #72d39b; --ok-soft: #1b3226; --bad: #f2897c; --bad-soft: #3b2220;
+  --quote: #212925; --on-strong: #10150f; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font: 17px/1.55 var(--f-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: 44rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 3rem; }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { padding-block: .6rem; display: flex; flex-wrap: wrap; gap: .35rem 1rem; align-items: center; }
+.brand { font-family: var(--f-display); font-size: 1.1rem; margin: 0; flex: 1 1 auto; }
+.status { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.status.err { color: var(--bad); }
+.bar { flex: 1 1 100%; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+h2 { font-family: var(--f-display); font-size: 1.55rem; line-height: 1.2; margin: 1.5rem 0 .5rem; text-wrap: balance; }
+p { margin: .45rem 0; max-width: 65ch; }
+.kicker { font: 600 .74rem var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 1.25rem 0 .4rem; }
+ol.steps { padding-left: 1.3rem; margin: .5rem 0; display: grid; gap: .4rem; }
+.examples { display: grid; gap: 1rem; margin: .75rem 0; }
+.example { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: .85rem 1rem; min-width: 0; }
+.example .tag { font-weight: 700; }
+.example.good .tag { color: var(--ok); }
+.example.badex .tag { color: var(--bad); }
+.picker { display: flex; flex-wrap: wrap; gap: .6rem; margin: .5rem 0 1rem; }
+.btn { font: 700 1rem var(--f-body); padding: .75rem 1.2rem; border-radius: 10px; border: 2px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; min-height: 48px; }
+.btn.primary { background: var(--accent); color: var(--surface); }
+.picker .btn[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.notice { border: 1px solid var(--bad); background: var(--bad-soft); border-radius: 8px; padding: .7rem 1rem; margin: 1rem 0; }
+.chat { display: grid; gap: .6rem; margin: .5rem 0 1rem; }
+.bubble { max-width: 92%; border-radius: 14px; padding: .65rem .9rem; min-width: 0; overflow-wrap: anywhere; }
+.bubble .who { font: 600 .72rem var(--f-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); display: block; margin-bottom: .2rem; }
+.bubble.client { justify-self: end; background: var(--client); border-bottom-right-radius: 4px; }
+.bubble.client.prev { opacity: .8; }
+.bubble.bot { justify-self: start; background: var(--bot); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.bubble p { margin: .3rem 0; }
+.bubble ul { margin: .3rem 0; padding-left: 1.2rem; }
+.tr { margin-top: .5rem; padding-top: .5rem; border-top: 1px dashed var(--line); font-size: .93rem; color: var(--muted); white-space: pre-wrap; }
+.lang { font-size: .92rem; color: var(--muted); }
+.linkbtn { font: 700 .95rem var(--f-body); color: var(--accent); background: none; border: 0; padding: .25rem 0; cursor: pointer; text-decoration: underline; }
+a.src { display: inline-block; font: 600 .7rem var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 .3rem; margin: 0 .1rem; text-decoration: none; vertical-align: .1em; }
+details.hands { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: .75rem 1rem; }
+details.hands > summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.hint { font-size: .9rem; color: var(--muted); }
+.block { border-top: 1px solid var(--line); padding-top: .65rem; margin-top: .65rem; min-width: 0; }
+.block h4 { margin: 0 0 .35rem; font-size: .95rem; }
+dl.fields { display: grid; grid-template-columns: auto 1fr; gap: .2rem .9rem; margin: .3rem 0; font-size: .92rem; }
+dl.fields dt { color: var(--muted); }
+dl.fields dd { margin: 0; font-variant-numeric: tabular-nums; }
+.tablebox { overflow-x: auto; margin: .4rem 0; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; font-size: .86rem; font-variant-numeric: tabular-nums; min-width: 100%; }
+caption { text-align: left; font-weight: 700; padding: .35rem .55rem; }
+th, td { text-align: left; padding: .35rem .55rem; border-top: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; background: var(--quote); }
+.excerpt { background: var(--quote); border-radius: 6px; padding: .55rem .75rem; font-size: .92rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.excerpt-link { font-size: .88rem; }
+.hands-list { display: grid; gap: .35rem; margin-top: .5rem; }
+details.hand { border: 1px solid var(--line); border-radius: 8px; padding: .45rem .7rem; min-width: 0; }
+details.hand > summary { cursor: pointer; list-style: none; display: flex; gap: .55rem; align-items: baseline; flex-wrap: wrap; }
+details.hand > summary::-webkit-details-marker { display: none; }
+details.hand > summary::after { content: "▸"; margin-left: auto; color: var(--accent); }
+details.hand[open] > summary::after { content: "▾"; }
+details.hand .tag { font: 600 .68rem var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 .3rem; white-space: nowrap; }
+details.hand .ht { font-size: .93rem; min-width: 0; overflow-wrap: anywhere; }
+.hbody { margin-top: .5rem; }
+details.src-item > summary { cursor: pointer; list-style: none; display: grid; gap: .1rem; }
+details.src-item > summary::-webkit-details-marker { display: none; }
+details.src-item > summary strong::after { content: " ▸"; color: var(--accent); }
+details.src-item[open] > summary strong::after { content: " ▾"; }
+.preview { font-size: .88rem; color: var(--muted); }
+details.src-item[open] .preview { display: none; }
+.excerpt-link a { color: var(--accent); }
+.q { border: 1px solid var(--line); border-radius: 10px; padding: .8rem 1rem; margin: .75rem 0; background: var(--surface); min-width: 0; }
+.q .qtitle { font-weight: 700; margin: 0 0 .25rem; }
+.q.answered { border-color: var(--muted); }
+.langpair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin: .4rem 0; }
+.langpair > div { border: 1px solid var(--line); border-radius: 8px; padding: .45rem .7rem; min-width: 0; }
+.langpair small { display: block; font-size: .78rem; color: var(--muted); }
+.langpair b { font-size: 1.05rem; }
+.choices { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+.choices .btn { flex: 1 1 6rem; border-color: var(--line); color: var(--fg); }
+.choices .btn[aria-pressed="true"] { color: var(--on-strong); }
+.choices .btn.yes[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); }
+.choices .btn.no[aria-pressed="true"] { background: var(--bad); border-color: var(--bad); }
+.choices .btn.dk[aria-pressed="true"] { background: var(--muted); border-color: var(--muted); }
+.dots { display: flex; flex-wrap: wrap; gap: .4rem; margin: .25rem 0 .75rem; }
+.dots button { width: 2.1rem; height: 2.1rem; border-radius: 50%; font: 700 .85rem var(--f-body); cursor: pointer; border: 2px solid var(--muted); background: transparent; color: var(--fg); font-variant-numeric: tabular-nums; }
+.dots button.done { background: var(--accent); border-color: var(--accent); color: var(--on-strong); }
+.dots button[aria-current="step"] { outline: 3px solid var(--accent); outline-offset: 2px; }
+.legend { font-size: .85rem; color: var(--muted); margin: 0 0 .25rem; }
+.result { border-radius: 10px; padding: .85rem 1rem; margin: 1rem 0; font-weight: 700; border: 2px solid var(--line); background: var(--surface); }
+.result.pass { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.result.fail { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.result small { display: block; font-weight: 400; color: var(--fg); margin-top: .2rem; }
+.note input { font: 1rem var(--f-body); padding: .6rem .7rem; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); width: 100%; }
+.nav { display: flex; gap: .6rem; justify-content: space-between; margin-top: 1.25rem; }
+mark { background: #fbe27a; color: #1c231f; border-radius: 3px; padding: 0 .12em; }
+details.ex { margin-top: .35rem; font-size: .9rem; }
+details.ex > summary { cursor: pointer; color: var(--accent); font-weight: 700; }
+details.ex p { margin: .3rem 0; }
+.practice-tag { display: inline-block; font: 700 .78rem var(--f-mono); text-transform: uppercase; letter-spacing: .06em; background: var(--accent); color: var(--on-strong); border-radius: 4px; padding: .1rem .45rem; }
+.feedback { border: 2px solid var(--accent); border-radius: 10px; padding: .85rem 1rem; margin: 1rem 0; background: var(--surface); }
+.feedback ul { margin: .4rem 0; padding-left: 1.2rem; }
+.feedback .hit { color: var(--ok); font-weight: 700; }
+.feedback .miss { color: var(--bad); font-weight: 700; }
+.nav .btn { flex: 1 1 0; }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <h1 class="brand">Conferência de respostas</h1>
+    <span class="status" id="who"></span>
+    <span class="status" id="count"></span>
+    <span class="status" id="save" aria-live="polite"></span>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="start">
+    <h2>Você vai conferir as respostas de um assistente virtual</h2>
+    <p>O assistente atende <strong>donos de loja que usam a maquininha de cartão da Getnet</strong>. Ele tira dúvidas
+      usando o site oficial da Getnet e consulta os dados da loja do cliente, como vendas e maquininhas. Os clientes e os
+      dados daqui são fictícios.</p>
+    <p>Seu papel é dizer se cada resposta está <strong>certa</strong> ou <strong>errada</strong>. Não precisa entender
+      de maquininha nem de tecnologia: tudo o que você precisa para decidir aparece na tela.</p>
+
+    <p class="kicker">Como funciona, em cada situação</p>
+    <ol class="steps">
+      <li>Leia a conversa: o que o cliente escreveu (balão verde, à direita) e o que o assistente respondeu (balão branco).</li>
+      <li>Olhe "O que o assistente tinha em mãos": os dados da loja e os trechos do site que ele consultou.</li>
+      <li>Responda 3 perguntas de sim ou não. A página mostra o resultado: certa ou errada.</li>
+    </ol>
+    <p>Antes das situações de verdade há <strong>2 exemplos de treino</strong>: você marca, e a página mostra a
+      resposta esperada e o porquê. O treino não conta na conferência.</p>
+
+    <p class="kicker">Três exemplos</p>
+    <div class="examples">
+      <div class="example good">
+        <p><span class="tag">Certa.</span> O cliente pergunta "Quanto vendi ontem no débito?". Nos dados da loja aparece
+          "vendas de ontem no débito: 3 vendas, total R$ 150,00". O assistente responde "Ontem você vendeu R$ 150,00 no
+          débito, em 3 vendas".</p>
+        <p class="hint">Responde ao que foi pedido, o número confere com os dados e está em português.</p>
+      </div>
+      <div class="example badex">
+        <p><span class="tag">Errada.</span> Mesma pergunta e mesmos dados, mas o assistente responde "Ontem você vendeu
+          R$ 180,00 no débito".</p>
+        <p class="hint">R$ 180,00 não aparece em lugar nenhum do que ele tinha em mãos: o número foi inventado.</p>
+      </div>
+      <div class="example good">
+        <p><span class="tag">Também é certa.</span> O cliente pergunta algo que o site da Getnet não explica, e o
+          assistente diz "Não encontrei essa informação; passei sua pergunta para um atendente (protocolo T-…)".</p>
+        <p class="hint">Admitir que não sabe e chamar uma pessoa é melhor do que inventar.</p>
+      </div>
+    </div>
+
+    <p class="kicker">Quem é você?</p>
+    <div class="picker" id="picker"></div>
+    <div class="notice" id="notice" hidden></div>
+    <button type="button" class="btn primary" id="go" disabled>Começar o treino (2 exemplos)</button>
+    <p><button type="button" class="linkbtn" id="skiptrain" hidden>Já fiz o treino: ir direto para as situações</button></p>
+  </section>
+
+  <section id="item" hidden></section>
+
+  <section id="end" hidden>
+    <h2>Pronto, obrigado!</h2>
+    <p id="endtext"></p>
+    <p id="savedline">As marcações já estão salvas. Pode fechar a página.</p>
+    <div id="copybox" hidden>
+      <p><strong>Suas marcações não chegaram ao responsável</strong> (você não entrou com uma conta do claude.ai). Toque em
+        "Copiar minhas respostas" e cole o texto numa mensagem para quem te mandou o link.</p>
+      <button type="button" class="btn primary" id="copy">Copiar minhas respostas</button>
+      <textarea id="copytext" readonly rows="6" style="width:100%;margin-top:.6rem;font:.85rem var(--f-mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:.5rem"></textarea>
+    </div>
+    <div class="nav"><button type="button" class="btn" id="review">Revisar alguma situação</button></div>
+  </section>
+</main>
+
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+(() => {
+  "use strict";  // erro de escrita aparece, em vez de sumir em silêncio
+  const DATA = JSON.parse(document.getElementById("data").textContent);
+  const ITEMS = DATA.items, RATERS = DATA.raters;
+  const LANG = { pt: "português", en: "inglês", es: "espanhol" };
+  // Kit v5.3 final (V5: kappa 0,054 entre o dono e a 2ª pessoa): perguntas concretas, uma por modo de falha, cada uma
+  // com a resposta que REPROVA (`bad`) e um exemplo de sim e de não na dica; a pergunta 2 pergunta pelo defeito
+  // ("tem algo sem base?"), com os números da resposta destacados no que ele tinha em mãos.
+  const QUESTIONS = [
+    { key: "c1", title: "A resposta responde o que o cliente perguntou?", bad: "nao",
+      yes: "Sim, responde", no: "Não, fugiu do pedido",
+      hint: "Se o assistente disse que não encontrou a informação e ofereceu (ou chamou) um atendente, conte como sim.",
+      exYes: "Cliente: \"Quanto vendi ontem?\" → \"Ontem você vendeu R$ 150,00.\"",
+      exNo: "Cliente: \"Quanto vendi ontem?\" → \"A Get Smart imprime nota fiscal.\" (outro assunto)" },
+    { key: "c2", title: "Tem algum número, prazo, valor ou regra na resposta que NÃO aparece no que o assistente tinha em mãos?", bad: "sim",
+      yes: "Sim, tem algo sem base", no: "Não, tudo aparece lá",
+      hint: "Os números que estão na resposta aparecem destacados em amarelo no que ele tinha em mãos. Número que não aparece destacado em lugar nenhum = Sim. Pedir confirmação antes de fazer algo (\"confirme a ação A-…\") é o comportamento certo.",
+      exYes: "Em mãos: \"o valor cai em 30 dias\". Resposta: \"cai em 2 dias\" → Sim (o 2 não está lá).",
+      exNo: "Em mãos: \"o valor cai em 30 dias\". Resposta: \"cai em 30 dias\" → Não." },
+    // Pós-morte V5 (N8): a 2ª pessoa leu esta pergunta como "devia ser em português" e marcou 5 de 10 respostas
+    // certas em inglês como idioma errado. A pergunta mostra os dois idiomas lado a lado e diz a regra com todas as letras.
+    { key: "c3", title: "A resposta está no MESMO idioma da pergunta?", bad: "nao",
+      yes: "Sim, mesmo idioma", no: "Não, idiomas diferentes",
+      hint: "Regra: pergunta em inglês e resposta em inglês = Sim. Pergunta em português e resposta em português = Sim. A resposta NÃO precisa estar em português. Olhe só o idioma, não o conteúdo.",
+      exYes: "Pergunta em inglês, resposta em inglês → Sim.",
+      exNo: "Pergunta em inglês, resposta em português → Não." },
+  ];
+  const FAIL_TYPE = { c1: ["wrong_route", "não responde o que o cliente perguntou"],
+                      c2: ["unsupported_claim", "afirma algo que não estava no que ele tinha em mãos"],
+                      c3: ["wrong_language", "está num idioma diferente do da pergunta"] };
+  const PRACTICE = DATA.practice || [];
+  const state = { rater: "", marks: {}, i: 0, view: "start", train: {}, trainDone: false, pi: 0 };
+  const tr = {};
+  const diag = [];  // diagnóstico (teste do dono, desktop): o que a página recebe de cada toque, gravado na ficha
+  const note = (kind, e, extra) => {
+    const el = e && e.target && e.target.closest ? e.target.closest("button") : null;
+    diag.push({ t: new Date().toISOString().slice(11, 23), kind, el: el ? el.id || el.className : (e && e.target && e.target.tagName) || "", ...extra });
+    if (diag.length > 12) diag.shift();
+  };
+  document.addEventListener("pointerdown", (e) => note("down", e), true);
+  document.addEventListener("click", (e) => note("click", e), true);
+  let ref = null, sample = null, writing = false, pending = false, saveTimer = null;
+  const $ = (id) => document.getElementById(id);
+
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function chips(line, urls) {  // código de fonte ("[sup-pix-09]", "(fontes: a, b)") vira o link "fonte"
+    const link = (id) => urls[id] ? `<a class="src" href="${esc(urls[id])}" target="_blank" rel="noopener" title="${esc(id)}">fonte</a>` : null;
+    const group = (ids) => { const l = ids.split(/\s*,\s*/).map(link); return l.every(Boolean) ? l.join("") : null; };
+    return line
+      .replace(/\[([\w.-]+(?:\s*,\s*[\w.-]+)*)\]/g, (m, ids) => group(ids) ?? m)
+      .replace(/\((?:fontes?|sources?)\s*:?\s*([\w.-]+(?:\s*,\s*[\w.-]+)*)\)/gi, (m, ids) => group(ids) ?? m)
+      .replace(/\(([\w.-]+(?:\s*,\s*[\w.-]+)*)\)/g, (m, ids) => group(ids) ?? m);
+  }
+  function md(text, urls = {}) {  // **negrito**, listas, parágrafos e fontes; todo o resto escapado
+    const out = []; let list = null;
+    for (const raw of String(text || "").split(/\n/)) {
+      const line = chips(esc(raw), urls).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      const m = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+      if (m) { (list ||= []).push(`<li>${m[1]}</li>`); continue; }
+      if (list) { out.push(`<ul>${list.join("")}</ul>`); list = null; }
+      if (line.trim()) out.push(`<p>${line}</p>`);
+    }
+    if (list) out.push(`<ul>${list.join("")}</ul>`);
+    return out.join("");
+  }
+
+  function verdict(m) {  // 3 respostas → certa / errada (com o motivo) / fora da conta
+    const no = QUESTIONS.find((q) => m[q.key] === q.bad);
+    if (no) return { v: "fail", tipo: FAIL_TYPE[no.key][0], why: FAIL_TYPE[no.key][1] };
+    const answered = QUESTIONS.map((q) => m[q.key]);
+    if (answered.every((a) => a === "sim" || a === "nao")) return { v: "pass" };
+    if (answered.every(Boolean)) return { v: "skip" };
+    return { v: "" };
+  }
+  const done = () => ITEMS.filter((it) => state.marks[it.id]?.v).length;
+
+  function renderHeader() {
+    $("who").textContent = state.rater ? `Conferindo: ${state.rater}` : "";
+    $("count").textContent = `${done()} de ${ITEMS.length} respondidas`;
+    $("bar").style.width = `${ITEMS.length ? (100 * done()) / ITEMS.length : 0}%`;
+  }
+
+  function renderStart() {
+    $("picker").innerHTML = RATERS.map((r, k) =>
+      `<button type="button" class="btn" id="rater-${k}" data-rater="${k}" aria-pressed="${state.rater === r}">${esc(r)}</button>`).join("");
+    $("go").disabled = !state.rater;
+    const needTrain = PRACTICE.length && !state.trainDone && !done();
+    $("go").textContent = done() ? "Continuar de onde parei" : needTrain ? `Começar o treino (${PRACTICE.length} exemplos)` : "Começar";
+    $("skiptrain").hidden = !needTrain || !state.rater;
+  }
+
+  // Números da resposta (R$ 150,00, 30, 18h…) destacados no que ele tinha em mãos: a pergunta 2 vira procurar o
+  // amarelo, não ler tudo. Só números com 2+ caracteres ou com vírgula (um "1" solto acenderia a página inteira).
+  function answerNumbers(it) {
+    const found = String(it.answer || "").match(/\d[\d.,]*\d|\d/g) || [];
+    return [...new Set(found.map((x) => x.replace(/[.,]$/, "")).filter((x) => x.length >= 2))].sort((a, b) => b.length - a.length);
+  }
+  function hl(escaped, nums) {
+    if (!nums.length) return escaped;
+    const re = new RegExp("(?<![\\d.,])(" + nums.map((n) => n.replace(/[.]/g, "\\.")).join("|") + ")(?![\\d])", "g");
+    return escaped.replace(re, "<mark>$1</mark>");
+  }
+  function blocksHtml(it) {
+    const nums = answerNumbers(it);
+    // Lista curta: um título por item, fechado; o conteúdo só abre no toque (pedido do dono: "simples e sucinto").
+    const all = it.blocks || [];
+    const item = (tag, title, body) => `<details class="hand"><summary><span class="tag">${tag}</span><span class="ht">${esc(title)}</span></summary><div class="hbody">${body}</div></details>`;
+    const rows = all.map((b) => {
+      if (b.kind === "data") {
+        const fields = (b.fields || []).length ? `<dl class="fields">${b.fields.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${hl(esc(v), nums)}</dd>`).join("")}</dl>` : "";
+        const tables = (b.tables || []).map((t) => `<div class="tablebox"><table>
+          <thead><tr>${t.columns.map((c) => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
+          <tbody>${t.rows.map((r) => `<tr>${r.map((c) => `<td>${hl(esc(c), nums)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+        const caps = (b.tables || []).map((t) => `${t.caption} (${t.rows.length})`);
+        return item("Dados da loja", caps.length ? caps.join(", ") : "resumo", fields + tables);
+      }
+      if (b.kind === "text") {
+        const link = b.url ? `<p class="excerpt-link"><a href="${esc(b.url)}" target="_blank" rel="noopener">Abrir a página</a></p>` : "";
+        const hit = nums.some((n) => String(b.text).includes(n));
+        return item("Fonte", b.title + (hit ? " · tem número da resposta" : ""), `<div class="excerpt">${hl(esc(b.text), nums)}</div>${link}`);
+      }
+      return "";
+    }).join("");
+    const notes = all.filter((b) => b.kind === "memory" || b.kind === "rules");
+    const extra = notes.length ? item("Sistema", "anotações e regras do assistente",
+      `<p class="hint">Data de hoje, o que já foi dito e o que o assistente pode fazer. Só precisa olhar se a resposta oferece fazer algo.</p><ul>${notes.map((b) => `<li>${hl(esc(b.text), nums)}</li>`).join("")}</ul>`) : "";
+    if (!rows) return `<p class="hint">Nada: o assistente respondeu sem consultar dados nem o site.</p>${extra}`;
+    return `<div class="hands-list">${rows}${extra}</div>`;
+  }
+
+  // Tela de uma situação: a de verdade (ITEMS[state.i], conta) ou a de treino (PRACTICE[state.pi], não conta).
+  const training = () => state.view === "train";
+  const current = () => training() ? { it: PRACTICE[state.pi], store: state.train } : { it: ITEMS[state.i], store: state.marks };
+
+  function feedbackHtml(it, m) {
+    const key = it.key || {}, word = { sim: "Sim", nao: "Não", naosei: "Não sei" };
+    const lines = QUESTIONS.map((q, k) => {
+      const hit = m[q.key] === key[q.key];
+      return `<li>Pergunta ${k + 1}: esperado <b>${word[key[q.key]] || "—"}</b>, você marcou ${word[m[q.key]] || "—"} <span class="${hit ? "hit" : "miss"}">${hit ? "✓ igual" : "✗ diferente"}</span></li>`;
+    }).join("");
+    return `<div class="feedback" role="status"><p><strong>Gabarito deste treino: resposta ${it.expected === "pass" ? "CERTA" : "ERRADA"}.</strong></p><ul>${lines}</ul><p>${esc(it.explain || "")}</p></div>`;
+  }
+
+  function renderItem() {
+    const { it, store } = current(), m = store[it.id] || {}, res = verdict(m), practice = training();
+    const lang = LANG[it.lang] || "o mesmo idioma";
+    const qLang = LANG[it.lang] || "veja o texto", aLang = LANG[it.answer_lang] || "veja o texto";
+    const pair = `<div class="langpair" aria-label="Idiomas"><div><small>Idioma da pergunta</small><b>${esc(qLang)}</b></div><div><small>Idioma da resposta</small><b>${esc(aLang)}</b></div></div>`;
+    const foreign = it.lang && it.lang !== "pt";
+    const t = tr[it.id];
+    const before = (it.before || []).map((b) => `<div class="bubble client prev"><span class="who">Cliente, antes</span>${esc(b)}</div>`).join("");
+    const qs = QUESTIONS.map((q, k) => {
+      const b = (val, cls, label) => `<button type="button" class="btn ${cls}" id="${q.key}-${val}" data-q="${q.key}" data-v="${val}" aria-pressed="${m[q.key] === val}">${m[q.key] === val ? "✓ " : ""}${esc(label)}</button>`;
+      const okFirst = q.bad === "sim" ? b("nao", "yes", q.no) + b("sim", "no", q.yes) : b("sim", "yes", q.yes) + b("nao", "no", q.no);
+      return `<div class="q${m[q.key] ? " answered" : ""}" role="group" aria-labelledby="qt-${q.key}">
+        <p class="qtitle" id="qt-${q.key}">${k + 1}. ${esc(q.title)}</p>${q.key === "c3" ? pair : ""}<p class="hint">${esc(q.hint)}</p>
+        <details class="ex"><summary>Ver um exemplo de Sim e de Não</summary><p><b>Sim:</b> ${esc(q.exYes)}</p><p><b>Não:</b> ${esc(q.exNo)}</p></details>
+        <div class="choices">${okFirst}${b("naosei", "dk", "Não sei")}</div></div>`;
+    }).join("");
+    const result = res.v === "pass" ? `<div class="result pass">Resultado: resposta CERTA</div>`
+      : res.v === "fail" ? `<div class="result fail">Resultado: resposta ERRADA<small>Motivo: ${esc(res.why)}.</small></div>`
+      : res.v === "skip" ? `<div class="result">Resultado: sem avaliação<small>Você marcou "não sei"; esta situação fica fora da conta.</small></div>`
+      : `<div class="result">Responda as 3 perguntas para ver o resultado.</div>`;
+    const full = QUESTIONS.every((q) => m[q.key]);
+    const head = practice
+      ? `<p class="kicker"><span class="practice-tag">Treino ${state.pi + 1} de ${PRACTICE.length}</span> não conta na conferência</p>`
+      : `<p class="kicker">Situação ${state.i + 1} de ${ITEMS.length}</p>
+      <nav class="dots" aria-label="Ir para a situação">${ITEMS.map((x, k) => `<button type="button" id="dot-${k}" data-go="${k}" class="${state.marks[x.id]?.v ? "done" : ""}" ${k === state.i ? 'aria-current="step"' : ""} aria-label="Situação ${k + 1}${state.marks[x.id]?.v ? ", respondida" : ", falta responder"}">${k + 1}</button>`).join("")}</nav>
+      <p class="legend">Bolinha cheia = já respondida. Toque num número para ir até a situação.</p>`;
+    const last = practice ? state.pi === PRACTICE.length - 1 : state.i === ITEMS.length - 1;
+    const nextLabel = practice ? (full ? (last ? "Começar as situações de verdade →" : "Próximo treino →") : "Marque as 3 para ver o gabarito")
+      : (last ? "Concluir" : res.v ? "Próxima →" : "Pular por agora →");
+    $("item").innerHTML = `
+      ${head}
+      <div class="chat">
+        ${before}
+        <div class="bubble client"><span class="who">Cliente</span>${esc(it.question)}${t ? `<div class="tr">Tradução: ${esc(t.q)}</div>` : ""}</div>
+        <div class="bubble bot"><span class="who">Assistente</span>${md(it.answer, it.source_urls || {})}${t ? `<div class="tr">Tradução: ${esc(t.a)}</div>` : ""}</div>
+      </div>
+      ${foreign ? `<p class="lang">Conversa em ${esc(lang)}. ${sample && !practice ? (t ? "A tradução automática aparece embaixo de cada balão, só para ajudar a ler." : `<button type="button" class="linkbtn" id="translate">Traduzir para português</button>`) : "Se não conseguir ler, responda \"Não sei\"."}</p>` : ""}
+      <details class="hands" open><summary>O que o assistente tinha em mãos</summary>
+        <p class="hint">Toque num item para ver o conteúdo. Números da resposta aparecem <mark>em amarelo</mark>. Use para a pergunta 2.</p>${practice ? blocksHtml(it).replaceAll('<details class="hand">', '<details class="hand" open>') : blocksHtml(it)}</details>
+      ${qs}
+      ${practice ? (full ? feedbackHtml(it, m) : "") : result}
+      ${practice ? "" : `<div class="note"><input id="nota" type="text" maxlength="200" placeholder="Quer comentar algo? (opcional)" value="${esc(m.nota || "")}"></div>`}
+      <div class="nav">
+        <button type="button" class="btn" id="prev" ${(practice ? state.pi : state.i) === 0 ? "disabled" : ""}>← Anterior</button>
+        <button type="button" class="btn primary" id="next" ${practice && !full ? "disabled" : ""}>${nextLabel}</button>
+      </div>`;
+  }
+
+  function setMark(patch) {
+    const { it, store } = current();
+    const cur = { ...(store[it.id] || {}), ...patch };
+    const r = verdict(cur);
+    store[it.id] = { ...cur, v: r.v, tipo: r.tipo || "", at: new Date().toISOString() };
+    if (training() && state.pi === PRACTICE.length - 1 && QUESTIONS.every((q) => cur[q.key])) state.trainDone = true;
+    queueSave();
+  }
+  // Um só ouvinte para a tela da situação: o HTML é refeito a cada clique e, no visualizador do desktop, pode ser
+  // trocado por uma versão nova da página; botão com data-* nunca perde o clique (teste do dono, 02/11/2026).
+  function answer(el, how) {
+    const { it, store } = current();
+    if ((store[it.id] || {})[el.dataset.q] === el.dataset.v) return;  // já marcado (pointerup + click)
+    try {
+      setMark({ [el.dataset.q]: el.dataset.v }); renderItem(); renderHeader();
+      document.getElementById(el.id)?.focus({ preventScroll: true });
+      note("answered", null, { how, q: el.dataset.q, v: el.dataset.v, i: training() ? "t" + state.pi : state.i });
+    } catch (err) {
+      note("error", null, { how, msg: String(err && err.message || err).slice(0, 120) });
+      queueSave();
+    }
+  }
+  $("item").addEventListener("pointerup", (e) => {
+    const el = e.target.closest("button[data-q]");
+    if (el && !el.disabled) answer(el, "pointerup");
+  });
+  $("item").addEventListener("click", (e) => {
+    const el = e.target.closest("button");
+    if (!el || el.disabled) return;
+    if (el.dataset.q) answer(el, "click");
+    else if (el.dataset.go !== undefined) go(Number(el.dataset.go));
+    else if (el.id === "prev") (training() ? train(state.pi - 1) : go(state.i - 1));
+    else if (el.id === "next") {
+      if (training()) (state.pi === PRACTICE.length - 1 ? (state.trainDone = true, queueSave(), go(firstOpen())) : train(state.pi + 1));
+      else (state.i === ITEMS.length - 1 ? show("end") : go(state.i + 1));
+    }
+    else if (el.id === "translate") translate(ITEMS[state.i]);
+  });
+  $("item").addEventListener("change", (e) => {
+    if (e.target.id === "nota") setMark({ nota: e.target.value.slice(0, 200) });
+  });
+
+  async function translate(it) {
+    if (!sample || tr[it.id]) return;
+    $("translate").textContent = "Traduzindo…"; $("translate").disabled = true;
+    try {
+      const ask = (text) => sample(`Traduza para português do Brasil, mantendo números, valores, datas, códigos e nomes exatamente como estão. Responda só com a tradução.\n\n${text}`, { modelTier: "quick" });
+      const [q, a] = await Promise.all([ask(it.question), ask(it.answer)]);
+      tr[it.id] = { q: q.text.trim(), a: a.text.trim() };
+    } catch (e) {
+      delete tr[it.id];
+      if ($("translate")) { $("translate").textContent = "Tradução indisponível agora"; }
+      return;
+    }
+    renderItem();
+  }
+
+  function go(i) { state.i = Math.max(0, Math.min(ITEMS.length - 1, i)); show("item"); window.scrollTo(0, 0); }
+  function train(i) { state.pi = Math.max(0, Math.min(PRACTICE.length - 1, i)); show("train"); window.scrollTo(0, 0); }
+  function show(view) {
+    state.view = view;
+    const onItem = view === "item" || view === "train";
+    $("start").hidden = view !== "start"; $("item").hidden = !onItem; $("end").hidden = view !== "end";
+    if (view === "start") renderStart();
+    if (onItem) renderItem();
+    if (view === "end") {
+      $("copybox").hidden = !!ref; $("savedline").hidden = !ref;
+      $("copytext").value = exportText();
+      const n = done(), skip = ITEMS.filter((it) => state.marks[it.id]?.v === "skip").length, missing = ITEMS.length - n;
+      $("endtext").textContent = `Você conferiu ${n} de ${ITEMS.length} situações` + (skip ? ` (${skip} com "não sei")` : "") + "." +
+        (missing ? ` Ainda faltam ${missing}: toque em "Revisar" para voltar a elas.` : "");
+      window.scrollTo(0, 0);
+    }
+    renderHeader();
+  }
+  const firstOpen = () => { const k = ITEMS.findIndex((it) => !state.marks[it.id]?.v); return k < 0 ? 0 : k; };
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("#start button, #end button");
+    if (!el || el.disabled) return;
+    if (el.dataset.rater !== undefined) { state.rater = RATERS[Number(el.dataset.rater)]; queueSave(); renderStart(); renderHeader(); }
+    else if (el.id === "go") (PRACTICE.length && !state.trainDone && !done() ? train(0) : go(firstOpen()));
+    else if (el.id === "skiptrain" || el.id === "review") { state.trainDone = state.trainDone || el.id === "skiptrain"; go(firstOpen()); }
+    else if (el.id === "copy") {
+      const text = exportText(), box = $("copytext");
+      box.value = text;
+      const ok = () => { el.textContent = "Copiado! Cole numa mensagem"; };
+      const manual = () => { box.focus(); box.select(); el.textContent = "Selecionei o texto: copie e cole numa mensagem"; };
+      try { navigator.clipboard.writeText(text).then(ok, manual); } catch (err) { manual(); }
+    }
+  });
+
+  function exportText() {
+    const lines = ITEMS.map((it) => { const m = state.marks[it.id]; return m?.v ? `${it.id}=${m.v}${m.tipo ? ":" + m.tipo : ""} ` + QUESTIONS.map((q) => `${q.key}=${m[q.key] || ""}`).join(" ") : null; }).filter(Boolean);
+    return [`CONFERENCIA ${DATA.sample} ${state.rater || "?"}`, ...lines].join("\n");
+  }
+  function keepLocal() { try { localStorage.setItem("rot-" + DATA.sample, JSON.stringify({ rater: state.rater, marks: state.marks, trainDone: state.trainDone })); } catch (e) {} }
+  function notice(text) { $("notice").textContent = text; $("notice").hidden = !text; }
+  function saveLabel(text, err) { $("save").textContent = text; $("save").classList.toggle("err", !!err); }
+  function queueSave() {
+    if (!ref) { keepLocal(); saveLabel("só neste aparelho", true); return; }
+    clearTimeout(saveTimer); saveTimer = setTimeout(flush, 400); saveLabel("salvando…");
+  }
+  async function flush() {
+    if (writing) { pending = true; return; }
+    writing = true;
+    try {
+      await ref.set({ rater: state.rater, marks: state.marks, sample: DATA.sample, updated_at: new Date().toISOString(),
+                      train_done: state.trainDone, train: state.train, diag: diag.slice() });
+      saveLabel("salvo");
+    } catch (e) {
+      if (e?.code === "unavailable") { setTimeout(flush, 800 + Math.random() * 800); saveLabel("tentando de novo…"); }
+      else { saveLabel("não salvo", true); notice("Não consegui salvar (" + (e?.code || "erro") + "). Avise quem te mandou o link antes de continuar."); }
+    } finally { writing = false; if (pending) { pending = false; flush(); } }
+  }
+
+  async function connect() {
+    const timer = setTimeout(() => notice("A página ainda não conseguiu se conectar para salvar. Confira se você entrou com sua conta do claude.ai."), 10000);
+    try {
+      if (!window.claude?.use) { clearTimeout(timer); notice("Esta visualização não salva as marcações. Abra o link no claude.ai, entrando com sua conta."); return; }
+      const [d, u, s] = await Promise.all([window.claude.use("db"), window.claude.use("user"), window.claude.use("sample")]);
+      clearTimeout(timer);
+      sample = s;
+      if (!d || !u) { notice("Você não entrou com uma conta do claude.ai: suas marcações ficam só neste aparelho. Entre com sua conta (é grátis) e abra o link de novo; ou marque assim mesmo e, no fim, toque em \"Copiar minhas respostas\"."); return; }
+      const uid = await u.id();
+      if (!uid) { notice("Você não entrou com uma conta do claude.ai: suas marcações ficam só neste aparelho. Entre com sua conta (é grátis) e abra o link de novo; ou marque assim mesmo e, no fim, toque em \"Copiar minhas respostas\"."); return; }
+      ref = d.doc("rotulos/" + uid);
+      const snap = await ref.get();
+      if (snap.exists) {
+        const saved = snap.data() || {};
+        // data() vem CONGELADO: gravar em cima dele falhava em silêncio (teste do dono, 02/11/2026: quem reabria a
+        // página com marcações salvas não conseguia marcar mais nada). A página trabalha numa cópia.
+        if (saved.sample === DATA.sample) { state.rater = saved.rater || ""; state.marks = JSON.parse(JSON.stringify(saved.marks || {})); state.trainDone = !!saved.train_done; }
+      }
+      notice("");
+      saveLabel(done() ? "salvo" : "");
+      show(state.view);
+    } catch (e) {
+      clearTimeout(timer);
+      notice("Não consegui me conectar para salvar (" + (e?.code || "erro") + "). Avise quem te mandou o link.");
+    }
+  }
+
+  try {
+    const local = JSON.parse(localStorage.getItem("rot-" + DATA.sample) || "null");
+    if (local) { state.rater = local.rater || ""; state.marks = local.marks || {}; state.trainDone = !!local.trainDone; }
+  } catch (e) {}
+  show("start");
+  connect();
+})();
+</script>

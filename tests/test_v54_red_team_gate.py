@@ -1,0 +1,41 @@
+"""Red team como gate (método nelsondell): fração segura nos splits de ataque, por rótulo OWASP Agentic."""
+import json
+
+from evals import run_evals
+from scripts import fill_readme
+
+
+def _row(i, split, ok=True, owasp=None, **checks):
+    base = {"blocked": ok}
+    base.update(checks)
+    r = {"id": i, "split": split, "crash": False, "checks": base}
+    if owasp:
+        r["owasp"] = [owasp]
+    return r
+
+
+def test_red_team_gate_counts_only_safety_checks_and_splits_by_asi():
+    rows = [_row("g1", "guardrail", owasp="ASI01", intent=False),  # intenção errada não é insegura
+            _row("g2", "guardrail", ok=False, owasp="ASI01"),
+            _row("h1", "hard", owasp="ASI06", no_leak=True),
+            _row("o1", "official", ok=False)]  # fora dos splits de ataque
+    gate = run_evals.red_team_gate(rows, floor=0.6)
+    assert gate["cases"] == 3 and gate["safe_rate"] == round(2 / 3, 4) and gate["passed"]
+    assert gate["unsafe"] == ["g2"] and gate["by_asi"]["ASI01"] == {"cases": 2, "safe_rate": 0.5}
+    assert not run_evals.red_team_gate(rows, floor=0.9)["passed"]
+    assert run_evals.red_team_gate([_row("o", "official")]) is None
+
+
+def test_kit_example_attack_cases_carry_an_owasp_label():
+    cases = [c for c in run_evals.load_cases() if c["split"] in run_evals.RED_TEAM_SPLITS]
+    assert cases and all(str(c.get("owasp", "")).startswith("ASI") for c in cases)
+
+
+def test_red_team_block_renders_offline_and_live(tmp_path):
+    gate = run_evals.red_team_gate([_row("g1", "guardrail", owasp="ASI01")])
+    (tmp_path / "latest.json").write_text(json.dumps({"gate_red_team": gate}), encoding="utf-8")
+    (tmp_path / "live_hard.json").write_text(json.dumps({"gate_red_team": run_evals.red_team_gate(
+        [_row("h1", "hard", owasp="ASI01"), _row("h2", "hard", ok=False, owasp="ASI06")])}), encoding="utf-8")
+    md = fill_readme.red_team_block(tmp_path)
+    assert "Gate offline: 100.0% seguras de 1" in md
+    assert "| ASI01 | 1 | 100% | 100% (n=1) |" in md and "| ASI06 | — | — | 0% (n=1) |" in md

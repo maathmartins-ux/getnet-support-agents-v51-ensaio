@@ -1,0 +1,6 @@
+{"user": "u1"}
+{"say": "Onde está meu pedido 1002?"}
+{"say": "E o 1001?"}
+{"say": "Pode cancelar o pedido 1001?"}
+{"confirm": true}
+{"say": "Quero falar com um atendente sobre o prazo de entrega", "operator": "Verifiquei: o prazo do seu pedido é de 3 a 5 dias úteis.", "wait_s": 5, "operator_after_s": 0.3}

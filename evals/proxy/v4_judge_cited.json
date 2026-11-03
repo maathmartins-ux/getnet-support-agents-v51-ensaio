@@ -1,0 +1,286 @@
+{
+ "_doc": "Rótulos para evals/claims_proxy.py: frases que o juiz (getnet-support-agents-v4/evals/results/judge.json, split official) citou nas 12 reprovações, tiradas do texto do motivo. expect=catch: deveria ser apontada; expect=keep: é regra ou capacidade verdadeira do sistema (cartão policy:capabilities) e NÃO deveria ser apontada. `tools` = metadados do registro de ferramentas da v4 (description, write, risk), copiados de src/app/domain/challenge/tools.py.",
+ "source": "maathmartins-ux/getnet-support-agents-v4@fd85cf6 evals/results/{live_official,judge}.json",
+ "tools": {
+  "get_settlements": {
+   "description": "Agenda de recebimentos do lojista autenticado: cada venda aprovada com valor, modalidade, data prevista de depósito em dias úteis (Pix no mesmo dia, débito no dia útil seguinte, crédito em 30 dias), status, total e valor disponível para antecipar.",
+   "write": false
+  },
+  "get_transactions": {
+   "description": "Transações recentes do lojista autenticado (aprovadas e recusadas), com código e motivo da recusa e se a transação é contestável.",
+   "write": false
+  },
+  "get_terminal_status": {
+   "description": "Maquininhas do lojista autenticado: modelo, conexão (chip/Wi-Fi), sinal, online, minutos desde o último contato, bobina e bloqueio.",
+   "write": false
+  },
+  "restart_terminal": {
+   "description": "Reinicia remotamente uma maquininha do lojista. Escrita: só propõe; executa depois que o lojista confirmar.",
+   "write": true
+  },
+  "request_anticipation": {
+   "description": "Solicita antecipação de recebíveis de crédito. Sem amount = todo o disponível. Exige confirmação do lojista e aprovação de um atendente.",
+   "write": true,
+   "risk": "high"
+  },
+  "open_chargeback": {
+   "description": "Abre contestação de uma transação APROVADA do lojista (recusada não é contestável). Exige confirmação do lojista e aprovação de um atendente.",
+   "write": true,
+   "risk": "high"
+  }
+ },
+ "cited": [
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "mist, 19°C",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "thundery outbreaks nearby, 29°C",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "light rain shower, 24°C",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "31°C / 88°F",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-02",
+   "run": 0,
+   "sentence": "AccuWeather also shows rain and a thunderstorm",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "sentence": "minimum 20°C, maximum 31°C",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "sentence": "many clouds, with a chance of isolated rain",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-02",
+   "run": 1,
+   "sentence": "many clouds, with isolated showers",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "sentence": "minimum 20°C, maximum 31°C",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "sentence": "cloudy, with a chance of isolated rain",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-02",
+   "run": 2,
+   "sentence": "cloudy, with isolated showers",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-03",
+   "run": 0,
+   "sentence": "Pix is normally deposited the same day",
+   "expect": "keep",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-03",
+   "run": 0,
+   "sentence": "You would need to confirm it, and an operator would then approve it",
+   "expect": "keep",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-03",
+   "run": 1,
+   "sentence": "Deposits follow business days",
+   "expect": "keep",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-03",
+   "run": 1,
+   "sentence": "A request to anticipate needs your confirmation and an operator's approval",
+   "expect": "keep",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-03",
+   "run": 2,
+   "sentence": "tell me and I can start a request",
+   "expect": "keep",
+   "type": "offered_unavailable_action"
+  },
+  {
+   "id": "official-03",
+   "run": 2,
+   "sentence": "You would have to confirm it, and an operator would then approve it",
+   "expect": "keep",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "sentence": "Turn it off and on again",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "sentence": "near a window and away from metal or thick walls",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-05",
+   "run": 0,
+   "sentence": "I can propose a remote restart of T1988B",
+   "expect": "keep",
+   "type": "offered_unavailable_action"
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "sentence": "away from thick walls and metal",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "sentence": "Turn it off and on again",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-05",
+   "run": 1,
+   "sentence": "I can also propose a remote restart of T1988B",
+   "expect": "keep",
+   "type": "offered_unavailable_action"
+  },
+  {
+   "id": "official-05",
+   "run": 2,
+   "sentence": "near a window and away from thick walls",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-05",
+   "run": 2,
+   "sentence": "I can also propose a remote restart of the T1988B",
+   "expect": "keep",
+   "type": "offered_unavailable_action"
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "1 EUR = 1.11838091 USD",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "€1 = 1.116 USD",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "The page gave no clear timestamp",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-07",
+   "run": 0,
+   "sentence": "check the Banco Central do Brasil (PTAX)",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "sentence": "lists 1.00 EUR = 1.11838091 USD",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "sentence": "similar figure of €1 = 1.116 USD",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-07",
+   "run": 1,
+   "sentence": "check the Banco Central do Brasil (PTAX)",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "1 EUR = 1.11838091 USD, dated 11/01/2026",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "1 EUR = 1.116 USD",
+   "expect": "catch",
+   "type": "invented_number"
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "Neither page showed a timestamp",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  },
+  {
+   "id": "official-07",
+   "run": 2,
+   "sentence": "check the Banco Central do Brasil.",
+   "expect": "catch",
+   "type": "unsupported_claim"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+.git
+.env
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+evals/results
+var
+!var/embeddings
+**/*.egg-info
+tests
+docs
+.github
+.claude
+ops
