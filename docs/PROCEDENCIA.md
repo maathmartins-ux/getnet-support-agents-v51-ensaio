@@ -84,7 +84,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 5 | 3 | 1 |
 | `Makefile` | 38 | 0 | 0 | 0 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 110 | 28 | 1 |
+| `README.md` | 319 | 112 | 28 | 1 |
 | `data` | 34 | 45 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
 | `data/intent_examples.d` | 0 | 26 | 0 | 0 |
@@ -110,12 +110,12 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
-| `scripts` | 4505 | 51 | 13 | 5 |
-| `src/app` | 10844 | 804 | 2 | 2 |
-| `tests` | 12008 | 474 | 10 | 4 |
+| `scripts` | 4505 | 53 | 14 | 5 |
+| `src/app` | 10844 | 848 | 3 | 6 |
+| `tests` | 12008 | 509 | 10 | 4 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **7970** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 28. Fora da conta, por serem gerados: 132147 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **8053** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 32. Fora da conta, por serem gerados: 132216 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

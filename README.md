@@ -390,8 +390,10 @@ e como comparar pela primeira entrega.
 | 15:41:47 | 207 | confirmação: final.sh do kit (commit final com os docs gerados) |
 | 15:41:48 | 207 | readme: números e linha do tempo (fill_readme, último passo) |
 | 15:57:49 | 223 | eval: confirmação ao vivo — memory repeat 3 complete (pass@1 0,92, fato da conversa 86,1%, números 100%); replan e dependent abortaram por cota (16/20 e 8/11), fora; juiz re-rodado (US$ 6,61) |
+| 15:57:50 | 223 | readme: números e linha do tempo (fill_readme, último passo) |
+| 16:10:50 | 236 | confirmação: pergunta sobre a própria Getnet vai ao conhecimento (replan-06/11/12 iam ao general sem escalar) |
 
-Do primeiro ao último commit: **223 min**.
+Do primeiro ao último commit: **236 min**.
 <!-- timeline:end -->
 
 </details>
