@@ -84,3 +84,12 @@ def test_rerank_gate_decides_when_the_retriever_reranks(monkeypatch):
     assert agents.covered_hits([hit(-7.0), hit(-6.0)]) == []  # BM25 alto não salva: o rerank recusa
     assert len(agents.covered_hits([hit(-4.0), hit(-9.0)])) == 2
     assert len(agents.covered_hits([hit(None)])) == 1  # sem nota de rerank: o BM25 decide
+
+
+def test_enriched_label_sample_brings_suspected_failures_and_skips_labeled():
+    from evals import label
+
+    rows = [{"id": f"c{i}", "split": "s", "checks": {"facts": i % 5 != 0}} for i in range(40)]
+    got = label.enriched_sample(rows, 10, suspects=6, exclude={"c0"}, suspect_ids={"c5", "c10", "c15", "c20", "c0"})
+    ids = {r["id"] for r in got}
+    assert len(got) == 10 and "c0" not in ids and {"c5", "c10", "c15", "c20"} <= ids

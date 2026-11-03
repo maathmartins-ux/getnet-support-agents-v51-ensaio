@@ -87,6 +87,42 @@ def load_rows(results: Path = RESULTS) -> list[dict]:
     return rows
 
 
+def suspected_ids(rows: list[dict], judge_path: Path | None = None) -> set[str]:
+    """Casos com falha suspeita (alguma checagem automática falhou ou o juiz reprovou). Servem para enriquecer a
+    amostra humana com negativos: com 1 falha em 18 rótulos, o TNR do juiz não se mede (pede ~20 de cada classe)."""
+    out = {r["id"] for r in rows if r.get("crash") or any(v is False for v in (r.get("checks") or {}).values())}
+    jp = judge_path or (RESULTS / "judge.json")
+    if jp.exists():
+        for v in json.loads(jp.read_text(encoding="utf-8")).get("verdicts", []):
+            if not v.get("grounded", True) or not v.get("helpful", True):
+                out.add(v["id"])
+    return out
+
+
+def labeled_ids(base: Path = HERE) -> set[str]:
+    """Ids já rotulados por alguém (qualquer human_labels*.csv): a amostra nova não os repete."""
+    out: set[str] = set()
+    for path in base.glob("human_labels*.csv"):
+        out |= {r["id"] for r in read_labels(path) if r.get("id")}
+    return out
+
+
+def enriched_sample(rows: list[dict], n: int, seed: int = 7, suspects: int = 0, exclude: set[str] | None = None,
+                    suspect_ids: set[str] | None = None) -> list[dict]:
+    """Até `suspects` casos com falha suspeita + o resto estratificado, sem os `exclude`. A página nunca mostra qual
+    é qual (quem rotula não vê o veredito automático), e a ordem é embaralhada."""
+    rows = [r for r in rows if r["id"] not in (exclude or set())]
+    bad = suspect_ids if suspect_ids is not None else suspected_ids(rows)
+    rng = random.Random(seed)
+    pool = [r for r in rows if r["id"] in bad]
+    rng.shuffle(pool)
+    picked = pool[:min(suspects, n)]
+    rest = sample([r for r in rows if r["id"] not in {p["id"] for p in picked}], n - len(picked), seed)
+    out = picked + rest
+    rng.shuffle(out)
+    return out
+
+
 def sample(rows: list[dict], n: int, seed: int = 7) -> list[dict]:
     """Amostra estratificada: uma passada por split até completar n (seed fixa = reproduzível)."""
     rng = random.Random(seed)

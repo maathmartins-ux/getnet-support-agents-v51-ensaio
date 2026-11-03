@@ -158,8 +158,11 @@ def answer_lang(row: dict) -> str:
     return row.get("language_detected") or detect_text_language(row.get("answer") or "", 1) or ""
 
 
-def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] | None = None) -> list[dict]:
-    """Mesma amostra do `evals.label --export` (com `splits`, a mesma função sobre as linhas desses splits)."""
+def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] | None = None,
+          suspects: int = 0, fresh: bool = False) -> list[dict]:
+    """Mesma amostra do `evals.label --export` (com `splits`, a mesma função sobre as linhas desses splits).
+    `suspects`: até N casos com falha suspeita na amostra (negativos para medir o TNR do juiz); `fresh`: sem os já
+    rotulados."""
     from evals import label
 
     rows = label.load_rows(results or label.RESULTS)
@@ -167,7 +170,9 @@ def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] |
         rows = [r for r in rows if r.get("split") in splits]
     before = _before()
     out = []
-    for r in label.sample(rows, n, seed):
+    picked = (label.enriched_sample(rows, n, seed, suspects, label.labeled_ids() if fresh else None)
+              if suspects or fresh else label.sample(rows, n, seed))
+    for r in picked:
         seen, sources = set(), []
         for s in r.get("sources") or []:
             if isinstance(s, dict) and s.get("url") and s["url"] not in seen:
@@ -221,6 +226,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--splits", help="só estes splits (ex.: official,memory); padrão: todos os live_*.json")
     ap.add_argument("--heldout", action="store_true",
                     help="só o held-out (live_heldout.json): o passa/falha humano às cegas é a medida ponta a ponta")
+    ap.add_argument("--suspects", type=int, default=0,
+                    help="até N casos com falha suspeita (checagem ou juiz) na amostra: negativos para o TNR do juiz")
+    ap.add_argument("--fresh", action="store_true", help="sem os casos já rotulados (human_labels*.csv)")
     ap.add_argument("--raters", required=True, help="nomes separados por vírgula (ex.: Matheus,Bianca)")
     ap.add_argument("--out", type=Path, default=ROOT / "var" / "rotulagem.html")
     args = ap.parse_args(argv)
@@ -228,7 +236,7 @@ def main(argv: list[str] | None = None) -> int:
     if len(raters) < 2:
         ap.error("a avaliação independente pede 2+ pessoas")
     splits = {"heldout"} if args.heldout else ({x.strip() for x in args.splits.split(",")} if args.splits else None)
-    rows = items(args.n, args.seed, splits=splits)
+    rows = items(args.n, args.seed, splits=splits, suspects=args.suspects, fresh=args.fresh)
     if args.heldout and not rows:
         ap.error("sem linhas do held-out em evals/results/live_heldout.json: rode o held-out ao vivo antes")
     args.out.parent.mkdir(parents=True, exist_ok=True)

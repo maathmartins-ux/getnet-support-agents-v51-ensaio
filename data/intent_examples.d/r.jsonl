@@ -24,3 +24,5 @@
 {"text": "Me transfere para uma pessoa, por favor", "intent": "human_request"}
 {"text": "I want to talk to a human agent", "intent": "human_request"}
 {"text": "I would rather have a staff member handle this", "intent": "human_request"}
+{"text": "O Get Tap funciona no iPhone e qual é a taxa no débito?", "intent": "knowledge"}
+{"text": "Does the Get Smart print receipts, and how much is its monthly fee?", "intent": "knowledge"}
