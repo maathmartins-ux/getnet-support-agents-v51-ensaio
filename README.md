@@ -412,8 +412,9 @@ e como comparar pela primeira entrega.
 | 19:29:57 | 435 | readme: números e linha do tempo (fill_readme, último passo) |
 | 19:37:38 | 443 | hitl: transcrição ao vivo com o operador respondendo no turno (router → escalation → human); README sem frases vencidas; TIMESHEET regenerado |
 | 19:37:39 | 443 | readme: números e linha do tempo (fill_readme, último passo) |
+| 19:44:13 | 449 | kit: RESULTS enxuto (uma linha por split), argumentos das tools validados no servidor; offline regenerado |
 
-Do primeiro ao último commit: **443 min**.
+Do primeiro ao último commit: **449 min**.
 <!-- timeline:end -->
 
 </details>
