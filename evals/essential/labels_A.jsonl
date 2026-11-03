@@ -1,87 +1,59 @@
-{"qid": "q022", "essential": [["c0", "c10"], ["c7", "c13"]]}
-{"qid": "q023", "essential": [["c7"]]}
+{"qid": "q022", "essential": [["c0", "c6", "c9", "c14"], ["c7", "c12"]]}
+{"qid": "q023", "essential": [["c11", "c1"]]}
 {"qid": "q024", "essential": [["c2"]]}
 {"qid": "q025", "essential": [["c16"], ["c17"]]}
-{"qid": "q026", "essential": []}
-{"qid": "q027", "essential": [["c3", "c6"]]}
-{"qid": "q028", "essential": [["c11"]]}
-{"qid": "q029", "essential": [["c11"]]}
-{"qid": "q030", "essential": []}
-{"qid": "q031", "essential": [["c12", "c6"]]}
-{"qid": "q032", "essential": [["c4", "c6"]]}
-{"qid": "q033", "essential": [["c10", "c3"]]}
-{"qid": "q034", "essential": [["c0"]]}
-{"qid": "q035", "essential": []}
-{"qid": "q036", "essential": []}
-{"qid": "q037", "essential": []}
-{"qid": "q038", "essential": [["c10", "c11", "c12"]]}
-{"qid": "q039", "essential": [["c0", "c10"]]}
-{"qid": "q040", "essential": [["c1", "c4"]]}
-{"qid": "q041", "essential": [["c0"]]}
-{"qid": "q042", "essential": [["c12", "c13"]]}
-{"qid": "q043", "essential": []}
-{"qid": "q044", "essential": [["c15"]]}
-{"qid": "q045", "essential": [["c16", "c6"]]}
-{"qid": "q046", "essential": [["c16"]]}
-{"qid": "q047", "essential": [["c2", "c9"]]}
-{"qid": "q048", "essential": []}
-{"qid": "q049", "essential": []}
-{"qid": "q050", "essential": [["c16"]]}
-{"qid": "q051", "essential": [["c8"]]}
-{"qid": "q052", "essential": [["c7", "c5"]]}
-{"qid": "q053", "essential": [["c2"]]}
-{"qid": "q054", "essential": [["c4"], ["c2"]]}
-{"qid": "q055", "essential": [["c14"]]}
-{"qid": "q056", "essential": [["c3", "c1"]]}
-{"qid": "q057", "essential": [["c13"]]}
-{"qid": "q058", "essential": [["c6"]]}
-{"qid": "q059", "essential": [["c15"]]}
-{"qid": "q060", "essential": [["c13"]]}
-{"qid": "q061", "essential": []}
-{"qid": "q062", "essential": [["c8"]]}
-{"qid": "q063", "essential": [["c0"]]}
-{"qid": "q064", "essential": [["c0", "c8"]]}
-{"qid": "q065", "essential": [["c9"]]}
-{"qid": "q066", "essential": [["c5", "c0"]]}
-{"qid": "q067", "essential": [["c1"]]}
-{"qid": "q068", "essential": [["c12", "c4"]]}
-{"qid": "q069", "essential": []}
-{"qid": "q070", "essential": []}
-{"qid": "q071", "essential": []}
-{"qid": "q072", "essential": []}
-{"qid": "q073", "essential": []}
-{"qid": "q074", "essential": []}
-{"qid": "q075", "essential": [["c8"]]}
-{"qid": "q076", "essential": [["c2"]]}
-{"qid": "q077", "essential": [["c3"]]}
-{"qid": "q078", "essential": []}
-{"qid": "q079", "essential": []}
-{"qid": "q080", "essential": []}
-{"qid": "q081", "essential": []}
-{"qid": "q082", "essential": []}
-{"qid": "q083", "essential": []}
-{"qid": "q084", "essential": [["c5"]]}
-{"qid": "q085", "essential": [["c8", "c0"]]}
-{"qid": "q086", "essential": []}
-{"qid": "q087", "essential": []}
-{"qid": "q088", "essential": [["c9", "c3"]]}
-{"qid": "q089", "essential": []}
-{"qid": "q090", "essential": []}
-{"qid": "q091", "essential": []}
-{"qid": "q092", "essential": [["c1"]]}
-{"qid": "q093", "essential": []}
-{"qid": "q094", "essential": []}
-{"qid": "q095", "essential": [["c2"]]}
-{"qid": "q096", "essential": []}
-{"qid": "q097", "essential": []}
-{"qid": "q098", "essential": []}
-{"qid": "q099", "essential": []}
-{"qid": "q100", "essential": []}
-{"qid": "q101", "essential": []}
-{"qid": "q102", "essential": []}
-{"qid": "q103", "essential": []}
-{"qid": "q104", "essential": []}
-{"qid": "q105", "essential": []}
-{"qid": "q106", "essential": []}
-{"qid": "q107", "essential": []}
-{"qid": "q108", "essential": []}
+{"qid": "q026", "essential": [["c3", "c5"]]}
+{"qid": "q027", "essential": [["c9", "c14"]]}
+{"qid": "q028", "essential": [["c12"]]}
+{"qid": "q029", "essential": [["c14", "c5", "c7"]]}
+{"qid": "q030", "essential": [["c14", "c7"], ["c7"]]}
+{"qid": "q031", "essential": [["c5"]]}
+{"qid": "q032", "essential": [["c9"]]}
+{"qid": "q033", "essential": [["c0"]]}
+{"qid": "q034", "essential": [["c7", "c2", "c9", "c11"]]}
+{"qid": "q035", "essential": [["c7"], ["c8"]]}
+{"qid": "q036", "essential": [["c12"]]}
+{"qid": "q037", "essential": [["c10", "c13"]]}
+{"qid": "q038", "essential": [["c0", "c11"]]}
+{"qid": "q039", "essential": [["c2", "c12"]]}
+{"qid": "q040", "essential": [["c0"]]}
+{"qid": "q041", "essential": [["c15", "c16", "c7"], ["c12"]]}
+{"qid": "q042", "essential": [["c1"]]}
+{"qid": "q043", "essential": [["c15"]]}
+{"qid": "q044", "essential": [["c16"]]}
+{"qid": "q045", "essential": [["c14"]]}
+{"qid": "q046", "essential": [["c4"]]}
+{"qid": "q047", "essential": [["c3", "c12", "c1"]]}
+{"qid": "q048", "essential": [["c9"]]}
+{"qid": "q049", "essential": [["c16"]]}
+{"qid": "q050", "essential": [["c8"]]}
+{"qid": "q051", "essential": [["c5"]]}
+{"qid": "q052", "essential": [["c3"]]}
+{"qid": "q053", "essential": [["c6"], ["c4", "c10"]]}
+{"qid": "q054", "essential": [["c14"]]}
+{"qid": "q055", "essential": [["c5"], ["c12"]]}
+{"qid": "q056", "essential": [["c10"]]}
+{"qid": "q057", "essential": [["c6"]]}
+{"qid": "q058", "essential": [["c15", "c3"]]}
+{"qid": "q059", "essential": [["c12"]]}
+{"qid": "q060", "essential": [["c9", "c12"]]}
+{"qid": "q061", "essential": [["c0"]]}
+{"qid": "q062", "essential": [["c0"]]}
+{"qid": "q063", "essential": [["c9", "c10"]]}
+{"qid": "q064", "essential": [["c4", "c13"]]}
+{"qid": "q065", "essential": [["c1"]]}
+{"qid": "q066", "essential": [["c13"]]}
+{"qid": "q067", "essential": []}
+{"qid": "q068", "essential": []}
+{"qid": "q069", "essential": [["c3"]]}
+{"qid": "q070", "essential": [["c1"]]}
+{"qid": "q071", "essential": [["c0"]]}
+{"qid": "q072", "essential": [["c5"], ["c16"]]}
+{"qid": "q073", "essential": [["c8"]]}
+{"qid": "q074", "essential": [["c0"]]}
+{"qid": "q075", "essential": [["c11"]]}
+{"qid": "q076", "essential": [["c7", "c2", "c14"], ["c16"]]}
+{"qid": "q077", "essential": [["c0", "c9", "c7"]]}
+{"qid": "q078", "essential": [["c4"]]}
+{"qid": "q079", "essential": [["c2", "c10"]]}
+{"qid": "q080", "essential": [["c0"], ["c16"]]}

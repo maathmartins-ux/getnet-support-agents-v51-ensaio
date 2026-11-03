@@ -262,6 +262,15 @@ def rerank_mode() -> str:
     return mode if mode in ("cross", "llm") else "off"
 
 
+def rerank_order() -> str:
+    # RERANK_ORDER=cross (padrão): a nota do cross-encoder reordena o top do base. base: a ordem do base fica e a nota
+    # só vai no trecho (o portão sem fonte usa a nota, MIN_RERANK). Escolha por medida no gold do domínio: num corpus
+    # real o denso sozinho ordenou melhor (Recall@3 0,898 × 0,856, MRR igual) e a nota do cross separou com × sem
+    # fonte um pouco melhor que o cosseno (AUC 0,93 × 0,92): ordem do base + portão pela nota.
+    mode = (os.getenv("RERANK_ORDER") or _bundle().get("rerank_order") or "cross").lower()
+    return mode if mode in ("cross", "base") else "cross"
+
+
 def rerank_enabled() -> bool:
     return rerank_mode() != "off"
 

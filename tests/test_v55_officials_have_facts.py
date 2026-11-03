@@ -210,3 +210,30 @@ def test_readme_timeline_shows_milestones_and_points_to_the_full_timesheet(tmp_p
     rows = [ln for ln in text.splitlines() if ln.startswith("| ") and "commit |" not in ln]
     assert len(rows) <= _fr.TIMELINE_MAX_ROWS and "docs/TIMESHEET.md" in text and "33 commits" in text
     assert "chore: scaffold" in text and "eval: bateria" in text and "readme: fim" in text
+
+
+def test_rerank_order_base_keeps_the_base_order_and_attaches_the_score(monkeypatch):
+    """RERANK_ORDER=base: a nota do cross vai em cada trecho (o portão usa), a ordem é a do buscador base."""
+    from types import SimpleNamespace
+
+    from app import rag
+
+    docs = [SimpleNamespace(id=f"d{i}", head=f"h{i}", text=f"t{i}", url=f"u{i}") for i in range(3)]
+    hits = [rag.Hit(doc=d, score=1.0 - i / 10, bm25=1.0, cosine=None) for i, d in enumerate(docs)]
+
+    class Base:
+        name = "dense"
+
+        def search(self, q, k=3):
+            return hits[:k]
+
+    class Scorer:
+        def score(self, q, texts):
+            return [0.1, 0.9, 0.5]  # o cross preferia d1
+
+    r = rag.CrossRerankRetriever(Base(), Scorer(), pool=3)
+    monkeypatch.setenv("RERANK_ORDER", "cross")
+    assert [h.doc.id for h in r.search("q", 3)][0] == "d1"
+    monkeypatch.setenv("RERANK_ORDER", "base")
+    got = r.search("q", 3)
+    assert [h.doc.id for h in got] == ["d0", "d1", "d2"] and [h.rerank for h in got] == [0.1, 0.9, 0.5]

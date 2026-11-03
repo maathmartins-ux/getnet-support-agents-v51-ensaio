@@ -1,0 +1,28 @@
+{
+  "_doc": "Escolha medida no gold do desafio (re-rotulado às cegas por 2 rotuladores depois da ampliação do corpus): a ordem do denso (e5-large) ficou melhor que a reordenada pelo cross-encoder, e a nota do cross separa com × sem fonte melhor que o cosseno; por isso a ordem é a do denso e a nota do cross só decide o portão sem fonte (MIN_RERANK).",
+  "choice": {
+    "retriever": "dense",
+    "embed_model": "intfloat/multilingual-e5-large",
+    "rerank": "cross",
+    "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+    "rerank_pool": 10,
+    "rerank_chars": 600,
+    "rerank_order": "base"
+  },
+  "measured": {
+    "dense+cross (ordem do cross)": {
+      "recall@3": 0.856,
+      "recall@5": 0.907,
+      "mrr": 0.842
+    },
+    "dense (ordem do denso)": {
+      "recall@3": 0.898,
+      "recall@5": 0.915,
+      "mrr": 0.842
+    },
+    "separação com × sem fonte (AUC)": {
+      "nota do cross": 0.93,
+      "cosseno": 0.917
+    }
+  }
+}

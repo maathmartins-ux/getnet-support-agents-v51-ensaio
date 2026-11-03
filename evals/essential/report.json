@@ -5,46 +5,20 @@
   ],
   "agreement": {
     "labels_A×labels_B": {
-      "questions": 87,
-      "jaccard_mean": 0.619,
-      "identical": 57
+      "questions": 59,
+      "jaccard_mean": 0.857,
+      "identical": 46
     }
   },
-  "questions_labelled": 59,
+  "questions_labelled": 57,
   "drafts_labelled": {
     "official": 6,
     "page": 39,
-    "real": 14
+    "real": 12
   },
   "no_essential": [
-    "My card machine is showing a transaction decline error.",
-    "Respondeu à sua dúvida?",
-    "Recebi uma maquininha Getnet que eu não pedi e continuam mandando mensagem sobre a entrega. O que eu faço?",
-    "Fiz vendas na maquininha Getnet, foram aprovadas e o dinheiro não caiu. Como resolvo?",
-    "Uma máquina da Getnet chegou sem eu solicitar e já estão cobrando taxas. Como cancelo e contesto essas cobranças?",
-    "Como cancelo minha maquininha Getnet? Não consigo falar com o suporte e continuam cobrando.",
-    "Não fiz pedido de maquininha nenhuma e a Getnet enviou uma. Como faço para não ser cobrado?",
-    "Minha máquina Getnet deu defeito e perdi vendas no consultório. Tenho direito a troca imediata?",
-    "Meu Pix aparece como inativo na Getnet. Como reativo?",
-    "A opção de Pix não aparece na minha maquininha. O que fazer?",
-    "Meu Pix foi bloqueado e o estorno está demorando. Quanto tempo leva a liberação?",
-    "O Pix está instável e meu saldo ficou bloqueado por 30 dias. Isso é normal?",
-    "Não consigo criar a conta digital Getnet, o cadastro não avança. O que pode ser?",
-    "Minhas vendas não foram pagas e ainda cobram aluguel da máquina. Isso pode?",
-    "Disseram que não tinha taxa de cancelamento do aluguel, mas agora cobram R$ 79,90. Existe essa taxa?",
-    "Que taxa de maquininha é essa que apareceu cobrada na minha conta?",
-    "Tive um chargeback e até hoje não foi resolvido. Qual o prazo?",
-    "Foram retidos valores de chargeback que eu acho indevidos. Como contesto?",
-    "O antifraude da Getnet está barrando vendas legítimas. Como ajusto?",
-    "Tenho loja online e a Getnet bloqueou meus valores sem justificativa. A quem recorro?",
-    "Querem cobrar taxas de vendas não liquidadas e negaram meu cancelamento. Isso é permitido?",
-    "Minha máquina Getnet deu defeito e a troca está demorando. Como acelero?",
-    "Aparece uma mensagem de erro de \"irruption\" na máquina Getnet. O que significa?",
-    "A máquina parou de funcionar e a Getnet não faz a troca. O que faço?",
-    "Como peço bobina se o aplicativo dá erro e não consigo ligar?",
-    "Comprei a maquininha e eles não querem trocar. A compra tem garantia?",
-    "Pedi bobinas há meses e não chegaram. Como regularizo a entrega?",
-    "Minha maquininha está com o sistema corrompido. Como resolvo?"
+    "Por que a taxa de antecipação da Getnet está tão alta?",
+    "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?"
   ],
   "unmatched_rules": [],
   "gold": "evals/retrieval.d/k.jsonl"

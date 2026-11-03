@@ -38,6 +38,7 @@ from .config import (
     rerank_chars,
     rerank_mode,
     rerank_model,
+    rerank_order,
     rerank_pool,
     retriever_name,
 )
@@ -680,6 +681,8 @@ class CrossRerankRetriever:
             return cands[:k]
         finally:
             self.last_latency_s = time.perf_counter() - t0
+        if rerank_order() == "base":  # a nota vai no trecho (portão), a ordem é a do base (medida no domínio)
+            return diversify([replace(h, rerank=float(sc)) for h, sc in zip(cands, scores, strict=True)], k)
         order = sorted(range(len(cands)), key=lambda i: (-scores[i], i))  # empate: ordem do base
         return diversify([replace(cands[i], rerank=float(scores[i])) for i in order], k)
 

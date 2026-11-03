@@ -11,6 +11,8 @@ Blocos (texto entre <!-- tag:begin --> e <!-- tag:end -->):
   since      opcional    · "Desde a última avaliação": lacuna citada → o que mudou → prova (chaves do placar de
              scripts/scorecard.py + teste do mecanismo)
   kit        opcional    · git: linhas do scaffold declarado × linhas escritas no relógio, por pasta
+  trace      opcional    · evals/results/live_*.json (evals/trace_stats.py): p50/p95 do turno e SLO por split, fatia
+             de tempo de cada agente e quem decide cada passo (supervisor LLM × código)
   quickstart obrigatório no --check · o `curl` do "Como rodar" com a 1ª mensagem do split `official` de
              evals/cases.jsonl (sem isso o exemplo fica "pedido 1002", sobra do domínio de exemplo do kit)
 Arquivo ausente vira "não rodado" (declarado, não escondido). Idempotente: rodar duas vezes dá o mesmo arquivo.
@@ -426,9 +428,18 @@ def red_team_block(results: Path) -> str:
     return head + "\n\n" + "\n".join(rows)
 
 
+def trace_block(results: Path) -> str:
+    """Onde vai o tempo e quem decide: SLO por split, fatia de cada agente e passos decididos pelo supervisor LLM ×
+    inseridos pelo código, das linhas ao vivo (evals/trace_stats.py). Os turnos de cada caso saem dos arquivos de
+    casos, para a linha de memória (conversa inteira) não passar por um turno só."""
+    from evals import trace_stats
+
+    return trace_stats.markdown(trace_stats.summarize(trace_stats.load_rows(results), trace_stats.case_turns()))
+
+
 BLOCKS = {"eval": offline_block, "eval-live": live_block, "judge": judge_block, "human": human_block,
           "replan": replan_block, "scorecard": scorecard_block, "retrieval": retrieval_block,
-          "quickstart": quickstart_block, "red-team": red_team_block, "since": since_block}
+          "quickstart": quickstart_block, "red-team": red_team_block, "since": since_block, "trace": trace_block}
 # Os detalhes (tabelas por split com IC95) vão para docs/RESULTS.md; o README fica com o placar e o mapa.
 EXTRA_FILES = ("docs/RESULTS.md", "docs/PROCEDENCIA.md", "docs/SECURITY_ASI.md")
 
