@@ -1,0 +1,6567 @@
+{
+  "recorded_at": "2026-11-03T22:49:55+00:00",
+  "gold": "retrieval.jsonl",
+  "k": 3,
+  "results": {
+    "bm25": {
+      "cases": 59,
+      "positives": 59,
+      "negatives": 22,
+      "recall@3": 0.763,
+      "mrr": 0.709,
+      "hit@3": 0.797,
+      "recall@5": 0.797,
+      "mrr@10": 0.719,
+      "first_gold_rank": {
+        "What's the difference between the Get Clássica and the Get Smart?": 2,
+        "Do I need a bank account to receive my sales via Pix?": null,
+        "My card machine won't connect to the internet, what should I do?": null,
+        "How does receivables advance (antecipação) work with Getnet?": 2,
+        "How many installments can I split a sale into with the crediário?": 4,
+        "Can I sell through WhatsApp using the Payment Link?": 1,
+        "Qual a sua máquina?": 3,
+        "Gestão na palma da sua mão Já tem a sua Get Conta?": 1,
+        "Como eu contrato o Crediário e qual a taxa?": 1,
+        "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?": 1,
+        "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?": 1,
+        "Posso antecipar o valor da Reserva Financeira?": 1,
+        "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?": 1,
+        "Dúvidas sobre Link de Pagamento?": 1,
+        "Como você prefere continuar?": 1,
+        "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?": 1,
+        "Como faço para baixar o Aplicativo Getnet Brasil?": 1,
+        "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?": 2,
+        "Quando a Reserva Financeira é liberada?": null,
+        "Meu celular é compatível?": 1,
+        "Já é nosso cliente?": 1,
+        "Onde visualizo o pagamento e em que prazo eu recebo?": 1,
+        "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?": 1,
+        "Como realizar pagamento por aproximação?": 1,
+        "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 2,
+        "Gestão na palma da sua mão Já tem o seu Get Tap?": 1,
+        "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 1,
+        "Qualquer estabelecimento pode ter o Crediário?": 1,
+        "A Get Smart aceita pagamento com auxilio emergencial?": 1,
+        "Quais tipos de pagamentos são aceitos na Get Smart?": 2,
+        "A Reserva Financeira é um valor extra que preciso pagar?": 1,
+        "Dúvidas sobre Get Tap?": 2,
+        "E se eu não quiser ter o produto?": 1,
+        "Como insiro o Chip na minha máquina?": 2,
+        "Quais bandeiras são aceitas na Get Smart?": 1,
+        "A Reserva Financeira impacta minhas vendas?": 1,
+        "Quais os benefícios do Chip Algar?": 1,
+        "Quais os diferenciais de uma Get Smart?": 1,
+        "O que é o Chip Algar?": 1,
+        "Qual tipo de negócio mais indicado para ter uma Get Smart?": 1,
+        "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?": 1,
+        "O que é a Get Smart?": null,
+        "As condições comerciais são cumulativas?": 1,
+        "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?": 1,
+        "O que acontecerá caso ocorra a contratação de uma nova condição comercial?": 1,
+        "Por que a taxa de antecipação da Getnet está tão alta?": 1,
+        "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?": 1,
+        "Como é calculada a taxa de antecipação? Achei absurda.": 1,
+        "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?": null,
+        "Por que a Getnet não libera pagamento por Pix para mim?": null,
+        "Como habilito o Pix na minha conta Getnet?": null,
+        "Quero abrir a conta digital da Getnet. Como faço?": null,
+        "Preciso ter conta no Santander para liberar o Pix na Getnet?": null,
+        "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?": 1,
+        "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?": 5,
+        "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?": 2,
+        "Como devolvo a máquina Getnet sem continuar sendo cobrado?": 2,
+        "Como me defendo de um chargeback como lojista da Getnet?": 1,
+        "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?": 7
+      },
+      "by_origin": {
+        "official": {
+          "cases": 6,
+          "recall@3": 0.417,
+          "recall@5": 0.583,
+          "mrr@10": 0.375
+        },
+        "page": {
+          "cases": 39,
+          "recall@3": 0.91,
+          "recall@5": 0.923,
+          "mrr@10": 0.868
+        },
+        "real": {
+          "cases": 14,
+          "recall@3": 0.5,
+          "recall@5": 0.536,
+          "mrr@10": 0.453
+        }
+      },
+      "hit@3_ci": {
+        "k": 47,
+        "n": 59,
+        "lo": 67.7,
+        "hi": 88.0
+      },
+      "ndcg@3": 0.707,
+      "page": {
+        "recall@3": 0.941,
+        "mrr": 0.912,
+        "hit@3": 0.983,
+        "hit@3_ci": {
+          "k": 58,
+          "n": 59,
+          "lo": 91.0,
+          "hi": 99.7
+        }
+      },
+      "latency_ms": {
+        "p50": 0.7,
+        "p95": 1.0,
+        "mean": 0.7
+      },
+      "gate": {
+        "min_score": 7.287,
+        "min_cosine": 2.0,
+        "pos_answered": 0.695,
+        "neg_refused": 0.955,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 41,
+          "n": 59,
+          "lo": 56.9,
+          "hi": 79.7
+        },
+        "neg_ci": {
+          "k": 21,
+          "n": 22,
+          "lo": 78.2,
+          "hi": 99.2
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "separation": {
+        "auc": 0.925,
+        "gap": -4.766,
+        "positives": 59,
+        "negatives": 17,
+        "enough": true
+      },
+      "separation_rerank": null,
+      "rerank_gate": null,
+      "essential": 59,
+      "gold_unresolved": [],
+      "dedupe_aliases": 8,
+      "retriever": "bm25",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "passages": 2,
+          "top3": [
+            "prod-todas-as-maquininhas-02",
+            "prod-ofertas-maquininha-11",
+            "prod-taxas-02"
+          ],
+          "latency_ms": 0.5,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.565,
+          "page_recall": 0.6,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "passages": 1,
+          "top3": [
+            "prod-pix-02",
+            "sup-duvidas-61",
+            "sup-duvidas-62"
+          ],
+          "latency_ms": 0.6,
+          "origin": "official",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.5,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "passages": 1,
+          "top3": [
+            "prod-ofertas-maquininha-07",
+            "prod-todas-as-maquininhas-05",
+            "sup-duvidas-96"
+          ],
+          "latency_ms": 0.4,
+          "origin": "official",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.333,
+          "page_hit": true
+        },
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-01",
+            "sup-duvidas-14",
+            "sup-duvidas-102"
+          ],
+          "latency_ms": 0.5,
+          "origin": "official",
+          "recall": 0.5,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 0.5,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.387,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "passages": 1,
+          "top3": [
+            "prod-crediario-05",
+            "sup-duvidas-97",
+            "sup-duvidas-85"
+          ],
+          "latency_ms": 0.4,
+          "origin": "official",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 1.0,
+          "rr10": 0.25,
+          "first": 4,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Can I sell through WhatsApp using the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "prod-link-de-pagamento-01",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 0.4,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-07",
+            "sup-duvidas-26",
+            "sup-manual-maquinas-01"
+          ],
+          "latency_ms": 0.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem a sua Get Conta?",
+          "passages": 1,
+          "top3": [
+            "prod-get-conta-02",
+            "prod-get-tap-07",
+            "prod-pix-03"
+          ],
+          "latency_ms": 0.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-35",
+            "sup-duvidas-56",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 0.4,
+          "origin": "page",
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 0.5,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-17",
+            "sup-duvidas-01",
+            "prod-ofertas-maquininha-09"
+          ],
+          "latency_ms": 0.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-01",
+            "sup-duvidas-get-smart-17"
+          ],
+          "latency_ms": 0.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Posso antecipar o valor da Reserva Financeira?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-01",
+            "sup-antecipacao-03",
+            "sup-duvidas-28"
+          ],
+          "latency_ms": 0.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-03",
+            "prod-todas-as-maquininhas-04",
+            "prod-pix-01"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "prod-link-de-pagamento-04",
+            "prod-pagamentos-pelo-whatsapp-08",
+            "sup-duvidas-51"
+          ],
+          "latency_ms": 0.9,
+          "origin": "page",
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 0.5,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-04",
+            "sup-antecipacao-04",
+            "prod-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-37",
+            "prod-crediario-08",
+            "prod-crediario-09"
+          ],
+          "latency_ms": 1.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço para baixar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-18",
+            "sup-duvidas-01",
+            "prod-pix-03"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-get-smart-02",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 1.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-01",
+            "sup-antecipacao-03",
+            "sup-duvidas-96"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Meu celular é compatível?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-47",
+            "sup-duvidas-46",
+            "prod-get-tap-05"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-06",
+            "sup-duvidas-101",
+            "prod-taxas-01"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Onde visualizo o pagamento e em que prazo eu recebo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-39",
+            "prod-ofertas-maquininha-09",
+            "sup-duvidas-91"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-03",
+            "sup-duvidas-03",
+            "prod-taxas-02"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizar pagamento por aproximação?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-05",
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-96"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-antecipacao-03",
+            "sup-duvidas-get-smart-01"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem o seu Get Tap?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-07",
+            "prod-get-conta-02",
+            "prod-pix-03"
+          ],
+          "latency_ms": 0.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-09",
+            "prod-todas-as-maquininhas-07",
+            "prod-get-conta-02"
+          ],
+          "latency_ms": 0.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qualquer estabelecimento pode ter o Crediário?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-40",
+            "sup-duvidas-get-smart-09",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Get Smart aceita pagamento com auxilio emergencial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-05",
+            "sup-duvidas-get-smart-06",
+            "sup-duvidas-get-smart-07"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-06",
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é um valor extra que preciso pagar?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-01",
+            "sup-duvidas-117"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "passages": 2,
+          "top3": [
+            "prod-get-tap-07",
+            "sup-duvidas-46",
+            "prod-pix-02"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 0.5,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.387,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-40",
+            "prod-ofertas-maquininha-08",
+            "prod-pagamentos-pelo-whatsapp-08"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-05",
+            "sup-duvidas-06",
+            "sup-manual-maquinas-01"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são aceitas na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-06",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira impacta minhas vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-04",
+            "sup-antecipacao-03",
+            "sup-duvidas-116"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os benefícios do Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-07",
+            "sup-duvidas-05",
+            "sup-manual-maquinas-01"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os diferenciais de uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-08",
+            "sup-duvidas-get-smart-16",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-07",
+            "sup-duvidas-05",
+            "sup-manual-maquinas-01"
+          ],
+          "latency_ms": 0.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual tipo de negócio mais indicado para ter uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-09",
+            "sup-duvidas-get-smart-06",
+            "sup-duvidas-43"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-09",
+            "sup-duvidas-08",
+            "prod-get-tap-06"
+          ],
+          "latency_ms": 0.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-16",
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "As condições comerciais são cumulativas?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-09",
+            "prod-link-de-pagamento-03"
+          ],
+          "latency_ms": 0.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.25,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-11",
+            "prod-ofertas-maquininha-09",
+            "sup-duvidas-17"
+          ],
+          "latency_ms": 0.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que acontecerá caso ocorra a contratação de uma nova condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-09",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 0.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a taxa de antecipação da Getnet está tão alta?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "prod-todas-as-maquininhas-07",
+            "sup-duvidas-111"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-antecipacao-01",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como é calculada a taxa de antecipação? Achei absurda.",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-111",
+            "sup-antecipacao-01"
+          ],
+          "latency_ms": 0.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?",
+          "passages": 1,
+          "top3": [
+            "prod-crediario-04",
+            "sup-duvidas-52",
+            "sup-duvidas-get-smart-04"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a Getnet não libera pagamento por Pix para mim?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-59",
+            "prod-pagamentos-pelo-whatsapp-02",
+            "sup-duvidas-84"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-61",
+            "sup-duvidas-59",
+            "prod-get-tap-07"
+          ],
+          "latency_ms": 0.8,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "passages": 1,
+          "top3": [
+            "prod-get-conta-01",
+            "sup-duvidas-43",
+            "prod-get-conta-02"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-43",
+            "sup-duvidas-80",
+            "prod-ofertas-maquininha-14"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-27",
+            "sup-duvidas-26",
+            "sup-duvidas-get-smart-13"
+          ],
+          "latency_ms": 0.6,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-57",
+            "sup-duvidas-get-smart-12",
+            "sup-duvidas-27"
+          ],
+          "latency_ms": 1.1,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.5,
+          "rr10": 0.2,
+          "first": 5,
+          "ndcg": 0.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-27",
+            "sup-duvidas-88",
+            "prod-get-tap-06"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "passages": 1,
+          "top3": [
+            "prod-ofertas-maquininha-07",
+            "sup-duvidas-27",
+            "sup-duvidas-26"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Como me defendo de um chargeback como lojista da Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-67",
+            "sup-duvidas-68",
+            "prod-todas-as-maquininhas-08"
+          ],
+          "latency_ms": 0.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "passages": 2,
+          "top3": [
+            "prod-ofertas-maquininha-09",
+            "prod-pagamentos-pelo-whatsapp-08",
+            "sup-duvidas-116"
+          ],
+          "latency_ms": 1.1,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.143,
+          "first": 7,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        }
+      ],
+      "memory_mb": 39.9,
+      "config": {
+        "retriever": "bm25"
+      }
+    },
+    "dense": {
+      "cases": 59,
+      "positives": 59,
+      "negatives": 22,
+      "recall@3": 0.898,
+      "mrr": 0.842,
+      "hit@3": 0.915,
+      "recall@5": 0.915,
+      "mrr@10": 0.846,
+      "first_gold_rank": {
+        "What's the difference between the Get Clássica and the Get Smart?": 1,
+        "Do I need a bank account to receive my sales via Pix?": 2,
+        "My card machine won't connect to the internet, what should I do?": 1,
+        "How does receivables advance (antecipação) work with Getnet?": 4,
+        "How many installments can I split a sale into with the crediário?": 3,
+        "Can I sell through WhatsApp using the Payment Link?": 1,
+        "Qual a sua máquina?": 1,
+        "Gestão na palma da sua mão Já tem a sua Get Conta?": 1,
+        "Como eu contrato o Crediário e qual a taxa?": 1,
+        "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?": 1,
+        "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?": 1,
+        "Posso antecipar o valor da Reserva Financeira?": 1,
+        "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?": 2,
+        "Dúvidas sobre Link de Pagamento?": 1,
+        "Como você prefere continuar?": null,
+        "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?": 1,
+        "Como faço para baixar o Aplicativo Getnet Brasil?": 1,
+        "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?": 1,
+        "Quando a Reserva Financeira é liberada?": 1,
+        "Meu celular é compatível?": 1,
+        "Já é nosso cliente?": null,
+        "Onde visualizo o pagamento e em que prazo eu recebo?": 1,
+        "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?": 1,
+        "Como realizar pagamento por aproximação?": 1,
+        "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 1,
+        "Gestão na palma da sua mão Já tem o seu Get Tap?": 1,
+        "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 1,
+        "Qualquer estabelecimento pode ter o Crediário?": 1,
+        "A Get Smart aceita pagamento com auxilio emergencial?": 1,
+        "Quais tipos de pagamentos são aceitos na Get Smart?": 1,
+        "A Reserva Financeira é um valor extra que preciso pagar?": 1,
+        "Dúvidas sobre Get Tap?": 1,
+        "E se eu não quiser ter o produto?": null,
+        "Como insiro o Chip na minha máquina?": 1,
+        "Quais bandeiras são aceitas na Get Smart?": 1,
+        "A Reserva Financeira impacta minhas vendas?": 1,
+        "Quais os benefícios do Chip Algar?": 1,
+        "Quais os diferenciais de uma Get Smart?": 1,
+        "O que é o Chip Algar?": 1,
+        "Qual tipo de negócio mais indicado para ter uma Get Smart?": 1,
+        "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?": 1,
+        "O que é a Get Smart?": 1,
+        "As condições comerciais são cumulativas?": 1,
+        "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?": 1,
+        "O que acontecerá caso ocorra a contratação de uma nova condição comercial?": 1,
+        "Por que a taxa de antecipação da Getnet está tão alta?": 1,
+        "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?": 1,
+        "Como é calculada a taxa de antecipação? Achei absurda.": 1,
+        "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?": 3,
+        "Por que a Getnet não libera pagamento por Pix para mim?": 2,
+        "Como habilito o Pix na minha conta Getnet?": 1,
+        "Quero abrir a conta digital da Getnet. Como faço?": 2,
+        "Preciso ter conta no Santander para liberar o Pix na Getnet?": 2,
+        "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?": 1,
+        "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?": 2,
+        "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?": 1,
+        "Como devolvo a máquina Getnet sem continuar sendo cobrado?": null,
+        "Como me defendo de um chargeback como lojista da Getnet?": 1,
+        "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?": 1
+      },
+      "by_origin": {
+        "official": {
+          "cases": 6,
+          "recall@3": 0.833,
+          "recall@5": 0.917,
+          "mrr@10": 0.68
+        },
+        "page": {
+          "cases": 39,
+          "recall@3": 0.923,
+          "recall@5": 0.923,
+          "mrr@10": 0.91
+        },
+        "real": {
+          "cases": 14,
+          "recall@3": 0.857,
+          "recall@5": 0.893,
+          "mrr@10": 0.738
+        }
+      },
+      "hit@3_ci": {
+        "k": 54,
+        "n": 59,
+        "lo": 81.6,
+        "hi": 96.3
+      },
+      "ndcg@3": 0.84,
+      "page": {
+        "recall@3": 0.916,
+        "mrr": 0.929,
+        "hit@3": 0.966,
+        "hit@3_ci": {
+          "k": 57,
+          "n": 59,
+          "lo": 88.5,
+          "hi": 99.1
+        }
+      },
+      "latency_ms": {
+        "p50": 265.5,
+        "p95": 1213.4,
+        "mean": 344.7
+      },
+      "gate": {
+        "min_score": 5.976,
+        "min_cosine": 0.838,
+        "pos_answered": 0.898,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 53,
+          "n": 59,
+          "lo": 79.5,
+          "hi": 95.3
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "separation": {
+        "auc": 0.972,
+        "gap": -0.045,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "separation_rerank": null,
+      "rerank_gate": null,
+      "essential": 59,
+      "gold_unresolved": [],
+      "dedupe_aliases": 8,
+      "retriever": "dense",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-get-smart-08",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 76.4,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.75,
+          "page_recall": 0.6,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-59",
+            "sup-duvidas-42",
+            "prod-pix-01"
+          ],
+          "latency_ms": 1282.2,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-06",
+            "sup-duvidas-96",
+            "prod-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 1039.2,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-duvidas-102",
+            "sup-antecipacao-04"
+          ],
+          "latency_ms": 1229.0,
+          "origin": "official",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.5,
+          "rr10": 0.25,
+          "first": 4,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-78",
+            "sup-duvidas-77",
+            "prod-crediario-03"
+          ],
+          "latency_ms": 1213.4,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Can I sell through WhatsApp using the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "prod-pagamentos-pelo-whatsapp-05",
+            "prod-link-de-pagamento-01"
+          ],
+          "latency_ms": 1003.1,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-manual-maquinas-01",
+            "prod-todas-as-maquininhas-01",
+            "sup-duvidas-96"
+          ],
+          "latency_ms": 411.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem a sua Get Conta?",
+          "passages": 1,
+          "top3": [
+            "prod-get-conta-02",
+            "sup-duvidas-get-smart-08",
+            "sup-duvidas-42"
+          ],
+          "latency_ms": 714.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.333,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-35",
+            "prod-crediario-08",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 434.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.815,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-17",
+            "sup-duvidas-01",
+            "prod-get-tap-07"
+          ],
+          "latency_ms": 578.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-get-smart-02",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 423.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Posso antecipar o valor da Reserva Financeira?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-01",
+            "sup-antecipacao-04",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 369.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?",
+          "passages": 1,
+          "top3": [
+            "prod-link-de-pagamento-01",
+            "prod-todas-as-maquininhas-04",
+            "prod-get-tap-03"
+          ],
+          "latency_ms": 566.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 0.667,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "sup-duvidas-51",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 386.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-94",
+            "sup-duvidas-19",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 377.5,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-37",
+            "prod-crediario-09",
+            "prod-crediario-08"
+          ],
+          "latency_ms": 681.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço para baixar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-18",
+            "sup-duvidas-01",
+            "sup-duvidas-get-smart-11"
+          ],
+          "latency_ms": 272.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-02",
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 825.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-antecipacao-01",
+            "sup-duvidas-64"
+          ],
+          "latency_ms": 147.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Meu celular é compatível?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-47",
+            "prod-get-tap-05",
+            "sup-duvidas-19"
+          ],
+          "latency_ms": 307.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-117",
+            "prod-pix-03",
+            "sup-duvidas-50"
+          ],
+          "latency_ms": 93.6,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Onde visualizo o pagamento e em que prazo eu recebo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-39",
+            "sup-duvidas-92",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 241.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-03",
+            "sup-duvidas-03",
+            "sup-duvidas-get-smart-11"
+          ],
+          "latency_ms": 309.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizar pagamento por aproximação?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-05",
+            "sup-duvidas-get-smart-04",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 47.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-02",
+            "sup-duvidas-69"
+          ],
+          "latency_ms": 67.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem o seu Get Tap?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-07",
+            "sup-duvidas-45",
+            "prod-get-tap-01"
+          ],
+          "latency_ms": 121.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-09",
+            "sup-duvidas-96",
+            "prod-todas-as-maquininhas-07"
+          ],
+          "latency_ms": 221.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qualquer estabelecimento pode ter o Crediário?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-40",
+            "prod-crediario-08",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 302.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Get Smart aceita pagamento com auxilio emergencial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-05",
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-08"
+          ],
+          "latency_ms": 265.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-05",
+            "sup-duvidas-get-smart-04"
+          ],
+          "latency_ms": 205.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é um valor extra que preciso pagar?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-04",
+            "sup-duvidas-95"
+          ],
+          "latency_ms": 57.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-45",
+            "prod-get-tap-07",
+            "sup-duvidas-49"
+          ],
+          "latency_ms": 46.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-88",
+            "sup-duvidas-11",
+            "sup-duvidas-get-smart-02"
+          ],
+          "latency_ms": 290.5,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-06",
+            "sup-manual-maquinas-01",
+            "sup-duvidas-07"
+          ],
+          "latency_ms": 364.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são aceitas na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 128.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira impacta minhas vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-04",
+            "sup-antecipacao-03",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 173.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os benefícios do Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-07",
+            "sup-duvidas-08",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 125.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os diferenciais de uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-08",
+            "sup-duvidas-get-smart-10",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 91.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-08",
+            "sup-duvidas-07",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 50.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual tipo de negócio mais indicado para ter uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-09",
+            "sup-duvidas-get-smart-10",
+            "prod-todas-as-maquininhas-08"
+          ],
+          "latency_ms": 188.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-09",
+            "sup-duvidas-87",
+            "prod-crediario-08"
+          ],
+          "latency_ms": 506.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-get-smart-17",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 44.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "As condições comerciais são cumulativas?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-09",
+            "prod-ofertas-maquininha-12"
+          ],
+          "latency_ms": 116.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-11",
+            "sup-duvidas-06",
+            "sup-duvidas-28"
+          ],
+          "latency_ms": 115.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que acontecerá caso ocorra a contratação de uma nova condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-11",
+            "prod-ofertas-maquininha-12"
+          ],
+          "latency_ms": 252.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a taxa de antecipação da Getnet está tão alta?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 136.3,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 689.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como é calculada a taxa de antecipação? Achei absurda.",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 186.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-01",
+            "prod-ofertas-maquininha-07",
+            "sup-duvidas-82"
+          ],
+          "latency_ms": 271.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 0.333,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a Getnet não libera pagamento por Pix para mim?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-84",
+            "sup-duvidas-82",
+            "prod-pix-02"
+          ],
+          "latency_ms": 142.4,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-duvidas-61",
+            "prod-pix-03"
+          ],
+          "latency_ms": 56.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-42",
+            "sup-duvidas-44",
+            "prod-get-conta-01"
+          ],
+          "latency_ms": 311.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-62",
+            "sup-duvidas-81",
+            "prod-pix-03"
+          ],
+          "latency_ms": 381.8,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-27",
+            "sup-duvidas-28",
+            "prod-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 306.1,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-57",
+            "sup-duvidas-88",
+            "sup-duvidas-get-smart-12"
+          ],
+          "latency_ms": 133.0,
+          "origin": "real",
+          "recall": 0.5,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.387,
+          "page_recall": 0.25,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-06",
+            "prod-ofertas-maquininha-15",
+            "sup-duvidas-27"
+          ],
+          "latency_ms": 561.8,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-88",
+            "sup-duvidas-67",
+            "prod-ofertas-maquininha-09"
+          ],
+          "latency_ms": 67.7,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como me defendo de um chargeback como lojista da Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-67",
+            "sup-duvidas-68",
+            "prod-crediario-08"
+          ],
+          "latency_ms": 203.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-duvidas-39",
+            "sup-duvidas-103"
+          ],
+          "latency_ms": 124.0,
+          "origin": "real",
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 0.5,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        }
+      ],
+      "memory_mb": 1540.6,
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large"
+      }
+    },
+    "dense+cross": {
+      "cases": 59,
+      "positives": 59,
+      "negatives": 22,
+      "recall@3": 0.873,
+      "mrr": 0.859,
+      "hit@3": 0.881,
+      "recall@5": 0.907,
+      "mrr@10": 0.87,
+      "first_gold_rank": {
+        "What's the difference between the Get Clássica and the Get Smart?": 1,
+        "Do I need a bank account to receive my sales via Pix?": 1,
+        "My card machine won't connect to the internet, what should I do?": 1,
+        "How does receivables advance (antecipação) work with Getnet?": 4,
+        "How many installments can I split a sale into with the crediário?": 1,
+        "Can I sell through WhatsApp using the Payment Link?": 1,
+        "Qual a sua máquina?": 1,
+        "Gestão na palma da sua mão Já tem a sua Get Conta?": 1,
+        "Como eu contrato o Crediário e qual a taxa?": 1,
+        "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?": 1,
+        "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?": 1,
+        "Posso antecipar o valor da Reserva Financeira?": 1,
+        "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?": 1,
+        "Dúvidas sobre Link de Pagamento?": 1,
+        "Como você prefere continuar?": null,
+        "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?": 1,
+        "Como faço para baixar o Aplicativo Getnet Brasil?": 1,
+        "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?": 1,
+        "Quando a Reserva Financeira é liberada?": 1,
+        "Meu celular é compatível?": 1,
+        "Já é nosso cliente?": null,
+        "Onde visualizo o pagamento e em que prazo eu recebo?": 1,
+        "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?": 1,
+        "Como realizar pagamento por aproximação?": 1,
+        "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 1,
+        "Gestão na palma da sua mão Já tem o seu Get Tap?": 1,
+        "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 1,
+        "Qualquer estabelecimento pode ter o Crediário?": 1,
+        "A Get Smart aceita pagamento com auxilio emergencial?": 1,
+        "Quais tipos de pagamentos são aceitos na Get Smart?": 1,
+        "A Reserva Financeira é um valor extra que preciso pagar?": 1,
+        "Dúvidas sobre Get Tap?": 1,
+        "E se eu não quiser ter o produto?": null,
+        "Como insiro o Chip na minha máquina?": 1,
+        "Quais bandeiras são aceitas na Get Smart?": 1,
+        "A Reserva Financeira impacta minhas vendas?": 1,
+        "Quais os benefícios do Chip Algar?": 1,
+        "Quais os diferenciais de uma Get Smart?": 1,
+        "O que é o Chip Algar?": 1,
+        "Qual tipo de negócio mais indicado para ter uma Get Smart?": 1,
+        "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?": 1,
+        "O que é a Get Smart?": 1,
+        "As condições comerciais são cumulativas?": 1,
+        "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?": 1,
+        "O que acontecerá caso ocorra a contratação de uma nova condição comercial?": 1,
+        "Por que a taxa de antecipação da Getnet está tão alta?": 1,
+        "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?": 1,
+        "Como é calculada a taxa de antecipação? Achei absurda.": 1,
+        "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?": 6,
+        "Por que a Getnet não libera pagamento por Pix para mim?": 4,
+        "Como habilito o Pix na minha conta Getnet?": 1,
+        "Quero abrir a conta digital da Getnet. Como faço?": 1,
+        "Preciso ter conta no Santander para liberar o Pix na Getnet?": 1,
+        "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?": 1,
+        "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?": 3,
+        "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?": 3,
+        "Como devolvo a máquina Getnet sem continuar sendo cobrado?": null,
+        "Como me defendo de um chargeback como lojista da Getnet?": 1,
+        "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?": 1
+      },
+      "by_origin": {
+        "official": {
+          "cases": 6,
+          "recall@3": 0.833,
+          "recall@5": 0.917,
+          "mrr@10": 0.875
+        },
+        "page": {
+          "cases": 39,
+          "recall@3": 0.923,
+          "recall@5": 0.923,
+          "mrr@10": 0.923
+        },
+        "real": {
+          "cases": 14,
+          "recall@3": 0.75,
+          "recall@5": 0.857,
+          "mrr@10": 0.72
+        }
+      },
+      "hit@3_ci": {
+        "k": 52,
+        "n": 59,
+        "lo": 77.5,
+        "hi": 94.1
+      },
+      "ndcg@3": 0.855,
+      "page": {
+        "recall@3": 0.908,
+        "mrr": 0.941,
+        "hit@3": 0.949,
+        "hit@3_ci": {
+          "k": 56,
+          "n": 59,
+          "lo": 86.1,
+          "hi": 98.3
+        }
+      },
+      "latency_ms": {
+        "p50": 1016.2,
+        "p95": 1503.7,
+        "mean": 1077.9
+      },
+      "gate": {
+        "min_score": 5.976,
+        "min_cosine": 0.838,
+        "pos_answered": 0.864,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 51,
+          "n": 59,
+          "lo": 75.5,
+          "hi": 93.0
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "separation": {
+        "auc": 0.975,
+        "gap": -0.043,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "separation_rerank": {
+        "auc": 0.971,
+        "gap": -8.397,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "rerank_gate": {
+        "min_rerank": -5.5017,
+        "pos_answered": 0.983,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 58,
+          "n": 59,
+          "lo": 91.0,
+          "hi": 99.7
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85,
+        "enough": true
+      },
+      "essential": 59,
+      "gold_unresolved": [],
+      "dedupe_aliases": 8,
+      "retriever": "dense+cross",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-get-smart-08",
+            "prod-ofertas-maquininha-11",
+            "sup-duvidas-get-smart-10"
+          ],
+          "latency_ms": 1205.1,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.815,
+          "page_recall": 0.6,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-42",
+            "sup-duvidas-59",
+            "prod-pix-01"
+          ],
+          "latency_ms": 975.6,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-06",
+            "prod-todas-as-maquininhas-05",
+            "prod-todas-as-maquininhas-01"
+          ],
+          "latency_ms": 1121.4,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-duvidas-102",
+            "sup-antecipacao-04"
+          ],
+          "latency_ms": 1234.5,
+          "origin": "official",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.5,
+          "rr10": 0.25,
+          "first": 4,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "passages": 1,
+          "top3": [
+            "prod-crediario-01",
+            "prod-crediario-03",
+            "sup-duvidas-77"
+          ],
+          "latency_ms": 1185.5,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Can I sell through WhatsApp using the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "prod-link-de-pagamento-01",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 933.3,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-manual-maquinas-01",
+            "prod-get-conta-02",
+            "prod-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 1258.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem a sua Get Conta?",
+          "passages": 1,
+          "top3": [
+            "prod-get-conta-02",
+            "prod-get-tap-07",
+            "sup-duvidas-42"
+          ],
+          "latency_ms": 962.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-35",
+            "prod-crediario-08",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 1050.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.815,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-17",
+            "sup-duvidas-01",
+            "prod-taxas-02"
+          ],
+          "latency_ms": 1571.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-01",
+            "sup-duvidas-get-smart-02"
+          ],
+          "latency_ms": 903.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Posso antecipar o valor da Reserva Financeira?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-01",
+            "sup-antecipacao-04",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 850.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-03",
+            "prod-todas-as-maquininhas-04",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 1180.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "prod-link-de-pagamento-04",
+            "prod-pagamentos-pelo-whatsapp-05"
+          ],
+          "latency_ms": 868.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-94",
+            "prod-crediario-06",
+            "prod-pix-03"
+          ],
+          "latency_ms": 766.7,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-37",
+            "sup-duvidas-78",
+            "prod-crediario-09"
+          ],
+          "latency_ms": 1241.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço para baixar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-18",
+            "prod-pix-03",
+            "sup-duvidas-01"
+          ],
+          "latency_ms": 896.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-02",
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 1014.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-antecipacao-01",
+            "sup-duvidas-64"
+          ],
+          "latency_ms": 967.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Meu celular é compatível?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-05",
+            "sup-duvidas-47",
+            "sup-duvidas-19"
+          ],
+          "latency_ms": 959.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "passages": 1,
+          "top3": [
+            "prod-pix-03",
+            "sup-duvidas-50",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 970.7,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Onde visualizo o pagamento e em que prazo eu recebo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-39",
+            "prod-crediario-02",
+            "prod-link-de-pagamento-03"
+          ],
+          "latency_ms": 974.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-03",
+            "sup-duvidas-03",
+            "prod-get-tap-05"
+          ],
+          "latency_ms": 1318.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizar pagamento por aproximação?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-05",
+            "sup-duvidas-get-smart-04",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 983.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-02",
+            "sup-duvidas-69"
+          ],
+          "latency_ms": 973.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem o seu Get Tap?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-07",
+            "prod-get-conta-02",
+            "sup-duvidas-45"
+          ],
+          "latency_ms": 1016.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-09",
+            "prod-todas-as-maquininhas-07",
+            "prod-get-conta-02"
+          ],
+          "latency_ms": 988.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qualquer estabelecimento pode ter o Crediário?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-40",
+            "prod-crediario-08",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 1287.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Get Smart aceita pagamento com auxilio emergencial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-05",
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-08"
+          ],
+          "latency_ms": 1044.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-04",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 1165.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é um valor extra que preciso pagar?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-04",
+            "sup-duvidas-95"
+          ],
+          "latency_ms": 833.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-45",
+            "sup-duvidas-49",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 840.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-88",
+            "prod-ofertas-maquininha-08",
+            "sup-duvidas-11"
+          ],
+          "latency_ms": 877.1,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-06",
+            "sup-duvidas-07",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 962.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são aceitas na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "prod-get-tap-02",
+            "sup-duvidas-26"
+          ],
+          "latency_ms": 1053.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira impacta minhas vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-04",
+            "sup-antecipacao-03",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 1174.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os benefícios do Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-07",
+            "sup-duvidas-08",
+            "prod-ofertas-maquininha-10"
+          ],
+          "latency_ms": 1129.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os diferenciais de uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-08",
+            "sup-duvidas-get-smart-10",
+            "prod-todas-as-maquininhas-08"
+          ],
+          "latency_ms": 1274.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-08",
+            "sup-duvidas-07",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 1166.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual tipo de negócio mais indicado para ter uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-09",
+            "sup-duvidas-get-smart-10",
+            "prod-todas-as-maquininhas-08"
+          ],
+          "latency_ms": 1246.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-09",
+            "sup-duvidas-87",
+            "sup-duvidas-get-smart-07"
+          ],
+          "latency_ms": 990.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-get-smart-17",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 1077.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "As condições comerciais são cumulativas?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-09",
+            "prod-ofertas-maquininha-12"
+          ],
+          "latency_ms": 863.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-11",
+            "prod-get-tap-07",
+            "sup-duvidas-06"
+          ],
+          "latency_ms": 921.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que acontecerá caso ocorra a contratação de uma nova condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-11",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 957.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a taxa de antecipação da Getnet está tão alta?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "prod-taxas-02",
+            "sup-antecipacao-03"
+          ],
+          "latency_ms": 1929.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-antecipacao-02",
+            "sup-antecipacao-01"
+          ],
+          "latency_ms": 1022.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como é calculada a taxa de antecipação? Achei absurda.",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 1417.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?",
+          "passages": 1,
+          "top3": [
+            "prod-ofertas-maquininha-07",
+            "prod-ofertas-maquininha-14",
+            "prod-todas-as-maquininhas-01"
+          ],
+          "latency_ms": 971.0,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.167,
+          "first": 6,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Por que a Getnet não libera pagamento por Pix para mim?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-84",
+            "prod-pix-02",
+            "prod-ofertas-maquininha-07"
+          ],
+          "latency_ms": 932.5,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 1.0,
+          "rr10": 0.25,
+          "first": 4,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-duvidas-61",
+            "prod-pix-01"
+          ],
+          "latency_ms": 900.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-44",
+            "prod-get-conta-01",
+            "prod-get-conta-02"
+          ],
+          "latency_ms": 1279.4,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-81",
+            "sup-duvidas-62",
+            "prod-todas-as-maquininhas-06"
+          ],
+          "latency_ms": 1105.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-27",
+            "sup-duvidas-28",
+            "prod-todas-as-maquininhas-01"
+          ],
+          "latency_ms": 1194.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-57",
+            "sup-duvidas-get-smart-12",
+            "sup-duvidas-88"
+          ],
+          "latency_ms": 957.0,
+          "origin": "real",
+          "recall": 0.5,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.307,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-27",
+            "prod-todas-as-maquininhas-02",
+            "prod-ofertas-maquininha-14"
+          ],
+          "latency_ms": 1503.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.5,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-88",
+            "prod-todas-as-maquininhas-01",
+            "prod-get-tap-06"
+          ],
+          "latency_ms": 1280.8,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como me defendo de um chargeback como lojista da Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-68",
+            "sup-duvidas-67",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 832.6,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-antecipacao-04",
+            "sup-duvidas-39"
+          ],
+          "latency_ms": 1034.5,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        }
+      ],
+      "memory_mb": 2381.8,
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large",
+        "rerank": "cross",
+        "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+        "rerank_pool": 10,
+        "rerank_chars": 600
+      }
+    },
+    "dense+cross:base": {
+      "cases": 59,
+      "positives": 59,
+      "negatives": 22,
+      "recall@3": 0.898,
+      "mrr": 0.842,
+      "hit@3": 0.915,
+      "recall@5": 0.915,
+      "mrr@10": 0.846,
+      "first_gold_rank": {
+        "What's the difference between the Get Clássica and the Get Smart?": 1,
+        "Do I need a bank account to receive my sales via Pix?": 2,
+        "My card machine won't connect to the internet, what should I do?": 1,
+        "How does receivables advance (antecipação) work with Getnet?": 4,
+        "How many installments can I split a sale into with the crediário?": 3,
+        "Can I sell through WhatsApp using the Payment Link?": 1,
+        "Qual a sua máquina?": 1,
+        "Gestão na palma da sua mão Já tem a sua Get Conta?": 1,
+        "Como eu contrato o Crediário e qual a taxa?": 1,
+        "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?": 1,
+        "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?": 1,
+        "Posso antecipar o valor da Reserva Financeira?": 1,
+        "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?": 2,
+        "Dúvidas sobre Link de Pagamento?": 1,
+        "Como você prefere continuar?": null,
+        "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?": 1,
+        "Como faço para baixar o Aplicativo Getnet Brasil?": 1,
+        "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?": 1,
+        "Quando a Reserva Financeira é liberada?": 1,
+        "Meu celular é compatível?": 1,
+        "Já é nosso cliente?": null,
+        "Onde visualizo o pagamento e em que prazo eu recebo?": 1,
+        "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?": 1,
+        "Como realizar pagamento por aproximação?": 1,
+        "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 1,
+        "Gestão na palma da sua mão Já tem o seu Get Tap?": 1,
+        "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 1,
+        "Qualquer estabelecimento pode ter o Crediário?": 1,
+        "A Get Smart aceita pagamento com auxilio emergencial?": 1,
+        "Quais tipos de pagamentos são aceitos na Get Smart?": 1,
+        "A Reserva Financeira é um valor extra que preciso pagar?": 1,
+        "Dúvidas sobre Get Tap?": 1,
+        "E se eu não quiser ter o produto?": null,
+        "Como insiro o Chip na minha máquina?": 1,
+        "Quais bandeiras são aceitas na Get Smart?": 1,
+        "A Reserva Financeira impacta minhas vendas?": 1,
+        "Quais os benefícios do Chip Algar?": 1,
+        "Quais os diferenciais de uma Get Smart?": 1,
+        "O que é o Chip Algar?": 1,
+        "Qual tipo de negócio mais indicado para ter uma Get Smart?": 1,
+        "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?": 1,
+        "O que é a Get Smart?": 1,
+        "As condições comerciais são cumulativas?": 1,
+        "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?": 1,
+        "O que acontecerá caso ocorra a contratação de uma nova condição comercial?": 1,
+        "Por que a taxa de antecipação da Getnet está tão alta?": 1,
+        "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?": 1,
+        "Como é calculada a taxa de antecipação? Achei absurda.": 1,
+        "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?": 3,
+        "Por que a Getnet não libera pagamento por Pix para mim?": 2,
+        "Como habilito o Pix na minha conta Getnet?": 1,
+        "Quero abrir a conta digital da Getnet. Como faço?": 2,
+        "Preciso ter conta no Santander para liberar o Pix na Getnet?": 2,
+        "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?": 1,
+        "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?": 2,
+        "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?": 1,
+        "Como devolvo a máquina Getnet sem continuar sendo cobrado?": null,
+        "Como me defendo de um chargeback como lojista da Getnet?": 1,
+        "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?": 1
+      },
+      "by_origin": {
+        "official": {
+          "cases": 6,
+          "recall@3": 0.833,
+          "recall@5": 0.917,
+          "mrr@10": 0.68
+        },
+        "page": {
+          "cases": 39,
+          "recall@3": 0.923,
+          "recall@5": 0.923,
+          "mrr@10": 0.91
+        },
+        "real": {
+          "cases": 14,
+          "recall@3": 0.857,
+          "recall@5": 0.893,
+          "mrr@10": 0.738
+        }
+      },
+      "hit@3_ci": {
+        "k": 54,
+        "n": 59,
+        "lo": 81.6,
+        "hi": 96.3
+      },
+      "ndcg@3": 0.84,
+      "page": {
+        "recall@3": 0.916,
+        "mrr": 0.929,
+        "hit@3": 0.966,
+        "hit@3_ci": {
+          "k": 57,
+          "n": 59,
+          "lo": 88.5,
+          "hi": 99.1
+        }
+      },
+      "latency_ms": {
+        "p50": 953.5,
+        "p95": 1308.8,
+        "mean": 1004.6
+      },
+      "gate": {
+        "min_score": 5.976,
+        "min_cosine": 0.838,
+        "pos_answered": 0.898,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 53,
+          "n": 59,
+          "lo": 79.5,
+          "hi": 95.3
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "separation": {
+        "auc": 0.972,
+        "gap": -0.045,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "separation_rerank": {
+        "auc": 0.971,
+        "gap": -8.397,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "rerank_gate": {
+        "min_rerank": -5.5017,
+        "pos_answered": 0.983,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 58,
+          "n": 59,
+          "lo": 91.0,
+          "hi": 99.7
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85,
+        "enough": true
+      },
+      "essential": 59,
+      "gold_unresolved": [],
+      "dedupe_aliases": 8,
+      "retriever": "dense+cross",
+      "fallback": "",
+      "questions": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-get-smart-08",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 1138.1,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.75,
+          "page_recall": 0.6,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-59",
+            "sup-duvidas-42",
+            "prod-pix-01"
+          ],
+          "latency_ms": 935.5,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-06",
+            "sup-duvidas-96",
+            "prod-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 981.8,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-duvidas-102",
+            "sup-antecipacao-04"
+          ],
+          "latency_ms": 900.2,
+          "origin": "official",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.5,
+          "rr10": 0.25,
+          "first": 4,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-78",
+            "sup-duvidas-77",
+            "prod-crediario-03"
+          ],
+          "latency_ms": 1099.2,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Can I sell through WhatsApp using the Payment Link?",
+          "passages": 1,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "prod-pagamentos-pelo-whatsapp-05",
+            "prod-link-de-pagamento-01"
+          ],
+          "latency_ms": 869.1,
+          "origin": "official",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-manual-maquinas-01",
+            "prod-todas-as-maquininhas-01",
+            "sup-duvidas-96"
+          ],
+          "latency_ms": 1211.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem a sua Get Conta?",
+          "passages": 1,
+          "top3": [
+            "prod-get-conta-02",
+            "sup-duvidas-get-smart-08",
+            "sup-duvidas-42"
+          ],
+          "latency_ms": 1115.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.333,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-35",
+            "prod-crediario-08",
+            "prod-crediario-06"
+          ],
+          "latency_ms": 1207.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.815,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-17",
+            "sup-duvidas-01",
+            "prod-get-tap-07"
+          ],
+          "latency_ms": 1308.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-get-smart-02",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 904.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Posso antecipar o valor da Reserva Financeira?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-01",
+            "sup-antecipacao-04",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 888.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?",
+          "passages": 1,
+          "top3": [
+            "prod-link-de-pagamento-01",
+            "prod-todas-as-maquininhas-04",
+            "prod-get-tap-03"
+          ],
+          "latency_ms": 1217.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 0.667,
+          "page_rr": 0.5,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "passages": 2,
+          "top3": [
+            "prod-pagamentos-pelo-whatsapp-02",
+            "sup-duvidas-51",
+            "prod-link-de-pagamento-04"
+          ],
+          "latency_ms": 832.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-94",
+            "sup-duvidas-19",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 736.4,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-37",
+            "prod-crediario-09",
+            "prod-crediario-08"
+          ],
+          "latency_ms": 1175.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como faço para baixar o Aplicativo Getnet Brasil?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-18",
+            "sup-duvidas-01",
+            "sup-duvidas-get-smart-11"
+          ],
+          "latency_ms": 859.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-02",
+            "sup-duvidas-get-smart-01",
+            "sup-duvidas-03"
+          ],
+          "latency_ms": 1032.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-antecipacao-01",
+            "sup-duvidas-64"
+          ],
+          "latency_ms": 914.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Meu celular é compatível?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-47",
+            "prod-get-tap-05",
+            "sup-duvidas-19"
+          ],
+          "latency_ms": 841.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-117",
+            "prod-pix-03",
+            "sup-duvidas-50"
+          ],
+          "latency_ms": 896.0,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 0.0,
+          "page_rr": 0.0,
+          "page_hit": false
+        },
+        {
+          "question": "Onde visualizo o pagamento e em que prazo eu recebo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-39",
+            "sup-duvidas-92",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 885.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-03",
+            "sup-duvidas-03",
+            "sup-duvidas-get-smart-11"
+          ],
+          "latency_ms": 1003.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como realizar pagamento por aproximação?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-05",
+            "sup-duvidas-get-smart-04",
+            "prod-crediario-05"
+          ],
+          "latency_ms": 783.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-02",
+            "sup-duvidas-69"
+          ],
+          "latency_ms": 793.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Gestão na palma da sua mão Já tem o seu Get Tap?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-07",
+            "sup-duvidas-45",
+            "prod-get-tap-01"
+          ],
+          "latency_ms": 891.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.667,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-09",
+            "sup-duvidas-96",
+            "prod-todas-as-maquininhas-07"
+          ],
+          "latency_ms": 823.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qualquer estabelecimento pode ter o Crediário?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-40",
+            "prod-crediario-08",
+            "prod-crediario-02"
+          ],
+          "latency_ms": 1168.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Get Smart aceita pagamento com auxilio emergencial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-05",
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-08"
+          ],
+          "latency_ms": 1040.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-05",
+            "sup-duvidas-get-smart-04"
+          ],
+          "latency_ms": 1144.3,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira é um valor extra que preciso pagar?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-03",
+            "sup-antecipacao-04",
+            "sup-duvidas-95"
+          ],
+          "latency_ms": 837.7,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-45",
+            "prod-get-tap-07",
+            "sup-duvidas-49"
+          ],
+          "latency_ms": 842.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.92,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-88",
+            "sup-duvidas-11",
+            "sup-duvidas-get-smart-02"
+          ],
+          "latency_ms": 843.9,
+          "origin": "page",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-06",
+            "sup-manual-maquinas-01",
+            "sup-duvidas-07"
+          ],
+          "latency_ms": 867.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são aceitas na Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-07",
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-05"
+          ],
+          "latency_ms": 1196.6,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Reserva Financeira impacta minhas vendas?",
+          "passages": 1,
+          "top3": [
+            "sup-antecipacao-04",
+            "sup-antecipacao-03",
+            "sup-duvidas-14"
+          ],
+          "latency_ms": 921.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os benefícios do Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-07",
+            "sup-duvidas-08",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 990.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais os diferenciais de uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-08",
+            "sup-duvidas-get-smart-10",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 1176.8,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é o Chip Algar?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-08",
+            "sup-duvidas-07",
+            "prod-ofertas-maquininha-08"
+          ],
+          "latency_ms": 1028.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Qual tipo de negócio mais indicado para ter uma Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-09",
+            "sup-duvidas-get-smart-10",
+            "prod-todas-as-maquininhas-08"
+          ],
+          "latency_ms": 1132.4,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-09",
+            "sup-duvidas-87",
+            "prod-crediario-08"
+          ],
+          "latency_ms": 1011.1,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-10",
+            "sup-duvidas-get-smart-17",
+            "prod-ofertas-maquininha-11"
+          ],
+          "latency_ms": 1091.2,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "As condições comerciais são cumulativas?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-09",
+            "prod-ofertas-maquininha-12"
+          ],
+          "latency_ms": 812.0,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 0.5,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-get-smart-11",
+            "sup-duvidas-06",
+            "sup-duvidas-28"
+          ],
+          "latency_ms": 953.5,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O que acontecerá caso ocorra a contratação de uma nova condição comercial?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-10",
+            "sup-duvidas-11",
+            "prod-ofertas-maquininha-12"
+          ],
+          "latency_ms": 900.9,
+          "origin": "page",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a taxa de antecipação da Getnet está tão alta?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 1546.3,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "O valor que recebi na antecipação automática ficou bem menor que o simulado no app. Por quê?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 1020.3,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como é calculada a taxa de antecipação? Achei absurda.",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-102",
+            "sup-duvidas-17",
+            "sup-antecipacao-02"
+          ],
+          "latency_ms": 1275.2,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?",
+          "passages": 1,
+          "top3": [
+            "prod-todas-as-maquininhas-01",
+            "prod-ofertas-maquininha-07",
+            "sup-duvidas-82"
+          ],
+          "latency_ms": 911.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.333,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.333,
+          "first": 3,
+          "ndcg": 0.5,
+          "page_recall": 1.0,
+          "page_rr": 0.333,
+          "page_hit": true
+        },
+        {
+          "question": "Por que a Getnet não libera pagamento por Pix para mim?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-84",
+            "sup-duvidas-82",
+            "prod-pix-02"
+          ],
+          "latency_ms": 917.3,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-82",
+            "sup-duvidas-61",
+            "prod-pix-03"
+          ],
+          "latency_ms": 892.9,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-42",
+            "sup-duvidas-44",
+            "prod-get-conta-01"
+          ],
+          "latency_ms": 1157.7,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-62",
+            "sup-duvidas-81",
+            "prod-pix-03"
+          ],
+          "latency_ms": 865.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.631,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-27",
+            "sup-duvidas-28",
+            "prod-todas-as-maquininhas-05"
+          ],
+          "latency_ms": 896.5,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "passages": 2,
+          "top3": [
+            "sup-duvidas-57",
+            "sup-duvidas-88",
+            "sup-duvidas-get-smart-12"
+          ],
+          "latency_ms": 975.2,
+          "origin": "real",
+          "recall": 0.5,
+          "rr": 0.5,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 0.5,
+          "first": 2,
+          "ndcg": 0.387,
+          "page_recall": 0.25,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "passages": 1,
+          "top3": [
+            "prod-get-tap-06",
+            "prod-ofertas-maquininha-15",
+            "sup-duvidas-27"
+          ],
+          "latency_ms": 1518.0,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-88",
+            "sup-duvidas-67",
+            "prod-ofertas-maquininha-09"
+          ],
+          "latency_ms": 1241.9,
+          "origin": "real",
+          "recall": 0.0,
+          "rr": 0.0,
+          "hit": false,
+          "recall5": 0.0,
+          "rr10": 0.0,
+          "first": null,
+          "ndcg": 0.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "Como me defendo de um chargeback como lojista da Getnet?",
+          "passages": 1,
+          "top3": [
+            "sup-duvidas-67",
+            "sup-duvidas-68",
+            "prod-crediario-08"
+          ],
+          "latency_ms": 831.5,
+          "origin": "real",
+          "recall": 1.0,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 1.0,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 1.0,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "passages": 2,
+          "top3": [
+            "sup-antecipacao-02",
+            "sup-duvidas-39",
+            "sup-duvidas-103"
+          ],
+          "latency_ms": 1018.0,
+          "origin": "real",
+          "recall": 0.5,
+          "rr": 1.0,
+          "hit": true,
+          "recall5": 0.5,
+          "rr10": 1.0,
+          "first": 1,
+          "ndcg": 0.613,
+          "page_recall": 1.0,
+          "page_rr": 1.0,
+          "page_hit": true
+        }
+      ],
+      "memory_mb": 2381.8,
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large",
+        "rerank": "cross",
+        "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+        "rerank_pool": 10,
+        "rerank_chars": 600,
+        "rerank_order": "base"
+      }
+    }
+  },
+  "diff_vs_baseline": {
+    "dense": {
+      "improved": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.333
+          ]
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.333
+          ]
+        },
+        {
+          "question": "Por que a Getnet não libera pagamento por Pix para mim?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "recall": [
+            0.0,
+            0.5
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "recall": [
+            0.0,
+            0.5
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        }
+      ],
+      "regressed": [
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "recall": [
+            0.5,
+            0.0
+          ],
+          "rr": [
+            0.5,
+            0.0
+          ]
+        },
+        {
+          "question": "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            0.5,
+            0.0
+          ]
+        }
+      ],
+      "same": 31
+    },
+    "dense+cross": {
+      "improved": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "recall": [
+            0.0,
+            0.5
+          ],
+          "rr": [
+            0.0,
+            0.333
+          ]
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        }
+      ],
+      "regressed": [
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "recall": [
+            0.5,
+            0.0
+          ],
+          "rr": [
+            0.5,
+            0.0
+          ]
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            0.333
+          ]
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            0.5,
+            0.0
+          ]
+        }
+      ],
+      "same": 34
+    },
+    "dense+cross:base": {
+      "improved": [
+        {
+          "question": "What's the difference between the Get Clássica and the Get Smart?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Do I need a bank account to receive my sales via Pix?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "My card machine won't connect to the internet, what should I do?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "How many installments can I split a sale into with the crediário?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.333
+          ]
+        },
+        {
+          "question": "Qual a sua máquina?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.333,
+            1.0
+          ]
+        },
+        {
+          "question": "Como eu contrato o Crediário e qual a taxa?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Dúvidas sobre Link de Pagamento?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Quando a Reserva Financeira é liberada?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "A Reserva Financeira é permitida em caso de cancelamento de vendas?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Quais tipos de pagamentos são aceitos na Get Smart?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Dúvidas sobre Get Tap?",
+          "recall": [
+            0.5,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "Como insiro o Chip na minha máquina?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "O que é a Get Smart?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.333
+          ]
+        },
+        {
+          "question": "Por que a Getnet não libera pagamento por Pix para mim?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Como habilito o Pix na minha conta Getnet?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "question": "Quero abrir a conta digital da Getnet. Como faço?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Preciso ter conta no Santander para liberar o Pix na Getnet?",
+          "recall": [
+            0.0,
+            1.0
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?",
+          "recall": [
+            0.0,
+            0.5
+          ],
+          "rr": [
+            0.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            0.5,
+            1.0
+          ]
+        },
+        {
+          "question": "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?",
+          "recall": [
+            0.0,
+            0.5
+          ],
+          "rr": [
+            0.0,
+            1.0
+          ]
+        }
+      ],
+      "regressed": [
+        {
+          "question": "How does receivables advance (antecipação) work with Getnet?",
+          "recall": [
+            0.5,
+            0.0
+          ],
+          "rr": [
+            0.5,
+            0.0
+          ]
+        },
+        {
+          "question": "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?",
+          "recall": [
+            1.0,
+            1.0
+          ],
+          "rr": [
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "question": "Como você prefere continuar?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Já é nosso cliente?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "E se eu não quiser ter o produto?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "question": "Como devolvo a máquina Getnet sem continuar sendo cobrado?",
+          "recall": [
+            1.0,
+            0.0
+          ],
+          "rr": [
+            0.5,
+            0.0
+          ]
+        }
+      ],
+      "same": 31
+    }
+  }
+}

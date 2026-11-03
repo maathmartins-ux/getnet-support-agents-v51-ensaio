@@ -1,5 +1,12 @@
 {
-  "_doc": "Escolha medida no gold do desafio (re-rotulado às cegas por 2 rotuladores depois da ampliação do corpus): a ordem do denso (e5-large) ficou melhor que a reordenada pelo cross-encoder, e a nota do cross separa com × sem fonte melhor que o cosseno; por isso a ordem é a do denso e a nota do cross só decide o portão sem fonte (MIN_RERANK).",
+  "_doc": "gerado por `python -m evals.run_evals --choose-retriever --apply`; não edite à mão",
+  "chosen_at": "2026-11-03T22:49:55+00:00",
+  "git_sha": "c3aaa79",
+  "gold": "retrieval.jsonl",
+  "criterion": "maior Recall@5 (o que o redator lê) com p95 <= 1500 ms e RAM <= 4096 MB (empate: MRR, Recall@3, cobertura do portão, p95)",
+  "latency_budget_ms": 1500.0,
+  "ram_budget_mb": 4096.0,
+  "chosen": "dense+cross:base",
   "choice": {
     "retriever": "dense",
     "embed_model": "intfloat/multilingual-e5-large",
@@ -7,22 +14,350 @@
     "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
     "rerank_pool": 10,
     "rerank_chars": 600,
-    "rerank_order": "base"
+    "rerank_order": "base",
+    "gate": {
+      "min_score": 5.976,
+      "min_cosine": 0.838,
+      "min_rerank": -5.5017
+    }
+  },
+  "rejected": {
+    "dense+cross": "p95 1503.7 ms > orçamento 1500 ms"
   },
   "measured": {
-    "dense+cross (ordem do cross)": {
-      "recall@3": 0.856,
-      "recall@5": 0.907,
-      "mrr": 0.842
+    "bm25": {
+      "cases": 59,
+      "recall@3": 0.763,
+      "recall@5": 0.797,
+      "mrr": 0.709,
+      "hit@3": 0.797,
+      "hit@3_ci": {
+        "k": 47,
+        "n": 59,
+        "lo": 67.7,
+        "hi": 88.0
+      },
+      "ndcg@3": 0.707,
+      "page": {
+        "recall@3": 0.941,
+        "mrr": 0.912,
+        "hit@3": 0.983,
+        "hit@3_ci": {
+          "k": 58,
+          "n": 59,
+          "lo": 91.0,
+          "hi": 99.7
+        }
+      },
+      "latency_ms": {
+        "p50": 0.7,
+        "p95": 1.0,
+        "mean": 0.7
+      },
+      "memory_mb": 39.9,
+      "dedupe_aliases": 8,
+      "fallback": "",
+      "config": {
+        "retriever": "bm25"
+      },
+      "gate": {
+        "min_score": 7.287,
+        "min_cosine": 2.0,
+        "pos_answered": 0.695,
+        "neg_refused": 0.955,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 41,
+          "n": 59,
+          "lo": 56.9,
+          "hi": 79.7
+        },
+        "neg_ci": {
+          "k": 21,
+          "n": 22,
+          "lo": 78.2,
+          "hi": 99.2
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "rerank_gate": null,
+      "separation": {
+        "auc": 0.925,
+        "gap": -4.766,
+        "positives": 59,
+        "negatives": 17,
+        "enough": true
+      },
+      "separation_rerank": null
     },
-    "dense (ordem do denso)": {
+    "dense": {
+      "cases": 59,
       "recall@3": 0.898,
       "recall@5": 0.915,
-      "mrr": 0.842
+      "mrr": 0.842,
+      "hit@3": 0.915,
+      "hit@3_ci": {
+        "k": 54,
+        "n": 59,
+        "lo": 81.6,
+        "hi": 96.3
+      },
+      "ndcg@3": 0.84,
+      "page": {
+        "recall@3": 0.916,
+        "mrr": 0.929,
+        "hit@3": 0.966,
+        "hit@3_ci": {
+          "k": 57,
+          "n": 59,
+          "lo": 88.5,
+          "hi": 99.1
+        }
+      },
+      "latency_ms": {
+        "p50": 265.5,
+        "p95": 1213.4,
+        "mean": 344.7
+      },
+      "memory_mb": 1540.6,
+      "dedupe_aliases": 8,
+      "fallback": "",
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large"
+      },
+      "gate": {
+        "min_score": 5.976,
+        "min_cosine": 0.838,
+        "pos_answered": 0.898,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 53,
+          "n": 59,
+          "lo": 79.5,
+          "hi": 95.3
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "rerank_gate": null,
+      "separation": {
+        "auc": 0.972,
+        "gap": -0.045,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "separation_rerank": null
     },
-    "separação com × sem fonte (AUC)": {
-      "nota do cross": 0.93,
-      "cosseno": 0.917
+    "dense+cross": {
+      "cases": 59,
+      "recall@3": 0.873,
+      "recall@5": 0.907,
+      "mrr": 0.859,
+      "hit@3": 0.881,
+      "hit@3_ci": {
+        "k": 52,
+        "n": 59,
+        "lo": 77.5,
+        "hi": 94.1
+      },
+      "ndcg@3": 0.855,
+      "page": {
+        "recall@3": 0.908,
+        "mrr": 0.941,
+        "hit@3": 0.949,
+        "hit@3_ci": {
+          "k": 56,
+          "n": 59,
+          "lo": 86.1,
+          "hi": 98.3
+        }
+      },
+      "latency_ms": {
+        "p50": 1016.2,
+        "p95": 1503.7,
+        "mean": 1077.9
+      },
+      "memory_mb": 2381.8,
+      "dedupe_aliases": 8,
+      "fallback": "",
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large",
+        "rerank": "cross",
+        "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+        "rerank_pool": 10,
+        "rerank_chars": 600
+      },
+      "gate": {
+        "min_score": 5.976,
+        "min_cosine": 0.838,
+        "pos_answered": 0.864,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 51,
+          "n": 59,
+          "lo": 75.5,
+          "hi": 93.0
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "rerank_gate": {
+        "min_rerank": -5.5017,
+        "pos_answered": 0.983,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 58,
+          "n": 59,
+          "lo": 91.0,
+          "hi": 99.7
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85,
+        "enough": true
+      },
+      "separation": {
+        "auc": 0.975,
+        "gap": -0.043,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "separation_rerank": {
+        "auc": 0.971,
+        "gap": -8.397,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      }
+    },
+    "dense+cross:base": {
+      "cases": 59,
+      "recall@3": 0.898,
+      "recall@5": 0.915,
+      "mrr": 0.842,
+      "hit@3": 0.915,
+      "hit@3_ci": {
+        "k": 54,
+        "n": 59,
+        "lo": 81.6,
+        "hi": 96.3
+      },
+      "ndcg@3": 0.84,
+      "page": {
+        "recall@3": 0.916,
+        "mrr": 0.929,
+        "hit@3": 0.966,
+        "hit@3_ci": {
+          "k": 57,
+          "n": 59,
+          "lo": 88.5,
+          "hi": 99.1
+        }
+      },
+      "latency_ms": {
+        "p50": 953.5,
+        "p95": 1308.8,
+        "mean": 1004.6
+      },
+      "memory_mb": 2381.8,
+      "dedupe_aliases": 8,
+      "fallback": "",
+      "config": {
+        "retriever": "dense",
+        "embed_model": "intfloat/multilingual-e5-large",
+        "rerank": "cross",
+        "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
+        "rerank_pool": 10,
+        "rerank_chars": 600,
+        "rerank_order": "base"
+      },
+      "gate": {
+        "min_score": 5.976,
+        "min_cosine": 0.838,
+        "pos_answered": 0.898,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 53,
+          "n": 59,
+          "lo": 79.5,
+          "hi": 95.3
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85
+      },
+      "rerank_gate": {
+        "min_rerank": -5.5017,
+        "pos_answered": 0.983,
+        "neg_refused": 0.864,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 58,
+          "n": 59,
+          "lo": 91.0,
+          "hi": 99.7
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        },
+        "positives": 59,
+        "negatives": 22,
+        "neg_refusal_min": 0.85,
+        "enough": true
+      },
+      "separation": {
+        "auc": 0.972,
+        "gap": -0.045,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      },
+      "separation_rerank": {
+        "auc": 0.971,
+        "gap": -8.397,
+        "positives": 59,
+        "negatives": 22,
+        "enough": true
+      }
     }
   }
 }
