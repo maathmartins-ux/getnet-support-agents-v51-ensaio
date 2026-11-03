@@ -34,9 +34,25 @@ def test_extract_drops_chrome_and_scripts():
 
 def test_chunk_respects_bounds_and_is_literal():
     lines = [f"Frase número {i} sobre o prazo de entrega da loja." for i in range(60)]
-    joined = " ".join(lines)
+    joined = "\n".join(lines)  # linhas do HTML seguem separadas por quebra de linha dentro do trecho
     chunks = chunk(lines)
     assert chunks and all(MIN_CHARS <= len(c) <= MAX_CHARS and c in joined for c in chunks)
+
+
+def test_chunk_keeps_block_rows_apart_without_moving_the_cuts():
+    """Lista em blocos <p> (faixa de faturamento → maquininha): cada linha fica na sua; o separador tem o tamanho do
+    espaço, então os cortes (e os ids dos trechos) são os mesmos do texto colado com espaço."""
+    rows = ["Vendendo você ganha máquina grátis", "Acima de R$ 20mil por mês | Get Clássica",
+            "Acima de R$ 40mil por mês | Get Clássica ou Get Smart",
+            "Acima de R$ 80mil por mês | Get Clássica ou Get Smart",
+            "*As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel."]
+    lines = rows * 6
+    chunks = chunk(lines)
+    assert chunks and "Get Clássica\nAcima de R$ 40mil por mês" in chunks[0]
+    flat = [c.replace("\n", " ") for c in chunks]
+    assert all(c in " ".join(lines) for c in flat)  # mesmo texto, mesmos cortes; só o separador mudou
+    long_line = " ".join(f"Sentença {i} do texto longo." for i in range(80))
+    assert all("\n" not in c for c in chunk([long_line]))  # pedaços da MESMA linha seguem com espaço
 
 
 def test_chunk_splits_long_line_by_sentence():

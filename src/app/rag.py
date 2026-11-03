@@ -665,7 +665,8 @@ class CrossRerankRetriever:
         self.pool = pool or rerank_pool()
         self.chars = chars or rerank_chars()  # custo do par cresce com o texto lido: pool maior pede trecho menor
         self.order = order  # None = RERANK_ORDER / escolha gravada; o comparativo fixa a sua (o ambiente não vaza)
-        self.name = f"{base.name}+cross"
+        # ":base" = a ordem fica a do base (a nota só vai no trecho): o mesmo nome do comparativo (config_name)
+        self.name = f"{base.name}+cross" + (":base" if (order or rerank_order()) == "base" else "")
         self.last_latency_s = 0.0
 
     def search(self, query: str, k: int = 3) -> list[Hit]:

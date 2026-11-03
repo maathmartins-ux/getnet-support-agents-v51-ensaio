@@ -43,7 +43,8 @@ def test_cross_reranker_order_is_fixed_per_instance_and_ignores_the_environment(
     assert [h.doc.id for h in out] == ["d-0", "d-1", "d-2"] and [h.rerank for h in out] == scores
     monkeypatch.delenv("RERANK_ORDER")
     runtime = rag.CrossRerankRetriever(_Base(_hits()), _Scorer(scores), pool=3)  # app: vale a escolha/ambiente
-    assert runtime.search("q", k=3)[0].doc.id == "d-1"
+    assert runtime.search("q", k=3)[0].doc.id == "d-1" and runtime.name == "dense+cross"
+    assert base.name == "dense+cross:base" and cross.name == "dense+cross"  # o nome diz a ordem em uso
 
 
 def test_build_passes_the_measured_order_and_names_it(monkeypatch):

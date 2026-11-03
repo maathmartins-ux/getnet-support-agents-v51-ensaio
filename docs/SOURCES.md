@@ -2,6 +2,8 @@
 
 Ingerido em 2026-11-03 com `python -m app.ingest`; as páginas que vinham vazias no HTML estático foram renderizadas no Chromium por `python scripts/ingest_render.py` (só elas; os trechos já existentes mantêm o id); host permitido: site.getnet.com.br.
 
+Quebra de linha entre os blocos da página (cada `<p>`/`<li>` numa linha) restaurada numa 2ª coleta no mesmo dia com o chunker novo: só entrou o trecho cujo texto é idêntico ao anterior a menos do espaço em branco (189 de 201; 12 sem mudança; 0 com conteúdo diferente); os 10 trechos novos da 2ª coleta ficaram de fora, para o gold valer sem novo rótulo (as 81 perguntas do gold de busca resolvem para os mesmos trechos). Os vetores do e5 e as notas do cross-encoder saem idênticos (os tokenizadores tratam a quebra como espaço); quem ganha é o redator, que lê uma lista em blocos (faixa de faturamento → maquininha isenta) linha a linha.
+
 | grupo/slug | URL | trechos (ids) |
 |---|---|---|
 | produtos/todas-as-maquininhas | https://site.getnet.com.br/todas-as-maquininhas/ | prod-todas-as-maquininhas-01 … prod-todas-as-maquininhas-09 (9) |

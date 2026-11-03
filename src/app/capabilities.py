@@ -35,6 +35,7 @@ _TEXT = {
         "verdict": ("Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um "
                     "atendente humano; o assistente não decide."),
         "ids": "Identificadores que as consultas aceitam",
+        "options": "Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito)",
     },
     "en": {
         "head": "Capabilities and action policy of this assistant (generated from the system's tool registry):",
@@ -49,6 +50,7 @@ _TEXT = {
         "verdict": ("A decision on an individual case (dispute, block or release of a held amount) belongs to a human "
                     "agent; the assistant does not decide it."),
         "ids": "Identifiers the lookups accept",
+        "options": "Values the lookups and actions accept (closed list: no other value is accepted)",
     },
 }
 
@@ -102,6 +104,24 @@ def _id_lines(tools: dict[str, dict]) -> list[str]:
     return list(seen.values())
 
 
+def _option_lines(tools: dict[str, dict]) -> list[str]:
+    """Valores de cada parâmetro de lista fechada (enum) das tools. "A consulta cobre ontem, hoje e os últimos 7 dias"
+    é verdade do sistema, mas estava só no schema da tool, que o redator lê e o juiz não: a frase verdadeira contava
+    como afirmação sem base. Mesmo nome com listas diferentes em duas tools: as duas entram."""
+    seen: dict[tuple[str, tuple[str, ...]], str] = {}
+    for tool in tools.values():
+        props = ((tool.get("input_schema") or tool.get("parameters") or {}).get("properties") or {})
+        for name, spec in props.items():
+            values = spec.get("enum") if isinstance(spec, dict) else None
+            if not isinstance(values, list) or not values:
+                continue
+            key = (name, tuple(str(v) for v in values))
+            if key not in seen:
+                desc = str(spec.get("description", "")).strip()
+                seen[key] = f"{name}" + (f" ({desc})" if desc else "") + ": " + " | ".join(key[1])
+    return list(seen.values())
+
+
 def card(language: str = "pt", tools: dict[str, dict] | None = None, extra: list[str] | None = None) -> str:
     """Texto do cartão no idioma do turno. `tools`/`extra` só para medir com outro registro (evals offline)."""
     t = _TEXT.get(language, _TEXT["pt"])
@@ -120,6 +140,9 @@ def card(language: str = "pt", tools: dict[str, dict] | None = None, extra: list
     ids = _id_lines(tools)
     if ids:
         lines.append(f"- {t['ids']}: " + "; ".join(ids) + ".")
+    options = _option_lines(tools)
+    if options:
+        lines.append(f"- {t['options']}: " + "; ".join(options) + ".")
     lines += [f"- {line}" for line in (_domain_lines(language) if extra is None else extra)]
     return "\n".join(lines)
 

@@ -338,12 +338,23 @@ def _split_long(line: str, hi: int) -> list[str]:
     return pieces
 
 
-def _chunk_prose(pieces: list[tuple[str, str]], lo: int, hi: int) -> tuple[list[tuple[str, str]], str, str]:
-    """Trechos de texto corrido + a sobra (< lo) do fim, que vira legenda da tabela seguinte ou emenda no anterior."""
+# Separador entre linhas do HTML (blocos <p>, <li>, <div>) dentro do mesmo trecho: quebra de linha, não espaço. Uma
+# lista em blocos ("Acima de R$ 20mil | Get Clássica" / "Acima de R$ 40mil | Get Clássica ou Get Smart") colada com
+# espaço vira "...Get Clássica Acima de R$ 40mil..." e o redator lia a faixa errada. Tem o mesmo tamanho do espaço:
+# os cortes dos trechos (e os ids) não mudam. Pedaços de uma MESMA linha longa (_split_long) seguem com espaço.
+LINE_SEP = "\n"
+
+
+def _chunk_prose(pieces: list[tuple[str, str] | tuple[str, str, str]], lo: int,
+                 hi: int) -> tuple[list[tuple[str, str]], str, str]:
+    """Trechos de texto corrido + a sobra (< lo) do fim, que vira legenda da tabela seguinte ou emenda no anterior.
+
+    Cada peça é (seção, texto) ou (seção, texto, separador do texto anterior); sem separador, LINE_SEP."""
     out: list[tuple[str, str]] = []
     cur, cur_sec = "", ""
     section_cut = cut_on_section()
-    for sec, piece in pieces:
+    for sec, piece, *rest in pieces:
+        sep = rest[0] if rest else LINE_SEP
         if section_cut and cur and sec != cur_sec and len(cur) >= lo:
             out.append((cur_sec, cur))
             cur = ""
@@ -355,7 +366,7 @@ def _chunk_prose(pieces: list[tuple[str, str]], lo: int, hi: int) -> tuple[list[
             cur = ""  # sobra curta que não cabe com a próxima peça: descarta (abaixo do mínimo)
         if not cur:
             cur_sec = sec
-        cur = f"{cur} {piece}".strip()
+        cur = (f"{cur}{sep}{piece}" if cur else piece).strip()
         if len(cur) >= lo and piece.endswith((".", "!", "?", ":")):
             out.append((cur_sec, cur))
             cur = ""
@@ -415,7 +426,7 @@ def chunk_sections(lines: list[tuple[str, str]], lo: int = MIN_CHARS, hi: int = 
             out += [(s, c, True) for s, c in table]
             carry = ""
             continue
-        pieces = [(sec, p) for sec, line in seg for p in _split_long(line, hi)]
+        pieces = [(sec, p, " " if j else LINE_SEP) for sec, line in seg for j, p in enumerate(_split_long(line, hi))]
         chunks, carry, carry_sec = _chunk_prose(pieces, lo, hi)
         out += [(s, c, False) for s, c in chunks]
         nxt_is_table = i + 1 < len(segments) and segments[i + 1][0] is not None
@@ -427,7 +438,7 @@ def chunk_sections(lines: list[tuple[str, str]], lo: int = MIN_CHARS, hi: int = 
 def _attach(out: list[tuple[str, str, bool]], tail: str, hi: int) -> str:
     """Sobra curta emenda no último trecho de texto se couber (regra antiga); devolve "" quando emendou."""
     if out and not out[-1][2] and len(out[-1][1]) + 1 + len(tail) <= hi:
-        out[-1] = (out[-1][0], f"{out[-1][1]} {tail}", False)
+        out[-1] = (out[-1][0], f"{out[-1][1]}{LINE_SEP}{tail}", False)
         return ""
     return tail
 
