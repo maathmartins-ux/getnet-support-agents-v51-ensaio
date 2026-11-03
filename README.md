@@ -1,12 +1,12 @@
-# {{NOME DO PROJETO}}
+# Getnet Multi-Agent Support
 
-{{Uma frase: o que o sistema faz e para quem.}}
+Atendimento multi-agente para lojistas da Getnet: um Router decide, o Knowledge responde com RAG sobre o site oficial (e dado ao vivo de clima e câmbio), o Support lê os dados do próprio cliente por ferramentas e um humano entra só quando nada resolve.
 
 | | |
 |---|---|
 | Rodar | `docker compose up -d --build` → `http://localhost:8000/docs` · console do operador em `/operator` |
 | Testar | `python scripts/check.py --docker --scale` (lint, testes, eval com gate, build, imagem sem extras, smoke do container, 2 réplicas atrás de balanceador) |
-| CI | {{badge/link do último run verde}} |
+| CI | [Actions](../../actions/workflows/ci.yml) (o último commit é só o README; o código é o do commit anterior) |
 | Vídeo | [walkthrough na página de Releases](../../releases/tag/video) (MP4 + legendas; narração por IA a partir do roteiro do autor, telas e números reais) |
 
 O que o enunciado pede que o README cubra → onde: build, configure, run and test (§1) · orchestration architecture
@@ -117,7 +117,7 @@ Por que essa divisão: cada especialista tem uma fonte de verdade (faq → corpu
 fila humana) e devolve o mesmo contrato com status explícito (`AgentResult`); o supervisor só coordena, e o código
 confere o que ele decide (`ALLOWED`, `MAX_STEPS`, orçamento, escalada garantida). A resposta do operador volta ao
 plano como evidência, não como mensagem solta. Contrato público em `src/app/schemas.py`.
-{{o que o desafio acrescenta ou tira dessa divisão}}
+Na Getnet, o Knowledge também atende o geral (clima Open-Meteo e câmbio PTAX/BCB por API oficial, `LIVE_DATA=on`) e o troubleshoot encadeia records → faq: a ferramenta lê o terminal ou a recusa do cliente e emite `needs` do manual (`src/app/domain/challenge/tools.py`, `flow.py`).
 
 ### 2.1 Message workflow (o caminho de uma mensagem)
 
@@ -132,7 +132,7 @@ plano como evidência, não como mensagem solta. Contrato público em `src/app/s
 6. Conferência (`src/app/grounding.py`, `src/app/claims.py`): todo número e toda frase da resposta contra fonte,
    ferramenta e pergunta; o que não tem base é reescrito, cortado ou escalado.
 7. Resposta com fontes, ferramentas chamadas, handoff (ticket na fila do operador) e custo; o turno vai ao histórico.
-   {{o que muda no fluxo do desafio, se algo}}
+   Getnet: intenção `general` nunca escala (`NO_ESCALATION`); `troubleshoot` roda records antes de faq (`DEPENDS`).
 
 ### 2.2 RAG pipeline: ingestion → storage → retrieval → generation
 
@@ -152,7 +152,7 @@ plano como evidência, não como mensagem solta. Contrato público em `src/app/s
   limiar calibrado por idioma (`--calibrate-gate`); o BM25 só entra no idioma do corpus (`rag.lexical_fits`).
 - **Generation** (`src/app/agents.py`, `src/app/prompts/faq.md`): o agente de conhecimento redige só com os trechos
   aceitos e cita a fonte; responde o que a fonte cobre e diz o que falta (`partial`) ou vai ao humano (`insufficient`).
-  {{números do corpus deste desafio: páginas, trechos, buscador escolhido e por quê}}
+  Corpus Getnet: as páginas de `data/sources.json` (site.getnet.com.br: maquininhas, Pix, conta digital, crediário, Link de Pagamento, taxas, dúvidas, antecipação, manual das máquinas), lista e datas em [docs/SOURCES.md](docs/SOURCES.md); buscador do kit sem troca no relógio; medida em §0.
 
 ### 2.3 Supervisão humana (o caminho do operador)
 
