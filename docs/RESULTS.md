@@ -495,7 +495,12 @@ Família: juiz `claude-opus-5-5` (anthropic) × gerador `claude-haiku-5-5`, `cla
 ## Validação humana (às cegas, por rotulador)
 
 <!-- human:begin -->
-_Sem validação humana ainda (`python -m evals.label --export 30`)._
+18 respostas ao vivo rotuladas às cegas pelo dono: humano aprova 17/18, checagem automática aprova 18/18; concordância **0.944**, kappa **0.0**.
+- rotulador `matheus`: 18 rótulos · humano × automático: concordância 0.944, kappa 0.0
+Um rotulador só: a concordância entre humanos não foi medida.
+Held-out cego ponta a ponta: humano aprova **1/1** (1.0) [IC95 20.7–100.0; n=1]; diagnóstico: intenção certa em 1.0 das mesmas linhas; intenção errada com resposta aprovada: —.
+Aviso: só 18 rótulos: abaixo de 20 não dá para confiar.
+- `q-mem-02`: humano fail × automático pass wrong_route
 <!-- human:end -->
 
 ## Busca (sem LLM; o buscador do agente e as alternativas medidas)
