@@ -419,6 +419,7 @@ e como comparar pela primeira entrega.
 | 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
 | 20:23:56 | 489 | readme: números e linha do tempo (fill_readme, último passo) |
 | 20:32:26 | 497 | docs: README sem número escrito à mão que envelhece (portão, juiz); transcrição HITL regenerada sem frase quebrada; senha de exemplo barrada em produção |
+| 20:32:27 | 497 | readme: números e linha do tempo (fill_readme, último passo) |
 
 Do primeiro ao último commit: **497 min**.
 <!-- timeline:end -->

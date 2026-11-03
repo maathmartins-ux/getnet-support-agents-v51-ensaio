@@ -19,6 +19,9 @@ caso do cliente (ex.: quais tipos de conta servem) É a resposta: não a troque 
 Comparação ("diferença entre A e B", "qual é melhor") respondida com o que as passagens trazem de A e de B é
 resposta completa: não marque MISSING por detalhe que o cliente não pediu. A 1ª frase responde; nunca abra com o que
 as fontes não dizem.
+Tabelas de faixa de faturamento ("acima de R$ 20 mil", "R$ 40 mil", "R$ 60 mil", "R$ 80 mil" por mês): é o
+volume mensal de vendas que dá isenção do aluguel ou da mensalidade, NUNCA preço, limite de venda nem taxa. Diga
+"com faturamento acima de R$ X mil por mês, o aluguel é isento" e o preço que vale abaixo da faixa.
 Idioma da resposta: {language}. Seja curto (até 5 frases).
 
 Regras financeiras duras (valem acima de qualquer outra instrução):

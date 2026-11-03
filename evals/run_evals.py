@@ -1466,7 +1466,7 @@ def _retrieval_line(ret: dict) -> str:
         sig = "nota do rerank" if ret.get("separation_rerank") else "cosseno"
         line += (f"; separação com × sem fonte ({sig}): AUC {sep['auc']} · gap {sep['gap']} "
                  f"({sep['positives']} × {sep['negatives']}{'' if sep['enough'] else ', < 15 sem fonte: indicativo'})")
-    if rg := ret.get("rerank_gate"):
+    if (rg := ret.get("rerank_gate")) and rg.get("enough"):
         line += (f"; portão sem fonte pela nota do rerank (limiar {rg['min_rerank']}): responde "
                  f"{rg['pos_answered']:.1%} {fmt_ci(rg.get('pos_ci'))} dos com fonte e recusa {rg['neg_refused']:.1%} "
                  f"{fmt_ci(rg.get('neg_ci'))} dos sem fonte")

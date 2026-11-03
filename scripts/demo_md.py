@@ -111,7 +111,9 @@ def render(report: dict, split: str, sha: str, when: str) -> str:
         f"# Respostas reais — split `{split}`",
         "",
         f"Geradas de `evals/results/live_{split}.json` (provedor `{report.get('provider')}`, "
-        f"status `{report.get('status')}`, gasto US$ {report.get('spent_usd', 0):.2f}) no commit `{sha}` em {when}. "
+        f"status `{report.get('status')}`, gasto US$ {report.get('spent_usd', 0):.2f}); respostas medidas no commit "
+        f"`{report.get('git_sha', '?')}` ({report.get('recorded_at', '?')}), página gerada no commit `{sha}` "
+        f"em {when}. "
         "Nada aqui foi escrito à mão: é a saída do `POST /chat` com o LLM ligado, 1ª rodada de cada caso.",
         "",
     ]

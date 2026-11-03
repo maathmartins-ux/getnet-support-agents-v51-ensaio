@@ -1,6 +1,6 @@
 # Respostas reais — split `official`
 
-Geradas de `evals/results/live_official.json` (provedor `anthropic`, status `complete`, gasto US$ 0.84) no commit `9635ae5` em 03/11/2026 20:23 UTC. Nada aqui foi escrito à mão: é a saída do `POST /chat` com o LLM ligado, 1ª rodada de cada caso.
+Geradas de `evals/results/live_official.json` (provedor `anthropic`, status `complete`, gasto US$ 0.84); respostas medidas no commit `360e3d4` (2026-11-03T20:01:55Z), página gerada no commit `074ee00` em 03/11/2026 20:41 UTC. Nada aqui foi escrito à mão: é a saída do `POST /chat` com o LLM ligado, 1ª rodada de cada caso.
 
 Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
 
