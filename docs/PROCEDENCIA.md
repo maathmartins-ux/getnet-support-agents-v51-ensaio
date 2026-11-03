@@ -5,7 +5,7 @@ pronto antes do relógio, de onde veio e o que os {{MINUTOS}} minutos medem.
 
 ## 1. O kit e a sua história
 
-O primeiro commit (`chore: scaffold from entregar-desafio-cronometrado kit {{VERSAO}}`) traz um kit próprio, mantido
+O primeiro commit (`chore: scaffold from entregar-desafio-cronometrado kit v5.4.0`) traz um kit próprio, mantido
 entre as tentativas deste mesmo desafio. **O kit evoluiu a partir das correções das entregas anteriores.** Cada
 versão absorveu os gaps apontados na correção da tentativa anterior:
 
@@ -13,16 +13,16 @@ versão absorveu os gaps apontados na correção da tentativa anterior:
 |---|---|---:|---|
 | v1 | sem kit | 7,1 | — |
 | v2 | v2.0.0 | 8,2 | token sem expiração, operador com token compartilhado, HITL sem retomada (→ v3.7.0) |
-| v4 | v3.7.0 | 8,5 | groundedness 60%, busca fraca, memória 54%, humano sem continuar o plano, avaliação de um rotulador só (→ {{VERSAO}}) |
-| v5 | v5.1.0 | não enviada (ensaio cronometrado, medido pelo próprio autor) | 2 cenários oficiais sem resposta, escaladas a mais, intenção do held-out 67,5%, memória 0,72, juiz cortado (→ {{VERSAO}}) |
-| **v5.1 (esta)** | **{{VERSAO}}** | — | — |
+| v4 | v3.7.0 | 8,5 | groundedness 60%, busca fraca, memória 54%, humano sem continuar o plano, avaliação de um rotulador só (→ v5.4.0) |
+| v5 | v5.1.0 | não enviada (ensaio cronometrado, medido pelo próprio autor) | 2 cenários oficiais sem resposta, escaladas a mais, intenção do held-out 67,5%, memória 0,72, juiz cortado (→ v5.4.0) |
+| **v5.1 (esta)** | **v5.4.0** | — | — |
 
 O registro completo do que mudou em cada versão, com a causa medida, está em
 [KIT_CHANGELOG.md](KIT_CHANGELOG.md), copiado do kit sem edição.
 
 **Ideias de soluções públicas.** Algumas ideias do kit vieram da leitura de soluções públicas deste desafio (lista em
 [KIT_CHANGELOG.md](KIT_CHANGELOG.md), seção de referências): replanejamento medido com e sem, retomada do plano após o
-humano, juiz com canários. Na versão {{VERSAO}}, do desenho de duas entregas públicas:
+humano, juiz com canários. Na versão v5.4.0, do desenho de duas entregas públicas:
 
 - **farrulla-darze/skywalker:** o router como único leitor do histórico, com especialistas sem estado que recebem a
   pergunta reescrita; busca como ação do especialista, com uma busca por item comparado; corpus com a página de cada
