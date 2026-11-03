@@ -406,8 +406,9 @@ e como comparar pela primeira entrega.
 | 18:54:49 | 400 | readme: números e linha do tempo (fill_readme, último passo) |
 | 19:08:13 | 413 | kit: segurança (token fora do log, compartilhado só sem chave pessoal, /metrics com token); README por tema e sem número digitado divergente |
 | 19:08:14 | 413 | readme: números e linha do tempo (fill_readme, último passo) |
+| 19:29:56 | 435 | avaliação humana: 18 rótulos do dono pela página de rotulagem (humano passa 17/18; concordância com o automático 94,4%, juiz × humano 88,9%) |
 
-Do primeiro ao último commit: **413 min**.
+Do primeiro ao último commit: **435 min**.
 <!-- timeline:end -->
 
 </details>
