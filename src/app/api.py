@@ -465,5 +465,9 @@ def ready() -> JSONResponse:
 
 
 @app.get("/metrics", response_class=PlainTextResponse)
-def metrics() -> str:
+def metrics(authorization: str | None = Header(default=None)) -> str:
+    """Prometheus. Com METRICS_TOKEN definido, exige `Authorization: Bearer <METRICS_TOKEN>` (o scrape manda)."""
+    expected = os.getenv("METRICS_TOKEN", "")
+    if expected and not hmac.compare_digest((authorization or "").encode(), f"Bearer {expected}".encode()):
+        raise HTTPException(status_code=401, detail="metrics: token inválido")
     return METRICS.render()

@@ -24,6 +24,7 @@ def operators(monkeypatch):
     monkeypatch.setenv("OPERATOR_KEYS", f"ana:{digest(ANA['X-Operator-Token'])},"
                                         f"bruno:{digest(BRUNO['X-Operator-Token'])}")
     monkeypatch.setenv("OPERATOR_SKILLS", "ana:records|approval,bruno:faq")
+    monkeypatch.setenv("OPERATOR_SHARED_TOKEN", "on")  # o admin compartilhado convive com as chaves (migração)
 
 
 def chat(message, user="u1"):

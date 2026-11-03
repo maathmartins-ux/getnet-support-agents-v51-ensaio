@@ -5,10 +5,10 @@ Mapa do laço de um turno (`run` → `_run`):
 1. `run`: caso aberto na conversa → modo espera (`_hold`: a mensagem entra no caso, leituras seguem, nenhuma escrita
    fica proposta). `prior` traz o que já existe antes do plano (na retomada, o resultado "human" do operador).
 2. `_run` escolhe o caminho:
-   - **atalho de 1 passo** (`fast_path`: plano de um especialista, router confiante, sem resposta de operador): o
-     passo roda direto e, se respondeu (ok/partial), a resposta é a dele (`_offer_human_on_gap` acrescenta a
-     oferta do humano quando a fonte não cobre tudo). Se o especialista não resolve (insufficient), o resultado vai
-     ao supervisor LLM (`run_llm`), que decide;
+   - **atalho de 1 passo** (`fast_path`, DESLIGADO por padrão; `SUPERVISOR_FAST=on` liga): plano de um
+     especialista, router confiante, sem resposta de operador; o passo roda direto e, se respondeu (ok/partial),
+     a resposta é a dele (`_offer_human_on_gap` acrescenta a oferta do humano quando a fonte não cobre tudo).
+     Se o especialista não resolve (insufficient), o resultado vai ao supervisor LLM (`run_llm`), que decide;
    - **supervisor LLM** (`run_llm`, papel "supervisor"): loop manual de tool use em que os especialistas são tools
      (faq_agent, records_agent, escalation_agent). O modelo lê cada status e decide o próximo passo; várias tool
      calls na mesma resposta rodam em paralelo;

@@ -124,7 +124,9 @@ def _local_secret(name: str) -> str:
         except OSError:
             pass  # diretório só de leitura: vale para este processo
         if name == "OPERATOR_TOKEN":
-            print(f"OPERATOR_TOKEN não definido: gerado e guardado em {path} → {found[name]}", file=sys.stderr)
+            # o valor nunca vai para o log: quem opera lê o arquivo (0600) no próprio host/volume
+            print(f"OPERATOR_TOKEN não definido: gerado e guardado em {path} (leia o arquivo; o valor não é "
+                  "impresso)", file=sys.stderr)
     return found[name]
 
 

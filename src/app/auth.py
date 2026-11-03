@@ -35,6 +35,7 @@ import base64
 import hashlib
 import hmac
 import json
+import os
 import secrets
 import sys
 import time
@@ -226,7 +227,10 @@ def operator_name(token: str | None) -> str | None:
     for name, expected in operator_keys().items():
         if hmac.compare_digest(digest.encode(), expected.lower().encode()):
             return name
-    if hmac.compare_digest(token.encode(), operator_token().encode()):
+    # Com chave pessoal configurada, o token compartilhado deixa de valer (toda aprovação tem dono na auditoria),
+    # salvo OPERATOR_SHARED_TOKEN=on (migração: os dois juntos por um tempo).
+    shared_ok = not operator_keys() or os.getenv("OPERATOR_SHARED_TOKEN", "off").lower() == "on"
+    if shared_ok and hmac.compare_digest(token.encode(), operator_token().encode()):
         return "admin"
     return None
 

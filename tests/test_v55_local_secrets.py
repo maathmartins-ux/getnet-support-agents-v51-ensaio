@@ -22,3 +22,27 @@ def test_unset_secrets_are_random_persisted_and_not_flagged(tmp_path, monkeypatc
 def test_placeholder_from_env_example_is_flagged(monkeypatch):
     monkeypatch.setenv("OPERATOR_TOKEN", "troque-por-outro-segredo-longo")
     assert "OPERATOR_TOKEN" in insecure_defaults()
+
+
+def test_metrics_token_and_shared_operator_token(monkeypatch):
+    """/metrics com METRICS_TOKEN exige o token; com chave pessoal, o token compartilhado deixa de valer."""
+    from fastapi.testclient import TestClient
+
+    from app import auth
+    from app.api import app
+
+    c = TestClient(app)
+    assert c.get("/metrics").status_code == 200  # sem METRICS_TOKEN: aberto (rede interna)
+    monkeypatch.setenv("METRICS_TOKEN", "m" * 24)
+    assert c.get("/metrics").status_code == 401
+    assert c.get("/metrics", headers={"Authorization": "Bearer " + "m" * 24}).status_code == 200
+    assert auth.operator_name("test-operator") == "admin"
+    monkeypatch.setenv("OPERATOR_KEYS", f"ana:{auth._hash('k' * 20)}")
+    assert auth.operator_name("test-operator") is None and auth.operator_name("k" * 20) == "ana"
+
+
+def test_generated_operator_token_is_not_printed(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "app.db"))
+    monkeypatch.delenv("OPERATOR_TOKEN", raising=False)
+    token = config.operator_token()
+    assert token not in capsys.readouterr().err
