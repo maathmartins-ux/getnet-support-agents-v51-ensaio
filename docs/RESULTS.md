@@ -467,7 +467,7 @@ Ao vivo: status `complete` · gasto US$ 0.696948 (teto 0.75494) · erros de LLM 
 ## Juiz LLM sobre as respostas ao vivo
 
 <!-- judge:begin -->
-Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_dependent.json, live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_parallel.json, live_partial.json, live_real.json, live_replan.json · gasto US$ 13.463376
+Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_dependent.json, live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_parallel.json, live_partial.json, live_real.json, live_replan.json · gasto US$ 13.973552
 
 | split | casos | grounded | helpful | nota média |
 |---|---:|---:|---:|---:|
@@ -477,13 +477,13 @@ Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_de
 | hard | 5 | 1.0 [IC95 56.6–100.0; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 4.8 |
 | heldout | 79 | 0.899 [IC95 81.3–94.8; n=79] | 0.937 [IC95 86.0–97.3; n=79] | 4.43 |
 | memory | 66 | 0.924 [IC95 83.5–96.7; n=66] | 1.0 [IC95 94.5–100.0; n=66] | 4.59 |
-| official | 30 | 0.967 [IC95 83.3–99.4; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.9 |
+| official | 30 | 0.933 [IC95 78.7–98.2; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.73 |
 | official-var | 36 | 0.972 [IC95 85.8–99.5; n=36] | 1.0 [IC95 90.4–100.0; n=36] | 4.72 |
 | parallel | 4 | 1.0 [IC95 51.0–100.0; n=4] | 1.0 [IC95 51.0–100.0; n=4] | 5.0 |
 | partial | 15 | 0.933 [IC95 70.2–98.8; n=15] | 1.0 [IC95 79.6–100.0; n=15] | 4.8 |
 | real | 40 | 0.9 [IC95 76.9–96.0; n=40] | 0.975 [IC95 87.1–99.6; n=40] | 4.3 |
 | replan | 20 | 1.0 [IC95 83.9–100.0; n=20] | 1.0 [IC95 83.9–100.0; n=20] | 4.8 |
-| ALL | 346 | 0.939 [IC95 90.9–96.0; n=346] | 0.98 [IC95 95.9–99.0; n=346] | 4.61 |
+| ALL | 346 | 0.936 [IC95 90.6–95.8; n=346] | 0.98 [IC95 95.9–99.0; n=346] | 4.6 |
 
 Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): 48 rótulos · concordância **1.0** [IC95 92.6–100.0; n=48] · kappa de Cohen **1.0** · TPR 1.0 [IC95 86.2–100.0; n=24] (24 grounded) · TNR 1.0 [IC95 86.2–100.0; n=24] (24 não grounded) · discordâncias: —
 - official: concordância 1.0 [IC95 92.6–100.0; n=48] · kappa 1.0 (48 rótulos)
