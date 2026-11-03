@@ -19,3 +19,13 @@ def test_official_without_facts_fails_unless_it_expects_a_human(tmp_path):
                       {"id": "m1", "split": "memory", "expect": {}}])
     _name, ok, _, detail = check.officials_have_facts(tmp_path)
     assert not ok and detail == "sem expect.facts: o3"
+
+
+def test_offline_quote_engine_does_not_count_language():
+    """Modo offline (motor `table`) cita a fonte em português sem tradução: o idioma do redator se mede com LLM."""
+    from evals.run_evals import score
+
+    case = {"expect": {"language": "en"}}
+    quoted = {"engine": "table", "answer": "O Pix é um meio de pagamento criado pelo Banco Central do Brasil."}
+    assert "language" not in score(case, quoted)
+    assert score(case, {**quoted, "engine": "llm"})["language"] is False

@@ -235,7 +235,9 @@ def score(case: dict, got: dict) -> dict[str, bool]:
         checks["handoff_outcome"] = required <= called and not forbidden & called
     if "blocked" in exp:
         checks["blocked"] = got.get("blocked") == exp["blocked"]
-    if "language" in exp:  # o TEXTO, não o campo declarado; inconclusivo fica fora da conta
+    # o TEXTO, não o campo declarado; inconclusivo fica fora da conta. Motor `table` (modo offline, sem LLM) cita o
+    # trecho da fonte como está, sem tradução: idioma do redator só se mede com LLM (ao vivo/replay).
+    if "language" in exp and got.get("engine") != "table":
         detected = detect_text_language(got.get("answer", ""))
         if detected is not None:
             checks["language"] = detected == exp["language"]
@@ -1511,11 +1513,16 @@ def to_markdown(report: dict, split_view: bool = False) -> str:
     """Relatório em markdown. `split_view`: bloco de UM split numa página com vários (o retrieval sai uma vez, na
     seção de busca, e o gate só aparece no split que o gate cobre)."""
     splits = [s for s in report["metrics"] if s != "ALL"] + ["ALL"]
-    keys = [k for k in report["metrics"]["ALL"] if k != "ci"]
+    # métrica sem valor em nenhum split não vira linha de traços (ex.: idioma no modo offline, que cita a fonte)
+    keys = [k for k in report["metrics"]["ALL"] if k != "ci"
+            and any(report["metrics"][s].get(k) is not None for s in splits)]
     out = [line] if (line := resolved_line(report)) else []
     out += ["| Métrica | " + " | ".join(splits) + " |", "|---|" + "---:|" * len(splits)]
     for k in keys:
         out.append(f"| {k} | " + " | ".join(fmt_cell(report["metrics"][s], k) for s in splits) + " |")
+    if "language_acc" in report["metrics"]["ALL"] and "language_acc" not in keys:
+        out.append("\nIdioma da resposta: medido só com LLM (ao vivo e replay); o modo offline cita o trecho da "
+                   "fonte como está, sem tradução.")
     verdict = "PASS" if report["passed"] else "FAIL"
     if not (split_view and not report.get("gated_splits")):
         out.append(f"\nGate (splits {', '.join(report.get('gated_splits', []))}): intent {report['intent_acc']:.1%} "

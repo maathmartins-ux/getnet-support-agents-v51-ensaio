@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from . import capabilities, cases, casestate, claims, domain, grounding, memory, router, supervisor
 from .agents import Context, escalation_agent
 from .grounding import risk_flags, unsupported_numbers
-from .guardrails import Verdict, llm_check, mask_output, pre_check
+from .guardrails import UNAVAILABLE, Verdict, llm_check, mask_output, pre_check
 from .llm import get_llm
 from .observability import METRICS, log, new_trace_id, prompt_versions, request_usage, span
 from .rag import get_index
@@ -219,6 +219,21 @@ def _enforce(answer: str, *, evidence: list[str], said: str, ctx: Context, outco
     return answer, final.unsupported, action, risks, handoff
 
 
+WRITE_HELD = {"pt": "Não posso propor alterações agora: a verificação de segurança está indisponível. "
+                    "Tente de novo em instantes.",
+              "en": "I can't propose changes right now: the safety check is unavailable. Please try again shortly."}
+
+
+def _hold_writes(store, outcome, language: str) -> None:
+    """Sem o classificador LLM, a escrita proposta no turno é recusada (falha fechada para escrita)."""
+    for result in outcome.results:
+        if result.pending_action:
+            store.claim_action(result.pending_action, frm="pending", to="expired")
+            METRICS.inc("writes_held_total", reason=UNAVAILABLE)
+            result.pending_action, result.text = None, WRITE_HELD.get(language, WRITE_HELD["pt"])
+            outcome.answer = None  # a resposta é remontada dos resultados, já sem a proposta
+
+
 def _guard_and_route(message: str, history: list[dict]) -> tuple[Verdict, RouterDecision | None]:
     with span("guardrails"):
         verdict = pre_check(message)
@@ -291,6 +306,8 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
     ctx.facts["standalone"] = getattr(decision, "standalone", "") or ""
     ctx.facts["search_queries"] = list(getattr(decision, "search_queries", []) or [])  # consultas do RAG (LLM)
     outcome = supervisor.run(list(decision.plan), ctx, decision.confidence)
+    if UNAVAILABLE in verdict.flags:
+        _hold_writes(store, outcome, language)
 
     answer = outcome.answer or "\n\n".join(r.text for r in outcome.results if r.text)
     if not answer.strip():  # nunca 200 vazio: vazio no histórico vira 400 da API no turno seguinte

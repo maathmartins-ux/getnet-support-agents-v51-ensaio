@@ -128,3 +128,19 @@ def test_security_tip_about_developer_mode_is_not_injection():
     tip = ("Dica: para reforçar a segurança do Get Tap, mantenha o app atualizado, evite o uso do modo "
            "desenvolvedor e não instale aplicativos de terceiros.")
     assert not guardrails.pre_check(tip).blocked
+
+
+def test_classifier_down_keeps_reading_but_holds_writes(monkeypatch):
+    """Classificador LLM fora do ar: a leitura segue (a regex já rodou), mas nenhuma escrita é proposta no turno."""
+    from app.llm import LLMError
+    from app.store import get_store
+
+    llm, _ = fake_llm([LLMError("timeout", "connection")] * 4)
+    monkeypatch.setattr(guardrails, "get_llm", lambda role="agent": llm)
+    monkeypatch.setattr(pipeline, "get_llm", lambda role="agent": llm)  # liga a 2ª camada (que falha)
+    body = TestClient(app).post("/chat", json={"message": "Quero cancelar o pedido 1001"},
+                                headers={"Authorization": f"Bearer {issue_token('u1')}"}).json()
+    assert body["blocked"] is False and guardrails.UNAVAILABLE in body["guardrails"]
+    assert body["pending_action"] is None and "verificação de segurança" in body["answer"]
+    with get_store()._db() as conn:
+        assert not conn.execute("SELECT 1 FROM actions WHERE status = 'pending'").fetchall()

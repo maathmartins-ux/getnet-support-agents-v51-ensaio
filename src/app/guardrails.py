@@ -142,6 +142,11 @@ def _regex_layer(message: str) -> str | None:
     return None
 
 
+# Classificador fora do ar: falha aberta para LEITURA (a camada regex já rodou e o atendimento continua) e fechada
+# para ESCRITA (nenhuma ação é proposta no turno sem a segunda camada).
+UNAVAILABLE = "guardrail_llm_unavailable"
+
+
 def _llm_layer(masked: str) -> str | None:
     llm = get_llm("guardrail")
     if not llm.enabled:
@@ -151,7 +156,8 @@ def _llm_layer(masked: str) -> str | None:
                                 schema=SCHEMA).json()["category"]
     except (LLMError, ValueError, KeyError, TypeError):
         METRICS.inc("guardrail_llm_unavailable_total")
-        return None  # camada 1 já rodou; indisponibilidade do classificador não derruba o atendimento
+        # camada 1 já rodou: a leitura segue, mas o turno perde o direito de propor escrita (pipeline)
+        return UNAVAILABLE
     return category if category in BLOCKING else None
 
 
@@ -169,6 +175,8 @@ def llm_check(verdict: Verdict) -> Verdict:
     if verdict.blocked:
         return verdict
     reason = _llm_layer(verdict.text)
+    if reason == UNAVAILABLE:
+        return Verdict(text=verdict.text, flags=[*verdict.flags, UNAVAILABLE])
     if reason:
         return Verdict(text="", blocked=True, reason=reason, flags=[*verdict.flags, reason, "layer_llm"])
     return verdict
