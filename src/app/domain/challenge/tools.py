@@ -98,8 +98,13 @@ def _money(v: float) -> str:
 # --- ferramentas ---------------------------------------------------------------------------------------------
 # Contrato: argumentos do schema + `user_id` (do servidor, nunca do schema) → {ok, data} | {ok: False, error}.
 # Registro de outro cliente e inexistente devolvem a MESMA resposta: not_found.
-_PERIOD = {"type": "string", "enum": ["yesterday", "today", "last_7_days"],
-           "description": "Período das vendas (padrão: yesterday)"}
+# Mesmo enum, padrão diferente por consulta (o código de cada tool usa o seu): o schema diz o padrão de cada uma,
+# senão o modelo lia o padrão de recebimentos (ontem) também nas vendas (7 dias) e consultava o período errado.
+_PERIODS = ["yesterday", "today", "last_7_days"]
+_PERIOD_SETTLEMENTS = {"type": "string", "enum": _PERIODS, "default": "yesterday",
+                       "description": "Período dos recebimentos (padrão: yesterday)"}
+_PERIOD_TX = {"type": "string", "enum": _PERIODS, "default": "last_7_days",
+              "description": "Período das vendas (padrão: last_7_days)"}
 _METHOD = {"type": "string", "enum": ["debito", "credito", "pix"], "description": "Forma de pagamento"}
 _TX_ID = {"type": "string", "pattern": r"^TX\d{4}$", "description": "Id da transação (ex.: TX1007)"}
 _TERM_ID = {"type": "string", "pattern": r"^T\d{4}[A-Z]$", "description": "Id do terminal (ex.: T1988A)"}
@@ -214,11 +219,12 @@ def _obj(props: dict, required: list[str] | None = None) -> dict:
 TOOLS = {
     "get_settlements": {"description": "Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de "
                                        "depósito (dia útil), totais e contagens já calculados.", "write": False,
-                        "input_schema": _obj({"period": _PERIOD, "method": _METHOD}), "fn": _get_settlements},
+                        "input_schema": _obj({"period": _PERIOD_SETTLEMENTS, "method": _METHOD}),
+                        "fn": _get_settlements},
     "get_transactions": {"description": "Vendas e recusas do cliente autenticado, com o significado do código de "
                                         "recusa, contagens e totais calculados.", "write": False,
                          "input_schema": _obj({"status": {"type": "string", "enum": ["all", "approved", "declined"]},
-                                               "transaction_id": _TX_ID, "period": _PERIOD}),
+                                               "transaction_id": _TX_ID, "period": _PERIOD_TX}),
                          "fn": _get_transactions},
     "get_terminal_status": {"description": "Terminais do cliente autenticado: conexão, sinal, último contato e há "
                                            "quanto tempo está offline.", "write": False,

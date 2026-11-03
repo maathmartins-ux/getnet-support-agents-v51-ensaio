@@ -53,6 +53,9 @@ class LiveResult:
     text_pt: str  # resposta pronta (template), também evidência
     text_en: str
     evidence: list[str] = field(default_factory=list)  # texto bruto da API + valores arredondados
+    # valores que a resposta TEM de trazer (o prompt pede; o código confere): (rótulo pt, rótulo en, valor, tolerância
+    # do arredondamento que o prompt permite). Clima: mínima, máxima e chance de chuva; câmbio: venda e compra.
+    must: list[tuple[str, str, float, float]] = field(default_factory=list)
 
     def text(self, language: str) -> str:
         return self.text_en if language == "en" else self.text_pt
@@ -201,8 +204,9 @@ def fx(code: str, wanted: date) -> LiveResult | None:
                f"on {day.isoformat()}{note_en}: 1 {code} = R$ {sell:.4f} (sell) and R$ {buy:.4f} (buy). "
                "Source: Banco Central do Brasil (PTAX).")
     rounded = f"Arredondado: venda R$ {_br(sell, 2)}, compra R$ {_br(buy, 2)} ({sell:.2f} / {buy:.2f})"
+    must = [("a venda", "the sell rate", sell, 0.0051), ("a compra", "the buy rate", buy, 0.0051)]
     return LiveResult("fx", "Banco Central do Brasil (PTAX)", "https://www.bcb.gov.br/estabilidadefinanceira/"
-                      "historicocotacoes", last_day, text_pt, text_en,
+                      "historicocotacoes", last_day, text_pt, text_en, must=must,
                       evidence=[f"PTAX {code} (API do Banco Central): cotacaoCompra {buy:.4f}; "
                                 f"cotacaoVenda {sell:.4f}; dataHoraCotacao {row.get('dataHoraCotacao')}; "
                                 f"tipoBoletim {kind}",
@@ -303,10 +307,18 @@ def weather(city: str, offset: int) -> LiveResult | None:
     flat = "; ".join(f"{k} {v[0] if isinstance(v, list) and v else v}" for k, v in daily.items())
     where = f"{place.get('name')} (lat {place.get('latitude')}, lon {place.get('longitude')}, {tz})"
     return LiveResult("weather", "Open-Meteo", "https://open-meteo.com/", day.isoformat(), text_pt, text_en,
-                      evidence=[f"Open-Meteo (API) para {where}: {flat}", rounded])
+                      evidence=[f"Open-Meteo (API) para {where}: {flat}", rounded], must=weather_must(tmin, tmax, rain))
 
 
 WTTR = "https://wttr.in/{where}"
+
+
+def weather_must(tmin: float, tmax: float, rain) -> list[tuple[str, str, float, float]]:
+    """Mínima e máxima (a resposta pode arredondar ao grau) e a chance de chuva, quando a fonte traz."""
+    out = [("a mínima", "the low", tmin, 0.51), ("a máxima", "the high", tmax, 0.51)]
+    if rain is not None:
+        out.append(("a chance de chuva", "the chance of rain", float(rain), 0.0))
+    return out
 
 
 def weather_backup(city: str, offset: int) -> LiveResult | None:
@@ -330,7 +342,8 @@ def weather_backup(city: str, offset: int) -> LiveResult | None:
                f"{rain_en}. Source: wttr.in.")
     flat = f"date {day.isoformat()}; mintempC {d['mintempC']}; maxtempC {d['maxtempC']}; chanceofrain_max {rain}"
     return LiveResult("weather", "wttr.in", "https://wttr.in/", day.isoformat(), text_pt, text_en,
-                      evidence=[f"wttr.in (API) para {city}: {flat}", "Fonte desta previsão: wttr.in."])
+                      evidence=[f"wttr.in (API) para {city}: {flat}", "Fonte desta previsão: wttr.in."],
+                      must=weather_must(tmin, tmax, rain))
 
 
 def followup_query(text: str, previous: str | None) -> str | None:

@@ -279,24 +279,46 @@ def _lang_tail(ctx: Context) -> str:
     return tail
 
 
+_NUM = re.compile(r"-?\d+(?:[.,]\d+)?")
+
+
+def live_missing(text: str, live: live_data.LiveResult, language: str) -> list[str]:
+    """Rótulos dos valores obrigatórios (live.must) que a resposta não traz: número com a tolerância do arredondamento
+    que o prompt permite ("19 °C" vale para 19,4). Vírgula ou ponto decimal, conforme o idioma da resposta."""
+    nums = [float(n.replace(",", ".")) for n in _NUM.findall(text or "")]
+    return [en if language == "en" else pt for pt, en, value, tol in live.must
+            if not any(abs(n - value) <= tol + 1e-9 for n in nums)]
+
+
 def _live(ctx: Context, live: live_data.LiveResult) -> AgentResult:
-    """Câmbio/clima já consultados no código: o texto bruto da API é a evidência; o LLM (se houver) só redige."""
+    """Câmbio/clima já consultados no código: o texto bruto da API é a evidência; o LLM (se houver) só redige.
+
+    O código confere a redação: faltando um valor obrigatório (mínima, máxima, chance de chuva; venda e compra), o
+    LLM refaz uma vez com o que faltou; se ainda faltar, vale o texto pronto da consulta (`live_repair` no passo).
+    Medido: uma resposta em inglês omitiu a chance de chuva que estava na evidência, e o prompt já a pedia."""
     template = live.text(ctx.language)
     evidence = [*live.evidence, live.text_pt, live.text_en, f"Hoje é {_today()}"]
     source = Source(id=live.url, title=live.source, url=live.url)
-    text = template
+    text, facts = template, {"live_data": live.kind, "web_search": False}
     llm = get_llm("agent")
     if llm.enabled:
         framed = (f"<untrusted_content>\n{chr(10).join(live.evidence)}\n{template}\n</untrusted_content>\n\n"
                   f"Pergunta: {ctx.text}{_lang_tail(ctx)}")
+        system = domain.prompt("live_data.md").format(language=ctx.language, today=_today())
         try:
-            reply = llm.complete(domain.prompt("live_data.md").format(language=ctx.language, today=_today()),
-                                 llm_history(ctx, framed), max_tokens=1024)
-            text = reply.text.strip() or template
+            text = llm.complete(system, llm_history(ctx, framed), max_tokens=1024).text.strip() or template
+            missing = live_missing(text, live, ctx.language)
+            if missing:
+                ask = ("\n\nSua resposta anterior deixou de fora: " + ", ".join(missing)
+                       + ". Responda de novo trazendo esses valores do resultado acima.")
+                text = llm.complete(system, llm_history(ctx, framed + ask), max_tokens=1024).text.strip() or template
+                facts["live_repair"] = "llm"
+                if live_missing(text, live, ctx.language):
+                    text, facts["live_repair"] = template, "template"
+                METRICS.inc("live_data_repair_total", kind=live.kind, outcome=facts["live_repair"])
         except LLMError:
-            pass  # template já cita fonte e data
-    return AgentResult("faq", "ok", text=text, sources=[source], evidence=evidence,
-                       facts={"live_data": live.kind, "web_search": False})
+            text = template  # template já cita fonte e data
+    return AgentResult("faq", "ok", text=text, sources=[source], evidence=evidence, facts=facts)
 
 
 def _general(ctx: Context) -> AgentResult:

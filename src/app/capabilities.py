@@ -105,21 +105,22 @@ def _id_lines(tools: dict[str, dict]) -> list[str]:
 
 
 def _option_lines(tools: dict[str, dict]) -> list[str]:
-    """Valores de cada parâmetro de lista fechada (enum) das tools. "A consulta cobre ontem, hoje e os últimos 7 dias"
-    é verdade do sistema, mas estava só no schema da tool, que o redator lê e o juiz não: a frase verdadeira contava
-    como afirmação sem base. Mesmo nome com listas diferentes em duas tools: as duas entram."""
-    seen: dict[tuple[str, tuple[str, ...]], str] = {}
-    for tool in tools.values():
+    """Valores de cada parâmetro de lista fechada (enum), POR TOOL, com o padrão quando o schema o declara. "A consulta
+    cobre ontem, hoje e os últimos 7 dias" é verdade do sistema, mas estava só no schema da tool, que o redator lê e o
+    juiz não: a frase verdadeira contava como afirmação sem base. Por tool porque o mesmo parâmetro (período) tem
+    padrão diferente em cada consulta; juntar as duas fazia o modelo escolher o período errado."""
+    out = []
+    for tool_name, tool in tools.items():
         props = ((tool.get("input_schema") or tool.get("parameters") or {}).get("properties") or {})
+        params = []
         for name, spec in props.items():
             values = spec.get("enum") if isinstance(spec, dict) else None
-            if not isinstance(values, list) or not values:
-                continue
-            key = (name, tuple(str(v) for v in values))
-            if key not in seen:
-                desc = str(spec.get("description", "")).strip()
-                seen[key] = f"{name}" + (f" ({desc})" if desc else "") + ": " + " | ".join(key[1])
-    return list(seen.values())
+            if isinstance(values, list) and values:
+                default = f" (padrão {spec['default']})" if spec.get("default") is not None else ""
+                params.append(f"{name}{default}: " + " | ".join(str(v) for v in values))
+        if params:
+            out.append(f"{tool_name} — " + "; ".join(params))
+    return out
 
 
 def card(language: str = "pt", tools: dict[str, dict] | None = None, extra: list[str] | None = None) -> str:
@@ -142,7 +143,7 @@ def card(language: str = "pt", tools: dict[str, dict] | None = None, extra: list
         lines.append(f"- {t['ids']}: " + "; ".join(ids) + ".")
     options = _option_lines(tools)
     if options:
-        lines.append(f"- {t['options']}: " + "; ".join(options) + ".")
+        lines.append(f"- {t['options']}: " + " · ".join(options) + ".")
     lines += [f"- {line}" for line in (_domain_lines(language) if extra is None else extra)]
     return "\n".join(lines)
 
