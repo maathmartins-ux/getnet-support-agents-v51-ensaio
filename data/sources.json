@@ -1,8 +1,25 @@
 {
-  "_doc": "Páginas do site oficial da empresa para `python -m app.ingest` (frente K). allowed_hosts = só o domínio do país do enunciado.",
-  "allowed_hosts": [],
+  "_doc": "Páginas do site oficial da Getnet (site.getnet.com.br) para `python -m app.ingest` (frente K). Get Clássica/Get Smart não têm página própria com slug (get-smart redireciona para imagem); cobertas por todas-as-maquininhas, duvidas/get-smart e ofertas.",
+  "allowed_hosts": ["site.getnet.com.br"],
   "groups": {
-    "produtos": {"prefix": "prod", "pages": {}},
-    "suporte": {"prefix": "sup", "pages": {}}
+    "produtos": {"prefix": "prod", "pages": {
+      "todas-as-maquininhas": "https://site.getnet.com.br/todas-as-maquininhas/",
+      "ofertas-maquininha": "https://site.getnet.com.br/ofertas-maquininha-de-cartao-getnet-2/",
+      "pix": "https://site.getnet.com.br/pix/",
+      "get-conta": "https://site.getnet.com.br/conta-digital/",
+      "crediario": "https://site.getnet.com.br/crediario/",
+      "link-de-pagamento": "https://site.getnet.com.br/link-de-pagamento/",
+      "pagamentos-pelo-whatsapp": "https://site.getnet.com.br/pagamentos-pelo-whatsapp/",
+      "get-tap": "https://site.getnet.com.br/get-tap/",
+      "taxas": "https://site.getnet.com.br/taxas/"
+    }},
+    "suporte": {"prefix": "sup", "pages": {
+      "duvidas": "https://site.getnet.com.br/duvidas/",
+      "duvidas-get-smart": "https://site.getnet.com.br/duvidas/get-smart/",
+      "get-ajuda": "https://site.getnet.com.br/get-ajuda/",
+      "antecipacao": "https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/",
+      "reserva-financeira": "https://site.getnet.com.br/get-ajuda-reserva-financeira/",
+      "manual-maquinas": "https://site.getnet.com.br/boas-vindas/manual-maquinas/"
+    }}
   }
 }
