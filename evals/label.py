@@ -208,9 +208,20 @@ def import_page(dump: Path, n: int | None = None, seed: int = 7, results: Path =
         if not rater or not marks:
             continue
         path = csv_path(rater, base)
+        live = {r["id"]: r for r in load_rows(results)}
         if not path.exists():  # o CSV nasce das linhas que a página mostrou (com --splits a amostra é outra)
-            live = {r["id"]: r for r in load_rows(results)}
             _write_csv(path, [live[i] for i in marks if i in live])
+        else:  # 2ª página da mesma pessoa: as respostas novas entram no CSV dela (antes eram ignoradas)
+            have = {r["id"] for r in read_labels(path)}
+            new = [live[i] for i in marks if i in live and i not in have]
+            if new:
+                old_rows = read_labels(path)
+                _write_csv(path, new)
+                added = read_labels(path)
+                with path.open("w", encoding="utf-8", newline="") as fh:
+                    w = csv.DictWriter(fh, fieldnames=FIELDS)
+                    w.writeheader()
+                    w.writerows(old_rows + added)
         pairs = []
         for case_id, m in marks.items():
             verdict = m.get("v")

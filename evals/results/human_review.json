@@ -1,31 +1,37 @@
 {
- "rotulos": 18,
- "humano_passa": 17,
- "automatico_passa": 18,
- "concordancia": 0.944,
- "kappa": 0.0,
+ "rotulos": 37,
+ "humano_passa": 36,
+ "automatico_passa": 36,
+ "concordancia": 0.946,
+ "kappa": -0.028,
  "divergencias": [
   {
    "id": "q-mem-02",
    "humano": "fail",
    "automatico": "pass",
    "nota": "wrong_route"
+  },
+  {
+   "id": "dependent-07",
+   "humano": "pass",
+   "automatico": "fail",
+   "nota": ""
   }
  ],
  "rotuladores": 1,
  "por_rotulador": {
   "matheus": {
-   "rotulos": 18,
-   "concordancia": 0.944,
-   "kappa": 0.0,
+   "rotulos": 37,
+   "concordancia": 0.946,
+   "kappa": -0.028,
    "heldout": {
-    "rotulos": 1,
-    "humano_passa": 1,
+    "rotulos": 8,
+    "humano_passa": 8,
     "taxa": 1.0,
     "ci": {
-     "k": 1,
-     "n": 1,
-     "lo": 20.7,
+     "k": 8,
+     "n": 8,
+     "lo": 67.6,
      "hi": 100.0
     },
     "diagnostico_intencao": 1.0,
@@ -34,13 +40,13 @@
   }
  },
  "heldout": {
-  "rotulos": 1,
-  "humano_passa": 1,
+  "rotulos": 8,
+  "humano_passa": 8,
   "taxa": 1.0,
   "ci": {
-   "k": 1,
-   "n": 1,
-   "lo": 20.7,
+   "k": 8,
+   "n": 8,
+   "lo": 67.6,
    "hi": 100.0
   },
   "diagnostico_intencao": 1.0,
@@ -48,20 +54,19 @@
  },
  "entre_humanos": null,
  "juiz_x_humano": {
-  "casos": 18,
-  "concordancia": 0.889,
-  "tpr": 0.941,
-  "tnr": 0.0,
-  "positives": 17,
+  "casos": 37,
+  "concordancia": 0.946,
+  "tpr": 0.944,
+  "tnr": 1.0,
+  "positives": 36,
   "negatives": 1,
   "validacao": {
    "validated": false,
    "missing": [
-    ">= 10 positivos e negativos humanos (tem 17 e 1)",
-    "TPR e TNR >= 0.8 (tem 0.941 e 0.0)"
+    ">= 10 positivos e negativos humanos (tem 36 e 1)"
    ],
    "rule": ">= 10 por classe e TPR, TNR >= 0.8"
   }
  },
- "aviso": "só 18 rótulos: abaixo de 20 não dá para confiar"
+ "aviso": null
 }

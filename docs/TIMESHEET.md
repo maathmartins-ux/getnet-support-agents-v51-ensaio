@@ -1,6 +1,6 @@
 # Linha do tempo (gerada do `git log`)
 
-Relógio: **344 min** de 03/11/2026 13:45:50 a 19:29:57 (commit de scaffold ('chore: scaffold') ao último commit; horário do commit, fuso UTC). 74 commits dentro do relógio, 0 depois (declarados abaixo).
+Relógio: **446 min** de 03/11/2026 13:45:50 a 21:12:12 (commit de scaffold ('chore: scaffold') ao último commit; horário do commit, fuso UTC). 89 commits dentro do relógio, 0 depois (declarados abaixo).
 Maior rajada: 28 commits em até 10 min a partir de 13:48:57.
 
 | min | hora | autor | arquivos | commit | relógio |
@@ -79,3 +79,18 @@ Maior rajada: 28 commits em até 10 min a partir de 13:48:57.
 | 322.4 | 19:08:14 | Claude | 2 | `17edecb` readme: números e linha do tempo (fill_readme, último passo) | dentro |
 | 344.1 | 19:29:56 | Claude | 5 | `3a3b739` avaliação humana: 18 rótulos do dono pela página de rotulagem (humano passa 17/18; concord | dentro |
 | 344.1 | 19:29:57 | Claude | 2 | `4bdbe71` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 351.8 | 19:37:38 | Claude | 5 | `df915e7` hitl: transcrição ao vivo com o operador respondendo no turno (router → escalation → human | dentro |
+| 351.8 | 19:37:39 | Claude | 2 | `bd95c56` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 358.4 | 19:44:13 | Claude | 7 | `2f1d854` kit: RESULTS enxuto (uma linha por split), argumentos das tools validados no servidor; off | dentro |
+| 358.4 | 19:44:14 | Claude | 2 | `e38f38f` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 366.7 | 19:52:33 | Claude | 10 | `360e3d4` kit: portão sem fonte pela nota do cross-encoder (MIN_RERANK -5,2247 calibrado no gold do  | dentro |
+| 391.4 | 20:17:17 | Claude | 12 | `9635ae5` router: exemplos rotulados de duas perguntas sobre o MESMO produto (knowledge, não multi); | dentro |
+| 398.1 | 20:23:56 | Claude | 9 | `b7fbc1b` eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no cód | dentro |
+| 398.1 | 20:23:56 | Claude | 2 | `21258d7` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 406.6 | 20:32:26 | Claude | 18 | `14cd062` docs: README sem número escrito à mão que envelhece (portão, juiz); transcrição HITL regen | dentro |
+| 406.6 | 20:32:27 | Claude | 2 | `074ee00` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 415.6 | 20:41:24 | Claude | 11 | `ef92c3b` domínio: faixa de faturamento não é preço nem limite (faq); fora do escopo sem resposta de | dentro |
+| 422.6 | 20:48:29 | Claude | 4 | `8fc2c32` domínio: glossário 'bank account' → Get Conta (a busca do official-04 traz a conta digital | dentro |
+| 442.4 | 21:08:15 | Claude | 25 | `8f72f8e` eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,9 | dentro |
+| 443.6 | 21:09:29 | Claude | 3 | `b12e89a` domínio: 'preciso de conta?' responde com a Get Conta; clima sempre com temperaturas | dentro |
+| 446.4 | 21:12:12 | Claude | 4 | `3de0e10` readme: números e linha do tempo (fill_readme, último passo) | dentro |

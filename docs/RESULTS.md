@@ -140,17 +140,17 @@ Casos com alguma checagem falhando: `q-ov-04-en`.
 
 ### Split `official` — `live_official.json`
 
-Provedor `anthropic` · status `complete` · gasto US$ 0.915007 (teto 1.08341)
+Provedor `anthropic` · status `complete` · gasto US$ 0.899359 (teto 2.0)
 
-**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **86.7%** [IC95 70.3–94.7; n=30] · pass^3 80% (não resolvidos: official-02, official-04).
+**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **100.0%** [IC95 88.6–100.0; n=30] · pass^3 100%.
 
-resolvidas **86.7%** [70.3–94.7] (n=30) · intenção **100%** [88.6–100] (n=30) · humano certo **100%** [88.6–100] (n=30) · números com base **100%** [88.6–100] (n=30) · idioma **100%** [88.6–100] (n=30)
+resolvidas **100%** [88.6–100] (n=30) · intenção **100%** [88.6–100] (n=30) · humano certo **100%** [88.6–100] (n=30) · números com base **100%** [88.6–100] (n=30) · idioma **100%** [88.6–100] (n=30)
 
-Latência e custo: p50 10.8 s · p95 22.5 s · US$ 0.915007 no split.
+Latência e custo: p50 10.7 s · p95 17.5 s · US$ 0.899359 no split.
 
-Estabilidade (3 rodadas): pass@1 86.7% · pass^3 80.0% · instáveis: official-02.
+Estabilidade (3 rodadas): pass@1 100.0% · pass^3 100.0% · instáveis: —.
 
-Casos com alguma checagem falhando: `official-02`, `official-04`.
+Casos com alguma checagem falhando: nenhum.
 
 ### Split `parallel` — `live_parallel.json`
 
@@ -196,7 +196,7 @@ Casos com alguma checagem falhando: `replan-07`, `replan-09`.
 ## Juiz LLM sobre as respostas ao vivo
 
 <!-- judge:begin -->
-Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_dependent.json, live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_parallel.json, live_partial.json, live_real.json, live_replan.json · gasto US$ 22.083624
+Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_dependent.json, live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_parallel.json, live_partial.json, live_real.json, live_replan.json · gasto US$ 22.57922
 
 | split | casos | grounded | helpful | nota média |
 |---|---:|---:|---:|---:|
@@ -206,13 +206,13 @@ Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_de
 | hard | 5 | 1.0 [IC95 56.6–100.0; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 4.8 |
 | heldout | 79 | 0.873 [IC95 78.2–93.0; n=79] | 0.949 [IC95 87.7–98.0; n=79] | 4.46 |
 | memory | 66 | 0.939 [IC95 85.4–97.6; n=66] | 1.0 [IC95 94.5–100.0; n=66] | 4.62 |
-| official | 30 | 0.933 [IC95 78.7–98.2; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.77 |
+| official | 30 | 1.0 [IC95 88.6–100.0; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.9 |
 | official-var | 12 | 1.0 [IC95 75.8–100.0; n=12] | 1.0 [IC95 75.8–100.0; n=12] | 4.75 |
 | parallel | 4 | 1.0 [IC95 51.0–100.0; n=4] | 1.0 [IC95 51.0–100.0; n=4] | 5.0 |
 | partial | 5 | 0.8 [IC95 37.6–96.4; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 4.6 |
 | real | 40 | 0.975 [IC95 87.1–99.6; n=40] | 1.0 [IC95 91.2–100.0; n=40] | 4.42 |
 | replan | 20 | 1.0 [IC95 83.9–100.0; n=20] | 1.0 [IC95 83.9–100.0; n=20] | 5.0 |
-| ALL | 312 | 0.942 [IC95 91.1–96.3; n=312] | 0.984 [IC95 96.3–99.3; n=312] | 4.63 |
+| ALL | 312 | 0.949 [IC95 91.8–96.8; n=312] | 0.984 [IC95 96.3–99.3; n=312] | 4.64 |
 
 Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): 48 rótulos · concordância **1.0** [IC95 92.6–100.0; n=48] · kappa de Cohen **1.0** · TPR 1.0 [IC95 86.2–100.0; n=24] (24 grounded) · TNR 1.0 [IC95 86.2–100.0; n=24] (24 não grounded) · discordâncias: —
 - official: concordância 1.0 [IC95 92.6–100.0; n=48] · kappa 1.0 (48 rótulos)
@@ -224,12 +224,12 @@ Família: juiz `claude-opus-5-5` (anthropic) × gerador `claude-haiku-5-5`, `cla
 ## Validação humana (às cegas, por rotulador)
 
 <!-- human:begin -->
-18 respostas ao vivo rotuladas às cegas pelo dono: humano aprova 17/18, checagem automática aprova 18/18; concordância **0.944**, kappa **0.0**.
-- rotulador `matheus`: 18 rótulos · humano × automático: concordância 0.944, kappa 0.0
+37 respostas ao vivo rotuladas às cegas pelo dono: humano aprova 36/37, checagem automática aprova 36/37; concordância **0.946**, kappa **-0.028**.
+- rotulador `matheus`: 37 rótulos · humano × automático: concordância 0.946, kappa -0.028
 Um rotulador só: a concordância entre humanos não foi medida.
-Held-out cego ponta a ponta: humano aprova **1/1** (1.0) [IC95 20.7–100.0; n=1]; diagnóstico: intenção certa em 1.0 das mesmas linhas; intenção errada com resposta aprovada: —.
-Aviso: só 18 rótulos: abaixo de 20 não dá para confiar.
+Held-out cego ponta a ponta: humano aprova **8/8** (1.0) [IC95 67.6–100.0; n=8]; diagnóstico: intenção certa em 1.0 das mesmas linhas; intenção errada com resposta aprovada: —.
 - `q-mem-02`: humano fail × automático pass wrong_route
+- `dependent-07`: humano pass × automático fail
 <!-- human:end -->
 
 ## Busca (sem LLM; o buscador do agente e as alternativas medidas)

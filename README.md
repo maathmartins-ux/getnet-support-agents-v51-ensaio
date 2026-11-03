@@ -23,9 +23,9 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 <!-- scorecard:begin -->
 | medida | valor | como se mede |
 |---|---:|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.87 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
-| Oficiais resolvidas: pass^k (todas as rodadas) | 0.80 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 0.93 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
+| Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
 | Memória ao vivo: pass@1 | 0.95 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.82 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
@@ -424,8 +424,9 @@ e como comparar pela primeira entrega.
 | 20:48:29 | 513 | domínio: glossário 'bank account' → Get Conta (a busca do official-04 traz a conta digital da Getnet) |
 | 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
 | 21:09:29 | 534 | domínio: 'preciso de conta?' responde com a Get Conta; clima sempre com temperaturas |
+| 21:12:12 | 537 | readme: números e linha do tempo (fill_readme, último passo) |
 
-Do primeiro ao último commit: **534 min**.
+Do primeiro ao último commit: **537 min**.
 <!-- timeline:end -->
 
 </details>

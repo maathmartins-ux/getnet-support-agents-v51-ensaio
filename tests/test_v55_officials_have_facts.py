@@ -93,3 +93,59 @@ def test_enriched_label_sample_brings_suspected_failures_and_skips_labeled():
     got = label.enriched_sample(rows, 10, suspects=6, exclude={"c0"}, suspect_ids={"c5", "c10", "c15", "c20", "c0"})
     ids = {r["id"] for r in got}
     assert len(got) == 10 and "c0" not in ids and {"c5", "c10", "c15", "c20"} <= ids
+
+
+def test_replay_gate_fails_only_on_fresh_recordings_below_floor(tmp_path, monkeypatch):
+    import json as _json
+    import sys as _sys
+    from pathlib import Path as _P
+
+    _sys.path.insert(0, str(_P(__file__).resolve().parents[1] / "scripts"))
+    import check as _check
+
+    (tmp_path / "evals" / "cassettes").mkdir(parents=True)
+    (tmp_path / "evals" / "cassettes" / "official.jsonl").write_text("{}", encoding="utf-8")
+    (tmp_path / "evals" / "results").mkdir(parents=True)
+
+    def fake_run(*a, **k):
+        (tmp_path / "evals" / "results" / "replay.json").write_text(_json.dumps({"splits": {
+            "official": {"misses": 0, "problems": ["intent_acc: replay 80 abaixo do piso 100"]},
+            "memory": {"misses": 4, "problems": ["4 pedido(s) não gravado(s)"]}}}), encoding="utf-8")
+
+    monkeypatch.setattr(_check.subprocess, "run", fake_run)
+    _n, ok, _t, detail = _check.replay_gate(tmp_path)
+    assert not ok and "official" in detail and "AVISO regravar: memory" in detail
+
+
+def test_apply_min_rerank_writes_the_domain_threshold(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from app import domain
+    from evals import run_evals
+
+    target = tmp_path / "challenge" / "__init__.py"
+    target.parent.mkdir()
+    target.write_text("MIN_SCORE = 0.5\nMIN_RERANK: float | None = None\n", encoding="utf-8")
+    monkeypatch.setattr(domain, "active", lambda: SimpleNamespace(__file__=str(target)))
+    monkeypatch.setattr(run_evals, "HERE", tmp_path / "evals")
+    gate = {"min_rerank": -5.2, "pos_answered": 0.98, "neg_refused": 0.91, "positives": 59, "negatives": 22}
+    assert run_evals.apply_min_rerank(gate) == 0
+    text = target.read_text(encoding="utf-8")
+    assert "MIN_RERANK = -5.2" in text and "recusa 91%" in text and text.count("MIN_RERANK =") == 1
+
+
+def test_second_label_page_appends_new_answers(tmp_path):
+    import json as _json
+
+    from evals import label
+
+    res = tmp_path / "results"
+    res.mkdir()
+    rows = [{"id": f"c{i}", "split": "official", "message": "q", "answer": "a", "run": 0} for i in range(4)]
+    (res / "live_official.json").write_text(_json.dumps({"rows": rows}), encoding="utf-8")
+    for marks in ({"c0": {"v": "pass"}, "c1": {"v": "pass"}}, {"c2": {"v": "fail"}, "c3": {"v": "pass"}}):
+        dump = tmp_path / "dump.json"
+        dump.write_text(_json.dumps([{"rater": "ana", "marks": marks}]), encoding="utf-8")
+        label.import_page(dump, results=res, base=tmp_path)
+    got = {r["id"]: r["humano"] for r in label.read_labels(tmp_path / "human_labels.ana.csv")}
+    assert got == {"c0": "pass", "c1": "pass", "c2": "fail", "c3": "pass"}
