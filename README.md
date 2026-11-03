@@ -386,8 +386,10 @@ e como comparar pela primeira entrega.
 | 14:32:54 | 138 | readme: números e linha do tempo (fill_readme, último passo) |
 | 15:19:31 | 184 | confirmação: kit corrigido sobre o ensaio (CI, memória, hora ISO, entrega) e lint do domínio |
 | 15:39:32 | 205 | confirmação: resultados offline com o código corrigido (gate intenção 90,5%, memória 90,9%) e docs gerados |
+| 15:39:33 | 205 | readme: números e linha do tempo (fill_readme, último passo) |
+| 15:41:47 | 207 | confirmação: final.sh do kit (commit final com os docs gerados) |
 
-Do primeiro ao último commit: **205 min**.
+Do primeiro ao último commit: **207 min**.
 <!-- timeline:end -->
 
 </details>
