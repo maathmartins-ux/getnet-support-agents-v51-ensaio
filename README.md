@@ -19,9 +19,16 @@ strategy (§6).
 números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
 
 <!-- since:begin -->
+| Lacuna citada | O que mudou | Prova |
+|---|---|---|
+| Respostas oficiais: fundamentadas 60%, números 80%, pass^3 70% | manchete **oficiais resolvidas** (sem humano + todo fato + fonte); toda frase e todo número conferidos contra fonte, ferramenta e pergunta; juiz no mesmo processo | Oficiais resolvidas (sem humano + todo fato + fonte) **1.00** · Juiz: respostas oficiais fundamentadas **1.00** · Oficiais: números com base na evidência **100.0%** · Oficiais: pass^k (todas as rodadas passam) **1.00**; `tests/test_e53_resolved.py` |
+| Busca: Recall@3 0,49, MRR 0,61 | denso + cross-encoder decidido por medida antes do relógio; tabelas inteiras; placar no caminho do agente | Busca: Recall@3 **0.84** · Busca: Recall@5 (o que o redator lê) **0.89** · Busca: MRR **0.82**; `tests/test_v54_retrieval_method.py` |
+| Memória: pass@1 54%, números 64% | especialistas sem estado (pergunta reescrita pelo router + livro de fatos); rota medida pelo resultado | Memória ao vivo: pass@1 **0.67** · Memória ao vivo: números com base **93.9%**; `tests/test_v54_stateless_specialists.py` |
+| A resposta do humano era só a próxima mensagem; operação (especialidade, Postgres, JWKS) | a resposta do operador vira evidência e os passos pendentes do plano rodam (no turno, com espera curta, ou na retomada); fila por especialidade; Postgres atrás da mesma interface; JWKS | Turnos resolvidos sem humano (ao vivo, todos os splits) **0.88**; `tests/test_v54_hitl_sync.py` |
+| Avaliação independente: um rotulador, held-out de 24 | 2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes | Rotuladores humanos independentes **não medido** · Held-out cego: casos **80** · Held-out cego: ponta a ponta (humano passa) **não medido** · Juiz validado contra humanos (1 = sim, regra fixada antes) **1** · Juiz × humano: kappa **1.00**; `tests/test_v54_judge_validation_real.py` |
 <!-- since:end -->
 
-{{lacuna da correção que for só deste desafio, se houver: mudança e número}}
+Nesta tentativa: **sem validação humana** (ensaio pré-produção sem rotuladores; J1, J1b e J2 não aconteceram) e **rodada 2 não medida** (corte do T+45).
 
 Cada número que pesa na avaliação, ao lado da referência que a própria avaliação usou. Os que ficam abaixo aparecem
 aqui, com a causa (mecanismo e número) em §7, não escondidos.
@@ -30,10 +37,32 @@ Tabelas completas, com intervalo de confiança por split: [docs/RESULTS.md](docs
 cenários oficiais: [docs/DEMO.md](docs/DEMO.md). O que veio do kit: [docs/PROCEDENCIA.md](docs/PROCEDENCIA.md).
 
 <!-- scorecard:begin -->
+| métrica | valor | referência da avaliação | situação | de onde vem |
+|---|---:|---:|---|---|
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | 0.90 | na referência | `live_official.json resolved` |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | 0.90 | na referência | `live_official.json resolved` |
+| Juiz: respostas oficiais úteis (helpful) | 0.97 | 0.90 | na referência | `judge.json by_split.official` |
+| Juiz: respostas oficiais fundamentadas | 1.00 | 0.90 | na referência | `judge.json by_split.official` |
+| Oficiais: números com base na evidência | 100.0% | 95.0% | na referência | `live_official.json numbers_acc` |
+| Oficiais: pass^k (todas as rodadas passam) | 1.00 | 0.90 | na referência | `live_official.json` |
+| Memória ao vivo: pass@1 | 0.67 | 0.85 | abaixo da referência (causa nos limites) | `live_memory.json stability` |
+| Memória ao vivo: números com base | 93.9% | 95.0% | abaixo da referência (causa nos limites) | `live_memory.json numbers_acc` |
+| Busca: Recall@3 | 0.84 | 0.85 | abaixo da referência (causa nos limites) | `latest.json retrieval` |
+| Busca: MRR | 0.82 | 0.80 | na referência | `latest.json retrieval` |
+| Busca: Recall@5 (o que o redator lê) | 0.89 | — | diagnóstico | `latest.json retrieval` |
+| Held-out cego: casos | 80 | 80 | na referência | `latest.json metrics.heldout` |
+| Held-out cego: ponta a ponta (humano passa) | não medido | 0.80 | não medido | `human_review.json heldout` |
+| Held-out cego: intenção (diagnóstico) | 86.2% | — | diagnóstico | `latest.json metrics.heldout` |
+| Rotuladores humanos independentes | não medido | 2 | não medido | `human_review.json` |
+| Juiz × humano: kappa | 1.00 | 0.80 | na referência | `judge.json calibration` |
+| Juiz validado contra humanos (1 = sim, regra fixada antes) | 1 | 1 | na referência | `judge.json calibration.validation` |
+| Custo por turno resolvido sem humano (ao vivo) | US$ 0.0334 | — | diagnóstico | `live_*.json spent_usd ÷ linhas sem handoff` |
+| Turnos resolvidos sem humano (ao vivo, todos os splits) | 0.88 | — | diagnóstico | `live_*.json linhas sem handoff` |
+
+**Abaixo da referência ou sem medida (5 de 19), com a causa nos limites:** Memória ao vivo: pass@1 (0.67); Memória ao vivo: números com base (93.9%); Busca: Recall@3 (0.84); Held-out cego: ponta a ponta (humano passa) (não medido); Rotuladores humanos independentes (não medido).
 <!-- scorecard:end -->
 
-{{2–4 linhas: o que mudou da medida antes para a depois das correções feitas no relógio (docs/JUDGE_DIFF.md), e
-por que cada métrica abaixo da referência está abaixo.}}
+Uma rodada ao vivo só (a 2ª não coube no relógio; `docs/JUDGE_DIFF.md` não medido). Oficiais: todas resolvidas sem humano, com o fato de referência e fonte, e o juiz (com o texto das fontes) as dá por fundamentadas. Abaixo da referência: memória (o seguimento cita o valor do turno anterior em metade dos casos com `expects_fact`), Recall@3 logo abaixo da meta e a validação humana, que não houve. Causas em §7.
 
 ## 1. How to build, configure, run and test (construir, configurar, rodar e testar)
 
@@ -59,10 +88,10 @@ curl -s -X POST localhost:8000/auth/logout -H "Authorization: Bearer $TOKEN"   #
 
 <!-- quickstart:begin -->
 ```bash
-# 1º caso oficial (official-01, evals/cases.jsonl), como o cliente u1, com o $TOKEN do passo Entrar
-# (atalho de teste, sem senha: TOKEN=$(python -m app.auth u1))
+# 1º caso oficial (official-01, evals/cases.jsonl), como o cliente cliente1988, com o $TOKEN do passo Entrar
+# (atalho de teste, sem senha: TOKEN=$(python -m app.auth cliente1988))
 curl -s -X POST localhost:8000/chat -H "Authorization: Bearer $TOKEN" \
-     -H "Content-Type: application/json" -d '{"message": "Qual o prazo de entrega para São Paulo?"}'
+     -H "Content-Type: application/json" -d '{"message": "What'\''s the difference between the Get Clássica and the Get Smart?"}'
 ```
 <!-- quickstart:end -->
 
@@ -226,10 +255,10 @@ seção existe: `tests/test_evidence.py` falha se um sumir. Reproduzir tudo: `py
 
 | Critério | O que foi feito | Código | Prova | Número | Limite conhecido |
 |---|---|---|---|---|---|
-| Business & Challenge Fit (8%) | {{cenários do enunciado → split `official`; KPI do negócio que o sistema move}} | `src/app/tools.py` | `evals/cases.jsonl` | RESULTS.md: Offline e Ao vivo, `official` | mede os cenários do enunciado e perguntas reais coletadas, não tráfego de produção; custo por resolvido vem do eval ao vivo, não de fatura; {{o que o enunciado pede e o sistema não cobre}} |
+| Business & Challenge Fit (8%) | os 10 cenários do enunciado são o split `official` (respostas reais em `docs/DEMO.md`); KPI: turnos resolvidos sem humano e custo por turno resolvido (§0) | `src/app/tools.py` | `evals/cases.jsonl` | RESULTS.md: Offline e Ao vivo, `official` | mede os cenários do enunciado e perguntas reais coletadas, não tráfego de produção; custo por resolvido vem do eval ao vivo, não de fatura; o CRM é simulado (2 clientes em `data/crm/`) |
 | Agentic Reasoning & Orchestration (15%) | Supervisor LLM com agentes como tools, lê `insufficient`/`error` e replaneja; tabela PLANS/FALLBACK/ALLOWED/MAX_STEPS; agentes independentes em paralelo | `src/app/supervisor.py` | `tests/test_supervisor.py::test_llm_reads_insufficient_and_replans_to_escalation`, `tests/test_supervisor.py::test_llm_disallowed_transition_is_refused`, `tests/test_parallel.py::test_independent_agents_run_in_parallel_in_plan_order` | RESULTS.md: Replanejamento, splits `replan` e `parallel` | no atalho de 1 passo o supervisor só entra quando o especialista não resolve: um replanejamento que só o LLM veria numa resposta `ok` não acontece; `MAX_STEPS` e o orçamento por turno cortam planos longos (o resto vai ao humano); só transições listadas em `ALLOWED` do domínio |
 | ↳ Router (faz parte de Agentic Reasoning & Orchestration) | Haiku com JSON schema e few-shot dinâmico (8 exemplos mais parecidos); regra por frase + k-NN de n-gramas no offline; seguimento pela última fala com assunto; teste que reprova frase do held-out copiada para regra | `src/app/router.py` | `tests/test_router.py::test_llm_failure_falls_back_to_rules`, `tests/test_router_knn.py::test_unseen_paraphrase_goes_to_right_intent`, `tests/test_router_followup.py::test_follow_up_skips_acknowledgement`, `tests/test_router_contamination.py::test_detector_catches_v3_leak` | RESULTS.md: Offline, `intent_acc` | intenção fora dos exemplos do domínio cai no `DEFAULT_INTENT`; o seguimento resolve pela última fala com assunto (referência a turnos antigos depende do resumo rolante); offline, o k-NN só cobre paráfrases próximas dos exemplos |
-| Context, Knowledge & RAG (10%) | Denso (e5-large) + cross-encoder local (bge-reranker-v2-m3, top-10, 600 caracteres), **decidido por medida antes do relógio** (`KIT_RETRIEVER`; híbrido, pool 20 e 1000 caracteres medidos e rejeitados); ingest sem corte por seção e sem contexto no índice por padrão; tabelas inteiras e rotuladas; quase-duplicatas fora do índice; placar no **caminho do agente** (Recall@5, MRR@10, separação pela nota do rerank); "sem fonte, sem afirmação"; **todo número da resposta conferido contra fonte, tool e pergunta** (sem LLM; `unsupported_numbers` na resposta) | `src/app/rag.py`, `src/app/grounding.py` | `tests/test_k53_retriever_default.py::test_without_choice_the_kit_default_is_dense_e5_plus_bge_cross_pool_10_600_chars`, `tests/test_ingest_defaults_v52.py::test_default_does_not_cut_on_section`, `tests/test_v54_retrieval_method.py::test_published_retrieval_is_the_agent_path_with_the_base_beside_it`, `tests/test_v54_retrieval_method.py::test_score_question_has_recall5_mrr10_and_first_gold_rank`, `tests/test_v54_retrieval_method.py::test_separation_reports_auc_and_gap`, `tests/test_v54_retrieval_method.py::test_bm25_only_fuses_when_the_query_is_in_the_corpus_language`, `tests/test_ingest.py::test_table_rows_keep_their_column_labels`, `tests/test_agents.py::test_faq_llm_not_in_sources_is_insufficient`, `tests/test_grounding.py::test_pipeline_flags_invented_number_and_counts_it`, `evals/retrieval.jsonl` | RESULTS.md: Offline e Retrieval (Recall@3, Recall@5, MRR, separação, por origem, latência), `numbers_acc` | gold de busca escrito pelo time, não pelo cliente; a nota do rerank separa com × sem fonte com AUC 0,84, não 1,0: a recusa final fica com o redator LLM; corpus é retrato com `fetched_at`, sem re-ingestão agendada; BM25 só no idioma do corpus; {{páginas do domínio fora do corpus e por quê}} |
+| Context, Knowledge & RAG (10%) | Denso (e5-large) + cross-encoder local (bge-reranker-v2-m3, top-10, 600 caracteres), **decidido por medida antes do relógio** (`KIT_RETRIEVER`; híbrido, pool 20 e 1000 caracteres medidos e rejeitados); ingest sem corte por seção e sem contexto no índice por padrão; tabelas inteiras e rotuladas; quase-duplicatas fora do índice; placar no **caminho do agente** (Recall@5, MRR@10, separação pela nota do rerank); "sem fonte, sem afirmação"; **todo número da resposta conferido contra fonte, tool e pergunta** (sem LLM; `unsupported_numbers` na resposta) | `src/app/rag.py`, `src/app/grounding.py` | `tests/test_k53_retriever_default.py::test_without_choice_the_kit_default_is_dense_e5_plus_bge_cross_pool_10_600_chars`, `tests/test_ingest_defaults_v52.py::test_default_does_not_cut_on_section`, `tests/test_v54_retrieval_method.py::test_published_retrieval_is_the_agent_path_with_the_base_beside_it`, `tests/test_v54_retrieval_method.py::test_score_question_has_recall5_mrr10_and_first_gold_rank`, `tests/test_v54_retrieval_method.py::test_separation_reports_auc_and_gap`, `tests/test_v54_retrieval_method.py::test_bm25_only_fuses_when_the_query_is_in_the_corpus_language`, `tests/test_ingest.py::test_table_rows_keep_their_column_labels`, `tests/test_agents.py::test_faq_llm_not_in_sources_is_insufficient`, `tests/test_grounding.py::test_pipeline_flags_invented_number_and_counts_it`, `evals/retrieval.jsonl` | RESULTS.md: Offline e Retrieval (Recall@3, Recall@5, MRR, separação, por origem, latência), `numbers_acc` | gold de busca escrito pelo time, não pelo cliente; a nota do rerank separa com × sem fonte com AUC 0,84, não 1,0: a recusa final fica com o redator LLM; corpus é retrato com `fetched_at`, sem re-ingestão agendada; BM25 só no idioma do corpus; get-ajuda, reserva-financeira e pagamentos-pelo-whatsapp renderam 0 trechos (conteúdo por JavaScript); Get Clássica e Get Smart sem página própria no site (`docs/SOURCES.md`) |
 | Tool & Action Engineering (10%) | JSON Schema, identidade do servidor, escrita com confirmação do dono; **risco alto com aprovação de operador (quatro olhos)**; ação pendente expira (TTL); execução única entre réplicas; **servidor MCP em `/mcp`** (ask, search_knowledge, crm_tool; JWT obrigatório) | `src/app/actions.py`, `src/app/tools.py`, `src/app/mcp_server.py` | `tests/test_mcp.py::test_crm_tool_identity_comes_from_token_and_write_needs_confirmation`, `tests/test_mcp.py::test_anonymous_gets_401_before_the_protocol`, `tests/test_agents.py::test_tool_identity_is_server_side`, `tests/test_hitl.py::test_high_risk_action_needs_owner_then_operator_and_runs_once`, `tests/test_hitl.py::test_pending_action_expires`, `tests/test_memory_and_handoff.py::test_claim_is_atomic` | RESULTS.md: Offline, `tools_acc` | sistema de registros simulado (dados de demonstração); execução única garantida pelo banco do kit, não por chave de idempotência do sistema externo; limite de valor vem do `RISK_POLICY` do domínio |
 | Security & Identity (13%) | JWT HS256 com `exp`/`iss`/`aud`/`jti` e revogação; operador com chave pessoal (auditoria); rate limit no SQLite que falha fechado; `AUTH_MODE` required/demo; guardrails regex + Haiku com desofuscação e injeção indireta; PII mascarada na entrada, no log e na saída; **LGPD**: o titular apaga a própria conversa (`DELETE /me/conversations/{id}`, auditado) e a retenção por idade expurga o que passou de `MEMORY_RETENTION_DAYS` (`POST /admin/retention/purge`, só operador); **red team como gate** (guardrail + hard rotulados por ASI, `RED_TEAM_GATE`) | `src/app/auth.py`, `src/app/guardrails.py`, `src/app/store.py` | `tests/test_identity.py::test_expired_token_is_rejected`, `tests/test_identity.py::test_revoked_token_is_rejected_via_api`, `tests/test_identity.py::test_rate_limit_fails_closed`, `tests/test_guardrails.py::test_obfuscated_injection_is_caught`, `tests/test_guardrails.py::test_poisoned_document_is_dropped_at_load`, `docs/adr/0001-auth-mode-demo.md`, `tests/test_privacy.py::test_owner_deletes_own_conversation_and_it_is_audited`, `tests/test_privacy.py::test_retention_purge_by_age_keeps_recent_and_open_cases`, `tests/test_v54_red_team_gate.py::test_red_team_gate_counts_only_safety_checks_and_splits_by_asi` | RESULTS.md: Offline, split `guardrail`; red team: docs/SECURITY_ASI.md (gerado) | `AUTH_MODE=demo` aceita `user_id` do corpo (marcado `identity_verified=false`); o limite por chave/IP vive no banco e vale entre réplicas do mesmo banco, mas a cota do provedor de LLM é uma só para todas; guardrail LLM do mesmo provedor do redator; red team cobre os ataques rotulados por ASI, não fuzzing; chaves por variável de ambiente, sem cofre |
 | Memory, State & Resilience (8%) | Histórico em SQLite (WAL, vários processos) com **resumo rolante** além da janela; memória de longo prazo por usuário; queda do LLM cai no determinístico | `src/app/store.py`, `src/app/pipeline.py` | `tests/test_memory_and_handoff.py::test_history_survives_restart`, `tests/test_analytics.py::test_rolling_digest_keeps_early_facts_beyond_the_window`, `tests/test_identity.py::test_sqlite_survives_concurrent_writers`, `tests/test_agents.py::test_records_llm_failure_uses_deterministic_path`, `tests/test_runtime_store.py::test_two_replicas_escalating_the_same_conversation_open_one_ticket`, `scripts/scale_smoke.py` (conversa continua entre 2 réplicas, réplica cai e o atendimento segue) | RESULTS.md: Offline, split `memory` | SQLite só serve réplicas no mesmo host ([ADR 0002](docs/adr/0002-replicas-mesmo-host.md)); vários hosts precisam do Postgres, sem medida de latência nele; o resumo rolante é do LLM e pode perder detalhe além da janela; queda do LLM no meio do turno cai no determinístico, com resposta mais pobre |
@@ -237,7 +266,7 @@ seção existe: `tests/test_evidence.py` falha se um sumir. Reproduzir tudo: `py
 | Evaluation & Quality Engineering (14%) | Gate offline no CI; manchete **oficiais resolvidas** (sem humano + todo fato de referência + fonte) com gate opcional; ao vivo por split com teto proporcional e juiz no mesmo processo; `--repeat N` (pass^k, instáveis); juiz calibrado (kappa, TPR/TNR); análise de erros em traces reais com edições do dono contadas e uma checagem por modo; held-out cego ponta a ponta; checagem numérica sem LLM; limiar do portão por medida e por idioma | `evals/run_evals.py`, `evals/judge.py`, `evals/error_analysis.py`, `src/app/grounding.py` | `tests/test_e53_resolved.py::test_resolved_needs_no_handoff_every_fact_and_a_source`, `tests/test_e53_live_robustness.py::test_judge_runs_after_each_split_in_the_same_process_and_pays_trust_once`, `tests/test_e53_error_analysis.py::test_owner_review_counts_edits_and_modes_get_one_check_each`, `tests/test_e53_heldout_e2e.py::test_report_gives_heldout_end_to_end_with_intent_as_diagnostic`, `tests/test_evals.py::test_gate_passes_in_process`, `tests/test_evals.py::test_calibration_reports_tpr_tnr`, `tests/test_evals.py::test_repeat_reports_pass_hat_k_and_unstable_cases`, `tests/test_rag.py::test_gate_threshold_is_chosen_by_measurement`, `tests/test_eval_isolation.py::test_each_case_starts_without_memory_of_other_cases`, `tests/test_eval_judge_evidence.py::test_live_rows_record_tool_calls_sources_and_evidence`, `tests/test_eval_language_ci.py::test_detects_language_of_the_text`, `evals/judge_calibration.jsonl` | RESULTS.md: Offline, Ao vivo e Juiz | juiz da mesma família do modelo avaliado (outra família por `JUDGE_PROVIDER=openai_compat`, não medida); rótulos humanos de 2 pessoas do time, não de clientes; pass^k com k = 3; held-out escrito antes, mas pelo mesmo time |
 | Observability, Reliability & Cost (6%) | Log JSON com `trace_id` e status de cada agente; US$ e tokens por request; `/metrics`; **alertas Prometheus provisionados**; `/analytics` (resolução, custo por resolvido, 👍/👎); OTel por env | `src/app/observability.py`, `src/app/analytics.py`, `ops/alerts.yml` | `tests/test_agents.py::test_cost_per_request_from_price_table`, `tests/test_alerts.py::test_alert_rules_are_valid_and_actionable`, `tests/test_analytics.py::test_every_request_is_logged_and_feedback_is_owned`, `tests/test_otel.py::test_console_exporter_emits_span_linked_to_trace_id` | RESULTS.md: Ao vivo, `cost_usd` e p95 | métricas por processo (cada réplica expõe as suas; a soma é do Prometheus); custo pela tabela de preços do kit, não pela fatura; OTel só ligado por variável de ambiente; alertas provisionados, sem pager |
 | Production Engineering (5%) | Dockerfile multi-stage não-root, base fixada por digest com Dependabot, extra opcional embutido (`EXTRAS=hybrid`), lockfiles, smoke do container e **2 réplicas atrás de balanceador** no CI; scripts em bash e PowerShell | `Dockerfile` | `scripts/check.py`, `.github/workflows/ci.yml`, `.github/dependabot.yml`, `requirements.lock`, `requirements-hybrid.lock`, `scripts/live_eval.sh` | link do CI no topo | réplicas no mesmo host no compose; `ops/lb.py` é balanceador de demonstração (não repete pedido já enviado; timeout 120 s); sem TLS nem deploy em nuvem no compose |
-| Engineering Judgment (4%) | Decisões com a alternativa descartada e o número que decidiu; o que foi considerado e não feito, com a medida; limitações declaradas | `docs/adr/0001-auth-mode-demo.md`, `docs/adr/0003-postgres-opcional.md`, `docs/adr/0004-buscador-denso-com-teto-de-ram.md`, `docs/adr/0005-atalho-de-1-passo.md`, `docs/adr/0006-humano-so-quando-nao-resolve.md`, `docs/adr/0007-especialistas-sem-estado.md`, `docs/adr/0008-considerado-e-nao-feito.md` | §4 e §9 deste README; cada ADR com contexto, decisão, alternativas, consequências e números | — | as alternativas rejeitadas foram medidas no gold da entrega anterior; {{o que foi re-medido no corpus deste desafio}} |
+| Engineering Judgment (4%) | Decisões com a alternativa descartada e o número que decidiu; o que foi considerado e não feito, com a medida; limitações declaradas | `docs/adr/0001-auth-mode-demo.md`, `docs/adr/0003-postgres-opcional.md`, `docs/adr/0004-buscador-denso-com-teto-de-ram.md`, `docs/adr/0005-atalho-de-1-passo.md`, `docs/adr/0006-humano-so-quando-nao-resolve.md`, `docs/adr/0007-especialistas-sem-estado.md`, `docs/adr/0008-considerado-e-nao-feito.md` | §4 e §9 deste README; cada ADR com contexto, decisão, alternativas, consequências e números | — | as alternativas rejeitadas foram medidas no gold da entrega anterior; no corpus Getnet foram re-medidos o gold essencial (2 rotuladores às cegas), o portão sem fonte por idioma e o official_check (fatos dos oficiais no top-5) |
 
 ## 4. Design choices and trade-offs (decisões)
 
@@ -257,7 +286,7 @@ que vale para este desafio está no §0.
 | SQLite como padrão, **Postgres atrás da mesma interface** para vários hosts ([ADR 0003](docs/adr/0003-postgres-opcional.md)) | Postgres obrigatório / ORM / Redis | zero serviço externo para quem clona e roda; os testes de disputa (caso, ação, resposta, SLA, limite) rodam nos dois backends |
 | Agentes independentes em threads | asyncio | os agentes fazem I/O síncrono (SQLite, SDK); threads cortam o p95 sem reescrever a pilha |
 | Effort por papel (supervisor low, agentes medium) | um effort global | o supervisor só escolhe o próximo passo; quem redige com fonte precisa de mais |
-| {{decisão do desafio}} | {{alternativa}} | {{número}} |
+| Portão sem fonte mantido em 0,5 | limiar calibrado 7,19 (`--calibrate-gate`) | o calibrado responde 17% das perguntas en com fonte (n=6) contra 33% em uso; os 10 oficiais são en |
 
 ## 5. How LLM tools were used (como as ferramentas de LLM foram usadas)
 
@@ -265,8 +294,7 @@ que vale para este desafio está no §0.
   agentes Sonnet, juiz Opus ou de outra família (`JUDGE_PROVIDER=openai_compat`). Ferramentas com JSON Schema e
   identidade do servidor (`src/app/tools.py`); saída estruturada no router e no juiz; cassete grava cada resposta do
   LLM para o replay offline no CI.
-- **Na construção:** {{sessões do Claude Code (frentes em paralelo, orquestradas por uma sessão maestra), o que o
-  kit trouxe pronto e o que foi escrito no relógio; detalhe em docs/PROCEDENCIA.md}}
+- **Na construção:** uma sessão principal (regente) com 7 frentes em subagentes (K, R, T, Q, D em worktrees; H1, H2 e P sem acesso ao código), mais 2 rotuladores Sonnet independentes para o gold da busca; uma sessão maestra fora do relógio só cronometrou. O kit (motor, scripts e runner) veio pronto de antes do relógio: `docs/PROCEDENCIA.md`.
 - **Na avaliação:** LLM como juiz com canários e calibração humana; rascunho de rótulo pelo modelo com revisão do
   dono linha a linha (`python -m evals.error_analysis`), separado da rotulagem cega.
 
@@ -281,7 +309,7 @@ que vale para este desafio está no §0.
   cassete para o replay no CI (`--replay`, piso = taxas da gravação aceita).
 - **Humano**: análise de erros em ~60 traces reais (rascunho do modelo, edições do dono contadas, um modo de falha
   por checagem) e held-out cego rotulado na página (passa/falha ponta a ponta; a intenção é diagnóstico).
-  {{o que rodou no relógio e o que não rodou}}
+  rodou: corpus, gold, frentes, fumaça, rodada 1 ao vivo com juiz, ablação parcial. Não rodou: rodada 2, rotulagem humana, `check.py --docker --scale` completo.
 
 ## 7. Perguntas da entrevista, respondidas
 
@@ -289,11 +317,11 @@ As perguntas que a correção anterior deixou para a entrevista, respondidas com
 
 | Pergunta | Resposta curta | Onde está a prova |
 |---|---|---|
-| Quais respostas oficiais o juiz reprova, e por quê, se intenção e ferramentas acertam? | {{causas por caso, antes × depois}} | `docs/JUDGE_DIFF.md` |
-| O rerank tem ganho medido? Por que está (ou não) no caminho? | {{tabela bm25 × híbrido × rerank, latência}} | `evals/results/retrieval_compare.json` |
-| Onde a memória perde informação? | {{memória × roteamento, separados}} | §0 e `docs/RESULTS.md` |
-| Quanto do kit foi escrito depois das correções anteriores? | {{resposta direta, com a tabela do git}} | `docs/PROCEDENCIA.md` |
-| Como medir o ganho do replanejamento em perguntas reais? | {{split de perguntas reais de lojistas, com e sem}} | `evals/results/ablation_replan*.json` |
+| Quais respostas oficiais o juiz reprova, e por quê, se intenção e ferramentas acertam? | nenhuma oficial reprovada pelo juiz na rodada 1; três (01, 04, 06) saem como parciais, porque o site cobre só parte (preço sem a descrição da Clássica; Pix sem a regra explícita de conta) | `docs/JUDGE_DIFF.md` |
+| O rerank tem ganho medido? Por que está (ou não) no caminho? | decidido antes do relógio pelo kit (`docs/adr/0004-buscador-denso-com-teto-de-ram.md`); no relógio só a qualidade no gold novo: ver §0 (Recall@3 com e sem rerank em `evals/results/latest.json`) | `evals/results/retrieval_compare.json` |
+| Onde a memória perde informação? | a intenção do seguimento acerta em todos os casos de memória ao vivo; o que falha é o valor do turno anterior na resposta (`memory_acc`), ou seja, perda de memória e não de rota | §0 e `docs/RESULTS.md` |
+| Quanto do kit foi escrito depois das correções anteriores? | o motor inteiro; no relógio só o domínio Getnet (fluxo, tools, corpus, prompts, casos): `docs/PROCEDENCIA.md` e `docs/TIMESHEET.md` | `docs/PROCEDENCIA.md` |
+| Como medir o ganho do replanejamento em perguntas reais? | 40 perguntas reais do Reclame Aqui (`evals/real_questions.jsonl`) com e sem `needs` (`--ablate-replan --mode no_needs`); a ablação abortou no teto de US$ 1 com 28 casos (parcial, não comparável) | `evals/results/ablation_replan*.json` |
 
 ## 8. Procedência e linha do tempo
 
@@ -307,13 +335,62 @@ e como comparar pela primeira entrega.
 <details><summary>Linha do tempo (git log)</summary>
 
 <!-- timeline:begin -->
+| hora (UTC; Brasília = UTC−3) | min | commit |
+|---|---:|---|
+| 12:15:01 | 0 | chore: repositório (antes do relógio) |
+| 13:45:50 | 91 | chore: scaffold from entregar-desafio-cronometrado kit v5.4.0 |
+| 13:48:57 | 94 | chore: pré-voo (domínio challenge no lugar; suíte 964 passed, 95 skipped) |
+| 13:48:57 | 94 | spec: oficiais (10 casos com expect.facts e expect.entities) |
+| 13:50:15 | 95 | spec: taxonomia, desempates, parcial, standalone; casos replan 20, dependent 11, parallel 4, approval 4, memory 16 |
+| 13:52:02 | 97 | fork d: ARCHITECTURE.md com 3 diagramas (agentes, RAG, HITL) |
+| 13:52:04 | 97 | heldout: 80 casos cegos (H1 40 + H2 40, autores Sonnet só com enunciado e SPEC) |
+| 13:52:23 | 97 | fork d: OBSERVABILITY.md (sinais, custo, painel do piloto) |
+| 13:52:41 | 98 | fork d: ADR 0008 com gatilho de revisão; ADR 0009 escrita Getnet com quatro olhos |
+| 13:52:47 | 98 | fork k: corpus site.getnet.com.br (15 páginas, 178 trechos), glossário pt/en, 20 no_source; official_check 7/7 entidades |
+| 13:52:54 | 98 | fork d: VIDEO_SCRIPT.md |
+| 13:52:54 | 98 | fork d: pronto (ARCHITECTURE, OBSERVABILITY, ADR 0008/0009, VIDEO_SCRIPT) |
+| 13:52:57 | 98 | fork q: casos (66: official-var 12, memory 6, partial 5, dependent 3, hard 5, guardrail 35; regex offline bloqueia 23/32 ataques) |
+| 13:53:03 | 98 | merge: fork d (docs: ARCHITECTURE, OBSERVABILITY, ADR 0008/0009, VIDEO_SCRIPT) |
+| 13:53:28 | 98 | real: 40 perguntas reais de lojistas (Reclame Aqui, com link; user_id normalizado para o cliente de teste; 7 buscas, ~25 fontes descartadas; só títulos, viés para reclamação) |
+| 13:54:11 | 99 | docs: PILOT (shadow → assistido → autônomo por intenção, portões por arquivo) e procedência v5.4.0 |
+| 13:54:34 | 100 | fork q: calibração do juiz (48 rótulos, 24 positivos, 24 negativos = 4 por failure_type; RAG, tool e web) |
+| 13:55:06 | 100 | fork r: flow.py taxonomia+desempates (intent 100% em official/replan/dependent/parallel/approval/memory; dependent completed 100%) |
+| 13:55:07 | 100 | fork k: pronto (Recall@3 não medido: 0 positivas no gold, só 20 negativas; MRR n/d; Jaccard n/d; official_check 7/7) |
+| 13:55:10 | 100 | fork q: testes HTTP e guardrail (23 passed) |
+| 13:55:40 | 101 | fork r: prompts router (standalone, taxonomia) e supervisor (partial = resposta; troubleshoot records->faq); intent offline segue 100% nos 6 splits |
+| 13:55:40 | 101 | merge: fork k (15 páginas, 178 trechos, glossário 19 pares; entidades 7/7; gold sem positivas) |
+| 13:55:52 | 101 | fork t: data/crm com cliente1988 e cliente2024 (2 terminais, 8 transações, 2 recusas 51/05) |
+| 13:55:54 | 101 | fork t: 5 tools da SPEC, totais/datas/código de recusa no código, needs do manual (vendas de ontem R$ 814,40) |
+| 13:55:56 | 101 | fork t: tests/test_tools.py (9 passed) |
+| 13:55:58 | 101 | fork t: pronto (5 tools, 9 testes passed, fork_check verde em 1,9 s) |
+| 13:56:05 | 101 | fork q: EVAL_STRATEGY e THREAT_MODEL (STRIDE 6, OWASP LLM 8, ASI01-ASI10; regex 23/32) |
+| 13:56:05 | 101 | fork q: pronto (66 casos, guardrail 35, calibração 48 = 24/24, 23 testes passed, regex bloqueia 23/32) |
+| 13:56:35 | 102 | merge: fork t (5 tools, CRM 2 clientes, needs do manual; 9 testes) |
+| 13:56:35 | 102 | merge: fork q (66 casos, guardrail 35, calibração 48; 23 testes) |
+| 13:56:53 | 102 | fork r: 26 exemplos k-NN pt/en (uma clausula, uma intencao); intent segue 100% nos 6 splits |
+| 13:58:08 | 103 | fork r: tests/test_domain_router.py (84 passed: 49 roteados + 16x2 memory/standalone + desempates) |
+| 13:58:39 | 104 | fork r: tests/test_domain_supervisor.py (6 passed: replan, general sem humano, dependent records->faq, needs, defer, partial) |
+| 13:58:41 | 104 | fork r: pronto (intent 100% em official 10/10, replan 20/20, dependent 11/11, parallel 4/4, approval 4/4, memory 16/16; dependent completed_acc 100% offline; 90 testes da frente) |
+| 13:58:41 | 104 | merge: fork r (taxonomia + desempates, standalone, 26 exemplos k-NN; intent offline 100% nos 6 splits; 84 testes) |
+| 13:59:09 | 104 | merge: fork r (supervisor: 6 testes; pronto) |
+| 13:59:55 | 105 | fix: 2 exemplos k-NN de human_request coincidiam com 3 frases do held-out cego (teste de contaminação); trocados; real: 40 perguntas no cases.jsonl |
+| 14:01:17 | 106 | gold essencial às cegas: 87 perguntas (page 40, real 40, official 7) + 20 sem fonte, 2 rotuladores Sonnet independentes; GOLD OK |
+| 14:01:29 | 106 | merge: fork k (gold essencial às cegas, 2 rotuladores, GOLD OK) |
+| 14:10:29 | 115 | eval: fumaça ao vivo official repeat 1 (10/10 intent, 0 handoff, US$ 0,195, 0 erros; 01/04/06 parciais) |
+| 14:12:15 | 117 | docs: README textos do desafio (nome, fluxo Getnet, corpus) |
+| 14:13:58 | 119 | eval: rodada 1 ao vivo, splits completos antes do OOM (approval 4, parallel 4, partial 5; status complete) |
+| 14:14:17 | 119 | eval: gravações ao vivo (cassettes) de official, approval, parallel, partial para o replay no CI |
+| 14:27:04 | 132 | eval: rodada 1 ao vivo (official/memory repeat 3, real, official-var, hard, guardrail, heldout complete; juiz 266 casos, official fundamentadas 30/30; memória expects_fact 50%; replan e dependent abortaram por teto, fora) |
+| 14:32:41 | 138 | fix: desempates no domínio (perdeu o sinal / refused → troubleshoot; preciso abrir conta → knowledge): q-ov-04-pt, q-ov-05-pt, q-dep-02; intent offline 88,1% → 90,5% (n=126); red team offline segue 77,5% (regex do motor congelado) |
+| 14:32:53 | 138 | docs: procedência (tabela do git e teto de 58 min do relógio) |
+
+Do primeiro ao último commit: **138 min**.
 <!-- timeline:end -->
 
 </details>
 
 ## 9. Limitações e próximos passos
 
-- {{o que é simulado}}
-- {{cada métrica abaixo da referência do §0: o mecanismo, o número e o custo de corrigir (ex.: "o limiar se apoia em
-  97 perguntas e num gap de 0,067"; "corrigir: +15 perguntas fora do domínio, 20 min")}}
-- {{o que ficou de fora e por quê; o que não rodou no relógio}}
+- CRM (2 clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (Pix D+0, débito D+1 útil, crédito D+30) e a fila do operador.
+- **Memória pass@1 e números da memória:** o seguimento ('e qual foi o valor dela?') roteia certo, mas a resposta não repete o valor do turno anterior; corrigir = levar o fato já visto (`memory.py` fatos) ao prompt do records/faq e medir de novo (~1 rodada, US$ 3). **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana e held-out ponta a ponta:** não medidos, ninguém rotulou neste ensaio. **Portão sem fonte:** em uso, recusa pouco dos sem fonte; o calibrado recusaria os oficiais em inglês (decisão em §4). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
+- Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana (ninguém até T+35: 'factual sem validação humana', 'sem rodada de consenso'); análise de erros não revisada (J2 não aconteceu); rodada 1 começou no T+25 (o gate ficou verde, mas o `--calibrate-gate` não foi adotado) e o 1º processo foi morto por falta de memória (4 processos pesados ao mesmo tempo); replan e dependent ao vivo abortaram por teto de gasto e ficaram fora; rodada 2 não medida (T+45); `check.py --docker --scale` não reconferido no relógio.
