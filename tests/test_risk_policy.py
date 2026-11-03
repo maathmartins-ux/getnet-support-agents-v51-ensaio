@@ -56,10 +56,15 @@ def test_above_ceiling_is_not_proposed(anticipation):
         assert conn.execute("SELECT COUNT(*) FROM actions").fetchone()[0] == 0
 
 
-def test_unknown_amount_falls_back_to_four_eyes(anticipation):
-    result, _ = actions.run_tool("anticipate", {}, "u1", "conv-r")
-    assert result["risk"] == "high" and result["policy"]["amount"] is None
-    assert propose("muito")["risk"] == "high"
+def test_args_outside_the_schema_never_become_a_proposal(anticipation):
+    """Valor ausente ou fora do tipo: o schema vale no servidor e nada é proposto (antes ia aos quatro olhos)."""
+    from app.store import get_store
+
+    for args in ({}, {"amount": "muito"}):
+        result, _ = actions.run_tool("anticipate", args, "u1", "conv-r")
+        assert result["ok"] is False and result["error"] == "invalid_args" and "action_id" not in result
+    with get_store()._db() as conn:
+        assert not conn.execute("SELECT 1 FROM actions WHERE conversation_id = 'conv-r'").fetchall()
 
 
 def test_env_overrides_the_domain_limit(anticipation, monkeypatch):

@@ -30,13 +30,26 @@ def tool_specs() -> list[dict]:
             for n, t in registry().items()]
 
 
+def schema_errors(schema: dict, args: dict) -> list[str]:
+    """Erros de JSON Schema dos argumentos (o `strict` do provedor vale só para quem chama pela API do modelo; MCP,
+    retomada e chamadas internas passam por aqui também). Lista vazia = válido."""
+    from jsonschema import Draft202012Validator
+
+    return [f"{'/'.join(map(str, e.path)) or '(raiz)'}: {e.message}"[:200]
+            for e in Draft202012Validator(schema).iter_errors(args)][:5]
+
+
 def run_tool(name: str, args: dict, user_id: str, conversation_id: str | None = None,
              confirmed: bool = False) -> tuple[dict, ToolCall]:
     # user_id vindo do modelo é descartado já aqui: não entra no registro, na ação pendente nem na chamada.
     args = {k: v for k, v in (args or {}).items() if k != "user_id"}
     tool = registry().get(name)
+    invalid = schema_errors(tool["input_schema"], args) if tool is not None else None
     if tool is None:
         result = {"ok": False, "error": f"unknown_tool:{name}"}
+    elif invalid:  # o schema vale no servidor: argumento fora do formato nem vira proposta nem chega à tool
+        METRICS.inc("tool_args_invalid_total", tool=name)
+        result = {"ok": False, "error": "invalid_args", "details": invalid}
     elif tool.get("write") and not confirmed:
         decision = risk_policy.classify(name, tool, args, user_id)
         risk = decision.pop("risk")

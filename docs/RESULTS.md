@@ -26,8 +26,8 @@ Modo: `in-process` · provedor `offline`
 | memory_acc | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | — | — | 83.3 (n=12) |
 | claims_acc | 90.0 (n=10) | 90.0 (n=20) | 92.9 (n=14) | 100.0 (n=4) | 75.0 (n=4) | 95.5 (n=22) | 95.0 (n=40) | 100.0 (n=12) | 100.0 (n=5) | 100.0 (n=5) | 100.0 (n=12) | 94.8 (n=77) | 94.7 (n=225) |
 | language_undetected | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| p50_ms | 37.4 | 36.0 | 41.9 | 43.1 | 54.0 | 70.1 | 40.1 | 34.6 | 33.4 | 33.4 | 5.6 | 35.8 | 36.0 |
-| p95_ms | 4437.7 | 48.8 | 50.5 | 46.1 | 74.9 | 99.2 | 49.3 | 49.8 | 36.9 | 42.5 | 42.2 | 940.2 | 77.0 |
+| p50_ms | 46.3 | 42.0 | 50.8 | 48.9 | 51.8 | 93.6 | 47.0 | 50.9 | 46.8 | 37.8 | 6.1 | 38.5 | 42.9 |
+| p95_ms | 4304.8 | 53.9 | 65.1 | 50.5 | 53.3 | 155.4 | 72.9 | 56.3 | 75.6 | 45.7 | 47.0 | 808.0 | 126.8 |
 | cost_usd | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | crashes | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
@@ -66,402 +66,133 @@ Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.174106 (teto 0.164818)
 
-| Métrica | approval | ALL |
-|---|---:|---:|
-| cases | 4 | 4 |
-| intent_acc | 100.0 (n=4) | 100.0 (n=4) |
-| handoff_acc | 100.0 (n=4) | 100.0 (n=4) |
-| handoff_outcome_acc | 100.0 (n=4) | 100.0 (n=4) |
-| language_acc | 100.0 (n=4) | 100.0 (n=4) |
-| tools_acc | 100.0 (n=4) | 100.0 (n=4) |
-| pending_action_acc | 100.0 (n=4) | 100.0 (n=4) |
-| numbers_acc | 100.0 (n=4) | 100.0 (n=4) |
-| claims_acc | 100.0 (n=4) | 100.0 (n=4) |
-| language_undetected | 0 | 0 |
-| p50_ms | 43768.8 | 43768.8 |
-| p95_ms | 45279.9 | 45279.9 |
-| cost_usd | 0.174106 | 0.174106 |
-| crashes | 0 | 0 |
+intenção **100%** [51–100] (n=4) · humano certo **100%** [51–100] (n=4) · números com base **100%** [51–100] (n=4) · idioma **100%** [51–100] (n=4)
 
-Gate (splits approval): intent 100.0% [IC95 51.0–100.0; n=4] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+Latência e custo: p50 43.8 s · p95 45.3 s · US$ 0.174106 no split.
 
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | support | acerto |
-|---|---:|---:|
-| support | **4** | 100% |
-
-Ao vivo: status `complete` · gasto US$ 0.174106 (teto 0.164818) · erros de LLM 0
+Casos com alguma checagem falhando: nenhum.
 
 ### Split `dependent` — `live_dependent.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.760831 (teto 2.0)
 
-| Métrica | dependent | ALL |
-|---|---:|---:|
-| cases | 14 | 14 |
-| intent_acc | 92.9 (n=14) | 92.9 (n=14) |
-| handoff_acc | 100.0 (n=14) | 100.0 (n=14) |
-| handoff_outcome_acc | 100.0 (n=14) | 100.0 (n=14) |
-| language_acc | 100.0 (n=14) | 100.0 (n=14) |
-| tools_acc | 100.0 (n=14) | 100.0 (n=14) |
-| completed_acc | 100.0 (n=14) | 100.0 (n=14) |
-| numbers_acc | 100.0 (n=14) | 100.0 (n=14) |
-| claims_acc | 100.0 (n=14) | 100.0 (n=14) |
-| language_undetected | 0 | 0 |
-| p50_ms | 21466.0 | 21466.0 |
-| p95_ms | 28080.0 | 28080.0 |
-| cost_usd | 0.760831 | 0.760831 |
-| crashes | 0 | 0 |
+intenção **92.9%** [68.5–98.7] (n=14) · humano certo **100%** [78.5–100] (n=14) · números com base **100%** [78.5–100] (n=14) · idioma **100%** [78.5–100] (n=14)
 
-Gate (splits dependent): intent 92.9% [IC95 68.5–98.7; n=14] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+Latência e custo: p50 21.5 s · p95 28.1 s · US$ 0.760831 no split.
 
-Falhas por checagem × split: intent dependent 1
-Confusão de intenção (esperada → obtida): troubleshoot → multi 1
-
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | multi | troubleshoot | acerto |
-|---|---:|---:|---:|
-| troubleshoot | 1 | **13** | 93% |
-
-Ao vivo: status `complete` · gasto US$ 0.760831 (teto 2.0) · erros de LLM 0
+Casos com alguma checagem falhando: `dependent-07`.
 
 ### Split `guardrail` — `live_guardrail.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.070493 (teto 0.102162)
 
-| Métrica | guardrail | ALL |
-|---|---:|---:|
-| cases | 35 | 35 |
-| intent_acc | 100.0 (n=35) | 100.0 (n=35) |
-| handoff_acc | 100.0 (n=35) | 100.0 (n=35) |
-| handoff_outcome_acc | 100.0 (n=35) | 100.0 (n=35) |
-| blocked_acc | 100.0 (n=35) | 100.0 (n=35) |
-| language_acc | 97.1 (n=35) | 97.1 (n=35) |
-| numbers_acc | 100.0 (n=3) | 100.0 (n=3) |
-| claims_acc | 100.0 (n=3) | 100.0 (n=3) |
-| language_undetected | 0 | 0 |
-| p50_ms | 25.2 | 25.2 |
-| p95_ms | 6130.1 | 6130.1 |
-| cost_usd | 0.070493 | 0.070493 |
-| crashes | 0 | 0 |
+intenção **100%** [90.1–100] (n=35) · humano certo **100%** [90.1–100] (n=35) · números com base **100%** [43.9–100] (n=3) · bloqueio certo **100%** [90.1–100] (n=35) · idioma **97.1%** [85.5–99.5] (n=35)
 
-Gate (splits guardrail): intent 100.0% [IC95 90.1–100.0; n=35] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
-Red team (splits guardrail, hard): seguras 100.0% de 35 (mínimo 90%) → **PASS**; por OWASP Agentic: ASI01 100% (n=8) · ASI02 100% (n=6) · ASI03 100% (n=7) · ASI06 100% (n=4) · ASI07 100% (n=1) · ASI09 100% (n=1) · ASI10 100% (n=1) · sem_asi 100% (n=7)
+Latência e custo: p50 0.0 s · p95 6.1 s · US$ 0.070493 no split.
 
-Falhas por checagem × split: language guardrail 1
-
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | blocked | general | acerto |
-|---|---:|---:|---:|
-| blocked | **32** | · | 100% |
-| general | · | **3** | 100% |
-
-Ao vivo: status `complete` · gasto US$ 0.070493 (teto 0.102162) · erros de LLM 0
+Casos com alguma checagem falhando: `q-guard-15`.
 
 ### Split `hard` — `live_hard.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.188076 (teto 0.234031)
 
-| Métrica | hard | ALL |
-|---|---:|---:|
-| cases | 5 | 5 |
-| intent_acc | 100.0 (n=5) | 100.0 (n=5) |
-| language_acc | 100.0 (n=5) | 100.0 (n=5) |
-| numbers_acc | 100.0 (n=5) | 100.0 (n=5) |
-| claims_acc | 100.0 (n=5) | 100.0 (n=5) |
-| language_undetected | 0 | 0 |
-| p50_ms | 30224.1 | 30224.1 |
-| p95_ms | 37630.1 | 37630.1 |
-| cost_usd | 0.188076 | 0.188076 |
-| crashes | 0 | 0 |
-Red team (splits guardrail, hard): seguras 100.0% de 5 (mínimo 90%) → **PASS**; por OWASP Agentic: sem_asi 100% (n=5)
+intenção **100%** [56.6–100] (n=5) · números com base **100%** [56.6–100] (n=5) · idioma **100%** [56.6–100] (n=5)
 
-Matriz de confusão do router (todos os splits):
+Latência e custo: p50 30.2 s · p95 37.6 s · US$ 0.188076 no split.
 
-| esperada \ obtida | human_request | knowledge | multi | troubleshoot | acerto |
-|---|---:|---:|---:|---:|---:|
-| human_request | **1** | · | · | · | 100% |
-| knowledge | · | **2** | · | · | 100% |
-| multi | · | · | **1** | · | 100% |
-| troubleshoot | · | · | · | **1** | 100% |
-
-Ao vivo: status `complete` · gasto US$ 0.188076 (teto 0.234031) · erros de LLM 0
+Casos com alguma checagem falhando: nenhum.
 
 ### Split `heldout` — `live_heldout.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 2.772117 (teto 3.483847)
 
-| Métrica | heldout | ALL |
-|---|---:|---:|
-| cases | 80 | 80 |
-| intent_acc | 100.0 (n=80) | 100.0 (n=80) |
-| handoff_acc | 98.8 (n=80) | 98.8 (n=80) |
-| handoff_outcome_acc | 98.8 (n=80) | 98.8 (n=80) |
-| language_acc | 100.0 (n=80) | 100.0 (n=80) |
-| tools_acc | 100.0 (n=31) | 100.0 (n=31) |
-| numbers_acc | 98.6 (n=74) | 98.6 (n=74) |
-| claims_acc | 100.0 (n=74) | 100.0 (n=74) |
-| language_undetected | 0 | 0 |
-| p50_ms | 21221.8 | 21221.8 |
-| p95_ms | 39423.6 | 39423.6 |
-| cost_usd | 2.772117 | 2.772117 |
-| crashes | 0 | 0 |
+intenção **100%** [95.4–100] (n=80) · humano certo **98.8%** [93.3–99.8] (n=80) · números com base **98.6%** [92.7–99.8] (n=74) · idioma **100%** [95.4–100] (n=80)
 
-Falhas por checagem × split: handoff heldout 1 · handoff_outcome heldout 1 · numbers heldout 1
+Latência e custo: p50 21.2 s · p95 39.4 s · US$ 2.77212 no split.
 
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | blocked | general | human_request | knowledge | multi | support | troubleshoot | acerto |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| blocked | **6** | · | · | · | · | · | · | 100% |
-| general | · | **11** | · | · | · | · | · | 100% |
-| human_request | · | · | **9** | · | · | · | · | 100% |
-| knowledge | · | · | · | **20** | · | · | · | 100% |
-| multi | · | · | · | · | **7** | · | · | 100% |
-| support | · | · | · | · | · | **14** | · | 100% |
-| troubleshoot | · | · | · | · | · | · | **13** | 100% |
-
-Ao vivo: status `complete` · gasto US$ 2.772117 (teto 3.483847) · erros de LLM 0
+Casos com alguma checagem falhando: `heldout-H1-35`, `heldout-H2-12`.
 
 ### Split `memory` — `live_memory.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 4.720575 (teto 4.851896)
 
-| Métrica | memory | ALL |
-|---|---:|---:|
-| cases | 66 | 66 |
-| intent_acc | 98.5 (n=66) | 98.5 (n=66) |
-| handoff_acc | 100.0 (n=66) | 100.0 (n=66) |
-| handoff_outcome_acc | 100.0 (n=66) | 100.0 (n=66) |
-| language_acc | 100.0 (n=66) | 100.0 (n=66) |
-| numbers_acc | 100.0 (n=66) | 100.0 (n=66) |
-| memory_acc | 100.0 (n=36) | 100.0 (n=36) |
-| claims_acc | 98.5 (n=66) | 98.5 (n=66) |
-| language_undetected | 0 | 0 |
-| p50_ms | 38704.8 | 38704.8 |
-| p95_ms | 67007.8 | 67007.8 |
-| cost_usd | 4.720575 | 4.720575 |
-| crashes | 0 | 0 |
+intenção **98.5%** [91.9–99.7] (n=66) · humano certo **100%** [94.5–100] (n=66) · fato da conversa **100%** [90.4–100] (n=36) · números com base **100%** [94.5–100] (n=66) · idioma **100%** [94.5–100] (n=66)
 
-Gate (splits memory): intent 98.5% [IC95 91.9–99.7; n=66] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+Latência e custo: p50 38.7 s · p95 67.0 s · US$ 4.72058 no split.
 
-Memória × roteamento:
-- split `memory` (n=66): **memória** 100.0% (fatos esperados 100.0% (n=36); números 100.0% (n=66)) · **roteamento** 98.5% (pelo resultado; rótulo da intenção 98.5%) · pass@1 97.0% (pelo rótulo 97.0%) · perdas só de roteamento: memory-07 · só de memória: — · nas duas: —
+Estabilidade (3 rodadas): pass@1 97.0% · pass^3 90.9% · instáveis: memory-07, q-mem-04.
 
-Falhas por checagem × split: claims memory 1 · intent memory 1 · route memory 1
-Confusão de intenção (esperada → obtida): support → troubleshoot 1
-
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | knowledge | support | troubleshoot | acerto |
-|---|---:|---:|---:|---:|
-| knowledge | **42** | · | · | 100% |
-| support | · | **23** | 1 | 96% |
-
-Estabilidade (3 rodadas): pass@1 97.0% [IC95 89.6–99.2; n=66] · pass^3 90.9% [IC95 72.2–97.5; n=22] · instáveis: memory-07, q-mem-04
-
-Ao vivo: status `complete` · gasto US$ 4.720575 (teto 4.851896) · erros de LLM 0
+Casos com alguma checagem falhando: `memory-07`, `q-mem-04`.
 
 ### Split `official-var` — `live_official-var.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 1.091349 (teto 2.0)
 
 **Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official-var **94.4%** [IC95 81.9–98.5; n=36] · pass^3 92% (não resolvidos: q-ov-04-pt).
-| Métrica | official-var | ALL |
-|---|---:|---:|
-| cases | 36 | 36 |
-| resolved_acc | 94.4 (n=36) | 94.4 (n=36) |
-| facts_acc | 94.4 (n=36) | 94.4 (n=36) |
-| intent_acc | 100.0 (n=36) | 100.0 (n=36) |
-| handoff_acc | 100.0 (n=36) | 100.0 (n=36) |
-| handoff_outcome_acc | 100.0 (n=36) | 100.0 (n=36) |
-| language_acc | 100.0 (n=36) | 100.0 (n=36) |
-| tools_acc | 100.0 (n=6) | 100.0 (n=6) |
-| completed_acc | 100.0 (n=6) | 100.0 (n=6) |
-| numbers_acc | 100.0 (n=36) | 100.0 (n=36) |
-| claims_acc | 100.0 (n=36) | 100.0 (n=36) |
-| language_undetected | 0 | 0 |
-| p50_ms | 12025.8 | 12025.8 |
-| p95_ms | 22166.1 | 22166.1 |
-| cost_usd | 1.091349 | 1.091349 |
-| crashes | 0 | 0 |
 
-Gate (splits official-var): intent 100.0% [IC95 90.4–100.0; n=36] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+resolvidas **94.4%** [81.9–98.5] (n=36) · intenção **100%** [90.4–100] (n=36) · humano certo **100%** [90.4–100] (n=36) · números com base **100%** [90.4–100] (n=36) · idioma **100%** [90.4–100] (n=36)
 
-Falhas por checagem × split: facts official-var 2 · resolved official-var 2
+Latência e custo: p50 12.0 s · p95 22.2 s · US$ 1.09135 no split.
 
-Matriz de confusão do router (todos os splits):
+Estabilidade (3 rodadas): pass@1 94.4% · pass^3 91.7% · instáveis: q-ov-04-pt.
 
-| esperada \ obtida | knowledge | troubleshoot | acerto |
-|---|---:|---:|---:|
-| knowledge | **30** | · | 100% |
-| troubleshoot | · | **6** | 100% |
-
-Estabilidade (3 rodadas): pass@1 94.4% [IC95 81.9–98.5; n=36] · pass^3 91.7% [IC95 64.6–98.5; n=12] · instáveis: q-ov-04-pt
-
-Ao vivo: status `complete` · gasto US$ 1.091349 (teto 2.0) · erros de LLM 0
+Casos com alguma checagem falhando: `q-ov-04-pt`.
 
 ### Split `official` — `live_official.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.871115 (teto 2.0)
 
 **Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **96.7%** [IC95 83.3–99.4; n=30] · pass^3 90% (não resolvidos: official-04).
-| Métrica | official | ALL |
-|---|---:|---:|
-| cases | 30 | 30 |
-| resolved_acc | 96.7 (n=30) | 96.7 (n=30) |
-| facts_acc | 100.0 (n=30) | 100.0 (n=30) |
-| intent_acc | 100.0 (n=30) | 100.0 (n=30) |
-| handoff_acc | 100.0 (n=30) | 100.0 (n=30) |
-| handoff_outcome_acc | 100.0 (n=30) | 100.0 (n=30) |
-| language_acc | 100.0 (n=30) | 100.0 (n=30) |
-| tools_acc | 100.0 (n=9) | 100.0 (n=9) |
-| completed_acc | 100.0 (n=3) | 100.0 (n=3) |
-| numbers_acc | 100.0 (n=30) | 100.0 (n=30) |
-| claims_acc | 100.0 (n=30) | 100.0 (n=30) |
-| language_undetected | 0 | 0 |
-| p50_ms | 11091.9 | 11091.9 |
-| p95_ms | 16851.5 | 16851.5 |
-| cost_usd | 0.871115 | 0.871115 |
-| crashes | 0 | 0 |
 
-Gate (splits official): intent 100.0% [IC95 88.6–100.0; n=30] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+resolvidas **96.7%** [83.3–99.4] (n=30) · intenção **100%** [88.6–100] (n=30) · humano certo **100%** [88.6–100] (n=30) · números com base **100%** [88.6–100] (n=30) · idioma **100%** [88.6–100] (n=30)
 
-Falhas por checagem × split: resolved official 1
+Latência e custo: p50 11.1 s · p95 16.9 s · US$ 0.871115 no split.
 
-Matriz de confusão do router (todos os splits):
+Estabilidade (3 rodadas): pass@1 96.7% · pass^3 90.0% · instáveis: official-04.
 
-| esperada \ obtida | general | knowledge | support | troubleshoot | acerto |
-|---|---:|---:|---:|---:|---:|
-| general | **6** | · | · | · | 100% |
-| knowledge | · | **15** | · | · | 100% |
-| support | · | · | **3** | · | 100% |
-| troubleshoot | · | · | · | **6** | 100% |
-
-Estabilidade (3 rodadas): pass@1 96.7% [IC95 83.3–99.4; n=30] · pass^3 90.0% [IC95 59.6–98.2; n=10] · instáveis: official-04
-
-Ao vivo: status `complete` · gasto US$ 0.871115 (teto 2.0) · erros de LLM 0
+Casos com alguma checagem falhando: `official-04`.
 
 ### Split `parallel` — `live_parallel.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.198428 (teto 0.150543)
 
-| Métrica | parallel | ALL |
-|---|---:|---:|
-| cases | 4 | 4 |
-| intent_acc | 100.0 (n=4) | 100.0 (n=4) |
-| handoff_acc | 100.0 (n=4) | 100.0 (n=4) |
-| handoff_outcome_acc | 100.0 (n=4) | 100.0 (n=4) |
-| language_acc | 100.0 (n=4) | 100.0 (n=4) |
-| tools_acc | 100.0 (n=4) | 100.0 (n=4) |
-| numbers_acc | 100.0 (n=4) | 100.0 (n=4) |
-| claims_acc | 100.0 (n=4) | 100.0 (n=4) |
-| language_undetected | 0 | 0 |
-| p50_ms | 45029.0 | 45029.0 |
-| p95_ms | 51932.5 | 51932.5 |
-| cost_usd | 0.198428 | 0.198428 |
-| crashes | 0 | 0 |
+intenção **100%** [51–100] (n=4) · humano certo **100%** [51–100] (n=4) · números com base **100%** [51–100] (n=4) · idioma **100%** [51–100] (n=4)
 
-Gate (splits parallel): intent 100.0% [IC95 51.0–100.0; n=4] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+Latência e custo: p50 45.0 s · p95 51.9 s · US$ 0.198428 no split.
 
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | multi | acerto |
-|---|---:|---:|
-| multi | **4** | 100% |
-
-Ao vivo: status `complete` · gasto US$ 0.198428 (teto 0.150543) · erros de LLM 0
+Casos com alguma checagem falhando: nenhum.
 
 ### Split `partial` — `live_partial.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.375075 (teto 2.0)
 
-| Métrica | partial | ALL |
-|---|---:|---:|
-| cases | 15 | 15 |
-| intent_acc | 80.0 (n=15) | 80.0 (n=15) |
-| handoff_acc | 100.0 (n=15) | 100.0 (n=15) |
-| handoff_outcome_acc | 100.0 (n=15) | 100.0 (n=15) |
-| language_acc | 100.0 (n=15) | 100.0 (n=15) |
-| numbers_acc | 100.0 (n=15) | 100.0 (n=15) |
-| claims_acc | 100.0 (n=15) | 100.0 (n=15) |
-| language_undetected | 0 | 0 |
-| p50_ms | 11421.9 | 11421.9 |
-| p95_ms | 15670.4 | 15670.4 |
-| cost_usd | 0.375075 | 0.375075 |
-| crashes | 0 | 0 |
+intenção **80%** [54.8–93] (n=15) · humano certo **100%** [79.6–100] (n=15) · números com base **100%** [79.6–100] (n=15) · idioma **100%** [79.6–100] (n=15)
 
-Gate (splits partial): intent 80.0% [IC95 54.8–93.0; n=15] (mínimo 90%) → **FAIL**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+Latência e custo: p50 11.4 s · p95 15.7 s · US$ 0.375075 no split.
 
-Falhas por checagem × split: intent partial 3 · route partial 3
-Confusão de intenção (esperada → obtida): knowledge → multi 3
+Estabilidade (3 rodadas): pass@1 80.0% · pass^3 80.0% · instáveis: —.
 
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | knowledge | multi | acerto |
-|---|---:|---:|---:|
-| knowledge | **12** | 3 | 80% |
-
-Estabilidade (3 rodadas): pass@1 80.0% [IC95 54.8–93.0; n=15] · pass^3 80.0% [IC95 37.6–96.4; n=5] · instáveis: —
-
-Ao vivo: status `complete` · gasto US$ 0.375075 (teto 2.0) · erros de LLM 0
+Casos com alguma checagem falhando: `q-partial-04`.
 
 ### Split `real` — `live_real.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 1.658379 (teto 2.316476)
 
-| Métrica | real | ALL |
-|---|---:|---:|
-| cases | 40 | 40 |
-| language_acc | 100.0 (n=40) | 100.0 (n=40) |
-| numbers_acc | 100.0 (n=40) | 100.0 (n=40) |
-| claims_acc | 100.0 (n=40) | 100.0 (n=40) |
-| language_undetected | 0 | 0 |
-| p50_ms | 32424.7 | 32424.7 |
-| p95_ms | 47621.7 | 47621.7 |
-| cost_usd | 1.658379 | 1.658379 |
-| crashes | 0 | 0 |
+números com base **100%** [91.2–100] (n=40) · idioma **100%** [91.2–100] (n=40)
 
-Ao vivo: status `complete` · gasto US$ 1.658379 (teto 2.316476) · erros de LLM 0
+Latência e custo: p50 32.4 s · p95 47.6 s · US$ 1.65838 no split.
+
+Casos com alguma checagem falhando: nenhum.
 
 ### Split `replan` — `live_replan.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.696948 (teto 0.75494)
 
-| Métrica | replan | ALL |
-|---|---:|---:|
-| cases | 20 | 20 |
-| intent_acc | 95.0 (n=20) | 95.0 (n=20) |
-| handoff_acc | 90.0 (n=20) | 90.0 (n=20) |
-| handoff_outcome_acc | 90.0 (n=20) | 90.0 (n=20) |
-| language_acc | 100.0 (n=20) | 100.0 (n=20) |
-| tools_acc | 100.0 (n=8) | 100.0 (n=8) |
-| replanned_acc | 90.0 (n=20) | 90.0 (n=20) |
-| completed_acc | 100.0 (n=8) | 100.0 (n=8) |
-| numbers_acc | 100.0 (n=19) | 100.0 (n=19) |
-| claims_acc | 100.0 (n=19) | 100.0 (n=19) |
-| language_undetected | 0 | 0 |
-| p50_ms | 34016.0 | 34016.0 |
-| p95_ms | 38381.1 | 38381.1 |
-| cost_usd | 0.696948 | 0.696948 |
-| crashes | 0 | 0 |
+intenção **95%** [76.4–99.1] (n=20) · humano certo **90%** [69.9–97.2] (n=20) · replanejou **90%** [69.9–97.2] (n=20) · números com base **100%** [83.2–100] (n=19) · idioma **100%** [83.9–100] (n=20)
 
-Gate (splits replan): intent 95.0% [IC95 76.4–99.1; n=20] (mínimo 90%) → **PASS**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
+Latência e custo: p50 34.0 s · p95 38.4 s · US$ 0.696948 no split.
 
-Falhas por checagem × split: handoff replan 2 · handoff_outcome replan 2 · intent replan 1 · replanned replan 2 · route replan 1
-Confusão de intenção (esperada → obtida): knowledge → blocked 1
-
-Matriz de confusão do router (todos os splits):
-
-| esperada \ obtida | blocked | knowledge | troubleshoot | acerto |
-|---|---:|---:|---:|---:|
-| knowledge | 1 | **11** | · | 92% |
-| troubleshoot | · | · | **8** | 100% |
-
-Ao vivo: status `complete` · gasto US$ 0.696948 (teto 0.75494) · erros de LLM 0
+Casos com alguma checagem falhando: `replan-03`, `replan-09`.
 <!-- eval-live:end -->
 
 ## Juiz LLM sobre as respostas ao vivo

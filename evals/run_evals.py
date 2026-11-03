@@ -1525,9 +1525,47 @@ def _lang_cell(lang: str, v: dict) -> str:
             f"recusa {pct(v['neg_refused'])} (n={v['negatives']})")
 
 
+SUMMARY_KEYS = (("resolved_acc", "resolvidas"), ("intent_acc", "intenção"),
+                ("handoff_acc", "humano certo"), ("replanned_acc", "replanejou"),
+                ("memory_acc", "fato da conversa"), ("numbers_acc", "números com base"),
+                ("blocked_acc", "bloqueio certo"), ("language_acc", "idioma"))
+
+
+def split_summary(report: dict) -> str:
+    """Bloco de UM split ao vivo, legível: uma linha de taxas com IC95 (Wilson) e n, latência e custo, e os casos que
+    falharam por id (a resposta de cada um está no JSON e, nos oficiais, em docs/DEMO.md). A tabela inteira de
+    métricas fica no JSON: repetida por split, escondia o que importa."""
+    m = report["metrics"]["ALL"]
+    ci = m.get("ci") or {}
+    parts = []
+    for key, label in SUMMARY_KEYS:
+        if m.get(key) is None:
+            continue
+        c = ci.get(key) or {}
+        rng = f" [{c['lo']:g}–{c['hi']:g}]" if c.get("lo") is not None else ""
+        parts.append(f"{label} **{m[key]:g}%**{rng} (n={c.get('n', m.get('cases'))})")
+    out = [" · ".join(parts) if parts else f"{m.get('cases')} casos"]
+    lat = [f"p50 {m['p50_ms'] / 1000:.1f} s" if m.get("p50_ms") else "",
+           f"p95 {m['p95_ms'] / 1000:.1f} s" if m.get("p95_ms") else "",
+           f"US$ {m['cost_usd']:g} no split" if m.get("cost_usd") is not None else ""]
+    out.append("Latência e custo: " + " · ".join(x for x in lat if x) + ".")
+    st = report.get("stability") or {}
+    if st.get("runs", 1) > 1:
+        out.append(f"Estabilidade ({st['runs']} rodadas): pass@1 {st['pass_at_1']:.1%} · pass^{st['runs']} "
+                   f"{st['pass_hat_k']:.1%} · instáveis: {', '.join(st['unstable']) or '—'}.")
+    failed = sorted({r["id"] for r in report.get("rows", [])
+                     if r.get("crash") or any(v is False for v in (r.get("checks") or {}).values())})
+    out.append("Casos com alguma checagem falhando: " + (", ".join(f"`{i}`" for i in failed) or "nenhum") + ".")
+    if line := resolved_line(report):
+        out.insert(0, line)
+    return "\n\n".join(out)
+
+
 def to_markdown(report: dict, split_view: bool = False) -> str:
     """Relatório em markdown. `split_view`: bloco de UM split numa página com vários (o retrieval sai uma vez, na
     seção de busca, e o gate só aparece no split que o gate cobre)."""
+    if split_view:
+        return split_summary(report)
     splits = [s for s in report["metrics"] if s != "ALL"] + ["ALL"]
     # métrica sem valor em nenhum split não vira linha de traços (ex.: idioma no modo offline, que cita a fonte)
     keys = [k for k in report["metrics"]["ALL"] if k != "ci"
