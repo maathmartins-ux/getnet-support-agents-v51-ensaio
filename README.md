@@ -28,8 +28,8 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 | Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
 | Memória ao vivo: pass@1 | 0.95 | conversas de vários turnos: o fato do turno anterior chega à resposta |
-| Busca: Recall@3 | 0.81 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
-| Busca: MRR | 0.78 | posição média da primeira página certa (1 = sempre em primeiro) |
+| Busca: Recall@3 | 0.88 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
+| Busca: MRR | 0.84 | posição média da primeira página certa (1 = sempre em primeiro) |
 <!-- scorecard:end -->
 
 ### 0.1 Mapeamento do desafio
@@ -344,9 +344,9 @@ e como comparar pela primeira entrega.
 | 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
 | 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
 | 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
-| 22:21:18 | 606 | domínio: portão sem fonte recalibrado no corpus ampliado (--calibrate-rerank-gate --apply: responde 98%, recusa 86%); offline regenerado |
+| 22:32:08 | 617 | busca: gold re-rotulado às cegas após o corpus ampliado (2 rotuladores, Jaccard 0,857); ordem do denso + nota do cross só no portão (data/retriever.json, medido); onde vai o tempo e quem decide (trace_stats) |
 
-Do primeiro ao último commit: **606 min**, 106 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **617 min**, 108 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
