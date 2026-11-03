@@ -418,8 +418,9 @@ e como comparar pela primeira entrega.
 | 20:17:17 | 482 | router: exemplos rotulados de duas perguntas sobre o MESMO produto (knowledge, não multi); rotulagem com amostra enriquecida |
 | 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
 | 20:23:56 | 489 | readme: números e linha do tempo (fill_readme, último passo) |
+| 20:32:26 | 497 | docs: README sem número escrito à mão que envelhece (portão, juiz); transcrição HITL regenerada sem frase quebrada; senha de exemplo barrada em produção |
 
-Do primeiro ao último commit: **489 min**.
+Do primeiro ao último commit: **497 min**.
 <!-- timeline:end -->
 
 </details>
