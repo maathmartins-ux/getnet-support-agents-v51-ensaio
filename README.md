@@ -344,9 +344,9 @@ e como comparar pela primeira entrega.
 | 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
 | 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
 | 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
-| 22:32:08 | 617 | busca: gold re-rotulado às cegas após o corpus ampliado (2 rotuladores, Jaccard 0,857); ordem do denso + nota do cross só no portão (data/retriever.json, medido); onde vai o tempo e quem decide (trace_stats) |
+| 22:32:42 | 618 | eval: offline com a ordem do denso e o portão pela nota do cross (gate de intenção 90,5%) |
 
-Do primeiro ao último commit: **617 min**, 108 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **618 min**, 109 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
