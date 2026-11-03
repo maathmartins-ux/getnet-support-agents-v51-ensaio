@@ -1,0 +1,771 @@
+{
+  "tolerance_pp": 0.0,
+  "splits": {
+    "approval": {
+      "cassette": "approval.jsonl",
+      "live": "live_approval.json",
+      "problems": [
+        "4 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split approval)",
+        "intent_acc: replay 0.0 abaixo do piso 100.0",
+        "handoff_acc: replay None abaixo do piso 100.0",
+        "handoff_outcome_acc: replay None abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "tools_acc: replay None abaixo do piso 100.0",
+        "pending_action_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 0.0 abaixo do piso 100.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 4,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_outcome_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "tools_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pending_action_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 4,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "dependent": {
+      "cassette": "dependent.jsonl",
+      "live": "live_dependent.json",
+      "problems": [
+        "14 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split dependent)",
+        "intent_acc: replay 0.0 abaixo do piso 92.9",
+        "handoff_acc: replay None abaixo do piso 100.0",
+        "handoff_outcome_acc: replay None abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "tools_acc: replay None abaixo do piso 100.0",
+        "completed_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 0.0 abaixo do piso 92.9",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 14,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 92.9,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_outcome_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "tools_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "completed_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 92.9,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 14,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "guardrail": {
+      "cassette": "guardrail.jsonl",
+      "live": "live_guardrail.json",
+      "problems": [
+        "10 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split guardrail)",
+        "intent_acc: replay 71.4 abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 97.1",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 71.4 abaixo do piso 97.1",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 10,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 71.4,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "handoff_outcome_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "blocked_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 97.1,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 71.4,
+          "floor": 97.1,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 10,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "hard": {
+      "cassette": "hard.jsonl",
+      "live": "live_hard.json",
+      "problems": [
+        "5 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split hard)",
+        "intent_acc: replay 0.0 abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 0.0 abaixo do piso 100.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 5,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 5,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "heldout": {
+      "cassette": "heldout.jsonl",
+      "live": "live_heldout.json",
+      "problems": [
+        "76 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split heldout)",
+        "intent_acc: replay 5.0 abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "tools_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 98.6",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 5.0 abaixo do piso 97.5",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 76,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 5.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": 100.0,
+          "floor": 98.8,
+          "ok": true
+        },
+        "handoff_outcome_acc": {
+          "replay": 100.0,
+          "floor": 98.8,
+          "ok": true
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "tools_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 98.6,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 5.0,
+          "floor": 97.5,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 76,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "memory": {
+      "cassette": "memory.jsonl.gz",
+      "live": "live_memory.json",
+      "problems": [
+        "66 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split memory)",
+        "intent_acc: replay 0.0 abaixo do piso 98.5",
+        "handoff_acc: replay None abaixo do piso 100.0",
+        "handoff_outcome_acc: replay None abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "memory_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 98.5",
+        "pass_at_1: replay 0.0 abaixo do piso 97.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 66,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 98.5,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_outcome_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "memory_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 98.5,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 97.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 66,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "official-var": {
+      "cassette": "official-var.jsonl",
+      "live": "live_official-var.json",
+      "problems": [
+        "36 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split official-var)",
+        "resolved_acc: replay None abaixo do piso 94.4",
+        "facts_acc: replay None abaixo do piso 94.4",
+        "intent_acc: replay 0.0 abaixo do piso 100.0",
+        "handoff_acc: replay None abaixo do piso 100.0",
+        "handoff_outcome_acc: replay None abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "tools_acc: replay None abaixo do piso 100.0",
+        "completed_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 0.0 abaixo do piso 94.4",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 36,
+      "status": "complete",
+      "comparison": {
+        "resolved_acc": {
+          "replay": null,
+          "floor": 94.4,
+          "ok": false
+        },
+        "facts_acc": {
+          "replay": null,
+          "floor": 94.4,
+          "ok": false
+        },
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_outcome_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "tools_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "completed_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 94.4,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 36,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "official": {
+      "cassette": "official.jsonl",
+      "live": "live_official.json",
+      "problems": [
+        "26 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split official)",
+        "intent_acc: replay 13.3 abaixo do piso 100.0",
+        "pass_at_1: replay 13.3 abaixo do piso 100.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 26,
+      "status": "complete",
+      "comparison": {
+        "resolved_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "facts_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "intent_acc": {
+          "replay": 13.3,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "handoff_outcome_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "language_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "tools_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "completed_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "numbers_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "claims_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "pass_at_1": {
+          "replay": 13.3,
+          "floor": 100.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 26,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "parallel": {
+      "cassette": "parallel.jsonl",
+      "live": "live_parallel.json",
+      "problems": [
+        "4 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split parallel)",
+        "intent_acc: replay 0.0 abaixo do piso 100.0",
+        "handoff_acc: replay None abaixo do piso 100.0",
+        "handoff_outcome_acc: replay None abaixo do piso 100.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "tools_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 0.0 abaixo do piso 100.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 4,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "handoff_outcome_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "tools_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 4,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "partial": {
+      "cassette": "partial.jsonl",
+      "live": "live_partial.json",
+      "problems": [],
+      "misses": 0,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "handoff_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "handoff_outcome_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "language_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "numbers_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "claims_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "pass_at_1": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "crashes": {
+          "replay": 0,
+          "max": 0,
+          "ok": true
+        }
+      }
+    },
+    "real": {
+      "cassette": "real.jsonl",
+      "live": "live_real.json",
+      "problems": [
+        "32 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split real)",
+        "pass_at_1: replay 20.0 abaixo do piso 100.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 32,
+      "status": "complete",
+      "comparison": {
+        "language_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "numbers_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "claims_acc": {
+          "replay": 100.0,
+          "floor": 100.0,
+          "ok": true
+        },
+        "pass_at_1": {
+          "replay": 20.0,
+          "floor": 100.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 32,
+          "max": 0,
+          "ok": false
+        }
+      }
+    },
+    "replan": {
+      "cassette": "replan.jsonl",
+      "live": "live_replan.json",
+      "problems": [
+        "20 pedido(s) não gravado(s): o código mudou desde a gravação; grave de novo (python -m evals.run_evals --live --split replan)",
+        "intent_acc: replay 0.0 abaixo do piso 95.0",
+        "handoff_acc: replay None abaixo do piso 90.0",
+        "handoff_outcome_acc: replay None abaixo do piso 90.0",
+        "language_acc: replay None abaixo do piso 100.0",
+        "tools_acc: replay None abaixo do piso 100.0",
+        "replanned_acc: replay None abaixo do piso 90.0",
+        "completed_acc: replay None abaixo do piso 100.0",
+        "numbers_acc: replay None abaixo do piso 100.0",
+        "claims_acc: replay None abaixo do piso 100.0",
+        "pass_at_1: replay 0.0 abaixo do piso 90.0",
+        "max_crashes: replay None abaixo do piso 0"
+      ],
+      "misses": 20,
+      "status": "complete",
+      "comparison": {
+        "intent_acc": {
+          "replay": 0.0,
+          "floor": 95.0,
+          "ok": false
+        },
+        "handoff_acc": {
+          "replay": null,
+          "floor": 90.0,
+          "ok": false
+        },
+        "handoff_outcome_acc": {
+          "replay": null,
+          "floor": 90.0,
+          "ok": false
+        },
+        "language_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "tools_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "replanned_acc": {
+          "replay": null,
+          "floor": 90.0,
+          "ok": false
+        },
+        "completed_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "numbers_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "claims_acc": {
+          "replay": null,
+          "floor": 100.0,
+          "ok": false
+        },
+        "pass_at_1": {
+          "replay": 0.0,
+          "floor": 90.0,
+          "ok": false
+        },
+        "crashes": {
+          "replay": 20,
+          "max": 0,
+          "ok": false
+        }
+      }
+    }
+  },
+  "passed": false
+}

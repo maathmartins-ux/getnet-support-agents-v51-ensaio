@@ -168,8 +168,8 @@ Na Getnet, o Knowledge também atende o geral (clima Open-Meteo e câmbio PTAX/B
   `src/app/config.py`; ninguém roda `--choose-retriever` no relógio). A 1ª busca usa as palavras do cliente; a
   pergunta reescrita pelo router entra junto. Placar no **caminho do agente** (o que o redator recebe, com o
   rerank): Recall@5 (o redator lê os 5 primeiros), MRR@10, rank do 1º trecho certo por pergunta e recorte por
-  origem; separação com × sem fonte pela nota do rerank (AUC no bloco de busca de `docs/RESULTS.md`, gerado). O portão "sem fonte" tem
-  limiar calibrado por idioma (`--calibrate-gate`); o BM25 só entra no idioma do corpus (`rag.lexical_fits`).
+  origem; separação com × sem fonte pela nota do rerank (AUC no bloco de busca de `docs/RESULTS.md`, gerado). O portão "sem fonte" em uso
+  é a nota do cross-encoder (`MIN_RERANK`, calibrado por `retrieval_eval.rerank_gate`); sem rerank, vale o BM25.
 - **Generation** (`src/app/agents.py`, `src/app/prompts/faq.md`): o agente de conhecimento redige só com os trechos
   aceitos e cita a fonte; responde o que a fonte cobre e diz o que falta (`partial`) ou vai ao humano (`insufficient`).
   Corpus Getnet: as páginas de `data/sources.json` (site.getnet.com.br: maquininhas, Pix, conta digital, crediário, Link de Pagamento, taxas, dúvidas, antecipação, manual das máquinas), lista e datas em [docs/SOURCES.md](docs/SOURCES.md); buscador do kit sem troca no relógio; medida em §0.
@@ -278,7 +278,7 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
 | SQLite como padrão, **Postgres atrás da mesma interface** para vários hosts ([ADR 0003](docs/adr/0003-postgres-opcional.md)) | Postgres obrigatório / ORM / Redis | zero serviço externo para quem clona e roda; os testes de disputa (caso, ação, resposta, SLA, limite) rodam nos dois backends |
 | Agentes independentes em threads | asyncio | os agentes fazem I/O síncrono (SQLite, SDK); threads cortam o p95 sem reescrever a pilha |
 | Effort por papel (supervisor low, agentes medium) | um effort global | o supervisor só escolhe o próximo passo; quem redige com fonte precisa de mais |
-| Portão sem fonte mantido em 0,5 | limiar calibrado 7,19 (`--calibrate-gate`) | o calibrado responde 17% das perguntas en com fonte (n=6) contra 33% em uso; os 10 oficiais são en |
+| **Portão sem fonte pela nota do cross-encoder** (`MIN_RERANK` no domínio) | portão BM25 (0,5) ou o BM25 calibrado (7,19) | o BM25 em 0,5 recusava pouco dos sem fonte e o calibrado recusava oficiais em inglês; a nota do cross-encoder separa melhor (calibração `rerank_gate`, números na linha de busca de `docs/RESULTS.md`, gerada) |
 
 ## 5. How LLM tools were used (como as ferramentas de LLM foram usadas)
 
@@ -301,7 +301,7 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
   cassete para o replay no CI (`--replay`, piso = taxas da gravação aceita).
 - **Humano**: análise de erros em ~60 traces reais (rascunho do modelo, edições do dono contadas, um modo de falha
   por checagem) e held-out cego rotulado na página (passa/falha ponta a ponta; a intenção é diagnóstico).
-  rodou: corpus, gold, frentes, fumaça, rodada 1 ao vivo com juiz, ablação parcial. Depois do relógio: bateria completa, 18 rótulos humanos do dono, transcrição HITL ao vivo. Não rodou: `check.py --docker --scale` completo.
+  O que rodou no relógio: corpus, gold, frentes, fumaça, rodada 1 ao vivo com juiz, ablação parcial. Depois do relógio: bateria completa, 18 rótulos humanos do dono, transcrição HITL ao vivo. Não rodou: `check.py --docker --scale` completo.
 
 ## 7. Perguntas da entrevista, respondidas
 
@@ -309,7 +309,7 @@ As perguntas que uma entrevista técnica faria, respondidas com o número medido
 
 | Pergunta | Resposta curta | Onde está a prova |
 |---|---|---|
-| Quais respostas oficiais o juiz reprova, e por quê, se intenção e ferramentas acertam? | 2 de 30 na rodada atual: official-02 (uma rodada) atribuiu a previsão à fonte principal de clima, que não tinha respondido; official-06 (uma rodada) descreveu a Reserva Financeira sem dar o nome. Nenhuma por número sem base | `evals/results/judge.json` |
+| Quais respostas oficiais o juiz reprova, e por quê, se intenção e ferramentas acertam? | as reprovadas e o motivo de cada uma estão em `evals/results/judge.json` (`verdicts`, campo `reason`) e no bloco do juiz de `docs/RESULTS.md` (gerado); o tipo mais comum é afirmação sem fonte, nunca número sem base | `evals/results/judge.json` |
 | O rerank tem ganho medido? Por que está (ou não) no caminho? | decidido antes do relógio pelo kit (`docs/adr/0004-buscador-denso-com-teto-de-ram.md`); no relógio só a qualidade no gold novo: ver §0 (Recall@3 e MRR do caminho do agente em `evals/results/latest.json`) | `docs/adr/0004-buscador-denso-com-teto-de-ram.md` |
 | Onde a memória perde informação? | a intenção do seguimento acerta nos casos de memória ao vivo; o que falta é pontual, não de rota (pass@1 e fato da conversa no §0, gerados) | §0 e `docs/RESULTS.md` |
 | Quanto do kit foi escrito depois das correções anteriores? | o motor inteiro; no relógio só o domínio Getnet (fluxo, tools, corpus, prompts, casos): `docs/PROCEDENCIA.md` e `docs/TIMESHEET.md` | `docs/PROCEDENCIA.md` |
@@ -417,6 +417,7 @@ e como comparar pela primeira entrega.
 | 19:52:33 | 458 | kit: portão sem fonte pela nota do cross-encoder (MIN_RERANK -5,2247 calibrado no gold do desafio); README sem contradição nos rótulos humanos; frase sem citação quebrada |
 | 20:17:17 | 482 | router: exemplos rotulados de duas perguntas sobre o MESMO produto (knowledge, não multi); rotulagem com amostra enriquecida |
 | 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
+| 20:23:56 | 489 | readme: números e linha do tempo (fill_readme, último passo) |
 
 Do primeiro ao último commit: **489 min**.
 <!-- timeline:end -->
@@ -426,5 +427,5 @@ Do primeiro ao último commit: **489 min**.
 ## 9. Limitações e próximos passos
 
 - CRM (2 clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (Pix D+0, débito D+1 útil, crédito D+30) e a fila do operador.
-- **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana:** 1 rotulador e 18 rótulos, só 1 falha entre eles: a concordância vale, o TNR do juiz não (precisa de ~20 falhas rotuladas; próxima amostra estratificada com falhas conhecidas). **Portão sem fonte:** em uso, recusa pouco dos sem fonte; o calibrado recusaria os oficiais em inglês (decisão em §4). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
+- **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana:** 1 rotulador e 18 rótulos, só 1 falha entre eles: a concordância vale, o TNR do juiz não (precisa de ~20 falhas rotuladas; próxima amostra estratificada com falhas conhecidas). **Portão sem fonte:** pela nota do cross-encoder, calibrado com 22 perguntas sem fonte (poucas: IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
 - Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana no relógio (feita depois, pelo dono: 18 rótulos, sem rodada de consenso); análise de erros não revisada (J2 não aconteceu); rodada 1 começou no T+25 (o gate ficou verde, mas o `--calibrate-gate` não foi adotado) e o 1º processo foi morto por falta de memória (4 processos pesados ao mesmo tempo); replan e dependent abortaram por teto na rodada 1 e foram medidos depois, completos, na confirmação (cota com piso nos turnos); `check.py --docker --scale` não reconferido no relógio.

@@ -59,7 +59,13 @@ def insecure_defaults() -> list[str]:
     """Segredo padrão ou curto torna o token forjável. Visível no /health e no log."""
     weak = keys.weak_secrets()  # HS256 do conjunto de chaves do JWT (AUTH_SECRET sem AUTH_KEYS)
     token = operator_token()
-    return weak + (["OPERATOR_TOKEN"] if token.startswith(("dev-", "troque-")) or len(token) < 16 else [])
+    weak += ["OPERATOR_TOKEN"] if token.startswith(("dev-", "troque-")) or len(token) < 16 else []
+    # senha de exemplo do compose (Postgres/Grafana) também conta: APP_ENV=production não sobe com ela
+    if "change-me" in os.getenv("DATABASE_URL", ""):
+        weak.append("POSTGRES_PASSWORD")
+    if "change-me" in os.getenv("GF_SECURITY_ADMIN_PASSWORD", ""):
+        weak.append("GRAFANA_ADMIN_PASSWORD")
+    return weak
 
 
 def sla_check(now: float | None = None) -> list[dict]:

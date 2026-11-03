@@ -46,3 +46,8 @@ def test_generated_operator_token_is_not_printed(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("OPERATOR_TOKEN", raising=False)
     token = config.operator_token()
     assert token not in capsys.readouterr().err
+
+
+def test_compose_example_passwords_count_as_insecure(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql://postgres:change-me-in-env@postgres:5432/app")
+    assert "POSTGRES_PASSWORD" in insecure_defaults()
