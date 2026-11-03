@@ -1,13 +1,13 @@
 # Respostas reais — split `official`
 
-Geradas de `evals/results/live_official.json` (provedor `anthropic`, status `complete`, gasto US$ 0.69) no commit `504f0ac` em 03/11/2026 14:27 UTC. Nada aqui foi escrito à mão: é a saída do `POST /chat` com o LLM ligado, 1ª rodada de cada caso.
+Geradas de `evals/results/live_official.json` (provedor `anthropic`, status `complete`, gasto US$ 0.91) no commit `1bebfd8` em 03/11/2026 16:54 UTC. Nada aqui foi escrito à mão: é a saída do `POST /chat` com o LLM ligado, 1ª rodada de cada caso.
 
-Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
+Estabilidade em 3 rodadas: pass@1 0.9667, pass^3 0.9; instáveis: official-02.
 
 | caso | intenção | rota | ferramentas | handoff | veredito automático |
 |---|---|---|---|---|---|
 | `official-01` | knowledge | router → faq | — | não | OK |
-| `official-02` | general | router → faq | — | não | OK |
+| `official-02` | general | router → faq | — | não | falhou: numbers |
 | `official-03` | support | router → records | get_settlements | não | OK |
 | `official-04` | knowledge | router → faq | — | não | OK |
 | `official-05` | troubleshoot | router → records → faq | get_terminal_status | não | OK |
@@ -21,60 +21,72 @@ Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
 
 **Pergunta:** What's the difference between the Get Clássica and the Get Smart?
 
-**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0120 · **latência:** 32.7 s
+**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0291 · **latência:** 41.8 s
 
 **Resposta:**
 
-> - **Get Smart:** It is a smart card machine. You can manage stock, take orders, close tabs, issue tax receipts and integrate with your business system, all on the terminal [sup-duvidas-get-smart-10]. It replaces the computer and fiscal printer at the counter [sup-duvidas-get-smart-08]. It also reconciles payments across credit, debit, store credit (crediário), QR Code and cash [sup-duvidas-get-smart-08]. It costs R$ 129,90/month [prod-todas-as-maquininhas-04][prod-get-tap-03].
-> - **Get Clássica:** It costs R$ 79,90/month [prod-todas-as-maquininhas-04][prod-get-tap-03].
+> Here's what the sources cover. They only partly answer your question.
 >
-> The sources don't list the Get Clássica's features or technical specifications. They also don't give a feature-by-feature comparison between the two.
+> - **Monthly price:** The Get Clássica costs R$ 79,90/month. The Get Smart costs R$ 129,90/month. Both prices apply if you don't reach the sales thresholds for the rental waiver [prod-get-tap-03][prod-todas-as-maquininhas-04].
+> - **Rental waiver:**
+>   - Get Clássica: monthly sales above R$ 20 mil, above R$ 40 mil, or above R$ 80 mil.
+>   - Get Smart: monthly sales above R$ 40 mil or above R$ 80 mil.
+>   - Source: [prod-todas-as-maquininhas-02].
+> - **Get Smart features:**
+>   - It's a smart machine. You can manage stock, take orders, close tabs and issue fiscal receipts on the device [sup-duvidas-get-smart-10].
+>   - It works as a fiscal printer and computer, so you don't need a separate one at the counter.
+>   - It reconciles payments across credit, debit, store credit (crediário), QR Code and cash [sup-duvidas-get-smart-08].
 >
-> If you'd like, I can hand this question to a human agent.
+> The sources don't describe the Get Clássica's features, so I can't give a feature-by-feature comparison. I can pass this to a human agent if you'd like.
 
 **Passos:**
 
-1. **faq** · partial · motivo `partial_coverage` · 29295 ms
+1. **faq** · partial · motivo `partial_coverage` · 21082 ms
 
-**Fontes:** <https://site.getnet.com.br/duvidas/get-smart/>; <https://site.getnet.com.br/todas-as-maquininhas/>; <https://site.getnet.com.br/duvidas/get-smart/>; <https://site.getnet.com.br/todas-as-maquininhas/>; <https://site.getnet.com.br/get-tap/>
+**Fontes:** <https://site.getnet.com.br/duvidas/get-smart/>; <https://site.getnet.com.br/get-tap/>; <https://site.getnet.com.br/duvidas/get-smart/>; <https://site.getnet.com.br/todas-as-maquininhas/>; <https://site.getnet.com.br/todas-as-maquininhas/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True, 'facts': True, 'resolved': True}
 
 ## official-02
 
 **Pergunta:** What's the weather forecast in Porto Alegre tomorrow?
 
-**Intenção:** general (esperada general) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.1043 · **latência:** 24.5 s
+**Intenção:** general (esperada general) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0723 · **latência:** 25.9 s
 
 **Resposta:**
 
-> I couldn't confirm the forecast for Porto Alegre tomorrow. The sources I found don't include the specific temperatures or conditions for that day, so I can't give you reliable numbers. For the latest forecast, check INMET (previsao.inmet.gov.br) directly.
+> I couldn't confirm tomorrow's forecast for Porto Alegre (Wednesday, Nov [unconfirmed value], 2026). The weather results I found are either undated or out of date, so I can't give you reliable temperatures, rain amounts or wind figures.
 >
-> I can help with your sales, deposit schedule, or terminal status if you need it.
+> I couldn't confirm one of the values; I can hand this to a human agent to confirm it.
 
 **Passos:**
 
-1. **faq** · ok · 17985 ms
+1. **faq** · ok · 16283 ms
 
-**Fontes:** <https://www.ventusky.com/porto-alegre>; <https://www.meteoblue.com/en/weather/week/porto-alegre_brazil_3452925>; <https://www.weatherandradar.com/weather/porto-alegre/18008712>; <https://www.accuweather.com/en/br/porto-alegre/45561/weather-forecast/45561>; <https://www.worldweatheronline.com/porto-alegre-weather/rio-grande-do-sul/br.aspx>
-**Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True}
+**Fontes:** <https://www.yr.no/en/forecast/daily-table/2-3452925/Brazil/Rio%20Grande%20do%20Sul/Porto%20Alegre/Porto%20Alegre>; <https://www.meteoblue.com/en/weather/week/porto-alegre_brazil_3452925>; <https://www.ventusky.com/porto-alegre>; <https://www.worldweatheronline.com/porto-alegre-weather/rio-grande-do-sul/br.aspx>; <https://www.accuweather.com/en/br/porto-alegre/45561/weather-forecast/45561>
+**Números sem base na evidência:** ['4']
+**Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': False, 'claims': True}
 
 ## official-03
 
 **Pergunta:** When will the money from yesterday's sales be deposited?
 
-**Intenção:** support (esperada support) · **rota:** router → records · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0164 · **latência:** 7.6 s
+**Intenção:** support (esperada support) · **rota:** router → records · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0312 · **latência:** 14.2 s
 
 **Resposta:**
 
-> Yesterday's sales (2026-11-02) total R$ 814,40. Deposit dates by payment method:
+> Yesterday's approved sales (2026-11-02) came to 5 sales and R$ 814,40 in total. Deposits are split by payment method:
 >
-> - **Pix:** 1 sale, R$ 64,00. Deposited yesterday (2026-11-02). Status: paid.
-> - **Debit:** 2 sales, R$ 200,50. Deposit date is today (2026-11-03). Status: paid.
-> - **Credit:** 2 sales, R$ 549,90. Deposit is scheduled for 2026-12-02, in 29 days. Status: scheduled.
+> | Method | Sales | Total | Deposit date | Status |
+> |---|---|---|---|---|
+> | Pix | 1 | R$ 64,00 | 2026-11-02 (yesterday) | Paid |
+> | Debit | 2 | R$ 200,50 | 2026-11-03 (today) | Paid |
+> | Credit | 2 | R$ 549,90 | 2026-12-02 (in 29 days) | Scheduled |
+>
+> Your record uses these rules: Pix D+0, debit D+1 business day, and credit D+30 (next business day).
 
 **Passos:**
 
-1. **records** · ok · 3156 ms
+1. **records** · ok · 6064 ms
    - `get_settlements` {"period": "yesterday"} → ok · `{"ok": true, "data": {"period": "yesterday", "items": [{"method": "pix", "method_pt": "Pix", "method_en": "Pix", "count": 1, "total": 64.0,…`
 
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'tools': True, 'numbers': True, 'claims': True}
@@ -83,73 +95,79 @@ Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
 
 **Pergunta:** Do I need a bank account to receive my sales via Pix?
 
-**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0143 · **latência:** 31.7 s
+**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0270 · **latência:** 26.2 s
 
 **Resposta:**
 
-> The sources say Pix is made through a checking account, a savings account or a prepaid payment account [sup-duvidas-59]. Getnet also offers Get Conta, a free digital account for your business that lets you send and receive money and sell via Pix [sup-duvidas-42]. You can generate a Pix QR Code on Getnet's terminals, TEF Auttar and Ecommerce [sup-duvidas-84]. The sources don't say whether Getnet requires a specific account to receive Pix sales, or whether you must use Get Conta.
+> I couldn't confirm whether you need a bank account. The sources don't say whether Pix sales can be received without one, or whether an account at another bank can be the deposit destination.
 >
-> If you'd like, I can hand this question to a human agent.
+> What they do say:
+> - Getnet lets you receive Pix by generating a QR Code on its physical terminals, TEF Auttar and Ecommerce [sup-duvidas-84].
+> - Getnet offers Get Conta, a free digital business account, through a partnership with Dock IP. With it you can send and receive money and sell via Pix [sup-duvidas-42].
+> - If you choose the two-day receipt option, you receive your sales on the Get Conta card in up to 2 business days, in the morning [sup-duvidas-42].
+> - Pix timing can vary by up to one calendar day. It depends on the Pix model you're eligible for and on when the sale is approved [prod-pix-01].
+>
+> I can hand your case to a human agent to confirm the account requirement. Do you want me to?
 
 **Passos:**
 
-1. **faq** · partial · motivo `partial_coverage` · 28361 ms
+1. **faq** · partial · motivo `partial_coverage` · 17303 ms
 
-**Fontes:** <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/pix/>; <https://site.getnet.com.br/todas-as-maquininhas/>
+**Fontes:** <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/pix/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/pix/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True, 'facts': True, 'resolved': True}
 
 ## official-05
 
 **Pergunta:** My card machine won't connect to the internet, what should I do?
 
-**Intenção:** troubleshoot (esperada troubleshoot) · **rota:** router → records → faq · **replanos:** ['records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)'] · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0449 · **latência:** 38.2 s
+**Intenção:** troubleshoot (esperada troubleshoot) · **rota:** router → records → faq · **replanos:** ['records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)'] · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0451 · **latência:** 29.9 s
 
 **Resposta:**
 
-> Your terminal **T1988B** (Get Clássica) is the one that's offline. It connects by chip and has no signal. Its last contact was 2026-11-03 09:13, about 5 hours ago. Your other terminal, T1988A, is online on Wi-Fi with a good signal.
+> Your terminal **T1988B (Get Clássica)** is the one that's offline. It connects by chip and shows no signal. Its last contact was 2026-11-03 11:51, about 5 hours ago. Your other terminal, T1988A, is online on Wi-Fi with good signal.
 >
-> **Chip checks for T1988B** [sup-duvidas-06]:
-> - Turn the machine off and open the cover on the back.
-> - Check that the chip is in the slot marked SIM1 or SIM2, with the metal part facing down.
-> - Close the cover, turn the machine on and wait for the data network to connect.
-> - When it shows a connected network (2G or 3G), the machine is ready.
-> - Run a communication test to confirm the chip is connecting.
+> **Steps for the chip (data SIM)** [sup-duvidas-06]:
+> 1. Turn the machine off and open the cover on the back.
+> 2. Insert the chip in the slot marked SIM1 or SIM2, with the metal part facing down.
+> 3. Close the cover, turn the machine on and wait for it to connect to the data network.
+> 4. When it shows a connected network (2G or 3G), the machine is ready to use.
+> 5. Run a communication test to check that the chip is connecting.
 >
-> Getnet has a manual for each machine model [sup-manual-maquinas-01].
+> You can download the manual for your model [sup-manual-maquinas-01].
 >
-> The sources don't cover weak-signal troubleshooting, so I can't give steps for that.
+> The sources don't cover the steps for improving signal or the steps of the communication test. A human agent can help with those if you want.
 >
-> If it still won't connect, I can propose a technical support ticket for T1988B. It is only opened after you confirm. You can also ask for a human agent. Do you want me to propose the ticket?
+> If the machine is still offline after this, I can propose a technical support ticket for T1988B with the reason "no signal". Nothing is opened until you confirm it. Do you want me to propose it?
 
 **Passos:**
 
-1. **records** · ok · 2792 ms
+1. **records** · ok · 6206 ms
    - `get_terminal_status` {} → ok · `{"ok": true, "data": {"items": [{"terminal_id": "T1988A", "model": "Get Smart", "connection": "Wi-Fi", "status": "online", "signal": "bom",…`
-2. **faq** · partial · motivo `partial_coverage` · 26412 ms
+2. **faq** · partial · motivo `partial_coverage` · 15402 ms
 
-**Fontes:** <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/boas-vindas/manual-maquinas/>; <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/get-tap/>; <https://site.getnet.com.br/todas-as-maquininhas/>
+**Fontes:** <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/boas-vindas/manual-maquinas/>; <https://site.getnet.com.br/todas-as-maquininhas/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/duvidas/get-smart/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'tools': True, 'numbers': True, 'claims': True, 'completed': True, 'facts': True, 'resolved': True}
 
 ## official-06
 
 **Pergunta:** How does receivables advance (antecipação) work with Getnet?
 
-**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0118 · **latência:** 32.7 s
+**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0282 · **latência:** 25.5 s
 
 **Resposta:**
 
-> Getnet's sources only partly explain how advancing receivables works.
+> Here's what Getnet's sources say about receivables advance:
 >
-> - You can advance your sales through the Getnet Brasil app, which is always available for this [sup-duvidas-17]. Using the app has no extra fee [sup-duvidas-17].
-> - Getnet also offers Automatic Advance (Antecipação Automática). For customers on the "Receba Conforme suas Vendas" payment plan, it is a condition for getting the exemption [sup-duvidas-102].
-> - Automatic Advance involves a credit approval process. Getnet may assess each contract individually and decide whether to grant the product [sup-duvidas-102].
-> - I can propose a request to advance your scheduled receivables. It runs only after you confirm it and a human agent approves it.
+> - **Getnet Brasil app:** You can advance your sales in the app, which is always available for this. The sources say it has no extra fees [sup-duvidas-17].
+> - **Automatic Advance (Antecipação Automática):** It is a condition for the fee exemption on the "Receba Conforme suas Vendas" receiving plan. It involves credit approval, so Getnet assesses each contract individually and decides whether to grant it [sup-duvidas-102].
+> - **Reserva Financeira:** This is a separate mechanism. It holds back part of your received amounts. The amount is released on the originally scheduled date, unless it was used to cover cancellations, chargebacks, terminal rental or other expenses [sup-antecipacao-02]. It doesn't affect your sales volume [sup-antecipacao-04].
+> - **Through this assistant:** I can propose a receivables advance request. It only runs after you confirm it and a human agent approves it.
 >
-> The sources don't give the advance fee or rate. They also don't give the step-by-step process or the payout timing for a regular advance.
+> The sources don't give the advance fee rates, the cutoff times or the payout timing. I can connect you with a human agent to get those details. Would you like me to?
 
 **Passos:**
 
-1. **faq** · partial · motivo `partial_coverage` · 28095 ms
+1. **faq** · partial · motivo `partial_coverage` · 17503 ms
 
 **Fontes:** <https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/>; <https://site.getnet.com.br/conta-digital/>; <https://site.getnet.com.br/duvidas/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True, 'facts': True, 'resolved': True}
@@ -158,15 +176,20 @@ Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
 
 **Pergunta:** What's the euro exchange rate today?
 
-**Intenção:** general (esperada general) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0044 · **latência:** 5.3 s
+**Intenção:** general (esperada general) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0171 · **latência:** 14.8 s
 
 **Resposta:**
 
-> According to the Banco Central do Brasil (PTAX), today's euro rate (November 3, 2026, intermediate bulletin) is R$ 6.1455 for sale and R$ 6.1438 for purchase per 1 EUR. Rounded, that's about R$ 6.15 (sell) and R$ 6.14 (buy).
+> According to the Banco Central do Brasil (PTAX closing bulletin) on 11/03/2026, the euro rate is:
+>
+> - **Sale:** 1 EUR = R$ 6.15 (6.1500)
+> - **Purchase:** 1 EUR = R$ 6.15 (6.1482)
+>
+> Source: https://www.bcb.gov.br/estabilidadefinanceira/historicocotacoes
 
 **Passos:**
 
-1. **faq** · ok · 2752 ms
+1. **faq** · ok · 6558 ms
 
 **Fontes:** <https://www.bcb.gov.br/estabilidadefinanceira/historicocotacoes>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True}
@@ -175,30 +198,28 @@ Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
 
 **Pergunta:** My card machine is showing a transaction decline error.
 
-**Intenção:** troubleshoot (esperada troubleshoot) · **rota:** router → records → faq · **replanos:** ['records:need->faq (transação recusada: a orientação vem do Knowledge)'] · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0582 · **latência:** 31.7 s
+**Intenção:** troubleshoot (esperada troubleshoot) · **rota:** router → records → faq · **replanos:** ['records:need->faq (transação recusada: a orientação vem do Knowledge)'] · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0444 · **latência:** 28.6 s
 
 **Resposta:**
 
-> Your account data shows the declines came from the card or the bank, not from the card machine. I did not find a knowledge base manual about decline errors.
+> Here is what I found. The records lookup answered part of your question, but the knowledge base had no guidance on decline errors.
 >
-> **Yesterday's declines:** 2 sales, totaling R$ 285.00.
-> - **TX1007** (credit, R$ 210.00, terminal T1988A): code 51, insufficient funds or credit limit on the card. Ask for another card or payment method.
-> - **TX1008** (debit, R$ 75.00, terminal T1988B): code 05, the issuing bank did not authorize the sale (generic reason). The cardholder should contact the bank, or you can try another card.
+> **Yesterday you had 2 declines, totaling R$ 285,00:**
+> - **TX1007** (credit, R$ 210,00, terminal T1988A): code 51, insufficient funds or credit limit on the customer's card. Ask the customer for another card or payment method. T1988A is online with good signal.
+> - **TX1008** (debit, R$ 75,00, terminal T1988B): code 05, not authorized by the issuing bank (generic). The cardholder should contact their bank or try another card.
 >
-> **Terminals:**
-> - **T1988A:** online on Wi-Fi, with good signal.
-> - **T1988B:** offline for 5 hours, no signal. The last contact was on 2026-11-03 at 09:15.
+> **Terminal T1988B:** it is offline with no signal, over chip. That connection problem may be separate from the decline.
 >
-> **Next step:** I can propose a technical support ticket for T1988B with the reason "no signal". It will only be opened after you confirm. The proposal expires in 15 minutes. Would you like me to propose it?
+> I can propose a support ticket for T1988B for the connection problem. It would only be a proposal until you confirm it, and nothing has been opened yet. Do you want me to propose it?
 >
-> If you prefer, I can also hand your case over to a human agent.
+> I can also hand your case to a human agent if you want more help with the declines.
 
 **Passos:**
 
-1. **records** · ok · 4893 ms
-   - `get_transactions` {"status": "declined", "period": "yesterday"} → ok · `{"ok": true, "data": {"items": [{"transaction_id": "TX1007", "method": "credito", "status": "recusada", "amount": 210.0, "decline_code": "5…`
+1. **records** · ok · 6592 ms
+   - `get_transactions` {"status": "declined", "period": "last_7_days"} → ok · `{"ok": true, "data": {"items": [{"transaction_id": "TX1007", "method": "credito", "status": "recusada", "amount": 210.0, "decline_code": "5…`
    - `get_terminal_status` {} → ok · `{"ok": true, "data": {"items": [{"terminal_id": "T1988A", "model": "Get Smart", "connection": "Wi-Fi", "status": "online", "signal": "bom",…`
-2. **faq** · insufficient · motivo `not_in_sources` · 14585 ms
+2. **faq** · insufficient · motivo `not_in_sources` · 12076 ms
 
 **Fontes:** <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/todas-as-maquininhas/>; <https://site.getnet.com.br/get-tap/>; <https://site.getnet.com.br/todas-as-maquininhas/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'tools': True, 'numbers': True, 'claims': True}
@@ -207,34 +228,39 @@ Estabilidade em 3 rodadas: pass@1 1.0, pass^3 1.0; instáveis: nenhum.
 
 **Pergunta:** How many installments can I split a sale into with the crediário?
 
-**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0102 · **latência:** 17.4 s
+**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0236 · **latência:** 17.4 s
 
 **Resposta:**
 
-> With the Crediário, you can split a sale into up to 48 installments on the credit card [prod-crediario-03][prod-crediario-01]. Interest rates may vary depending on the card issuer [prod-crediario-03]. Crediário sales are paid in a single payment within 2 business days after the transaction is captured, regardless of the number of installments. The discount fee is subtracted from the original transaction amount [sup-duvidas-39].
+> With the Crediário you can split a sale into up to 48 installments [prod-crediario-01][prod-crediario-02].
 >
-> On the terminal, choose 1. CREDITO, enter the amount, choose 4. CREDIARIO, then enter the number of installments [prod-crediario-05].
+> - **Issuer limits:** The maximum term and the interest rate depend on the card issuer. Your customer's card may allow fewer installments [prod-crediario-02][prod-crediario-03].
+> - **When you get paid:** You receive the full sale amount at once, within 2 business days after the transaction is captured. This holds for any number of installments, and the discount fee is subtracted from the original amount [sup-duvidas-39].
 
 **Passos:**
 
-1. **faq** · ok · 13862 ms
+1. **faq** · ok · 12490 ms
 
-**Fontes:** <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/duvidas/>
+**Fontes:** <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/crediario/>; <https://site.getnet.com.br/duvidas/>; <https://site.getnet.com.br/duvidas/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True, 'facts': True, 'resolved': True}
 
 ## official-10
 
 **Pergunta:** Can I sell through WhatsApp using the Payment Link?
 
-**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** atalho de 1 passo (o supervisor LLM decide se o especialista não resolver) · **custo:** US$ 0.0103 · **latência:** 17.1 s
+**Intenção:** knowledge (esperada knowledge) · **rota:** router → faq · **replanos:** nenhum · **caminho:** supervisor LLM (laço de tool use) · **custo:** US$ 0.0230 · **latência:** 17.7 s
 
 **Resposta:**
 
-> Yes. The Payment Link lets you sell through WhatsApp or your social network [prod-link-de-pagamento-01]. To create a link, open the Minha Conta portal or the Getnet Brasil app. Go to Products and Services, choose Link de Pagamento, then Criar Link de Pagamento. Fill in the product, shipping and payment options, then click share or copy and send the link wherever you like [prod-link-de-pagamento-04].
+> Yes, you can sell through WhatsApp with the Payment Link. It lets you sell from wherever you are, including WhatsApp and social media [prod-link-de-pagamento-01].
+>
+> 1. Create the link in the Minha Conta portal or the Getnet Brasil app.
+> 2. Click share or copy.
+> 3. Send the link wherever you like, including WhatsApp [prod-link-de-pagamento-04].
 
 **Passos:**
 
-1. **faq** · ok · 14674 ms
+1. **faq** · ok · 11452 ms
 
 **Fontes:** <https://site.getnet.com.br/link-de-pagamento/>; <https://site.getnet.com.br/get-tap/>; <https://site.getnet.com.br/link-de-pagamento/>; <https://site.getnet.com.br/link-de-pagamento/>; <https://site.getnet.com.br/duvidas/>
 **Checagens:** {'intent': True, 'route': True, 'handoff': True, 'handoff_outcome': True, 'language': True, 'numbers': True, 'claims': True, 'facts': True, 'resolved': True}
