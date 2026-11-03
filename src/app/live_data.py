@@ -72,6 +72,38 @@ def budget_s() -> float:
         return BUDGET_S
 
 
+_CACHE: dict[str, tuple[float, dict]] = {}
+_CACHE_LOCK = __import__("threading").Lock()
+
+
+def cache_s() -> float:
+    """Validade das respostas boas da API (LIVE_DATA_CACHE_S, padrão 600 s; 0 desliga). Previsão do dia e geocoding
+    não mudam em minutos, e cada pergunta de clima faz 2 chamadas: com o cache, uma falha de rede passageira (1 em
+    ~6 chamadas, sondado) não derruba as perguntas seguintes, e o limite de taxa do provedor (429) aparece menos."""
+    try:
+        return max(0.0, float(os.getenv("LIVE_DATA_CACHE_S", "600")))
+    except ValueError:
+        return 600.0
+
+
+def _fetch(url: str, params: dict) -> dict:
+    ttl = cache_s()
+    key = url + "?" + "&".join(f"{k}={params[k]}" for k in sorted(params))
+    if ttl:
+        with _CACHE_LOCK:
+            hit = _CACHE.get(key)
+        if hit and time.monotonic() - hit[0] < ttl:
+            METRICS.inc("live_data_cache_hits_total")
+            return hit[1]
+    data = _get_json(url, params)
+    if ttl:
+        with _CACHE_LOCK:
+            _CACHE[key] = (time.monotonic(), data)
+            if len(_CACHE) > 256:  # teto de memória: some a entrada mais antiga
+                _CACHE.pop(min(_CACHE, key=lambda k: _CACHE[k][0]))
+    return data
+
+
 def _get_json(url: str, params: dict) -> dict:
     """Único ponto de rede do módulo (os testes trocam esta função). Timeout curto: a resposta não pode esperar."""
     import httpx
@@ -150,7 +182,7 @@ def fx(code: str, wanted: date) -> LiveResult | None:
     params = {"@moeda": f"'{code}'", "@dataInicial": f"'{start:%m-%d-%Y}'",
               "@dataFinalCotacao": f"'{wanted:%m-%d-%Y}'", "$format": "json",
               "$select": "cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim"}
-    rows = [r for r in _get_json(PTAX, params).get("value", []) if r.get("cotacaoVenda") is not None]
+    rows = [r for r in _fetch(PTAX, params).get("value", []) if r.get("cotacaoVenda") is not None]
     if not rows:
         return None
     last_day = max(r["dataHoraCotacao"][:10] for r in rows)
@@ -233,7 +265,7 @@ _WMO = {0: ("céu limpo", "clear sky"), 1: ("predominantemente limpo", "mainly c
 
 
 def weather(city: str, offset: int) -> LiveResult | None:
-    geo = _get_json(GEOCODING, {"name": city, "count": 1, "language": "pt", "format": "json"}).get("results") or []
+    geo = _fetch(GEOCODING, {"name": city, "count": 1, "language": "pt", "format": "json"}).get("results") or []
     if not geo:
         return None
     place = geo[0]
@@ -246,7 +278,7 @@ def weather(city: str, offset: int) -> LiveResult | None:
     params = {"latitude": place["latitude"], "longitude": place["longitude"], "timezone": tz,
               "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code",
               "start_date": day.isoformat(), "end_date": day.isoformat()}
-    daily = _get_json(FORECAST, params).get("daily") or {}
+    daily = _fetch(FORECAST, params).get("daily") or {}
     if not daily.get("time"):
         return None
     # a data do texto é a que a API devolveu, não a que pedimos: com o relógio do servidor num fuso e a API noutro,
@@ -272,6 +304,33 @@ def weather(city: str, offset: int) -> LiveResult | None:
     where = f"{place.get('name')} (lat {place.get('latitude')}, lon {place.get('longitude')}, {tz})"
     return LiveResult("weather", "Open-Meteo", "https://open-meteo.com/", day.isoformat(), text_pt, text_en,
                       evidence=[f"Open-Meteo (API) para {where}: {flat}", rounded])
+
+
+WTTR = "https://wttr.in/{where}"
+
+
+def weather_backup(city: str, offset: int) -> LiveResult | None:
+    """Segunda fonte de clima (wttr.in, sem chave): o Open-Meteo devolve 429/timeout sob carga e o cenário oficial
+    de clima caía na recusa. Mesmo formato de evidência; a fonte citada é a que respondeu."""
+    data = _fetch(WTTR.format(where=city.replace(" ", "+")), {"format": "j1", "lang": "pt"})
+    days = data.get("weather") or []
+    if len(days) <= offset:
+        return None
+    d = days[offset]
+    day = date.fromisoformat(str(d["date"])[:10])
+    tmin, tmax = float(d["mintempC"]), float(d["maxtempC"])
+    rain = max((int(h.get("chanceofrain", 0)) for h in d.get("hourly") or []), default=None)
+    when_pt = {0: "hoje", 1: "amanhã", 2: "depois de amanhã"}[offset]
+    when_en = {0: "today", 1: "tomorrow", 2: "the day after tomorrow"}[offset]
+    rain_pt = f", chance de chuva de até {rain}%" if rain is not None else ""
+    rain_en = f", up to {rain}% chance of rain" if rain is not None else ""
+    text_pt = (f"Previsão para {city} {when_pt} ({day:%d/%m/%Y}): mínima de {_br(tmin, 0)} °C e máxima de "
+               f"{_br(tmax, 0)} °C{rain_pt}. Fonte: wttr.in.")
+    text_en = (f"Forecast for {city} {when_en} ({day.isoformat()}): low {tmin:.0f} °C, high {tmax:.0f} °C"
+               f"{rain_en}. Source: wttr.in.")
+    flat = f"date {day.isoformat()}; mintempC {d['mintempC']}; maxtempC {d['maxtempC']}; chanceofrain_max {rain}"
+    return LiveResult("weather", "wttr.in", "https://wttr.in/", day.isoformat(), text_pt, text_en,
+                      evidence=[f"wttr.in (API) para {city}: {flat}"])
 
 
 def followup_query(text: str, previous: str | None) -> str | None:
@@ -318,7 +377,17 @@ def _lookup(text: str, today: date | None = None) -> LiveResult | None:
             if code:
                 result = fx(code, today or datetime.now(ZoneInfo("America/Sao_Paulo")).date())
             else:
-                result = weather(city, _day_offset(text))
+                # 1ª fonte com 60% do teto; o resto fica para a segunda: a consulta inteira continua dentro do teto
+                start = time.monotonic()
+                if budget > 0:
+                    _DEADLINE.set(start + budget * 0.6)
+                try:
+                    result = weather(city, _day_offset(text))
+                except Exception:  # noqa: BLE001 — 429/timeout no Open-Meteo: a segunda fonte
+                    METRICS.inc("live_data_total", kind=kind, outcome="backup")
+                    if budget > 0:
+                        _DEADLINE.set(start + budget)
+                    result = weather_backup(city, _day_offset(text))
     except Exception as exc:  # noqa: BLE001 — timeout, HTTP, JSON: a busca web assume
         METRICS.inc("live_data_total", kind=kind, outcome="error")
         log.warning("live_data_failed", extra={"extra_fields": {"kind": kind, "error": type(exc).__name__}})

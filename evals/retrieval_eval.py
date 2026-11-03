@@ -21,16 +21,16 @@ import time
 from pathlib import Path
 
 K = 3
-# Kit v5.4 (metodologia do nelsondell, 9,5): o redator recebe os 5 primeiros (faq_top_k), então a cobertura que
+# O redator recebe os 5 primeiros (faq_top_k), então a cobertura que
 # importa é a do top-5; e o "rank do 1º gold por pergunta" (até DEPTH) diz onde a busca erra, não só se erra.
 K_GEN = 5
 DEPTH = 10
 # Teto padrão de p95 por consulta na escolha: o agente ainda chama o LLM depois da busca, e um rerank de vários
 # segundos em CPU dobraria o tempo de resposta de uma pergunta de FAQ. Troque com --latency-budget-ms.
 LATENCY_BUDGET_MS = 1500.0
-# Teto padrão de RAM residente por processo na escolha. Bancada da v4 (kit v5.1): o eval offline com e5-large +
-# bge-m3-int8 teve pico de 2,5–2,9 GB; na máquina de 15 GB do relógio rodam juntos a API, o eval ao vivo e outra
-# sessão, e 4 GB por processo deixa API + eval em 8 GB, metade dela. Troque com --ram-budget-mb (0 = sem teto).
+# Teto padrão de RAM residente por processo na escolha. Medido: o eval offline com e5-large + bge-m3-int8 teve pico
+# de 2,5–2,9 GB; numa máquina de 15 GB rodam juntos a API, o eval ao vivo e outra sessão, e 4 GB por processo deixa
+# API + eval em 8 GB, metade dela. Troque com --ram-budget-mb (0 = sem teto).
 RAM_BUDGET_MB = 4096.0
 BASELINE = "bm25"
 
@@ -107,7 +107,7 @@ def calibrate_gate(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict |
     que recusam >= NEG_REFUSAL_MIN dos negativos; empate → mais recusa → limiares menores.
 
     O piso de cosseno do kit (0,4) foi medido com o MiniLM; com o e5-large todo trecho fica acima de 0,75 e o portão
-    recusou 0 de 16 negativos no corpus Getnet v4. Por isso o par é calibrado junto com a escolha do retriever.
+    recusou 0 de 16 negativos num corpus real de FAQ. Por isso o par é calibrado junto com a escolha do retriever.
     """
     from app.agents import COSINE_MARGIN
     from evals.run_evals import NEG_REFUSAL_MIN, rate_ci
@@ -134,9 +134,9 @@ def calibrate_gate(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict |
 
 
 def separation(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict | None:
-    """Quanto o sinal do portão separa perguntas COM fonte das SEM fonte (método do nelsondell, 9,5:
-    evals/retrieval_calibration.md, "gap" e AUC por embedder): melhor cosseno de cada pergunta; AUC = chance de uma
-    pergunta com fonte superar uma sem fonte; gap = pior com fonte − melhor sem fonte (> 0 separa por completo).
+    """Quanto o sinal do portão separa perguntas COM fonte das SEM fonte ("gap" e AUC por embedder): melhor
+    cosseno de cada pergunta; AUC = chance de uma pergunta com fonte superar uma sem fonte; gap = pior com fonte −
+    melhor sem fonte (> 0 separa por completo).
     Sem cosseno (BM25 puro) usa o BM25. Pede >= 15 sem fonte para valer (`enough`)."""
     def best(hits: list[GateHit]) -> float:
         cos = [c for _, c, _ in hits if c is not None]
@@ -151,8 +151,9 @@ def separation(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict | Non
 
 
 def _by_origin(per_q: list[dict]) -> dict:
-    """Recorte por origem da pergunta (campo `origin` do gold: page | official | real | ...). nelsondell: a metade
-    escrita a partir das páginas saturou (41/41) e toda a diferença veio das perguntas reais e do desafio (36/41)."""
+    """Recorte por origem da pergunta (campo `origin` do gold: page | official | real | ...). Sem o recorte,
+    a média esconde o caso difícil: medido, a metade escrita a partir das páginas saturou (41/41) e toda a diferença
+    veio das perguntas reais e oficiais (36/41)."""
     groups: dict[str, list[dict]] = {}
     for q in per_q:
         groups.setdefault(q.get("origin") or "sem_origem", []).append(q)
@@ -233,7 +234,7 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
                            "mean": round(statistics.fmean(lat), 1) if lat else None},
             "gate": calibrate_gate(gate_pos, gate_neg),
             "separation": separation(gate_pos, gate_neg),
-            # com rerank, a nota do cross-encoder separa melhor que o cosseno (gold da V5: AUC 0,84 × 0,78)
+            # com rerank, a nota do cross-encoder separa melhor que o cosseno (medido num gold real: AUC 0,84 × 0,78)
             "separation_rerank": separation([[(0.0, x, True)] for x in rerank_pos if x is not None],
                                             [[(0.0, x, False)] for x in rerank_neg if x is not None]),
             "essential": sum(1 for _, g in rows if g.passages),
@@ -258,17 +259,16 @@ def default_configs(embed_models: list[str], rerank_models: list[str],
     return out
 
 
-# --choose-retriever --fast: só as configurações que venceram na bancada da v4 (frente R, kit v5.1: grade de 21
-# configurações; o denso e5-large bateu o híbrido e o MiniLM, e o bge-m3-int8 o jina com o mesmo pool), mais o bm25
-# de base. Medidas da R2 na mesma bancada, máquina compartilhada (load 2–7,6). A grade inteira não cabe nos 10 min
-# do relógio; estas 3 medem em minutos (o tempo maior é vetorizar o corpus com o e5-large, uma vez; o cache em
-# var/embeddings serve depois a API e o eval).
+# --choose-retriever --fast: só as configurações que venceram a grade completa (21 configurações; o denso e5-large
+# bateu o híbrido e o MiniLM, e o bge-m3-int8 o jina com o mesmo pool), mais o bm25 de base. Medidas abaixo numa
+# máquina compartilhada (load 2–7,6). A grade inteira não cabe em 10 min; estas 3 medem em minutos (o tempo maior é
+# vetorizar o corpus com o e5-large, uma vez; o cache em var/embeddings serve depois a API e o eval).
 FAST_EMBED = "intfloat/multilingual-e5-large"
 FAST_CROSS = "BAAI/bge-reranker-v2-m3-int8"
 FAST_CONFIGS = (
     {"retriever": "bm25"},
     {"retriever": "dense", "embed_model": FAST_EMBED},
-    # pool 10 lendo 600 caracteres por trecho (frente R2): Recall@3 0,754 / MRR 0,947 / p95 1130 ms, contra
+    # pool 10 lendo 600 caracteres por trecho: Recall@3 0,754 / MRR 0,947 / p95 1130 ms, contra
     # 0,734 / 0,937 / 896 ms do pool 5 com 1500 caracteres; pool 20 subiu a 0,777 com p95 de 4,7 s (fora do teto)
     {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
      "rerank_chars": 600},
@@ -311,7 +311,7 @@ class _Factories:
 
     `model_mb`: RAM que cada modelo somou ao processo ao carregar (RSS depois − antes); `base_mb`: o processo antes do
     1º modelo (app, índice BM25). RAM de uma configuração = base + os modelos dela: estimativa do processo que a
-    serve (bancada da v4: 2359 MB estimados para e5-large + bge-m3-int8; pico medido do processo, 2909 MB, com os
+    serve (medido: 2359 MB estimados para e5-large + bge-m3-int8; pico medido do processo, 2909 MB, com os
     vetores do corpus e o eval). `rss` é injetável (testes)."""
 
     def __init__(self, embedder=None, scorer=None, rerank_llm=None, rss=rss_mb) -> None:
@@ -337,7 +337,7 @@ class _Factories:
         return obj
 
     def _shared(self, model: str, cached, kind: str):
-        """O modelo do PROCESSO (rag._embedder_for / _cross_for), não uma 2ª cópia. Bancada da v4: `make eval` com o
+        """O modelo do PROCESSO (rag._embedder_for / _cross_for), não uma 2ª cópia. Sem isto, `make eval` com o
         app já aquecido carregava e5-large + bge-m3-int8 duas vezes e o processo chegou a 4951 MB. Se o modelo já
         estava carregado, a RAM dele não é medida aqui (None): o delta seria zero e mentiria na escolha."""
         misses = cached.cache_info().misses

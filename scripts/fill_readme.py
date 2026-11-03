@@ -80,7 +80,7 @@ def live_block(results: Path) -> str:
         r = _load(f)
         parts.append(f"### Split `{r.get('split', f.stem)}` — `{f.name}`\n\n"
                      f"Provedor `{r.get('provider')}` · status `{r.get('status')}` · "
-                     f"gasto US$ {r.get('spent_usd')} (teto {r.get('max_usd')})\n\n" + to_markdown(r))
+                     f"gasto US$ {r.get('spent_usd')} (teto {r.get('max_usd')})\n\n" + to_markdown(r, split_view=True))
     return "\n\n".join(parts)
 
 

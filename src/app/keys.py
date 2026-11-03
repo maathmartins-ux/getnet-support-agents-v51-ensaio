@@ -176,7 +176,7 @@ def weak_secrets() -> list[str]:
         return ["AUTH_KEYS"]
     label = (lambda k: "AUTH_SECRET") if not os.getenv("AUTH_KEYS", "").strip() else (lambda k: f"AUTH_KEYS[{k}]")
     return [label(k.kid) for k in keys.values()
-            if k.alg == "HS256" and (k.secret.startswith(b"dev-") or len(k.secret) < MIN_HS_BYTES)]
+            if k.alg == "HS256" and (k.secret.startswith((b"dev-", b"troque-")) or len(k.secret) < MIN_HS_BYTES)]
 
 
 def generate(alg: str, kid: str) -> tuple[str, dict]:

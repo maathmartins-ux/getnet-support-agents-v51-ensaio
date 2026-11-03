@@ -5,7 +5,8 @@ Aqui a espera é ANTES de virar ticket
 assíncrono e mantém tudo o que já existe (fila persistida, especialidade, SLA, quatro olhos, Telegram):
 
 1. o escalation abre o caso como sempre e avisa o operador (notify_new_ticket);
-2. com HITL_SYNC_WAIT_S > 0 (padrão 0: desligado; demo: 20; teto MAX_WAIT_S), o turno consulta o caso a cada
+2. com HITL_SYNC_WAIT_S > 0 (padrão 0 no processo, para a suíte e o eval; 20 no
+   docker-compose.yml; teto MAX_WAIT_S), o turno consulta o caso a cada
    HITL_SYNC_POLL_S (padrão 2 s) até o prazo. Cada turno espera só o próprio caso (o servidor atende outras
    conversas em paralelo);
 3. resposta dentro do prazo → vira evidência (resume.human_result) e os passos pendentes do plano rodam NO MESMO

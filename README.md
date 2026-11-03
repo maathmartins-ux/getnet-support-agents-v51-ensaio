@@ -56,19 +56,6 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 4. Pergunte algo que o site não cobre ("Vocês têm maquininha com impressora térmica colorida?"): a resposta diz o que
    a fonte cobre e oferece o atendente; pedido sem fonte vai ao operador, que responde em `/operator`.
 
-**Desde a última avaliação** (cada lacuna que a correção anterior citou → o que mudou → a prova; a tabela e os
-números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
-
-<!-- since:begin -->
-| Lacuna citada | O que mudou | Prova |
-|---|---|---|
-| Respostas oficiais: fundamentadas 60%, números 80%, pass^3 70% | manchete **oficiais resolvidas** (sem humano + todo fato + fonte); toda frase e todo número conferidos contra fonte, ferramenta e pergunta; juiz no mesmo processo | Oficiais resolvidas (sem humano + todo fato + fonte) **1.00** · Juiz: respostas oficiais fundamentadas **0.97** · Oficiais: números com base na evidência **96.7%** · Oficiais: pass^k (todas as rodadas passam) **0.90**; `tests/test_e53_resolved.py` |
-| Busca: Recall@3 0,49, MRR 0,61 | denso + cross-encoder decidido por medida antes do relógio; tabelas inteiras; placar no caminho do agente | Busca: Recall@3 **0.84** · Busca: Recall@5 (o que o redator lê) **0.89** · Busca: MRR **0.82**; `tests/test_v54_retrieval_method.py` |
-| Memória: pass@1 54%, números 64% | especialistas sem estado (pergunta reescrita pelo router + livro de fatos); rota medida pelo resultado | Memória ao vivo: pass@1 **0.92** · Memória ao vivo: números com base **100.0%**; `tests/test_v54_stateless_specialists.py` |
-| A resposta do humano era só a próxima mensagem; operação (especialidade, Postgres, JWKS) | a resposta do operador vira evidência e os passos pendentes do plano rodam (no turno, com espera curta, ou na retomada); fila por especialidade; Postgres atrás da mesma interface; JWKS | Turnos resolvidos sem humano (ao vivo, todos os splits) **0.88**; `tests/test_v54_hitl_sync.py` |
-| Avaliação independente: um rotulador, held-out de 24 | 2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes | Rotuladores humanos independentes **não medido** · Held-out cego: casos **80** · Held-out cego: ponta a ponta (humano passa) **não medido** · Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) **1** · Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa **1.00**; `tests/test_v54_judge_validation_real.py` |
-<!-- since:end -->
-
 Nesta tentativa: **sem validação humana** (ensaio pré-produção sem rotuladores) e **rodada 2 não medida** (corte do T+45).
 
 ## 1. How to build, configure, run and test (construir, configurar, rodar e testar)
@@ -194,8 +181,8 @@ Na Getnet, o Knowledge também atende o geral (clima Open-Meteo e câmbio PTAX/B
    pediu, o orçamento do turno acabou (`budget_exhausted`) ou a ação passa do limite de valor. Resposta parcial só
    oferece o humano, sem abrir caso.
 2. **Consulta no turno** (`src/app/hitl_sync.py`): o escalation abre o caso, avisa o operador (console `/operator`
-   ou Telegram) e, com `HITL_SYNC_WAIT_S` > 0, o turno espera a resposta por até 20 s (teto abaixo do timeout do
-   balanceador; no máximo 8 esperas simultâneas). Respondeu no prazo → a resposta vira evidência (agente `human`) e
+   ou Telegram) e o turno espera a resposta por até `HITL_SYNC_WAIT_S` (20 s no `docker-compose.yml`, 0 na suíte;
+   teto abaixo do timeout do balanceador; no máximo 8 esperas simultâneas). Respondeu no prazo → a resposta vira evidência (agente `human`) e
    os passos pendentes do plano rodam **no mesmo turno**.
 3. **Caso assíncrono** (`src/app/cases.py`, `src/app/resume.py`): fora do prazo, o caso fica na fila persistida
    com o plano pendente; mensagens novas do cliente entram no caso e nenhuma escrita é proposta enquanto ele está
@@ -405,6 +392,7 @@ e como comparar pela primeira entrega.
 | 17:19:00 | 304 | confirmação: kit limpo (comentários sem procedência, docs só com links válidos, ADR 0005 atual) |
 | 17:19:00 | 304 | readme: números e linha do tempo (fill_readme, último passo) |
 | 17:25:40 | 311 | confirmação: resultado offline regenerado com o código atual |
+| 17:25:41 | 311 | readme: números e linha do tempo (fill_readme, último passo) |
 
 Do primeiro ao último commit: **311 min**.
 <!-- timeline:end -->

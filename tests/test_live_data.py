@@ -163,6 +163,49 @@ def test_rate_limit_is_not_retried_and_the_whole_lookup_has_a_deadline(monkeypat
 
     monkeypatch.setattr(httpx, "get", hanging)
     monkeypatch.setenv("LIVE_DATA_BUDGET_S", "4")
+    monkeypatch.setenv("LIVE_DATA_CACHE_S", "0")  # sem a resposta boa de outro teste no cache
     assert live_data.lookup("Vai chover amanhã em Curitiba?") is None  # falhou dentro do teto: busca web
-    assert sum(timeouts) <= 4.0 and timeouts == [3.0, 1.0]
+    # clima: 60% do teto para o Open-Meteo, o resto para a segunda fonte
+    assert sum(timeouts) <= 4.0 + 1e-9 and timeouts == pytest.approx([2.4, 1.6])
     assert live_data._DEADLINE.get() is None  # o teto não vaza para a próxima consulta
+
+
+def test_good_responses_are_cached_and_a_later_network_failure_does_not_lose_them(monkeypatch):
+    """Previsão e geocoding não mudam em minutos: a 2ª pergunta igual não depende da rede."""
+    from app import live_data
+
+    calls = []
+
+    def fake(url, params):
+        calls.append(url)
+        if len(calls) > 1:
+            raise TimeoutError("rede caiu")
+        return {"ok": 1}
+
+    monkeypatch.setenv("LIVE_DATA_CACHE_S", "600")
+    monkeypatch.setattr(live_data, "_get_json", fake)
+    monkeypatch.setattr(live_data, "_CACHE", {})
+    assert live_data._fetch("https://x.test/a", {"q": 1}) == {"ok": 1}
+    assert live_data._fetch("https://x.test/a", {"q": 1}) == {"ok": 1} and len(calls) == 1
+    monkeypatch.setenv("LIVE_DATA_CACHE_S", "0")
+    import pytest
+
+    with pytest.raises(TimeoutError):
+        live_data._fetch("https://x.test/a", {"q": 1})
+
+
+def test_weather_falls_back_to_second_source_when_open_meteo_fails(monkeypatch):
+    """Open-Meteo com 429/timeout: a previsão vem da segunda fonte, citada pelo nome, em vez da recusa."""
+    def fake(url, params):
+        if "open-meteo" in url:
+            raise TimeoutError("429")
+        assert "wttr.in/Porto+Alegre" in url
+        return {"weather": [{"date": "2026-11-03", "mintempC": "19", "maxtempC": "28", "hourly": []},
+                            {"date": "2026-11-04", "mintempC": "18", "maxtempC": "24",
+                             "hourly": [{"chanceofrain": "40"}, {"chanceofrain": "88"}]}]}
+
+    monkeypatch.setattr(live_data, "_get_json", fake)
+    monkeypatch.setenv("LIVE_DATA_CACHE_S", "0")
+    r = live_data.lookup("What's the weather forecast in Porto Alegre tomorrow?")
+    assert r is not None and r.source == "wttr.in" and r.as_of == "2026-11-04"
+    assert "18 °C" in r.text("en") and "24 °C" in r.text("en") and "88%" in r.text("en")

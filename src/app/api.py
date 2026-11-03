@@ -59,7 +59,7 @@ def insecure_defaults() -> list[str]:
     """Segredo padrão ou curto torna o token forjável. Visível no /health e no log."""
     weak = keys.weak_secrets()  # HS256 do conjunto de chaves do JWT (AUTH_SECRET sem AUTH_KEYS)
     token = operator_token()
-    return weak + (["OPERATOR_TOKEN"] if token.startswith("dev-") or len(token) < 16 else [])
+    return weak + (["OPERATOR_TOKEN"] if token.startswith(("dev-", "troque-")) or len(token) < 16 else [])
 
 
 def sla_check(now: float | None = None) -> list[dict]:

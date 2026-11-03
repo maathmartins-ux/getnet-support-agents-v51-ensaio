@@ -14,6 +14,7 @@ os.environ["RETRIEVER"] = "bm25"
 os.environ.setdefault("LIVE_EVAL_MIN_FREE_GB", "0")
 os.environ.setdefault("LIVE_EVAL_MIN_RAM_GB", "0")
 os.environ.setdefault("LIVE_EVAL_ALLOW_FALLBACK", "1")
+os.environ.setdefault("LIVE_DATA_CACHE_S", "0")  # testes trocam a rede por monkeypatch: sem cache entre eles
 os.environ.setdefault("RETRIEVAL_CACHE", "off")  # testes trocam buscador/embedder por monkeypatch
 os.environ.setdefault("JUDGE_WORKERS", "1")  # ordem determinística nos testes de teto; o paralelo tem teste próprio
 

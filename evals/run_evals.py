@@ -1507,7 +1507,9 @@ def _lang_cell(lang: str, v: dict) -> str:
             f"recusa {pct(v['neg_refused'])} (n={v['negatives']})")
 
 
-def to_markdown(report: dict) -> str:
+def to_markdown(report: dict, split_view: bool = False) -> str:
+    """Relatório em markdown. `split_view`: bloco de UM split numa página com vários (o retrieval sai uma vez, na
+    seção de busca, e o gate só aparece no split que o gate cobre)."""
     splits = [s for s in report["metrics"] if s != "ALL"] + ["ALL"]
     keys = [k for k in report["metrics"]["ALL"] if k != "ci"]
     out = [line] if (line := resolved_line(report)) else []
@@ -1515,10 +1517,11 @@ def to_markdown(report: dict) -> str:
     for k in keys:
         out.append(f"| {k} | " + " | ".join(fmt_cell(report["metrics"][s], k) for s in splits) + " |")
     verdict = "PASS" if report["passed"] else "FAIL"
-    out.append(f"\nGate (splits {', '.join(report.get('gated_splits', []))}): intent {report['intent_acc']:.1%} "
-               f"{fmt_ci(report.get('intent_ci'))} (mínimo {report['gate']:.0%}) → **{verdict}**. "
-               f"Medidos fora do gate: {', '.join(report.get('ungated_splits', []))}. "
-               f"Isolamento: `{report.get('isolation', '?')}`.")
+    if not (split_view and not report.get("gated_splits")):
+        out.append(f"\nGate (splits {', '.join(report.get('gated_splits', []))}): intent {report['intent_acc']:.1%} "
+                   f"{fmt_ci(report.get('intent_ci'))} (mínimo {report['gate']:.0%}) → **{verdict}**. "
+                   f"Medidos fora do gate: {', '.join(report.get('ungated_splits', []))}. "
+                   f"Isolamento: `{report.get('isolation', '?')}`.")
     if rt := report.get("gate_red_team"):
         asi = " · ".join(f"{k} {v['safe_rate']:.0%} (n={v['cases']})" for k, v in rt["by_asi"].items())
         verdict = (f"(mínimo {rt['floor']:.0%}) → **{'PASS' if rt['passed'] else 'FAIL'}**"
@@ -1573,11 +1576,11 @@ def to_markdown(report: dict) -> str:
     if report.get("live"):
         out.append(f"\nAo vivo: status `{report['status']}` · gasto US$ {report['spent_usd']} "
                    f"(teto {report['max_usd']}) · erros de LLM {report['llm_errors']:g}")
-    ret = report.get("retrieval")
+    ret = None if split_view else report.get("retrieval")
     if ret:
         via = ", caminho de busca do agente" if ret.get("path") == "agente" else ""
         out.append(f"\nRetrieval ativo ({ret['retriever']}{via}, `evals/retrieval.jsonl`): {_retrieval_line(ret)}")
-    for name, cmp in (report.get("retrieval_compare") or {}).items():
+    for name, cmp in ({} if split_view else report.get("retrieval_compare") or {}).items():
         out.append(f"- {name}: {_retrieval_line(cmp)}")
     return "\n".join(out)
 

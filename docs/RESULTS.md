@@ -8,12 +8,12 @@ Tudo aqui é gerado por `scripts/fill_readme.py` a partir de `evals/results/` co
 <!-- eval:begin -->
 Modo: `in-process` · provedor `offline`
 
-**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **83.3%** [IC95 43.6–97.0; n=6] (não resolvidos: official-06) · official-var **75.0%** [IC95 46.8–91.1; n=12] (não resolvidos: q-ov-01-pt, q-ov-06-en, q-ov-06-pt).
+**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **90.0%** [IC95 59.6–98.2; n=10] (não resolvidos: official-06) · official-var **75.0%** [IC95 46.8–91.1; n=12] (não resolvidos: q-ov-01-pt, q-ov-06-en, q-ov-06-pt).
 | Métrica | official | replan | dependent | parallel | approval | memory | real | official-var | partial | hard | guardrail | heldout | ALL |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | cases | 10 | 20 | 14 | 4 | 4 | 22 | 40 | 12 | 5 | 5 | 35 | 80 | 251 |
-| resolved_acc | 83.3 (n=6) | — | — | — | — | — | — | 75.0 (n=12) | — | — | — | — | 77.8 (n=18) |
-| facts_acc | 83.3 (n=6) | — | — | — | — | — | — | 75.0 (n=12) | — | — | — | — | 77.8 (n=18) |
+| resolved_acc | 90.0 (n=10) | — | — | — | — | — | — | 75.0 (n=12) | — | — | — | — | 81.8 (n=22) |
+| facts_acc | 90.0 (n=10) | — | — | — | — | — | — | 75.0 (n=12) | — | — | — | — | 81.8 (n=22) |
 | intent_acc | 100.0 (n=10) | 100.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | 60.0 (n=5) | 65.7 (n=35) | 86.2 (n=80) | 88.2 (n=211) |
 | handoff_acc | 100.0 (n=10) | 40.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | — | 100.0 (n=35) | 91.2 (n=80) | 90.8 (n=206) |
 | handoff_outcome_acc | 100.0 (n=10) | 40.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | — | 100.0 (n=35) | 91.2 (n=80) | 90.8 (n=206) |
@@ -30,8 +30,8 @@ Modo: `in-process` · provedor `offline`
 | language_undetected | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | recall@3 | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | mrr | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| p50_ms | 45.5 | 43.4 | 42.2 | 52.9 | 50.0 | 79.7 | 42.6 | 40.9 | 31.6 | 40.8 | 5.3 | 37.1 | 39.7 |
-| p95_ms | 5332.3 | 53.9 | 55.8 | 55.8 | 51.8 | 103.0 | 68.1 | 50.0 | 32.8 | 46.7 | 44.7 | 1339.9 | 103.0 |
+| p50_ms | 46.1 | 43.5 | 40.8 | 44.4 | 53.7 | 71.9 | 35.8 | 35.8 | 34.9 | 32.4 | 5.4 | 37.3 | 36.9 |
+| p95_ms | 4181.4 | 53.6 | 50.8 | 48.7 | 59.3 | 100.8 | 51.3 | 50.1 | 40.1 | 34.9 | 41.2 | 629.4 | 99.0 |
 | cost_usd | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | crashes | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
@@ -108,8 +108,6 @@ Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9�
 
 Ao vivo: status `complete` · gasto US$ 0.109161 (teto 0.134367) · erros de LLM 0
 
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
-
 ### Split `guardrail` — `live_guardrail.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.067663 (teto 0.973262)
@@ -156,8 +154,6 @@ Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9�
 
 Ao vivo: status `complete` · gasto US$ 0.067663 (teto 0.973262) · erros de LLM 0
 
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
-
 ### Split `hard` — `live_hard.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.155 (teto 0.139037)
@@ -187,8 +183,6 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.155 (teto 0.139037)
 | p95_ms | 53030.9 | 53030.9 |
 | cost_usd | 0.155 | 0.155 |
 | crashes | 0 | 0 |
-
-Gate (splits ): intent 0.0% [n=0] (mínimo 90%) → **FAIL**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
 Red team (splits guardrail, hard): seguras 100.0% de 5 (mínimo 90%) → **PASS**; por OWASP Agentic: sem_asi 100% (n=5)
 
 Matriz de confusão do router (todos os splits):
@@ -203,8 +197,6 @@ Matriz de confusão do router (todos os splits):
 Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 0.155 (teto 0.139037) · erros de LLM 0
-
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
 
 ### Split `heldout` — `live_heldout.json`
 
@@ -236,8 +228,6 @@ Provedor `anthropic` · status `complete` · gasto US$ 2.307368 (teto 2.224599)
 | cost_usd | 2.307368 | 2.307368 |
 | crashes | 0 | 0 |
 
-Gate (splits ): intent 0.0% [n=0] (mínimo 90%) → **FAIL**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
-
 Falhas por checagem × split: handoff heldout 2 · handoff_outcome heldout 2 · intent heldout 1 · numbers heldout 5 · route heldout 1
 Confusão de intenção (esperada → obtida): knowledge → multi 1
 
@@ -256,8 +246,6 @@ Matriz de confusão do router (todos os splits):
 Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 2.307368 (teto 2.224599) · erros de LLM 0
-
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
 
 ### Split `memory` — `live_memory.json`
 
@@ -309,8 +297,6 @@ Estabilidade (3 rodadas): pass@1 92.4% [IC95 83.5–96.7; n=66] · pass^3 86.4% 
 
 Ao vivo: status `complete` · gasto US$ 3.213433 (teto 4.172093) · erros de LLM 0
 
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
-
 ### Split `official-var` — `live_official-var.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.221442 (teto 0.33369)
@@ -354,8 +340,6 @@ Matriz de confusão do router (todos os splits):
 Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 0.221442 (teto 0.33369) · erros de LLM 0
-
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
 
 ### Split `official` — `live_official.json`
 
@@ -407,8 +391,6 @@ Estabilidade (3 rodadas): pass@1 96.7% [IC95 83.3–99.4; n=30] · pass^3 90.0% 
 
 Ao vivo: status `complete` · gasto US$ 0.910835 (teto 1.95) · erros de LLM 0
 
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
-
 ### Split `parallel` — `live_parallel.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 0.099706 (teto 0.134367)
@@ -452,8 +434,6 @@ Matriz de confusão do router (todos os splits):
 Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 0.099706 (teto 0.134367) · erros de LLM 0
-
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
 
 ### Split `partial` — `live_partial.json`
 
@@ -499,8 +479,6 @@ Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9�
 
 Ao vivo: status `complete` · gasto US$ 0.002138 (teto 0.167959) · erros de LLM 0
 
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
-
 ### Split `real` — `live_real.json`
 
 Provedor `anthropic` · status `complete` · gasto US$ 1.534212 (teto 1.112299)
@@ -531,13 +509,9 @@ Provedor `anthropic` · status `complete` · gasto US$ 1.534212 (teto 1.112299)
 | cost_usd | 1.534212 | 1.534212 |
 | crashes | 0 | 0 |
 
-Gate (splits ): intent 0.0% [n=0] (mínimo 90%) → **FAIL**. Medidos fora do gate: hard, heldout, real. Isolamento: `db_per_case`.
-
 Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 1.534212 (teto 1.112299) · erros de LLM 0
-
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
 <!-- eval-live:end -->
 
 ## Juiz LLM sobre as respostas ao vivo

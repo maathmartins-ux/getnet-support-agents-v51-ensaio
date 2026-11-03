@@ -74,7 +74,8 @@ SOURCES = ('{\n  "_doc": "Páginas do site oficial da empresa para `python -m ap
 PROMPTS_LINE = 'PROMPTS_DIR = Path(__file__).resolve().parent.parent / "challenge_prompts"'
 # Exemplos que saem do produto (o original continua em tests/fixtures/kit_data).
 EMPTIED = ["data/sample.jsonl", "data/records.json", "data/intent_examples.jsonl",
-           "evals/cases.jsonl", "evals/retrieval.jsonl", "evals/judge_calibration.jsonl"]
+           "evals/cases.jsonl", "evals/retrieval.jsonl", "evals/judge_calibration.jsonl",
+           "evals/demo_transcript.jsonl"]
 # Ferramentas de construção do kit, sem papel no produto: saem do repositório da entrega.
 KIT_ONLY = ["scripts/ensaio_overlay.sh", "scripts/medir_forks.py"]
 GLOSSARY = ('{\n  "_doc": "Glossário pt -> en do DESAFIO (agents.expand_query): chave = termo do corpus em português; '

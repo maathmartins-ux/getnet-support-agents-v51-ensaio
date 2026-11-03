@@ -1,7 +1,10 @@
 """Configuração lida do ambiente a cada chamada (testes trocam variáveis sem reimportar)."""
 from __future__ import annotations
 
+import json
 import os
+import secrets
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -101,12 +104,36 @@ def auth_mode() -> str:
     return mode if mode in ("demo", "required") else "required"
 
 
+def _local_secret(name: str) -> str:
+    """Segredo aleatório gerado uma vez e guardado ao lado do banco (var/, fora do git, arquivo 0600).
+
+    Sem `.env`, não existe segredo conhecido para forjar token: o servidor e a CLI do mesmo diretório leem o mesmo
+    arquivo. O token de operador gerado sai uma vez no log, para o primeiro acesso ao painel.
+    """
+    path = db_path().parent / "local_secrets.json"
+    try:
+        found = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        found = {}
+    if not found.get(name):
+        found[name] = secrets.token_urlsafe(48)
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(found), encoding="utf-8")
+            path.chmod(0o600)
+        except OSError:
+            pass  # diretório só de leitura: vale para este processo
+        if name == "OPERATOR_TOKEN":
+            print(f"OPERATOR_TOKEN não definido: gerado e guardado em {path} → {found[name]}", file=sys.stderr)
+    return found[name]
+
+
 def auth_secret() -> str:
-    return os.getenv("AUTH_SECRET", "dev-secret-change-me")
+    return os.getenv("AUTH_SECRET") or _local_secret("AUTH_SECRET")
 
 
 def operator_token() -> str:
-    return os.getenv("OPERATOR_TOKEN", "dev-operator-change-me")
+    return os.getenv("OPERATOR_TOKEN") or _local_secret("OPERATOR_TOKEN")
 
 
 def operator_keys() -> dict[str, str]:

@@ -222,6 +222,26 @@ _LINK = __import__("re").compile(r"\]\(((?:\.\./)*[\w./-]+)(?:#[\w-]*)?\)")
 _TICK = __import__("re").compile(r"`((?:src|docs|evals|scripts|tests|data|ops)/[\w./-]+)`")
 
 
+def officials_have_facts(root: Path = ROOT) -> tuple[str, bool, float, str]:
+    """Todo cenário oficial que o agente resolve sozinho tem `expect.facts`: sem fato, "resolvido" conta só a rota.
+
+    A manchete (oficiais resolvidas = sem humano + todo fato + fonte) só mede conteúdo nos casos com fato; um oficial
+    sem fato passaria com uma recusa educada. Fato = regex curta do número ou do termo que a resposta certa contém.
+    """
+    t0 = time.perf_counter()
+    path = root / "evals" / "cases.jsonl"
+    missing = []
+    for line in (path.read_text(encoding="utf-8").splitlines() if path.exists() else []):
+        if not line.strip():
+            continue
+        case = __import__("json").loads(line)
+        exp = case.get("expect") or {}
+        if case.get("split") == "official" and not exp.get("handoff") and not exp.get("facts"):
+            missing.append(case.get("id", "?"))
+    return "cenários oficiais com fato verificável", not missing, time.perf_counter() - t0, \
+        ("sem expect.facts: " + ", ".join(missing)) if missing else ""
+
+
 def docs_links_exist(root: Path = ROOT) -> tuple[str, bool, float, str]:
     """Todo arquivo citado no README e em docs/*.md (link markdown relativo ou caminho entre crases) está versionado.
 
@@ -379,6 +399,7 @@ def main() -> int:
         results.append(no_example_data())
         results.append(readme_has_no_placeholders())
         results.append(docs_links_exist())
+        results.append(officials_have_facts())
     if args.docker:
         results += docker_steps(image_extras(args.extras), forced=args.extras != "auto")
     if args.scale:

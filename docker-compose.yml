@@ -7,6 +7,9 @@ services:
       # Padrão seguro: identidade só do Bearer JWT. Payload literal do enunciado ({"message","user_id"}):
       #   docker compose -f docker-compose.yml -f docker-compose.demo.yml up   (docs/adr/0001-auth-mode-demo.md)
       AUTH_MODE: ${AUTH_MODE:-required}
+      # Humano dentro do laço: o turno que abre um caso espera a resposta do operador por até 20 s e o plano continua
+      # no mesmo turno; sem resposta no prazo, o caso segue assíncrono (src/app/hitl_sync.py). 0 desliga.
+      HITL_SYNC_WAIT_S: ${HITL_SYNC_WAIT_S:-20}
     env_file:
       - path: .env
         required: false
