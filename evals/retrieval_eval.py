@@ -133,6 +133,28 @@ def calibrate_gate(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict |
     return {**out, "positives": len(pos), "negatives": len(neg), "neg_refusal_min": NEG_REFUSAL_MIN}
 
 
+def calibrate_rerank_gate(pos: list[float], neg: list[float]) -> dict | None:
+    """Portão "sem fonte" pela nota do cross-encoder (o sinal que melhor separa com × sem fonte): o menor limiar que
+    recusa >= NEG_REFUSAL_MIN das perguntas sem fonte, maximizando as com fonte respondidas (selective generation:
+    cobertura máxima com piso de recusa). A nota do reranker não é probabilidade e muda com o modelo: recalibrar a cada
+    troca de retriever. Pede >= 15 negativos para valer (`enough`)."""
+    from evals.run_evals import NEG_REFUSAL_MIN, rate_ci
+
+    if not pos or not neg:
+        return None
+    best = None
+    for t in sorted(set(pos) | set(neg)):
+        a = sum(x >= t for x in pos) / len(pos)
+        b = sum(x < t for x in neg) / len(neg)
+        key = (b >= NEG_REFUSAL_MIN - 1e-12, a, b, -t)
+        if best is None or key > best[0]:
+            best = (key, {"min_rerank": round(t, 4), "pos_answered": round(a, 3), "neg_refused": round(b, 3),
+                          "meets_floor": key[0], "pos_ci": rate_ci(sum(x >= t for x in pos), len(pos)),
+                          "neg_ci": rate_ci(sum(x < t for x in neg), len(neg))})
+    return {**best[1], "positives": len(pos), "negatives": len(neg), "neg_refusal_min": NEG_REFUSAL_MIN,
+            "enough": len(neg) >= 15}
+
+
 def separation(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict | None:
     """Quanto o sinal do portão separa perguntas COM fonte das SEM fonte ("gap" e AUC por embedder): melhor
     cosseno de cada pergunta; AUC = chance de uma pergunta com fonte superar uma sem fonte; gap = pior com fonte −
@@ -237,6 +259,8 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
             # com rerank, a nota do cross-encoder separa melhor que o cosseno (medido num gold real: AUC 0,84 × 0,78)
             "separation_rerank": separation([[(0.0, x, True)] for x in rerank_pos if x is not None],
                                             [[(0.0, x, False)] for x in rerank_neg if x is not None]),
+            "rerank_gate": calibrate_rerank_gate([x for x in rerank_pos if x is not None],
+                                                 [x for x in rerank_neg if x is not None]),
             "essential": sum(1 for _, g in rows if g.passages),
             **({"related": {"cases": len(related_q),
                             f"recall@{K}": round(sum(q["recall"] for q in related_q) / len(related_q), 3),

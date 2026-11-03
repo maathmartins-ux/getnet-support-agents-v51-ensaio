@@ -346,6 +346,13 @@ def coverage_min_score(default: float) -> float:
     return float(value) if value else default
 
 
+def coverage_min_rerank(default: float | None) -> float | None:
+    # Portão pela nota do cross-encoder (quando o buscador tem rerank): a pergunta tem fonte se a melhor nota do top-5
+    # passa do limiar. Calibrado por `retrieval_eval` (rerank_gate); None = desligado (vale o portão BM25/cosseno).
+    value = os.getenv("COVERAGE_MIN_RERANK")
+    return float(value) if value else default
+
+
 def coverage_min_cosine(default: float) -> float:
     # Piso de cosseno do portão no denso/híbrido. Muda de escala com o modelo (e5 põe quase tudo em 0,75–0,90):
     # sai calibrado pelo --choose-retriever junto com o retriever escolhido.

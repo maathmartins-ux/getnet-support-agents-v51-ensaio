@@ -33,6 +33,7 @@ from .config import (
     corpus_language_setting,
     coverage_gate,
     coverage_min_cosine,
+    coverage_min_rerank,
     coverage_min_score,
     data_dir,
     faq_max_searches,
@@ -208,6 +209,10 @@ def expand_query(text: str) -> str:
 
 
 # --- faq -------------------------------------------------------------------------------------
+def rerank_threshold() -> float | None:
+    return coverage_min_rerank(getattr(domain.active(), "MIN_RERANK", None))
+
+
 def covered_hits(found: list, min_score: float | None = None, min_cosine: float | None = None,
                  gate: dict | None = None) -> list:
     """Portão de cobertura: trechos que contam como fonte. Mesma função no agente e na calibração do eval.
@@ -216,6 +221,10 @@ def covered_hits(found: list, min_score: float | None = None, min_cosine: float 
     --choose-retriever calibrou PARA o retriever escolhido; o rag só o entrega se nada caiu) → MIN_SCORE/MIN_COSINE.
     """
     gate = gate or {}
+    if min_score is None and min_cosine is None and (rr := rerank_threshold()) is not None:
+        scores = [h.rerank for h in found if h.rerank is not None]
+        if scores:  # buscador com rerank: a nota do cross-encoder decide (separa com × sem fonte melhor que o BM25)
+            return list(found) if max(scores) >= rr else []
     threshold = min_score if min_score is not None else coverage_min_score(
         gate.get("min_score", domain.active().MIN_SCORE))
     floor = min_cosine if min_cosine is not None else coverage_min_cosine(gate.get("min_cosine", MIN_COSINE))
@@ -531,7 +540,8 @@ def covered_search(retriever, query: str, k: int, gate: dict | None = None) -> l
     `gate` (calibração) troca os limiares calibrados do buscador ({"min_score", "min_cosine"})."""
     found = retriever.search(query, k=k)
     hits = covered_hits(found, gate=gate if gate is not None else getattr(retriever, "gate", None))
-    if not hits and found and coverage_gate() == "bm25" and not str(retriever.name).startswith("bm25"):
+    reranked = rerank_threshold() is not None and any(h.rerank is not None for h in found)
+    if not hits and found and not reranked and coverage_gate() == "bm25" and not str(retriever.name).startswith("bm25"):
         # O portão do buscador escolhido (cosseno do denso) recusou; o BM25 com o limiar do domínio tem a última
         # palavra antes de "sem fonte". Só o portão do denso fazia o eval de ponta a ponta perder handoff (90,2% →
         # 84,0% num domínio real: pergunta de código de recusa ia ao humano com a fonte no índice).

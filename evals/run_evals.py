@@ -782,7 +782,7 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
                   "intent_ci": rate_ci(sum(vals), len(vals)),
                   # db_per_case: cada caso no seu banco; http: o servidor decide (memória por user_id compartilhada)
                   "isolation": "db_per_case" if not url else "shared_http",
-                  "coverage_min_score": threshold,
+                  "coverage_min_score": threshold, "coverage_min_rerank": _rerank_gate_in_use(),
                   "gated_splits": sorted({r["split"] for r in gated}), "ungated_splits": sorted(UNGATED),
                   "passed": bool(rows) and overall >= GATE and metrics["ALL"]["crashes"] == 0
                   and (gate_resolved is None or gate_resolved["passed"])
@@ -1466,6 +1466,10 @@ def _retrieval_line(ret: dict) -> str:
         sig = "nota do rerank" if ret.get("separation_rerank") else "cosseno"
         line += (f"; separação com × sem fonte ({sig}): AUC {sep['auc']} · gap {sep['gap']} "
                  f"({sep['positives']} × {sep['negatives']}{'' if sep['enough'] else ', < 15 sem fonte: indicativo'})")
+    if rg := ret.get("rerank_gate"):
+        line += (f"; portão sem fonte pela nota do rerank (limiar {rg['min_rerank']}): responde "
+                 f"{rg['pos_answered']:.1%} {fmt_ci(rg.get('pos_ci'))} dos com fonte e recusa {rg['neg_refused']:.1%} "
+                 f"{fmt_ci(rg.get('neg_ci'))} dos sem fonte")
     if (origins := ret.get("by_origin")) and len(origins) > 1:
         line += "; por origem: " + ", ".join(f"{o} R@5 {v['recall@5']} (n={v['cases']})" for o, v in origins.items())
     if page := ret.get("page"):
@@ -1561,6 +1565,14 @@ def split_summary(report: dict) -> str:
     return "\n\n".join(out)
 
 
+def _rerank_gate_in_use() -> float | None:
+    from app.agents import rerank_threshold
+    from app.rag import get_retriever
+
+    thr = rerank_threshold()
+    return thr if thr is not None and "cross" in str(getattr(get_retriever(), "name", "")) else None
+
+
 def to_markdown(report: dict, split_view: bool = False) -> str:
     """Relatório em markdown. `split_view`: bloco de UM split numa página com vários (o retrieval sai uma vez, na
     seção de busca, e o gate só aparece no split que o gate cobre)."""
@@ -1608,8 +1620,11 @@ def to_markdown(report: dict, split_view: bool = False) -> str:
         out.append("\n" + intent_matrix_table(fm["intent_matrix"]))
     gc = {} if split_view else report.get("gate_calibration") or {}  # o portão é do corpus: sai uma vez, no offline
     thr = None if split_view else report.get("coverage_min_score")
+    if (rr := None if split_view else report.get("coverage_min_rerank")) is not None:
+        out.append(f"\nPortão sem fonte EM USO: nota do cross-encoder ≥ {rr} (calibração na linha de busca, "
+                   "`rerank_gate`). A linha abaixo é o portão BM25, que só vale sem rerank.")
     if thr or gc.get("best"):
-        line = "\nPortão sem fonte:"
+        line = "\nPortão sem fonte (BM25):" if rr is not None else "\nPortão sem fonte:"
         if thr:
             line += f" limiar efetivo {thr['effective']} ({thr['source']})"
         cur = gc.get("at_current")

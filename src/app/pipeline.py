@@ -75,7 +75,8 @@ _INTERNAL_RE = re.compile(r"(?:\b(?:o|a|the)\s+)?`?\b(" + "|".join(_INTERNAL_NAM
 # Citação do cartão de capacidades ("[policy:capabilities]") é para o verificador, não para o cliente. Sem esta
 # limpeza, 19 de 69 respostas ao vivo (3 das 10 oficiais) mostravam o código ao cliente.
 # "Conforme [policy:x], o..." vira "O..."; no fim de frase, some com o espaço e os parênteses em volta.
-_POLICY_LEAD_RE = re.compile(r"\b(?:per|according to|as per|conforme|segundo|de acordo com)\s+"
+_POLICY_LEAD_RE = re.compile(r"\b(?:per|according to|as per|by|under|conforme|segundo|de acordo com|pelo|pela|"
+                             r"pelas|pelos|na|no)\s+"
                              r"\(?\[policy:[\w.-]+\]\)?,?\s*(\w)?", re.IGNORECASE)
 _POLICY_REF_RE = re.compile(r"\s*\(?\[policy:[\w.-]+\]\)?")
 
@@ -86,7 +87,10 @@ def _scrub_internal(answer: str, language: str) -> str:
     i = 1 if language == "en" else 0
     answer = _INTERNAL_RE.sub(lambda m: _INTERNAL_NAMES[m.group(1)][i], answer)
     answer = _POLICY_LEAD_RE.sub(lambda m: (m.group(1) or "").upper(), answer)
-    return _POLICY_REF_RE.sub("", answer)
+    answer = _POLICY_REF_RE.sub("", answer)
+    # o que sobrou da citação tirada: "atendente, ." → "atendente."; ", ," → ","; espaço antes de pontuação
+    answer = re.sub(r"\s*,\s*(?=[.;:!?])", "", answer)
+    return re.sub(r"[ \t]+([,.;:!?])", r"\1", answer)
 
 
 def _digest(store, conversation_id: str, ledger: memory.Ledger | None = None) -> str:

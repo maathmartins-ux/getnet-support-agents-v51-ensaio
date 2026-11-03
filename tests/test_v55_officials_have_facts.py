@@ -61,3 +61,26 @@ def test_answer_opening_with_abstention_is_not_resolved():
     assert opens_with_abstention(hedge) and not resolved(got, [])
     assert not opens_with_abstention(direct) and resolved({**got, "answer": direct}, [])
     assert opens_with_abstention("Não consegui confirmar a previsão.")
+
+
+def test_policy_citation_scrub_leaves_no_broken_sentence():
+    from app.pipeline import _scrub_internal
+
+    assert _scrub_internal("Esse tipo de decisão é de um atendente, conforme [policy:capabilities].", "pt") == \
+        "Esse tipo de decisão é de um atendente."
+    assert _scrub_internal("Pelo [policy:capabilities], uma proposta não confirmada expira em 15 minutos.", "pt") == \
+        "Uma proposta não confirmada expira em 15 minutos."
+    assert _scrub_internal("Total: R$ 10,00 [policy:capabilities].", "pt") == "Total: R$ 10,00."
+
+
+def test_rerank_gate_decides_when_the_retriever_reranks(monkeypatch):
+    """Com rerank e limiar calibrado, a nota do cross-encoder decide "tem fonte"; sem rerank, vale o portão antigo."""
+    from types import SimpleNamespace
+
+    from app import agents
+
+    monkeypatch.setenv("COVERAGE_MIN_RERANK", "-5.0")
+    hit = lambda r: SimpleNamespace(rerank=r, bm25=9.0, cosine=None)  # noqa: E731
+    assert agents.covered_hits([hit(-7.0), hit(-6.0)]) == []  # BM25 alto não salva: o rerank recusa
+    assert len(agents.covered_hits([hit(-4.0), hit(-9.0)])) == 2
+    assert len(agents.covered_hits([hit(None)])) == 1  # sem nota de rerank: o BM25 decide
