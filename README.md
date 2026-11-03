@@ -410,8 +410,9 @@ e como comparar pela primeira entrega.
 | 19:08:14 | 413 | readme: números e linha do tempo (fill_readme, último passo) |
 | 19:29:56 | 435 | avaliação humana: 18 rótulos do dono pela página de rotulagem (humano passa 17/18; concordância com o automático 94,4%, juiz × humano 88,9%) |
 | 19:29:57 | 435 | readme: números e linha do tempo (fill_readme, último passo) |
+| 19:37:38 | 443 | hitl: transcrição ao vivo com o operador respondendo no turno (router → escalation → human); README sem frases vencidas; TIMESHEET regenerado |
 
-Do primeiro ao último commit: **435 min**.
+Do primeiro ao último commit: **443 min**.
 <!-- timeline:end -->
 
 </details>
