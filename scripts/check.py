@@ -222,6 +222,30 @@ _LINK = __import__("re").compile(r"\]\(((?:\.\./)*[\w./-]+)(?:#[\w-]*)?\)")
 _TICK = __import__("re").compile(r"`((?:src|docs|evals|scripts|tests|data|ops)/[\w./-]+)`")
 
 
+def replay_gate(root: Path = ROOT) -> tuple[str, bool, float, str]:
+    """Replay das respostas gravadas ao vivo (evals/cassettes/, sem chave nem rede) contra os pisos da gravação.
+
+    Reprova se uma taxa cai abaixo do piso num split cuja gravação ainda bate com o código (é a regressão de
+    qualidade de resposta que o gate offline, só de intenção, não pega). Split com pedido não gravado (o código mudou
+    depois da gravação) sai como AVISO "regrave", sem reprovar: no relógio, uma correção tardia não pode travar o CI.
+    """
+    t0 = time.perf_counter()
+    cas = root / "evals" / "cassettes"
+    if not cas.exists() or not any(cas.iterdir()):
+        return "replay das gravações ao vivo", True, time.perf_counter() - t0, "sem cassetes: pulado"
+    subprocess.run([PY, "-m", "evals.run_evals", "--replay"], cwd=root, capture_output=True, text=True, env=ENV)
+    path = root / "evals" / "results" / "replay.json"
+    rep = __import__("json").loads(path.read_text(encoding="utf-8")) if path.exists() else {"splits": {}}
+    failed, stale = [], []
+    for name, e in (rep.get("splits") or {}).items():
+        if e.get("misses"):
+            stale.append(name)
+        elif e.get("problems"):
+            failed.append(f"{name}: {'; '.join(e['problems'])[:200]}")
+    detail = "; ".join(failed) + (f" | AVISO regravar: {', '.join(stale)}" if stale else "")
+    return "replay das gravações ao vivo", not failed, time.perf_counter() - t0, detail
+
+
 def officials_have_facts(root: Path = ROOT) -> tuple[str, bool, float, str]:
     """Todo cenário oficial que o agente resolve sozinho tem `expect.facts`: sem fato, "resolvido" conta só a rota.
 
@@ -400,6 +424,7 @@ def main() -> int:
         results.append(readme_has_no_placeholders())
         results.append(docs_links_exist())
         results.append(officials_have_facts())
+        results.append(replay_gate())
     if args.docker:
         results += docker_steps(image_extras(args.extras), forced=args.extras != "auto")
     if args.scale:

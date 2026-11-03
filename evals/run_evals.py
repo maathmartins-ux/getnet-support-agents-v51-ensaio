@@ -1236,6 +1236,40 @@ def _reaches_knowledge(question: str) -> bool:
     return bool(KNOWLEDGE_AGENTS & set(classify_offline(question, []).plan))
 
 
+def calibrate_rerank_gate() -> dict | None:
+    """Portão sem fonte pela nota do cross-encoder, medido no gold de busca (evals/retrieval.jsonl) com o buscador
+    configurado: menor limiar que recusa >= 85% dos sem fonte, maximizando os com fonte respondidos."""
+    from app.rag import get_retriever
+
+    from .retrieval_eval import evaluate
+
+    return evaluate(RETRIEVAL, get_retriever()).get("rerank_gate")
+
+
+def apply_min_rerank(gate: dict) -> int:
+    """Grava MIN_RERANK no __init__.py do domínio do desafio, com a medida no comentário (como o --apply do BM25)."""
+    import datetime
+
+    from app import domain
+
+    target = Path(domain.active().__file__)
+    if target.stem == "example" or target.parent.name == "domain":
+        print(f"--apply só grava no domínio do desafio (src/app/domain/<desafio>/__init__.py), não em {target.name}")
+        return 1
+    note = (f"# run_evals --calibrate-rerank-gate ({datetime.date.today():%d/%m/%Y}): responde "
+            f"{gate['pos_answered']:.0%} dos com fonte, recusa {gate['neg_refused']:.0%} dos sem fonte "
+            f"(n={gate['positives']}/{gate['negatives']})")
+    text = target.read_text(encoding="utf-8")
+    text = re.sub(r"(?m)^# run_evals --calibrate-rerank-gate.*\n(?=MIN_RERANK)", "", text)
+    line = f"{note}\nMIN_RERANK = {gate['min_rerank']}"
+    text, n = re.subn(r"(?m)^MIN_RERANK\s*[:=].*$", line, text)
+    if not n:
+        text = text.rstrip("\n") + "\n\n" + line + "\n"
+    target.write_text(text, encoding="utf-8")
+    print(f"MIN_RERANK = {gate['min_rerank']} gravado em {target.relative_to(HERE.parent)}")
+    return 0
+
+
 def apply_min_score(cal: dict) -> int:
     """Grava MIN_SCORE no __init__.py do domínio ativo, com a medida no comentário (linha <= 120, data de hoje).
 
@@ -1719,6 +1753,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--rerank-pools", help="tamanhos do pool do cross-encoder a comparar (ex.: 5,10,20)")
     ap.add_argument("--gold", type=Path, help="gold de retrieval alternativo (ex.: o revisado ou o mapeado)")
     ap.add_argument("--calibrate-gate", action="store_true", help="tabela do limiar do portão sem fonte e sai")
+    ap.add_argument("--calibrate-rerank-gate", action="store_true",
+                    help="limiar do portão sem fonte pela nota do cross-encoder (gold de busca); com --apply grava")
     ap.add_argument("--apply", action="store_true",
                     help="com --calibrate-gate: grava o melhor limiar como MIN_SCORE no domínio do desafio; com "
                          "--choose-retriever: grava a escolha em data/retriever.json")
@@ -1752,6 +1788,15 @@ def main(argv: list[str] | None = None) -> int:
         from evals.retrieval_eval import choose_cli
 
         return choose_cli(args, RETRIEVAL, RESULTS_DIR, git_sha())
+    if args.calibrate_rerank_gate:
+        gate = calibrate_rerank_gate()
+        if not gate:
+            print("Sem nota de rerank (buscador sem cross-encoder) ou sem perguntas com e sem fonte no gold.")
+            return 1
+        print(json.dumps(gate, ensure_ascii=False))
+        if not gate.get("enough"):
+            print(f"AVISO: só {gate['negatives']} perguntas sem fonte (< 15): limiar indicativo; acrescente no gold.")
+        return apply_min_rerank(gate) if args.apply else 0
     if args.calibrate_gate:
         cal = calibrate_gate()
         if not cal or not cal.get("table"):
