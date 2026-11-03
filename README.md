@@ -429,8 +429,9 @@ e como comparar pela primeira entrega.
 | 21:20:51 | 546 | readme: números e linha do tempo (fill_readme, último passo) |
 | 21:21:40 | 547 | kit: replay das gravações no check; calibração do portão rerank com --apply |
 | 21:21:40 | 547 | readme: números e linha do tempo (fill_readme, último passo) |
+| 21:29:45 | 555 | docs: README sem contagem de rótulos escrita à mão; juiz 'não validado' coerente por split; replay fora de evals/results |
 
-Do primeiro ao último commit: **547 min**.
+Do primeiro ao último commit: **555 min**.
 <!-- timeline:end -->
 
 </details>
