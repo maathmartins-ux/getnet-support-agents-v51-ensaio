@@ -56,7 +56,7 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 4. Pergunte algo que o site não cobre ("Vocês têm maquininha com impressora térmica colorida?"): a resposta diz o que
    a fonte cobre e oferece o atendente; pedido sem fonte vai ao operador, que responde em `/operator`.
 
-Validação humana: **1 rotulador** (o dono) marcou 18 respostas às cegas pela página de rotulagem; resultado e limites em `docs/RESULTS.md` (bloco humano).
+Validação humana: rótulos às cegas do dono pela página de rotulagem (2 rodadas; a 2ª com falhas suspeitas na amostra); quantos, a concordância e os limites estão no bloco humano de `docs/RESULTS.md` (gerado).
 
 ## 1. How to build, configure, run and test (construir, configurar, rodar e testar)
 
@@ -274,7 +274,7 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
 | **Humano só quando o sistema não resolve** ([ADR 0006](docs/adr/0006-humano-so-quando-nao-resolve.md)): resposta parcial oferece o humano; nada resolvido escala, garantido em código (`_enforce_escalation`) | deixar o LLM oferecer o humano em qualquer falta de fonte | a 1ª versão (falta de fonte vira oferta) derrubou o replan para 30%; com a regra em código: 95% |
 | **Especialistas sem estado** ([ADR 0007](docs/adr/0007-especialistas-sem-estado.md)): só o router lê o histórico; o especialista recebe a pergunta reescrita e o livro de fatos | cada especialista relê 10 turnos crus | memória pass@1 0,72 → 92,7% pelo resultado, fatos 100%; dependent 95% → 100% |
 | **Operador consultado no turno com espera curta** (`HITL_SYNC_WAIT_S`, teto 20 s, no máximo 8 esperas simultâneas) | o turno esperar o humano sem teto / só ticket assíncrono | o teto fica abaixo do timeout do balanceador (120 s, `ops/lb.py`) e do cliente; acima dele o caso segue assíncrono e a retomada leva a resposta à conversa |
-| **Juiz com regra de validação fixada antes de medir** (≥ 10 por classe, TPR e TNR ≥ 0,8; senão roda só como regressão) | publicar a nota do juiz como verdade | a regra é aplicada ao gabarito de calibração desta entrega (`evals/results/judge.json`, `calibration.validation`); com só 1 falha entre os 18 rótulos humanos, o TNR do juiz não se mede e ele conta só como regressão |
+| **Juiz com regra de validação fixada antes de medir** (≥ 10 por classe, TPR e TNR ≥ 0,8; senão roda só como regressão) | publicar a nota do juiz como verdade | a regra é aplicada ao gabarito de calibração desta entrega (`evals/results/judge.json`, `calibration.validation`); sem falhas humanas suficientes (≥ 10 por classe), o TNR do juiz não se mede e ele conta só como regressão (bloco humano de `docs/RESULTS.md`) |
 | SQLite como padrão, **Postgres atrás da mesma interface** para vários hosts ([ADR 0003](docs/adr/0003-postgres-opcional.md)) | Postgres obrigatório / ORM / Redis | zero serviço externo para quem clona e roda; os testes de disputa (caso, ação, resposta, SLA, limite) rodam nos dois backends |
 | Agentes independentes em threads | asyncio | os agentes fazem I/O síncrono (SQLite, SDK); threads cortam o p95 sem reescrever a pilha |
 | Effort por papel (supervisor low, agentes medium) | um effort global | o supervisor só escolhe o próximo passo; quem redige com fonte precisa de mais |
@@ -287,7 +287,7 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
   identidade do servidor (`src/app/tools.py`); saída estruturada no router e no juiz; cassete grava cada resposta do
   LLM para o replay offline no CI.
 - **Na construção:** uma sessão principal (regente) com 7 frentes em subagentes (K, R, T, Q, D em worktrees; H1, H2 e P sem acesso ao código), mais 2 rotuladores Sonnet independentes para o gold da busca; uma sessão maestra fora do relógio só cronometrou. O kit (motor, scripts e runner) veio pronto de antes do relógio: `docs/PROCEDENCIA.md`.
-- **Na avaliação:** LLM como juiz com canários e um gabarito de calibração (rótulos escritos a partir da SPEC) e 18 rótulos humanos do dono pela página de rotulagem; rascunho de rótulo pelo modelo com revisão do
+- **Na avaliação:** LLM como juiz com canários e um gabarito de calibração (rótulos escritos a partir da SPEC) e rótulos humanos do dono pela página de rotulagem (bloco humano, gerado); rascunho de rótulo pelo modelo com revisão do
   dono linha a linha (`python -m evals.error_analysis`), separado da rotulagem cega.
 
 ## 6. Testing strategy (unit, integration, live)
@@ -301,7 +301,7 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
   cassete para o replay no CI (`--replay`, piso = taxas da gravação aceita).
 - **Humano**: análise de erros em ~60 traces reais (rascunho do modelo, edições do dono contadas, um modo de falha
   por checagem) e held-out cego rotulado na página (passa/falha ponta a ponta; a intenção é diagnóstico).
-  O que rodou no relógio: corpus, gold, frentes, fumaça, rodada 1 ao vivo com juiz, ablação parcial. Depois do relógio: bateria completa, 18 rótulos humanos do dono, transcrição HITL ao vivo. Não rodou: `check.py --docker --scale` completo.
+  Na linha do tempo abaixo (do `git log`): o relógio do ensaio e, depois dele, a bateria completa no código final, a rotulagem humana e a transcrição HITL ao vivo. Não rodou: `check.py --docker --scale` completo.
 
 ## 7. Perguntas da entrevista, respondidas
 
@@ -428,6 +428,7 @@ e como comparar pela primeira entrega.
 | 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
 | 21:20:51 | 546 | readme: números e linha do tempo (fill_readme, último passo) |
 | 21:21:40 | 547 | kit: replay das gravações no check; calibração do portão rerank com --apply |
+| 21:21:40 | 547 | readme: números e linha do tempo (fill_readme, último passo) |
 
 Do primeiro ao último commit: **547 min**.
 <!-- timeline:end -->
@@ -437,5 +438,5 @@ Do primeiro ao último commit: **547 min**.
 ## 9. Limitações e próximos passos
 
 - CRM (2 clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (Pix D+0, débito D+1 útil, crédito D+30) e a fila do operador.
-- **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana:** 1 rotulador e 18 rótulos, só 1 falha entre eles: a concordância vale, o TNR do juiz não (precisa de ~20 falhas rotuladas; próxima amostra estratificada com falhas conhecidas). **Portão sem fonte:** pela nota do cross-encoder, calibrado com 22 perguntas sem fonte (poucas: IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
-- Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana no relógio (feita depois, pelo dono: 18 rótulos, sem rodada de consenso); análise de erros não revisada (J2 não aconteceu); rodada 1 começou no T+25 (o gate ficou verde, mas o `--calibrate-gate` não foi adotado) e o 1º processo foi morto por falta de memória (4 processos pesados ao mesmo tempo); replan e dependent abortaram por teto na rodada 1 e foram medidos depois, completos, na confirmação (cota com piso nos turnos); `check.py --docker --scale` não reconferido no relógio.
+- **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana:** 1 rotulador e quase nenhuma falha rotulada: a concordância vale, o TNR do juiz não (precisa de ~20 falhas; ver bloco humano). **Portão sem fonte:** pela nota do cross-encoder, calibrado com 22 perguntas sem fonte (poucas: IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
+- Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana no relógio (feita depois, pelo dono, sem rodada de consenso); análise de erros não revisada (J2 não aconteceu); rodada 1 começou no T+25 (o gate ficou verde, mas o `--calibrate-gate` não foi adotado) e o 1º processo foi morto por falta de memória (4 processos pesados ao mesmo tempo); replan e dependent abortaram por teto na rodada 1 e foram medidos depois, completos, na confirmação (cota com piso nos turnos); `check.py --docker --scale` não reconferido no relógio.

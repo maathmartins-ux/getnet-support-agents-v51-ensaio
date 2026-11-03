@@ -1023,6 +1023,12 @@ def _replay_metrics(report: dict) -> dict:
     return m
 
 
+def replay_dir() -> Path:
+    """Saída do replay fora de evals/results/: é conferência do CI, não evidência (replay velho commitado parecia gate
+    quebrado)."""
+    return HERE.parent / "var" / "replay"
+
+
 def run_replay(split: str | None = None, tolerance: float | None = None, workers: int = 1) -> dict:
     """Roda cada split gravado em evals/cassettes/ com LLM_PROVIDER=replay e compara com os pisos da gravação.
 
@@ -1048,7 +1054,7 @@ def run_replay(split: str | None = None, tolerance: float | None = None, workers
                                      f"(python -m evals.run_evals --live --split {name})")
             summary["passed"] = False
             continue
-        report = run(out=RESULTS_DIR / f"replay_{name}.json", split=None if name == "all" else name,
+        report = run(out=replay_dir() / f"replay_{name}.json", split=None if name == "all" else name,
                      workers=workers, repeat=cas.get("repeat", 1), replay=f)
         got = _replay_metrics(report)
         entry.update(misses=report.get("replay_misses", 0), status=report["status"], comparison={})
@@ -1067,8 +1073,8 @@ def run_replay(split: str | None = None, tolerance: float | None = None, workers
                 entry["problems"].append(f"{key}: replay {entry['comparison'].get(key, {}).get('replay')} "
                                          f"abaixo do piso {floor}")
         summary["passed"] = summary["passed"] and not entry["problems"]
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    (RESULTS_DIR / "replay.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    replay_dir().mkdir(parents=True, exist_ok=True)
+    (replay_dir() / "replay.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     return summary
 
 

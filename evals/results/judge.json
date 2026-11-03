@@ -410,8 +410,10 @@
         "positives": 24,
         "negatives": 24,
         "validation": {
-          "validated": true,
-          "missing": [],
+          "validated": false,
+          "missing": [
+            "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+          ],
           "rule": ">= 10 por classe e TPR, TNR >= 0.8"
         },
         "ci": {

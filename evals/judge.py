@@ -426,8 +426,9 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
                   "by_split": {s: _agreement(p) for s, p in sorted(pairs_by_split.items()) if s != "ALL"},
                   "by_failure_type": by_failure_type(type_pairs), **labels_origin(calib)}
     if cal_report["labels_origin"] != "human":  # concordância com rótulo escrito da SPEC não valida o juiz
-        cal_report["validation"] = {**cal_report["validation"], "validated": False,
-                                    "missing": [*cal_report["validation"]["missing"], HUMAN_LABELS_MISSING]}
+        for block in (cal_report, *cal_report["by_split"].values()):  # por split também (a régua viu true × false)
+            block["validation"] = {**block["validation"], "validated": False,
+                                   "missing": [*block["validation"]["missing"], HUMAN_LABELS_MISSING]}
     return {"status": status, **({"reason": reason} if reason else {}),
             "resumed_verdicts": len(kept), "model": llm.model, "provider": getattr(llm, "provider", "anthropic"),
             **family_report(llm.model), "live_files": [p.name for p in inputs],
@@ -488,7 +489,22 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--max-usd", type=float, default=None)
     ap.add_argument("--resume", action="store_true",
                     help="continua um judge.json interrompido (aborted_*): não paga de novo o que já foi julgado")
+    ap.add_argument("--revalidate", action="store_true",
+                    help="reaplica a regra de validação (origem dos rótulos) ao judge.json existente, sem chamar o LLM")
     args = ap.parse_args(argv)
+    if args.revalidate:
+        report = json.loads(OUT.read_text(encoding="utf-8"))
+        cal = report.get("calibration") or {}
+        cal.update(labels_origin(load_calibration()))
+        if cal["labels_origin"] != "human":
+            for block in (cal, *(cal.get("by_split") or {}).values()):
+                v = block.get("validation") or {}
+                block["validation"] = {**v, "validated": False,
+                                       "missing": sorted({*v.get("missing", []), HUMAN_LABELS_MISSING})}
+        report["calibration"] = cal
+        OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(json.dumps({"labels_origin": cal["labels_origin"], "validated": cal["validation"]["validated"]}))
+        return 0
     from app.config import llm_provider
     from app.llm import LLMError, get_judge_llm
 

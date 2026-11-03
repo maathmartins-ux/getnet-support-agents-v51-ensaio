@@ -116,7 +116,7 @@ def test_live_records_cassette_with_floors_and_replay_reproduces_it(fake_live):
     entry = summary["splits"]["official"]
     assert summary["passed"], entry["problems"]
     assert entry["misses"] == 0 and all(c["ok"] for c in entry["comparison"].values())
-    replayed = json.loads((run_evals.RESULTS_DIR / "replay_official.json").read_text(encoding="utf-8"))
+    replayed = json.loads((run_evals.replay_dir() / "replay_official.json").read_text(encoding="utf-8"))
     assert replayed["provider"] == "replay"
     key = lambda r: (r["id"], r["run"])  # noqa: E731
     # protocolo do caso é sorteado pelo store a cada execução (não vem do LLM): sai da comparação, como sai da chave

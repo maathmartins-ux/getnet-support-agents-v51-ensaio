@@ -105,10 +105,10 @@ def test_replay_gate_fails_only_on_fresh_recordings_below_floor(tmp_path, monkey
 
     (tmp_path / "evals" / "cassettes").mkdir(parents=True)
     (tmp_path / "evals" / "cassettes" / "official.jsonl").write_text("{}", encoding="utf-8")
-    (tmp_path / "evals" / "results").mkdir(parents=True)
+    (tmp_path / "var" / "replay").mkdir(parents=True)
 
     def fake_run(*a, **k):
-        (tmp_path / "evals" / "results" / "replay.json").write_text(_json.dumps({"splits": {
+        (tmp_path / "var" / "replay" / "replay.json").write_text(_json.dumps({"splits": {
             "official": {"misses": 0, "problems": ["intent_acc: replay 80 abaixo do piso 100"]},
             "memory": {"misses": 4, "problems": ["4 pedido(s) não gravado(s)"]}}}), encoding="utf-8")
 

@@ -234,7 +234,7 @@ def replay_gate(root: Path = ROOT) -> tuple[str, bool, float, str]:
     if not cas.exists() or not any(cas.iterdir()):
         return "replay das gravações ao vivo", True, time.perf_counter() - t0, "sem cassetes: pulado"
     subprocess.run([PY, "-m", "evals.run_evals", "--replay"], cwd=root, capture_output=True, text=True, env=ENV)
-    path = root / "evals" / "results" / "replay.json"
+    path = root / "var" / "replay" / "replay.json"
     rep = __import__("json").loads(path.read_text(encoding="utf-8")) if path.exists() else {"splits": {}}
     failed, stale = [], []
     for name, e in (rep.get("splits") or {}).items():
