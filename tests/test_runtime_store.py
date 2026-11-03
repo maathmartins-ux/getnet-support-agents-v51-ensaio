@@ -1,8 +1,8 @@
 """Criação concorrente do banco: N threads abrindo o MESMO banco novo ao mesmo tempo.
 
-Getnet v3 (31/10/2026): `_store_for` (lru_cache sem trava) deixou 4 threads do eval ao vivo criarem o Store
-juntas; `PRAGMA journal_mode=WAL` exige lock exclusivo e devolveu "database is locked" para as perdedoras.
-Caíram 7 respostas e o gate do split approval reprovou. Dois testes, duas causas:
+Com `_store_for` num lru_cache sem trava, 4 threads do eval ao vivo criavam o Store juntas; `PRAGMA
+journal_mode=WAL` exige lock exclusivo e devolvia "database is locked" para as perdedoras (7 respostas perdidas e
+o gate do split approval reprovado). Dois testes, duas causas:
 - get_store() em paralelo: uma instância só por caminho (trava no cache, dentro do processo);
 - Store(path) em paralelo: cobre réplicas/processos, onde trava de thread não alcança (retry no PRAGMA).
 """

@@ -45,8 +45,8 @@ def models(data: Path, embed_always: bool = False) -> tuple[str | None, str | No
 def needed_extras(data: Path) -> str:
     """Extra da imagem que o buscador escolhido exige: com embedding ou cross-encoder, `hybrid` (fastembed + modelos).
 
-    Ensaio v5.4: o padrão do kit virou denso + cross, mas a imagem padrão seguia sem fastembed; no container a busca
-    caía no BM25 (fallback) e o eval via HTTP resolvia 3 de 10 oficiais contra 9 de 10 no processo local.
+    Sem isto, com o padrão denso + cross a imagem sai sem fastembed: no container a busca cai no BM25 (fallback) e
+    o eval via HTTP resolve 3 de 10 oficiais contra 9 de 10 no processo local (medido).
     """
     embed, cross = models(data, False)
     return "hybrid" if (embed or cross) else ""

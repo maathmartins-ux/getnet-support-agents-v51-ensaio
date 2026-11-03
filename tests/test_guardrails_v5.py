@@ -1,4 +1,4 @@
-"""Guardrails novos do v5: crime financeiro (recusa) e autoagressão (apoio com CVV 188), no pipeline inteiro."""
+"""Guardrails de crime financeiro (recusa) e autoagressão (apoio com CVV 188), no pipeline inteiro."""
 import pytest
 from fastapi.testclient import TestClient
 

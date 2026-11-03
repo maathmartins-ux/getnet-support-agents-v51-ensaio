@@ -155,7 +155,7 @@ def docker_steps(extras: str = "", forced: bool = False) -> list[tuple[str, bool
     try:
         t0 = time.perf_counter()
         health = wait_health(f"http://localhost:{port}/health")
-        # o buscador do container é o pedido (sem fallback para BM25): o que o avaliador sobe é o que foi medido
+        # o buscador do container é o pedido (sem fallback para BM25): a imagem que sobe é a que foi medida
         ok = bool(health) and health.get("data_files", 0) > 0 and not health.get("retriever_fallback")
         logs = "" if health else sh(["docker", "logs", IMAGE]).stdout[-2000:]
         detail = json.dumps(health) if health else f"sem resposta em 60 s: {logs}"
@@ -163,7 +163,8 @@ def docker_steps(extras: str = "", forced: bool = False) -> list[tuple[str, bool
         if ok:
             # o token do eval é assinado com o mesmo segredo do container (senão 401)
             # os 10 oficiais pelo container (o eval inteiro já rodou em processo no "eval gate"): prova que a imagem
-            # serve o MESMO produto (buscador, modelos, dados). Ensaio v5.4: 271 casos via HTTP = 373 s em série.
+            # serve o MESMO produto (buscador, modelos, dados). Só os oficiais: os 271 casos via HTTP levam 373 s
+            # em série (medido).
             results.append(step("eval via HTTP (oficiais)", [PY, "-m", "evals.run_evals", "--url",
                                                             f"http://localhost:{port}", "--split", "official",
                                                             "--out", str(ROOT / "var" / "check-eval-http.json")],
@@ -176,9 +177,9 @@ def docker_steps(extras: str = "", forced: bool = False) -> list[tuple[str, bool
     return results
 
 
-# Marcas do domínio de EXEMPLO do kit: não podem sobrar no produto depois do pré-voo (Getnet v3: 3 textos da loja
-# no índice de busca, 9 perguntas da loja no Recall@3, 6 rótulos da loja na calibração do juiz, tools da loja
-# expostas ao LLM).
+# Marcas do domínio de EXEMPLO do kit: não podem sobrar no produto depois do pré-voo. Sem esta conferência já
+# sobraram 3 textos da loja no índice de busca, 9 perguntas da loja no Recall@3, 6 rótulos da loja na calibração do
+# juiz e tools da loja expostas ao LLM.
 EXAMPLE_MARKS = ("example.com", '"faq-entrega"', '"faq-troca"', '"faq-horario"', '"cal-0')
 EXAMPLE_TOOLS = {"lookup_record", "cancel_record", "refund_record"}
 
@@ -205,7 +206,7 @@ def no_example_data() -> tuple[str, bool, float, str]:
 
 
 def readme_has_no_placeholders() -> tuple[str, bool, float, str]:
-    """Depois do pré-voo, nenhum `{{...}}` do modelo sobra no README nem na SPEC (o avaliador lê como desleixo)."""
+    """Depois do pré-voo, nenhum `{{...}}` do modelo sobra no README nem na SPEC (marcador = texto não revisado)."""
     import re
 
     t0 = time.perf_counter()
@@ -217,9 +218,46 @@ def readme_has_no_placeholders() -> tuple[str, bool, float, str]:
     return "README e SPEC sem marcador do modelo", not left, time.perf_counter() - t0, "; ".join(left[:8])
 
 
+_LINK = __import__("re").compile(r"\]\(((?:\.\./)*[\w./-]+)(?:#[\w-]*)?\)")
+_TICK = __import__("re").compile(r"`((?:src|docs|evals|scripts|tests|data|ops)/[\w./-]+)`")
+
+
+def docs_links_exist(root: Path = ROOT) -> tuple[str, bool, float, str]:
+    """Todo arquivo citado no README e em docs/*.md (link markdown relativo ou caminho entre crases) está versionado.
+
+    O leitor confere a evidência pelo link; um link para arquivo que não foi para o repositório (anotação local,
+    resultado de uma rodada que não aconteceu, nome de arquivo antigo) é lido como documentação que diverge do código.
+    """
+    t0 = time.perf_counter()
+    tracked = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True).stdout.split()
+    files = set(tracked)
+    dirs = {str(Path(f).parent) for f in tracked}
+    for f in tracked:  # todos os ancestrais
+        parts = Path(f).parts
+        dirs.update("/".join(parts[:i]) for i in range(1, len(parts)))
+    missing = []
+    docs = ["README.md", *sorted(f for f in tracked if f.startswith("docs/") and f.endswith(".md")
+                                 and not f.startswith(("docs/kit/", "docs/changelog.d/"))
+                                 and f != "docs/KIT_CHANGELOG.md")]  # histórico do kit: cita arquivos do kit
+    for rel in docs:
+        path = root / rel
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        base = Path(rel).parent
+        for m in [*_LINK.findall(text), *_TICK.findall(text)]:
+            if m.startswith(("http", "#")) or "*" in m or "{" in m or m.startswith("../../"):
+                continue  # externo, âncora, curinga ou rota do GitHub (../../actions, ../../releases)
+            target = __import__("os").path.normpath(str(base / m)) if m.startswith(".") else m
+            target = target.rstrip("/")
+            if target.split("::")[0] not in files and target not in dirs and str(base / m).rstrip("/") not in files:
+                missing.append(f"{rel} → {m}")
+    return "docs sem link para arquivo inexistente", not missing, time.perf_counter() - t0, "; ".join(missing[:10])
+
+
 def commit_titles_clean(root: Path = ROOT) -> tuple[str, bool, float, str]:
-    """Nenhum título de commit com `{{` ou `}}` (pós-morte V5, N9: o título `{{N}}` de um commit da maestra foi para a
-    linha do tempo do README como marcador de modelo e a CI do último commit ficou vermelha)."""
+    """Nenhum título de commit com `{{` ou `}}`: a linha do tempo do README copia os títulos, um `{{N}}` vira marcador
+    de modelo e a CI do último commit fica vermelha."""
     t0 = time.perf_counter()
     r = subprocess.run(["git", "log", "--format=%h %s"], cwd=root, check=False, capture_output=True, text=True,
                        encoding="utf-8", errors="replace")
@@ -229,7 +267,7 @@ def commit_titles_clean(root: Path = ROOT) -> tuple[str, bool, float, str]:
 
 
 def cited_tests_pass(junit: Path) -> tuple[str, bool, float, str]:
-    """Todo `tests/x.py::teste` citado no README existe e passou nesta rodada (Getnet v3: 12 de 42 falhavam)."""
+    """Todo `tests/x.py::teste` citado no README existe e passou nesta rodada (sem isto, 12 de 42 citados falhavam)."""
     import re
     import xml.etree.ElementTree as ET
 
@@ -274,8 +312,8 @@ def committed_eval_is_current(fresh: Path) -> tuple[str, bool, float, str]:
         ("rode `make readme` e commite evals/results com o README. " + "; ".join(diff[:8])) if diff else ""
 
 
-# Getnet v4 (01/11/2026): a venv tinha o pacote `app` instalado em modo editável apontando para o repo da v3; o ingest
-# gravou o corpus no repo errado e os testes passaram contra o código antigo. O check recusa antes de tudo.
+# Uma venv com o pacote `app` instalado em modo editável a partir de OUTRO clone faz o ingest gravar o corpus no repo
+# errado e os testes passarem contra o código antigo. O check recusa antes de tudo.
 VENV_PROBE = (
     "import sys, pathlib, app; root = pathlib.Path(sys.argv[1]).resolve(); src = pathlib.Path(app.__file__).resolve(); "
     "ok = root in src.parents; print('app importado de', src); "
@@ -284,7 +322,7 @@ VENV_PROBE = (
 
 
 def write_verify_report(results: list, args) -> None:
-    """reports/verify.md: o que o check provou, com data e commit. O avaliador da V4 não roda nada; lê isto."""
+    """reports/verify.md: o que o check provou, com data e commit. Quem lê o repo sem rodar nada confere aqui."""
     import datetime
 
     sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True,
@@ -326,8 +364,8 @@ def main() -> int:
     results = [
         step("venv aponta para este repo", [PY, "-c", VENV_PROBE, str(ROOT)]),
         step("ruff", [PY, "-m", "ruff", "check", "."]),
-        # ensaio de 03/11: a tentativa instalou só [dev] (sem fastembed) e mediu tudo com o BM25 do fallback, enquanto
-        # CI e docker serviam denso + cross: evidência commitada de outro produto (oficiais 33% × 83% no CI)
+        # com só o extra [dev] (sem fastembed), tudo é medido com o BM25 do fallback enquanto CI e docker servem
+        # denso + cross: a evidência commitada seria de outro produto (medido: oficiais 33% × 83% no CI)
         step("buscador = o configurado (sem fallback)", [PY, "-c", RETRIEVER_PROBE]),
         step("pytest", [PY, "-m", "pytest", "-q", f"--junitxml={junit}", *pytest_workers()]),
         cited_tests_pass(junit),
@@ -340,6 +378,7 @@ def main() -> int:
     if domain_started():
         results.append(no_example_data())
         results.append(readme_has_no_placeholders())
+        results.append(docs_links_exist())
     if args.docker:
         results += docker_steps(image_extras(args.extras), forced=args.extras != "auto")
     if args.scale:

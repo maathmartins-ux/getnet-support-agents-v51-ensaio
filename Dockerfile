@@ -54,12 +54,12 @@ COPY --from=build --chown=10001:10001 /opt/models /opt/models
 COPY --from=build /opt/venv /opt/venv
 COPY data ./data
 COPY src ./src
-# Vetores do corpus prontos na imagem (ensaio v5.4: sem eles o 1º pedido no container vetorizava o corpus inteiro,
-# 2–4 min de CPU com o e5-large). Reaproveita var/embeddings do build (o eval local já vetorizou; chave = modelo +
+# Vetores do corpus prontos na imagem: sem eles o 1º pedido no container vetoriza o corpus inteiro (medido: 2–4 min
+# de CPU com o e5-large). Reaproveita var/embeddings do build (o eval local já vetorizou; chave = modelo +
 # texto) e calcula só o que falta. Imagem sem fastembed: nada a fazer.
 ENV EMBED_CACHE_DIR=/opt/vectors
 # bind do contexto (respeita o .dockerignore): sem var/embeddings no contexto (CI, clone limpo) o cp não acha nada e o
-# build segue. Ensaio v5.4: `COPY var/embeddin[g]s` quebrava com "lstat /var" quando a pasta var/ não existia.
+# build segue. Com `COPY var/embeddin[g]s` o build quebrava com "lstat /var" quando a pasta var/ não existia.
 RUN --mount=type=bind,source=.,target=/ctx \
     mkdir -p /opt/vectors && { cp -r /ctx/var/embeddings/. /opt/vectors/ 2>/dev/null || true; } \
  && if python -c "import fastembed" 2>/dev/null; then \

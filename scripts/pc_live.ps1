@@ -1,4 +1,4 @@
-﻿# PLANO B, NÃO É O CAMINHO PADRÃO: desde o kit v5 o eval ao vivo e o juiz rodam NA NUVEM (scripts/live_eval.sh,
+﻿# PLANO B, NÃO É O CAMINHO PADRÃO: o eval ao vivo e o juiz rodam NA NUVEM (scripts/live_eval.sh,
 # PLAYBOOK §2). Use este script só se a chave da API não funcionar na sessão da nuvem.
 #
 # Eval ao vivo + juiz NO PC (Windows), com o resto da tentativa na nuvem.

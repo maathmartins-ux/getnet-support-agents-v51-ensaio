@@ -2,12 +2,12 @@
 # Eval ao vivo por split + juiz + README (Linux/macOS/Git Bash). Mesmo comportamento de live_eval.ps1.
 #
 # Uso:
-#   scripts/live_eval.sh --max-usd 24        # ensaio v5.3 final (11 splits, official/memory repeat 3): conversa ~11 + juiz ~6,5
+#   scripts/live_eval.sh --max-usd 24        # medido com 11 splits (official/memory repeat 3): conversa ~11 + juiz ~6,5
 #   scripts/live_eval.sh --splits official,replan --workers 4 --repeat 1   # padrão 3 (pass^3); 1 = smoke
 #   scripts/live_eval.sh --dry-run            # mostra splits e teto, sem gastar
 #
 # - Lê o .env do projeto SEM imprimir valores (a chave nunca aparece no console nem no log).
-# - O teto vale para a rodada inteira: 80% dividido entre os splits (num processo só), 20% para o juiz.
+# - O teto vale para a rodada inteira: 65% dividido entre os splits (num processo só), 35% para o juiz.
 # - Sem chave: run_evals sai com código 2 e mensagem clara; o script para sem traceback.
 set -euo pipefail
 
@@ -26,7 +26,7 @@ done
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-# LIVE_EVAL_PY: intérprete explícito (CI Linux não tem .venv; Getnet v3 31/10/2026: CI vermelho do G1 ao fim)
+# LIVE_EVAL_PY: intérprete explícito (a CI Linux não tem .venv; sem ele o passo quebra na CI)
 PY="${LIVE_EVAL_PY:-$ROOT/.venv/bin/python}"
 [[ -x "$PY" ]] || PY="$ROOT/.venv/Scripts/python.exe"  # Git Bash no Windows
 [[ -x "$PY" ]] || { echo "Falta a venv em $ROOT/.venv ou LIVE_EVAL_PY (references/brief-de-fork.md, seção Ambiente)."; exit 1; }
@@ -37,20 +37,26 @@ if [[ -f .env ]]; then  # exporta KEY=VALUE sem ecoar nada
   done < <(grep -E '^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=' .env | sed -E 's/^[[:space:]]+//')
 fi
 export PYTHONIOENCODING=utf-8
+# Carga do eval, não do produto: N conversas ao mesmo tempo numa CPU com o buscador denso + cross deixam cada agente
+# mais lento que em produção. Medido: 12 simultâneas com o supervisor LLM em todo turno levaram passos além de 60 s e
+# o caso ia ao humano por node_timeout (splits partial e parallel inteiros). O eval roda com 8 simultâneas e teto de
+# 90 s por agente; o produto segue com os seus 60 s (NODE_TIMEOUT_S no ambiente vence os dois).
+export LIVE_MAX_CONCURRENT="${LIVE_MAX_CONCURRENT:-8}"
+export NODE_TIMEOUT_S="${NODE_TIMEOUT_S:-90}"
 FREE_GB="$("$PY" -c 'import shutil,sys; print(int(shutil.disk_usage(sys.argv[1]).free/1e9))' "$ROOT")"
 MIN_GB="${LIVE_EVAL_MIN_FREE_GB:-5}"  # os testes do script zeram (o disco do CI não é o da tentativa)
-if (( DRY == 0 && FREE_GB < MIN_GB )); then  # disco cheio no meio da bateria derruba o sqlite (ensaio v5.4)
+if (( DRY == 0 && FREE_GB < MIN_GB )); then  # disco cheio no meio da bateria derruba o sqlite
   echo "Disco com ${FREE_GB} GB livres (mínimo ${MIN_GB}). Libere antes: rm -rf /tmp/eval-* e caches." >&2; exit 1
 fi
-# Buscador: a evidência ao vivo tem de ser do MESMO produto que o CI e o docker servem (ensaio de 03/11: sem
-# fastembed na tentativa, a bateria rodou no BM25 do fallback e o CI, no denso + cross, discordou dos resultados).
+# Buscador: a evidência ao vivo tem de ser do MESMO produto que o CI e o docker servem (sem fastembed, a bateria
+# roda no BM25 do fallback e o CI, no denso + cross, discorda dos resultados).
 if (( DRY == 0 )) && [[ "${LIVE_EVAL_ALLOW_FALLBACK:-0}" != "1" ]]; then
   FB="$("$PY" -c "import sys; sys.path.insert(0, 'src'); from app.rag import get_retriever; print(getattr(get_retriever(), 'fallback', '') or '')" 2>/dev/null | tail -1)"
   if [[ -n "$FB" ]]; then
     echo "Buscador em fallback ($FB): instale requirements-hybrid.lock e rode scripts/fetch_models.py antes." >&2; exit 1
   fi
 fi
-# Memória: cada processo com o buscador do kit carrega o e5-large + cross (~3 GB). Ensaio v5.4: eval aquecido + check +
+# Memória: cada processo com o buscador do kit carrega o e5-large + cross (~3 GB). Medido: eval aquecido + check +
 # ablação + rodada 1 juntos = OOM no meio da bateria (3 de 12 splits salvos, 8 min perdidos). Espere os outros acabarem.
 MIN_RAM="${LIVE_EVAL_MIN_RAM_GB:-6}"
 AVAIL_GB="$(awk '/^MemAvailable:/ {print int($2/1048576)}' /proc/meminfo 2>/dev/null || echo 99)"
@@ -72,14 +78,14 @@ if [[ $DRY -eq 1 ]]; then
   exit 0
 fi
 
-# Getnet v4 (01/11/2026): em fila, cada split herdava o que sobrou do anterior; memory e approval abortaram por teto
-# (e o aborto SOBRESCREVEU um approval completo) e o juiz ficou sem nada. Por isso cada split tem a sua cota (80% do
-# teto dividido igualmente) e o juiz os 20% restantes. Custo medido na v4 (repeat 3, Sonnet): official 0,85 · replan
-# 0,88 · parallel 0,72 · approval 0,59 · memory 1,46 · juiz (90 respostas, Opus) 1,16 → ~6,1.
-# Kit v5.1 (ensaio): os splits rodam ao mesmo tempo num processo SÓ (run_evals --splits). Com o buscador denso cada
-# processo carrega e5-large + cross-encoder (GBs de RAM); um processo por split (5 ou mais) estourava a memória da
-# máquina. Num processo, os modelos carregam uma vez e as threads dos splits os compartilham.
-# ensaio v5.3: conversa US$ 10,45 e juiz ~US$ 6 (352 vereditos, Opus) → 65% / 35%
+# Com um teto único em fila, cada split herda o que sobrou do anterior: os últimos abortam por teto (e o aborto
+# sobrescrevia um resultado completo) e o juiz fica sem nada. Por isso cada split tem a sua cota e o juiz a dele.
+# Custo medido por split (repeat 3, Sonnet): official 0,85 · replan 0,88 · parallel 0,72 · approval 0,59 · memory
+# 1,46 · juiz (90 respostas, Opus) 1,16 → ~6,1.
+# Os splits rodam ao mesmo tempo num processo SÓ (run_evals --splits). Com o buscador denso cada processo carrega
+# e5-large + cross-encoder (GBs de RAM); um processo por split (5 ou mais) estourava a memória da máquina. Num
+# processo, os modelos carregam uma vez e as threads dos splits os compartilham.
+# Divisão do teto pela medida da rodada completa: conversa US$ 10,45 e juiz ~US$ 6 (352 vereditos, Opus) → 65% / 35%
 splits_usd="$("$PY" -c "print(round(float('$MAX_USD') * 0.65, 4))")"
 share="$("$PY" -c "print(round(float('$MAX_USD') * 0.65 / ${#CLEAN[@]}, 4))")"
 judge_usd="$("$PY" -c "print(round(float('$MAX_USD') * 0.35, 4))")"
@@ -87,8 +93,8 @@ mkdir -p var
 JOINED="$(IFS=','; echo "${CLEAN[*]}")"
 echo "== splits $JOINED num processo (cota US\$ $share cada) → var/live_splits.log"
 set +e
-# Kit v5.3 (pós-morte da V5, N6/N7): cota proporcional a casos × repeat (no run_evals), repeat 3 só em official e
-# memory (pass^3), o resto 1, e o juiz julga cada split ao terminar no MESMO processo (corte no fim não perde o juiz).
+# Cota proporcional a casos × repeat (no run_evals), repeat 3 só em official e memory (pass^3), o resto 1, e o juiz
+# julga cada split ao terminar no MESMO processo (corte no fim não perde o juiz).
 JUDGE_FLAGS=(); [[ $NO_JUDGE -eq 0 ]] && JUDGE_FLAGS=(--judge --judge-max-usd "$judge_usd")
 REPEAT_BY=(); [[ "$REPEAT" -gt 1 ]] && REPEAT_BY=(--repeat-by "official=$REPEAT,memory=$REPEAT") && REPEAT=1
 "$PY" -m evals.run_evals --live --splits "$JOINED" --max-usd "$splits_usd" --workers "$WORKERS" --repeat "$REPEAT" \

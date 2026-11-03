@@ -1,7 +1,7 @@
 """Gera slides.html do vídeo a partir dos resultados COMMITADOS (evals/results) e de respostas reais (demo.json).
 
 Uso: python scripts/video/make_slides.py [saida.html]   (lê README, docs/SPEC.md, evals/results, docs/video/demo.json)
-Nenhum número é digitado: tudo vem do JSON commitado. Getnet v4 (01/11/2026): 15 cenas, ~3 min.
+Nenhum número é digitado: tudo vem do JSON commitado. Resultado típico: 15 cenas, ~3 min.
 """
 import html
 import json

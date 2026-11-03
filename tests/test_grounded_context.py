@@ -1,6 +1,6 @@
 """Cartão `policy:capabilities` e `context` da linha do eval: o juiz vê o texto que quem redigiu viu.
 
-Getnet v4 (judge.json, official): 6 das 12 reprovações eram "as fontes só têm título e URL" (clima e câmbio pela
+Sem isso, no split official, 6 das 12 reprovações do juiz eram "as fontes só têm título e URL" (clima e câmbio pela
 web) e outras 2 eram regra verdadeira do sistema ("a antecipação precisa da sua confirmação e da aprovação de um
 atendente") que não estava em fonte nenhuma. Aqui: o cartão sai do registro de ferramentas, entra no prompt de
 quem redige e na evidência; a linha do eval leva a evidência como texto, com teto.

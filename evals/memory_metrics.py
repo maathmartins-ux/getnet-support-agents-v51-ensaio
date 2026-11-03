@@ -7,8 +7,8 @@ pass@1 esconde qual dos dois é. Aqui cada caso é classificado:
 - roteamento: route, handoff, handoff_outcome, tools, pending_action, replanned, blocked (os que o caso declara).
   `route` (run_evals.route_equivalent) é a rota pelo RESULTADO: rótulo certo, ou rótulo vizinho que leva ao mesmo
   plano de especialistas e os chamou (support × troubleshoot → records). O rótulo (`intent`) sai à parte, em
-  `intent_acc`, e não entra no pass@1 de memória quando a linha tem `route`: ensaio v5.3, 4 de 8 perdas eram só de
-  rótulo com a resposta certa (nelsondell, 9,5: mede-se o resultado, não a taxonomia). Linha antiga, sem `route`,
+  `intent_acc`, e não entra no pass@1 de memória quando a linha tem `route`: medido, 4 de 8 perdas eram só de
+  rótulo com a resposta certa (mede-se o resultado, não a taxonomia). Linha antiga, sem `route`,
   segue medida pelo rótulo;
 - memória: `memory` (campo opcional `expect.expects_fact`: valores que vieram de turnos anteriores e a resposta deve
   conter; comparação por valor, "R$ 75,00" = 75.0) e `numbers` (a mesma checagem determinística de toda resposta,

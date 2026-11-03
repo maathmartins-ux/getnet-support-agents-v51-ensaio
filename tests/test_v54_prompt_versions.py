@@ -1,4 +1,4 @@
-"""Kit v5.4: versão das instruções (hash por arquivo de prompt) na resposta, no log e na linha do eval."""
+"""Versão das instruções (hash por arquivo de prompt) na resposta, no log e na linha do eval."""
 import logging
 
 from fastapi.testclient import TestClient

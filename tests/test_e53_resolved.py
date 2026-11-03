@@ -1,7 +1,7 @@
 """E53 — manchete "oficiais resolvidas": sem humano E todo `expect.facts` na resposta E fonte citada.
 
-V5 (pós-morte, estudo Skywalker §1.8): "oficiais fundamentadas 1,00" contava "passei para um humano" como acerto; o
-mesmo juiz dava helpful 0,733 no official e esse número não estava no placar.
+"Oficiais fundamentadas 1,00" não pode contar "passei para um humano" como acerto: com essa conta, a manchete
+mostrava 1,00 enquanto o mesmo juiz dava helpful 0,733 no official, número que nem aparecia no placar.
 """
 import json
 

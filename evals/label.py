@@ -1,6 +1,6 @@
 """Validação humana do eval ao vivo: o dono rotula respostas às cegas e o relatório compara com as checagens.
 
-Fluxo (o avaliador da Régua V4 cobrou "validação humana" da qualidade semântica):
+Fluxo (as checagens automáticas não medem a qualidade semântica; a pessoa que rotula mede):
   python -m evals.label --export 30   # sorteia (seed fixa, por split); grava evals/human_labels.csv SEM o veredito
   (o dono lê pergunta, resposta e fontes e responde passa/falha; a sessão grava:)
   python -m evals.label --mark official-01=pass official-02=fail:número sem fonte
@@ -10,13 +10,13 @@ Dois ou mais rotuladores (avaliação independente): cada um rotula a MESMA amos
   python -m evals.label --export 30 --rater ana      # evals/human_labels.ana.csv (mesma seed = mesmas respostas)
   python -m evals.label --mark official-01=fail:numero_inventado --rater ana
 O relatório soma: humano × automático por rotulador e humano × humano (concordância e kappa nos ids em comum).
-Held-out ponta a ponta (estudo nelsondell §3.4): `--export N --splits heldout` (ou a página com `--heldout`) sorteia só
+Held-out ponta a ponta: `--export N --splits heldout` (ou a página com `--heldout`) sorteia só
 o held-out; o relatório traz `heldout` = humano passa/falha nessas linhas (a medida), com a acurácia de intenção nas
 mesmas linhas como diagnóstico (intenção errada com resposta certa = divergência de taxonomia, não falha).
 A nota livre depois de ":" começando por um tipo de falha conhecido (FAILURE_TYPES) vira `tipo_falha`, que o juiz
 usa para TPR/TNR por tipo.
 
-Concordância entre humanos (kit v5.3 final; V5: kappa 0,054 entre o dono e a 2ª pessoa): o relatório traz, por
+Concordância entre humanos (já medida: kappa 0,054 entre o dono e a 2ª pessoa): o relatório traz, por
 pergunta da página (c1 responde?, c2 tem algo sem base?, c3 mesmo idioma?) e no veredito, a % de concordância
 simples, o kappa de Cohen e o AC1 de Gwet, ANTES e DEPOIS da rodada de consenso. Por que os três: com prevalência
 alta (quase toda resposta certa) o kappa despenca mesmo com concordância alta — 18 de 20 iguais, cada pessoa reprovando
@@ -230,7 +230,7 @@ def import_text(text: str, results: Path = RESULTS, base: Path = HERE) -> dict:
 
 
 def ac1(pairs: list[tuple[bool, bool]]) -> float | None:
-    """AC1 de Gwet (2 avaliadores, 2 categorias): acaso = 2·q·(1−q), q = prevalência média de "sim" dos dois.
+    """AC1 de Gwet (2 rotuladores, 2 categorias): acaso = 2·q·(1−q), q = prevalência média de "sim" dos dois.
     Não despenca com prevalência alta como o kappa (ver o docstring do módulo)."""
     n = len(pairs)
     if not n:
@@ -379,7 +379,7 @@ HELDOUT_SPLIT = "heldout"
 
 def heldout_e2e(labeled: list[dict], live: dict[str, dict]) -> dict | None:
     """Ponta a ponta no held-out: humano passa / rotulados (a medida), com IC; intenção nas mesmas linhas é
-    diagnóstico. `intencao_errada_humano_passa` = taxonomia diverge mas a resposta serve (pós-morte V5, N4)."""
+    diagnóstico. `intencao_errada_humano_passa` = taxonomia diverge mas a resposta serve."""
     from evals.run_evals import rate_ci
 
     rows = [r for r in labeled if (live.get(r["id"]) or {}).get("split", r.get("split")) == HELDOUT_SPLIT]

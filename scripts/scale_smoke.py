@@ -1,7 +1,6 @@
 """Teste de réplicas: 2 cópias da api atrás de um balanceador, com o mesmo banco. Roda em `make scale` e no CI.
 
-Prova, pelo HTTP, três coisas que a banca pontua em Memory/State e Production (as soluções de 9+ na Régua V4
-mostram réplicas; a v3 só declarava "fora do escopo"):
+Prova, pelo HTTP, três propriedades de estado e de operação que só aparecem com mais de uma réplica:
 1. a conversa continua de uma réplica para a outra (histórico completo, servido por réplicas diferentes);
 2. a mesma conversa, escalada 8 vezes ao mesmo tempo nas duas réplicas, abre UM caso de atendimento;
 3. uma réplica cai e o atendimento segue pela outra.

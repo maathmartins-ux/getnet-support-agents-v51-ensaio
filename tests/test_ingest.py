@@ -66,8 +66,8 @@ def test_build_drops_repeated_site_chrome_and_writes_jsonl(tmp_path):
 
 
 def test_short_table_cells_are_glued_and_repeated_price_table_is_kept_once(tmp_path):
-    """Getnet v4: a tabela de preços (células curtas, repetida em 6+ páginas) sumia do corpus e o AC-01 ficava sem
-    fonte. Agora as células viram uma linha e a tabela longa repetida fica na 1ª página; o menu curto continua fora."""
+    """A tabela de preços (células curtas, repetida em 6+ páginas) não pode sumir do corpus, senão o AC-01 fica sem
+    fonte: as células viram uma linha e a tabela longa repetida fica na 1ª página; o menu curto continua fora."""
     from app.ingest import glue_short
 
     assert glue_short(["Get Clássica", "R$ 79,90/mês", "Uma frase longa de conteúdo da página."]) == [

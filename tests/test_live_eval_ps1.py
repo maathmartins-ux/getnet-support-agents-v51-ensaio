@@ -1,8 +1,8 @@
 """live_eval.ps1: `-Splits a,b` via `powershell -File` chega como UM texto ("a,b"), não como lista.
 
-Smoke de 31/10/2026: o exemplo do cabeçalho rodaria zero casos. -DryRun mostra o que rodaria sem gastar.
+Tratado como texto único, o exemplo do cabeçalho rodaria zero casos. -DryRun mostra o que rodaria sem gastar.
 Roda onde houver PowerShell/bash, inclusive no CI Linux (pwsh e bash vêm no runner): o intérprete vai por
-LIVE_EVAL_PY, porque lá não existe .venv (Getnet v3: o pulo "sem venv" escondia o teste justo no CI).
+LIVE_EVAL_PY, porque lá não existe .venv (pular quando não há venv esconderia o teste justo no CI).
 """
 import os
 import shutil
@@ -40,7 +40,7 @@ SH = Path(__file__).resolve().parents[1] / "scripts" / "live_eval.sh"
 
 @pytest.mark.skipif(BASH is None, reason="sem bash")
 def test_bash_twin_parses_the_same_way():
-    # feedback v2: "instruções centradas em Windows/PowerShell" → o mesmo fluxo em bash, mesma saída
+    # o fluxo não depende de Windows/PowerShell: o gêmeo em bash interpreta os mesmos argumentos, com a mesma saída
     out = subprocess.run([BASH, str(SH), "--splits", " official, ,replan", "--max-usd", "0.15", "--repeat", "2",
                           "--dry-run"], capture_output=True, text=True, encoding="utf-8", timeout=120, env=ENV)
     assert out.returncode == 0, out.stdout + out.stderr

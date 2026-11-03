@@ -1,4 +1,4 @@
-"""Padrões do ingest/índice medidos no ensaio v5.2: sem corte por seção e sem o contexto no índice (RAG_CONTEXT)."""
+"""Padrões do ingest/índice escolhidos por medida: sem corte por seção e sem o contexto no índice (RAG_CONTEXT)."""
 from app import ingest
 from app.rag import Doc
 

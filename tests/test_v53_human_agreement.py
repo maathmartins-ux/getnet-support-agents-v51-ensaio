@@ -1,4 +1,4 @@
-"""Concordância humano × humano (kit v5.3 final): % simples, kappa, AC1, por pergunta, consenso."""
+"""Concordância humano × humano: % simples, kappa, AC1, por pergunta, consenso."""
 import json
 
 from evals import label
@@ -91,7 +91,7 @@ def test_page_ships_practice_with_answer_key_and_concrete_questions():
     assert [p["id"] for p in data["practice"]] == ["treino-1", "treino-2"]
     assert {p["expected"] for p in data["practice"]} == {"pass", "fail"}
     assert all(set(p["key"]) == {"c1", "c2", "c3"} for p in data["practice"])
-    assert data["practice"][0]["lang"] == "en"  # armadilha da V5: resposta em inglês certa
+    assert data["practice"][0]["lang"] == "en"  # armadilha de propósito: resposta em inglês e correta
     for text in ("NÃO aparece no que o assistente tinha em mãos", "Ver um exemplo de Sim e de Não",
                  "Gabarito deste treino", "bad: \"sim\"", "<mark>"):
         assert text in html

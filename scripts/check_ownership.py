@@ -4,7 +4,7 @@ Uso (na sessão principal, antes de `git merge --no-ff fork/<nome>`):
   python scripts/check_ownership.py <nome-do-fork> [--base main]
 
 Lê OWNERSHIP.json e compara com `git diff --name-status <base>...fork/<nome>` — inclui
-arquivos apagados e renomeados, que foi como um fork derrubou o índice em 30/10/2026.
+arquivos apagados e renomeados, porque apagar ou renomear arquivo alheio também derruba o índice.
 """
 from __future__ import annotations
 

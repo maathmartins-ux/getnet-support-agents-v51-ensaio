@@ -1,5 +1,4 @@
-"""Supervisão humana de produção (feedback v2, 31/10/2026: "HITL não retoma o plano", "sem SLA ou timeout de
-caso", "lock da confirmação em processo e sem TTL na ação pendente").
+"""Supervisão humana de produção: o HITL retoma o plano, o caso tem SLA e a ação pendente tem prazo.
 
 - resposta do operador → o assistente escreve na hora a próxima mensagem ao cliente a partir dela (retomada);
 - ação de risco alto: confirmação do dono E aprovação do operador (quatro olhos); executa uma vez só;

@@ -8,7 +8,7 @@ from app.agents import AgentResult, Context
 
 @pytest.fixture(autouse=True)
 def _fast_path_on(monkeypatch):
-    """Estes testes cobrem o atalho de 1 passo, desligado por padrão desde o kit v5.5 (perfil Skywalker)."""
+    """Estes testes cobrem o atalho de 1 passo, que fica desligado por padrão (o supervisor LLM decide)."""
     monkeypatch.setenv("SUPERVISOR_FAST", "on")
 
 
@@ -36,7 +36,7 @@ def test_single_step_confident_plan_skips_the_supervisor_llm(monkeypatch):
 
 
 def test_fast_path_insufficient_goes_to_the_llm_and_keeps_the_table_fallback_if_it_fails(monkeypatch):
-    # kit v5.3: o insufficient do atalho vai ao supervisor LLM (tests/test_r53_supervisor.py); se o LLM falha, a
+    # o insufficient do atalho vai ao supervisor LLM (tests/test_r53_supervisor.py); se o LLM falha, a
     # tabela aplica o FALLBACK de antes, sem rodar o faq de novo
     from app.llm import LLMError
 

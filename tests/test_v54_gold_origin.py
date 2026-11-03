@@ -7,7 +7,8 @@ import pytest
 
 from evals import essential_gold, gold_questions, run_evals
 
-V5 = Path("/home/user/ens55")
+# domínio real opcional para medir o tempo do gerador (GOLD_DOMAIN_DIR = raiz de um repositório com corpus e casos)
+REAL = Path(__import__("os").environ.get("GOLD_DOMAIN_DIR", "/nonexistent"))
 
 
 def _write(path: Path, rows: list[dict]) -> Path:
@@ -89,11 +90,11 @@ def test_drafts_become_gold_in_their_origin_file_through_blind_labels(tmp_path):
     assert len((tmp_path / "gold.d" / "page.jsonl").read_text("utf-8").splitlines()) == 1
 
 
-@pytest.mark.skipif(not (V5 / "data" / "knowledge").is_dir(), reason="bancada do domínio da V5 ausente")
-def test_v5_domain_builds_the_four_origins_in_seconds_without_writing():
+@pytest.mark.skipif(not (REAL / "data" / "knowledge").is_dir(), reason="GOLD_DOMAIN_DIR sem corpus")
+def test_real_domain_builds_the_four_origins_in_seconds_without_writing():
     t0 = time.perf_counter()
-    built = gold_questions.build(V5 / "data" / "knowledge", V5 / "evals" / "cases.jsonl",
-                                 V5 / "evals" / "real_questions.jsonl", V5 / "evals" / "retrieval.jsonl")
+    built = gold_questions.build(REAL / "data" / "knowledge", REAL / "evals" / "cases.jsonl",
+                                 REAL / "evals" / "real_questions.jsonl", REAL / "evals" / "retrieval.jsonl")
     assert time.perf_counter() - t0 < 5
     assert all(built[o] for o in gold_questions.ORIGINS)
     assert len(built["no_source"]) >= 15 and len(built["page"]) >= 20

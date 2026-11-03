@@ -1,4 +1,4 @@
-"""Kit v5.4 — DEMO com árvore de passos e transcrição multi-turno (ideia do Skywalker: o trace legível por caso)."""
+"""DEMO com árvore de passos e transcrição multi-turno: o trace de cada caso legível sem abrir o JSON."""
 import importlib.util
 from pathlib import Path
 

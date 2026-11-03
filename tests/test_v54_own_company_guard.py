@@ -1,4 +1,5 @@
-"""Ensaio de 03/11 (replan ao vivo, padrão A): pergunta sobre a própria empresa ia ao `general` (sem escalada)."""
+"""Pergunta sobre a própria empresa não pode ficar numa intenção sem escalada (como `general`): vai à intenção
+que o domínio define (OWN_COMPANY_INTENT)."""
 from __future__ import annotations
 
 from app import domain, router

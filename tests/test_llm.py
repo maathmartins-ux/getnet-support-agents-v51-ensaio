@@ -53,7 +53,7 @@ def test_refusal_and_truncated_json_are_errors():
 
 
 def test_warmup_builds_one_client_per_role_only_when_live(monkeypatch):
-    # smoke de 31/10/2026: `import anthropic` levava ~7 s e caía dentro do 1º request de cada processo
+    # `import anthropic` leva ~7 s: sem o aquecimento, esse tempo cai dentro do 1º request de cada processo
     from app import llm as llm_mod
     from app.config import ROLES
 

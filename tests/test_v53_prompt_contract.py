@@ -1,4 +1,5 @@
-"""Contrato do motor no fim do prompt do domínio (ensaio v5.3: o domínio da V5 trocou faq/router/supervisor)."""
+"""Contrato do motor no fim do prompt do domínio: um domínio que troca os prompts de faq/router/supervisor
+continua recebendo as regras do motor (MISSING, NOT_IN_SOURCES, resposta indireta)."""
 from pathlib import Path
 
 from app import domain

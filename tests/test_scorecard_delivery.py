@@ -39,7 +39,7 @@ def test_delivery_message_always_lists_the_weak_metrics(tmp_path):
     text = delivery_message.render("https://github.com/o/r", None, _results(tmp_path), 57)
     good, weak = text.split("Onde ainda está abaixo da referência")
     assert "fundamentadas: 0.60" in weak and "Recall@3: 0.49" in weak
-    assert "kappa" not in text  # kit v5.5: diagnóstico do kit fica no docs/RESULTS.md, não na entrega
+    assert "kappa" not in text  # diagnóstico interno fica no docs/RESULTS.md, não na mensagem de entrega
     assert "docs/PROCEDENCIA.md" in text and "57 min" in text
 
 

@@ -1,5 +1,5 @@
-"""O pré-voo do T+0 tem destino para TODA seção do domínio de exemplo (ensaio v5.2: uma seção nova quebrava a
-largada com "seção sem destino no pré-voo" e nenhum teste pegava)."""
+"""O pré-voo do T+0 tem destino para TODA seção do domínio de exemplo: sem isso, uma seção nova quebra a
+largada com "seção sem destino no pré-voo" e nenhum outro teste pega."""
 import importlib.util
 
 from app.config import ROOT

@@ -5,25 +5,25 @@ Uso:
   python scripts/preflight.py            # cria o domínio do desafio e limpa os exemplos do produto
   python scripts/preflight.py --dry-run  # só mostra o que faria
 
-O que faz (cada item é uma lição da Getnet v3, 31/10/2026):
+O que faz (cada item fecha uma falha já medida):
 1. Cria `src/app/domain/challenge/` como CÓPIA do domínio de exemplo, em 3 arquivos com dono único:
    - `flow.py`  (frente R): taxonomia, planos, FALLBACK, regras do router offline;
    - `tools.py` (frente T): ferramentas do CRM e caminho offline do agente records;
    - `__init__.py` (sessão principal): MIN_SCORE calibrado e a junção dos dois.
-   Na v3 o domínio editou router.py/supervisor.py/tools.py/agents.py e 59 testes do kit quebraram. Agora o
-   motor é congelado (OWNERSHIP.json) e lê o domínio ativo.
+   Com o domínio escrito direto em router.py/supervisor.py/tools.py/agents.py, 59 testes do kit quebravam; por
+   isso o motor é congelado (OWNERSHIP.json) e lê o domínio ativo.
 2. Copia os prompts do kit para `src/app/domain/challenge_prompts/` (o desafio edita a cópia).
 3. Tira a loja de exemplo do PRODUTO: data/sample.jsonl, data/records.json, data/intent_examples.jsonl, o
    glossário da loja e os casos/retrieval/calibração de exemplo em evals/ (os originais ficam em
-   tests/fixtures/kit_data, que é o que os testes do kit usam). Na v3, 3 textos da loja ficaram no índice de
-   busca e 9 perguntas da loja entraram no Recall@3.
+   tests/fixtures/kit_data, que é o que os testes do kit usam). Sem esta limpeza, 3 textos da loja ficavam no
+   índice de busca e 9 perguntas da loja entravam no Recall@3.
 4. Roda a suíte do kit: tem de seguir verde com o domínio do desafio no lugar.
 
-Antes de tudo (kit v5.3, pós-morte V5 T1): confere o REPOSITÓRIO da tentativa. O ramo padrão do remoto tem de ser
-`main` (na V5 o padrão errado custou parte dos ~10 min perdidos antes do relógio) e o kit tem de ter vindo do ramo
-`kit-fonte` que a maestra criou antes do relógio: com `kit-fonte` presente, todo arquivo dele fora de docs/kit/ está
-no HEAD (consumido pelo scaffold); sem `kit-fonte` (já apagado), o HEAD tem o commit `chore: scaffold`. Falha com a
-correção escrita. `--skip-repo-check` pula só esta etapa (ensaio local sem remoto).
+Antes de tudo: confere o REPOSITÓRIO da tentativa. O ramo padrão do remoto tem de ser `main` (a CI e quem abre
+o repositório no GitHub leem o ramo padrão; corrigir isso depois custa minutos antes do relógio) e o kit tem de ter
+vindo do ramo `kit-fonte` que a maestra criou antes do relógio: com `kit-fonte` presente, todo arquivo dele fora de
+docs/kit/ está no HEAD (consumido pelo scaffold); sem `kit-fonte` (já apagado), o HEAD tem o commit
+`chore: scaffold`. Falha com a correção escrita. `--skip-repo-check` pula só esta etapa (execução local, sem remoto).
 """
 from __future__ import annotations
 
@@ -52,15 +52,15 @@ SECTION_FILE = {
     "achados": "tools.py",  # needs_for / NEEDS_BY_STATUS: achado do records que pede outro especialista
 }
 HEADERS = {
-    "flow.py": '"""Domínio do desafio — FLUXO (frente R): taxonomia, planos, FALLBACK, regras do router.\n\n'
+    "flow.py": '"""Domínio do desafio — FLUXO: taxonomia, planos, FALLBACK, regras do router.\n\n'
                'Contrato lido pelo motor: PLANS, FALLBACK, ALLOWED, DEPENDS, NO_ESCALATION, DEFAULT_INTENT,\n'
                'MULTI_PARTS, states_subject(), clause_intent(), combine().\nTeste: tests/test_domain_router.py.\n"""\n',
-    "tools.py": '"""Domínio do desafio — FERRAMENTAS (frente T): registro TOOLS e caminho offline do records.\n\n'
+    "tools.py": '"""Domínio do desafio — FERRAMENTAS: registro TOOLS e caminho offline do records.\n\n'
                 'Contrato lido pelo motor: TOOLS, ELIGIBLE_STATUS, records(), records_offline(). Teste em\n'
                 'tests/test_tools.py. Nenhuma tool da loja de exemplo pode sobrar aqui (check.py reprova).\n"""\n',
-    "__init__.py": '"""Domínio do desafio (sessão principal): junta flow + tools e guarda o limiar calibrado.\n\n'
+    "__init__.py": '"""Domínio do desafio: junta flow + tools e guarda o limiar calibrado.\n\n'
                    'MIN_SCORE sai de `python -m evals.run_evals --calibrate-gate` NO CORPUS DO DESAFIO; troque aqui,\n'
-                   'nunca no motor nem no domínio de exemplo (v3: trocar o padrão do kit quebrou 14 testes).\n"""\n',
+                   'nunca no motor nem no domínio de exemplo (os testes do motor rodam no exemplo).\n"""\n',
 }
 IMPORTS = {
     "flow.py": "from __future__ import annotations\n\nimport re\n",
@@ -75,6 +75,8 @@ PROMPTS_LINE = 'PROMPTS_DIR = Path(__file__).resolve().parent.parent / "challeng
 # Exemplos que saem do produto (o original continua em tests/fixtures/kit_data).
 EMPTIED = ["data/sample.jsonl", "data/records.json", "data/intent_examples.jsonl",
            "evals/cases.jsonl", "evals/retrieval.jsonl", "evals/judge_calibration.jsonl"]
+# Ferramentas de construção do kit, sem papel no produto: saem do repositório da entrega.
+KIT_ONLY = ["scripts/ensaio_overlay.sh", "scripts/medir_forks.py"]
 GLOSSARY = ('{\n  "_doc": "Glossário pt -> en do DESAFIO (agents.expand_query): chave = termo do corpus em português; '
             'valor = como o cliente pergunta em inglês. Preenchido pela frente K."\n}\n')
 
@@ -120,6 +122,11 @@ def build(dry: bool) -> list[str]:
                 path.unlink(missing_ok=True)
             else:
                 path.write_text("", encoding="utf-8")
+    for rel in KIT_ONLY:
+        if (ROOT / rel).exists():
+            done.append(f"remover {rel} (ferramenta de construção do kit)")
+            if not dry:
+                (ROOT / rel).unlink()
     done.append("trocar data/glossary.json pelo esqueleto do desafio")
     done.append("criar data/sources.json (frente K: domínios e páginas do site da empresa)")
     if not dry:
@@ -180,7 +187,7 @@ def check_repo(repo: Path = ROOT) -> list[str]:
                             "confira no GitHub (Settings → Branches) que o padrão é `main`.")
         elif branch != DEFAULT_BRANCH:
             problems.append(f"o ramo padrão do repositório é `{branch}`, não `{DEFAULT_BRANCH}`: troque em GitHub → "
-                            f"Settings → Branches → Default branch ANTES do relógio (a CI e o avaliador leem o padrão)")
+                            f"Settings → Branches → Default branch ANTES do relógio (a CI usa o padrão)")
     ref = kit_ref(repo)
     if ref is None:
         if not SCAFFOLD.search(git(repo, "log", "--format=%s", "HEAD").stdout):
@@ -217,7 +224,8 @@ def main() -> int:
         stream.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--skip-repo-check", action="store_true", help="pula a conferência do repositório (ensaio local)")
+    ap.add_argument("--skip-repo-check", action="store_true",
+                    help="pula a conferência do repositório (execução local, sem remoto)")
     args = ap.parse_args()
     if not args.skip_repo_check:
         problems = check_repo(ROOT)
@@ -228,7 +236,7 @@ def main() -> int:
             return 1
         print(f"repositório: ramo padrão `{DEFAULT_BRANCH}`, kit de `{KIT_BRANCH}` consumido")
     free = disk_free_gb(ROOT)
-    if free < MIN_FREE_GB:  # ensaio v5.4: 13 mil /tmp/eval-* lotaram o disco e o sqlite falhou no meio da bateria
+    if free < MIN_FREE_GB:  # 13 mil /tmp/eval-* já lotaram o disco e o sqlite falhou no meio da bateria
         print(f"DISCO: {free:.1f} GB livres (mínimo {MIN_FREE_GB:.0f}). Libere antes: rm -rf /tmp/eval-* e caches.")
         return 1
     for line in build(args.dry_run):

@@ -1,4 +1,4 @@
-"""Perguntas do gold de busca POR ORIGEM, em segundos e sem LLM (frente K, T+4→T+12, sem minuto a mais).
+"""Perguntas do gold de busca POR ORIGEM, em segundos e sem LLM.
 
   python -m evals.gold_questions                 # rascunhos + negativas → contagem por origem
   python -m evals.gold_questions --check         # reprova gold sem as origens ou com < 15 sem fonte
@@ -10,8 +10,8 @@ Origens (o recorte que o placar de busca publica em `by_origin`):
 - `no_source` (>= 15): perguntas fora do domínio de um atendimento — produto que não existe, concorrente, assunto
   pessoal, outro serviço — a partir de modelos fixos do kit.
 
-Por quê: numa entrega de referência a metade das perguntas escritas a partir das páginas saturou (41/41) e toda a
-diferença de busca veio da metade das perguntas reais e do desafio (36/41); sem o recorte, um gold só de páginas
+Por quê: num gold medido assim, a metade das perguntas escritas a partir das páginas saturou (41/41) e toda a
+diferença de busca veio da metade das perguntas reais e oficiais (36/41); sem o recorte, um gold só de páginas
 mede o caso fácil. E a separação com × sem fonte (AUC, gap) pede >= 15 sem fonte para valer.
 
 Onde grava:
@@ -20,7 +20,7 @@ Onde grava:
   essencial às cegas de 2 rotuladores (`python -m evals.essential_gold --export` lê os rascunhos; `--import` grava
   cada uma em `evals/retrieval.d/<origem>.jsonl` com `passage_text` e `origin`).
 - `no_source` → `evals/retrieval.d/no_source.jsonl` já como negativa (`relevant: []`): é fora do domínio por
-  construção; a frente K apaga a linha que o corpus de fato responde.
+  construção; quem monta o domínio apaga a linha que o corpus de fato responde.
 Pergunta que já está no gold não é repetida.
 """
 from __future__ import annotations
@@ -42,8 +42,8 @@ PAGE_MAX = 40  # perguntas de FAQ por rodada de rótulo: o pool às cegas de 2 r
 OFFICIAL_SPLITS = ("official", "official-var")
 
 # Fora do domínio de um atendimento de empresa, em pt e en (o portão é lido por idioma). Sem clima/câmbio/notícia:
-# isso o router manda à busca web (`general`), não à base. Produto inexistente é genérico de propósito; a frente K
-# pode trocar por um nome que pareça do domínio e não existe no corpus.
+# isso o router manda à busca web (`general`), não à base. Produto inexistente é genérico de propósito; quem monta o
+# domínio pode trocar por um nome que pareça do domínio e não exista no corpus.
 NO_SOURCE_TEMPLATES = (
     "Vocês vendem seguro de viagem para clientes?",
     "Vocês fazem empréstimo imobiliário para comprar a minha loja?",

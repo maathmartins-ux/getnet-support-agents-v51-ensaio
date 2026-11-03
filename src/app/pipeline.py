@@ -72,8 +72,8 @@ _INTERNAL_NAMES = {"faq_agent": ("a base de conhecimento", "the knowledge base")
 _INTERNAL_RE = re.compile(r"(?:\b(?:o|a|the)\s+)?`?\b(" + "|".join(_INTERNAL_NAMES) + r")\b`?", re.IGNORECASE)
 
 
-# Citação do cartão de capacidades ("[policy:capabilities]") é para o verificador, não para o cliente. Ensaio:
-# 19 de 69 respostas ao vivo (3 das 10 oficiais) mostravam o código ao cliente.
+# Citação do cartão de capacidades ("[policy:capabilities]") é para o verificador, não para o cliente. Sem esta
+# limpeza, 19 de 69 respostas ao vivo (3 das 10 oficiais) mostravam o código ao cliente.
 # "Conforme [policy:x], o..." vira "O..."; no fim de frase, some com o espaço e os parênteses em volta.
 _POLICY_LEAD_RE = re.compile(r"\b(?:per|according to|as per|conforme|segundo|de acordo com)\s+"
                              r"\(?\[policy:[\w.-]+\]\)?,?\s*(\w)?", re.IGNORECASE)

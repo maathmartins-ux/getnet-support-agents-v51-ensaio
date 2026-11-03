@@ -91,15 +91,14 @@ def test_compare_retrievers_reports_both():
 
 
 def test_gate_threshold_is_chosen_by_measurement(monkeypatch):
-    # feedback v2 (31/10/2026): o portão léxico barrava só 1 de 5 perguntas sem fonte; o limiar era chute
+    # o limiar do portão léxico vem de medida, não de chute: o valor fixo barrava só 1 de 5 perguntas sem fonte
     from evals.run_evals import calibrate_gate
 
     cal = calibrate_gate()
     assert cal["positives"] >= 6 and cal["negatives"] >= 3 and cal["current"] == 0.5
     best = cal["best"]
-    # critério v3.5 (auditoria 31/10): mais respondidas entre os limiares que recusam ≥ 85% dos sem fonte, e no
-    # empate o MENOR. O critério antigo (acurácia balanceada, empate para o maior) levou 1 negativo a fixar o limiar
-    # em 14,938 e o handoff oficial a 50% na v3.
+    # critério: mais respondidas entre os limiares que recusam ≥ 85% dos sem fonte e, no empate, o MENOR. Com
+    # acurácia balanceada e empate para o maior, 1 negativo fixava o limiar em 14,938 e o handoff oficial caía a 50%.
     ok = [r for r in cal["table"] if r["neg_refused"] >= 0.85]
     assert best["pos_answered"] == max(r["pos_answered"] for r in ok)
     assert best["threshold"] == min(r["threshold"] for r in ok if r["pos_answered"] == best["pos_answered"])

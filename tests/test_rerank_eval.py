@@ -1,7 +1,7 @@
 """O eval mede o retriever base; o rerank entra só como linha própria do comparativo.
 
-Achado da integração do kit 3.5.0 (31/10/2026): com LLM_PROVIDER=anthropic, calibrate_gate e retrieval_metrics
-chamavam o Haiku em cada pergunta, fora do teto --max-usd, e o limiar do portão era calibrado sobre outra ordem.
+Com LLM_PROVIDER=anthropic e o rerank no caminho do eval, calibrate_gate e retrieval_metrics chamariam o Haiku em
+cada pergunta, fora do teto --max-usd, e o limiar do portão seria calibrado sobre outra ordem.
 """
 import json
 

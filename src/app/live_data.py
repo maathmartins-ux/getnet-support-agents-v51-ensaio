@@ -28,7 +28,7 @@ from zoneinfo import ZoneInfo
 from .observability import METRICS, log, span
 
 TIMEOUT_S = 3.0
-# Teto da consulta INTEIRA (geocoding + previsão, com as novas tentativas). Ensaio: com timeout de conexão e 429 do
+# Teto da consulta INTEIRA (geocoding + previsão, com as novas tentativas). Medido: com timeout de conexão e 429 do
 # Open-Meteo, o `live_data` de clima levou 5–11 s e ainda caiu na busca web; sucesso levou 1,3–2,3 s. Passou do teto, a
 # busca web assume mais cedo. `LIVE_DATA_BUDGET_S` (env) troca; 0 desliga o teto.
 BUDGET_S = 5.0
@@ -78,7 +78,7 @@ def _get_json(url: str, params: dict) -> dict:
 
     last: Exception | None = None
     deadline = _DEADLINE.get()
-    # 3 tentativas: na nuvem do ensaio o Open-Meteo deu timeout de conexão ou 5xx em ~1 de 6 chamadas (sondado
+    # 3 tentativas: numa VM de nuvem o Open-Meteo deu timeout de conexão ou 5xx em ~1 de 6 chamadas (sondado
     # com curl) e 8 perguntas de clima caíram na busca web. 4xx de pedido errado não se repete; 429 também não: o
     # limite de taxa não some em milissegundos e repetir só gasta o teto (sondado: 3 x 429 seguidos no forecast).
     for _ in range(3):

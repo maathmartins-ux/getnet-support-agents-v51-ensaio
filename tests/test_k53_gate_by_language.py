@@ -1,6 +1,7 @@
-"""K53 (pós-morte V5, N2): a recusa do portão de cobertura lida por idioma, com o caminho de busca do agente.
+"""K53: a recusa do portão de cobertura lida por idioma, com o caminho de busca do agente.
 
-V5: o piso 0,88 do denso foi calibrado sem perguntas em inglês e recusou 4 oficiais em inglês com a fonte no índice.
+Um piso único calibrado sem perguntas em inglês (0,88 no denso) recusou 4 perguntas oficiais em inglês cuja fonte
+estava no índice; a taxa agregada escondia isso.
 """
 import json
 

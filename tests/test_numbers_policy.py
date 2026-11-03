@@ -1,6 +1,6 @@
-"""Checagem numérica que BLOQUEIA (kit v5): número sem base é reescrito (com LLM) e, se persistir, trocado por
+"""Checagem numérica que BLOQUEIA: número sem base é reescrito (com LLM) e, se persistir, trocado por
 "[valor não confirmado]" com oferta de humano (NUMBERS_POLICY=redact, padrão), aberto como caso (escalate) ou só
-sinalizado (flag, comportamento até a v4). Soma/diferença/contagem sustentada pela evidência passa.
+sinalizado (flag). Soma/diferença/contagem sustentada pela evidência passa.
 """
 import json
 

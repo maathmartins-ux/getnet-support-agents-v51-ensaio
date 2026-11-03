@@ -1,4 +1,4 @@
-"""Kit v5.4 — escrita executada mostra o antes e o depois (ideia do Skywalker)."""
+"""Escrita executada mostra o antes e o depois do registro alterado."""
 import json
 
 from app import actions

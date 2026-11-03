@@ -1,7 +1,7 @@
-"""Item 3: calibração do portão "sem fonte" (Getnet v3, 31/10/2026).
+"""Calibração do portão "sem fonte".
 
-Acurácia balanceada com 14 negativos e empate para o limiar mais alto: um negativo com BM25 14,938 empurrou o
-limiar para cima e o handoff oficial caiu para 50%. Critério novo: maximizar positivos respondidos com recusa
+Acurácia balanceada com 14 negativos e empate para o limiar mais alto não serve: um negativo com BM25 14,938 empurra
+o limiar para cima e o handoff oficial cai para 50%. Critério: maximizar positivos respondidos com recusa
 de negativos >= 85%; empate → o MENOR limiar. Negativo que o router não manda ao agente de conhecimento não
 passa pelo portão e sai da conta.
 """
@@ -30,7 +30,7 @@ def scenario(tmp_path):
         q = f"pergunta positiva p{i:02d}"
         table[q] = [("doc", 20.0), ("outro", 5.0)] if i < 28 else [("doc", 10.0)]
         rows.append({"question": q, "relevant": ["doc"]})
-    for i in range(14):  # 13 negativos fracos e 1 negativo forte (o 14,938 da v3)
+    for i in range(14):  # 13 negativos fracos e 1 negativo forte (o 14,938 que empurrava o limiar)
         q = f"pergunta negativa n{i:02d}"
         table[q] = [("x", 14.938 if i == 13 else 1.0)]
         rows.append({"question": q, "relevant": []})

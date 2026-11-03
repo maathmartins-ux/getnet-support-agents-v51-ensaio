@@ -159,7 +159,7 @@ def test_judge_main_runs_other_family_even_offline(monkeypatch, tmp_path):
 
 
 class QuotaAfter(StrictJudge):
-    """Juiz que esgota o limite da conta depois de `n` chamadas (ensaio v5.1: acabou no 99º julgamento)."""
+    """Juiz que esgota o limite da conta depois de `n` chamadas (como um limite real que acaba no meio da leva)."""
 
     def __init__(self, n: int):
         super().__init__()
@@ -194,7 +194,7 @@ def test_quota_mid_run_keeps_partial_and_resume_skips_what_was_judged(tmp_path):
 
 
 class RefusesRow(StrictJudge):
-    """Juiz que se recusa a julgar a linha "b" (ensaio v5.3: pergunta maliciosa do split hard)."""
+    """Juiz que se recusa a julgar a linha "b" (como faz com uma pergunta maliciosa do split hard)."""
 
     def complete(self, system, messages, max_tokens=1024, schema=None):
         if "Prazo do b?" in messages[-1]["content"]:

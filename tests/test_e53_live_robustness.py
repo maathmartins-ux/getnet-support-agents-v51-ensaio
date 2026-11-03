@@ -1,8 +1,9 @@
-"""E53 — eval ao vivo robusto (pós-morte V5, N6 e N7).
+"""E53 — eval ao vivo robusto.
 
-N7: com 11 splits e cota igual (teto / nº de splits), dependent, real, official-var e heldout abortaram por teto com o
-total sobrando. Agora a cota é proporcional a casos × repeat × turnos e a sobra de quem terminou fica para os outros.
-N6: o juiz da rodada 2 não foi medido (corte de tempo). Agora o juiz roda no mesmo processo, logo depois de cada split.
+Cota: com 11 splits e cota igual (teto / nº de splits), dependent, real, official-var e heldout abortavam por teto com
+o total sobrando. A cota é proporcional a casos × repeat × turnos e a sobra de quem terminou fica para os outros.
+Juiz: num passo separado, ele pode ficar sem rodar quando o tempo acaba; por isso roda no mesmo processo, logo
+depois de cada split.
 """
 import json
 import threading
@@ -125,3 +126,13 @@ def test_judge_error_does_not_break_the_eval():
 
     rep = run_evals.run(split="official", live=True, client=PerTurnClient(0.01), judge=broken)
     assert rep["status"] == "complete" and rep["judge"]["status"] == "error"
+
+
+def test_measured_cost_per_case_weighs_the_share(monkeypatch):
+    """O replan (4–6 chamadas por caso) não aborta por cota: a cota pesa o custo medido por caso, não os turnos."""
+    run_evals.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    (run_evals.RESULTS_DIR / "live_replan.json").write_text(json.dumps(
+        {"rows": [{}] * 3, "spent_usd": 0.6}), encoding="utf-8")  # US$ 0,20 por caso = 8 mensagens a 0,025
+    monkeypatch.setenv("LIVE_USD_PER_TURN", "0.025")
+    weights = run_evals.split_weights(["official", "replan"], {})
+    assert weights["official"] == 4.0 and weights["replan"] == pytest.approx(3 * 0.2 / 0.025)

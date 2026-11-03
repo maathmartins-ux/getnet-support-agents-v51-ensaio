@@ -1,4 +1,4 @@
-"""Página de rotulagem para 2+ pessoas (kit v5.2): gera o HTML que a sessão publica como Artifact privado do claude.ai.
+"""Página de rotulagem para 2+ pessoas: gera o HTML que a sessão publica como Artifact privado do claude.ai.
 
   python scripts/label_page.py --n 10 --raters Matheus,Bianca [--out var/rotulagem.html]
 
@@ -178,14 +178,16 @@ def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] |
         out.append({"id": r["id"], "question": r.get("message") or "", "answer": r.get("answer") or "",
                     "before": before.get(r["id"], []), "source_urls": ids,
                     "evidence": str(ctx)[:EVIDENCE_CHARS], "blocks": evidence_blocks(r), "sources": sources,
-                    # pergunta 3 da página: o idioma da pergunta e o da resposta lado a lado (pós-morte V5, N8)
+                    # pergunta 3 da página: o idioma da pergunta e o da resposta lado a lado (sem os dois à vista,
+                    # quem rotula marca resposta em inglês certa como idioma errado)
                     "lang": question_lang(r), "answer_lang": answer_lang(r)})
     return out
 
 
-# Treino com gabarito (kit v5.3 final; V5: kappa 0,054 entre as duas pessoas): 2 exemplos antes das situações, um
-# certo e um errado, que ensinam as duas armadilhas da V5 — resposta em inglês certa marcada como idioma errado (N8) e
-# número sem base que passa despercebido. `key` = a marcação esperada; não entram na conta nem no export.
+# Treino com gabarito: 2 exemplos antes das situações, um certo e um errado, que ensinam as duas armadilhas que
+# derrubam a concordância entre pessoas (medido sem treino: kappa 0,054) — resposta em inglês certa marcada como
+# idioma errado e número sem base que passa despercebido. `key` = a marcação esperada; não entram na conta nem no
+# export.
 PRACTICE = [
     {"id": "treino-1", "question": "How much did I sell yesterday on debit?", "lang": "en", "answer_lang": "en",
      "answer": "Yesterday you sold R$ 150,00 on debit, in 3 sales.",

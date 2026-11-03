@@ -1,8 +1,8 @@
 """Medida offline (sem API) das partes determinísticas da checagem de frases sobre respostas reais já julgadas.
 
 Uso:
-  python -m evals.claims_proxy --repo ../getnet-support-agents-v4 [--labels evals/proxy/v4_judge_cited.json]
-                               [--out docs/kit/ensaio/g_claims_proxy_v4.json]
+  python -m evals.claims_proxy --repo <repositório julgado> [--labels evals/proxy/v4_judge_cited.json]
+                               [--out <relatório>.json]
 
 Lê as linhas do eval ao vivo (`evals/results/live_official.json`) e os vereditos do juiz (`judge.json`) de outro
 repositório, e reproduz sobre cada resposta, com a evidência que a linha guardou e o cartão `policy:capabilities`

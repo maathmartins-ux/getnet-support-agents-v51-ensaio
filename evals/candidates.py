@@ -5,8 +5,8 @@
                                                        leva o candidato REVISADO para evals/cases.d/<s>.jsonl
   python -m evals.candidates --reject <id>             descarta (fica registrado como rejeitado)
 
-Kit v5.4 (ideia do Skywalker, nota 10: feedback como score no trace e fila de revisão). Nada entra num split sem uma
-pessoa decidir a expectativa: o 👎 diz que a resposta foi ruim, não qual seria a certa.
+O 👎 fica como score no trace e entra nesta fila de revisão. Nada entra num split sem uma pessoa decidir a
+expectativa: o 👎 diz que a resposta foi ruim, não qual seria a certa.
 """
 from __future__ import annotations
 

@@ -16,7 +16,7 @@ jobs:
   check:
     runs-on: ubuntu-24.04
     # o eval do gate usa o buscador escolhido (padrão do kit: denso + cross): sem fastembed e modelos ele cairia no
-    # BM25 e o CI mediria outro produto (ensaio v5.4: 3/10 oficiais no fallback contra 9/10 com o buscador do kit)
+    # BM25 e o CI mediria outro produto (medido: 3/10 oficiais no fallback contra 9/10 com o buscador do kit)
     env:
       FASTEMBED_CACHE_PATH: /home/runner/.cache/fastembed
     steps:
@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: "3.12"
       # restore + save separados (save com if: always()): o actions/cache só grava no fim de job VERDE, e com a CI
-      # vermelha cada execução recomeçava a frio (ensaio v5.4: eval gate de 870 s no CI)
+      # vermelha cada execução recomeçaria a frio (medido: eval gate de 870 s no CI sem cache)
       - uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: /home/runner/.cache/fastembed

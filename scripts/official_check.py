@@ -1,8 +1,9 @@
-"""Garantia dos cenários oficiais ANTES do merge da frente K (pós-morte V5, N1).
+"""Garantia dos cenários oficiais ANTES do merge da frente K.
 
-V5: official-01 (Clássica × Smart) e official-04 (Pix sem conta) foram ao humano com "não está nas fontes"; o fato
-estava no corpus (`prod-todas-maquininhas-04`: R$ 79,90 × R$ 129,90), mas fora do top-3 do denso, e ninguém mediu
-isso antes da rodada ao vivo do T+31. Esta checagem mede no fork K, em segundos e sem API:
+Um fato pode estar no corpus e mesmo assim a resposta sair com "não está nas fontes": official-01 (Clássica × Smart)
+e official-04 (Pix sem conta) já caíram assim com o trecho certo ingerido (`prod-todas-maquininhas-04`: R$ 79,90 ×
+R$ 129,90), mas fora do top-3 do denso. Sem esta checagem isso só aparece na rodada ao vivo; ela mede no fork K, em
+segundos e sem API:
 
 (a) cobertura do corpus: cada nome de `expect.entities` dos casos oficiais aparece em pelo menos um trecho ingerido
     (título ou texto, sem caixa nem acento); e, quando `data/sources.json` lista uma página daquela entidade (slug ou

@@ -1,4 +1,4 @@
-"""Kit v5.4 (revisão de tempo): a medida da busca é guardada em var/ pela chave do que muda o resultado."""
+"""A medida da busca é guardada em var/ pela chave do que muda o resultado e só é refeita quando essa chave muda."""
 from __future__ import annotations
 
 import json

@@ -148,7 +148,7 @@ def test_llm_sub_questions_reach_each_parallel_agent(monkeypatch):
 
 
 def test_agent_span_logs_status_and_reason(monkeypatch, caplog):
-    # sem isso o log do smoke de 31/10 não dizia qual agente desistiu nem por quê
+    # sem isso o log não diz qual agente desistiu nem por quê
     monkeypatch.setitem(supervisor.AGENTS, "faq",
                         lambda c: AgentResult("faq", "insufficient", reason="not_in_sources"))
     with caplog.at_level("INFO"):

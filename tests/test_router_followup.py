@@ -1,8 +1,8 @@
 """Item 2 — seguimento de conversa: última intenção COM ASSUNTO e a conversa inteira chegando ao roteador.
 
-Origem: v3 (31/10/2026). memory-04: "Minha maquininha não conecta." → "Ok, vou tentar reiniciar o roteador." →
-"Ela ainda está sem sinal?" perdia o fio porque o roteador olhava só a intenção da ÚLTIMA fala. E num caso de
-26 mensagens o primeiro turno sumiu: o roteador recebia só HISTORY_WINDOW=20 mensagens.
+Caso memory-04: "Minha maquininha não conecta." → "Ok, vou tentar reiniciar o roteador." → "Ela ainda está sem
+sinal?" perde o fio se o roteador olha só a intenção da ÚLTIMA fala. E num caso de 26 mensagens o primeiro turno
+some se o roteador recebe só HISTORY_WINDOW=20 mensagens.
 """
 import pytest
 

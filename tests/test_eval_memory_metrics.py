@@ -43,7 +43,7 @@ def test_report_carries_the_memory_routing_line(tmp_path):
 
 
 def test_route_by_outcome_accepts_neighbour_label_with_same_specialists(monkeypatch):
-    # ensaio v5.3, q-memory-04/05/15: support × troubleshoot levam ao records; a resposta veio certa
+    # support × troubleshoot levam ao mesmo especialista (records): rótulo vizinho com a resposta certa não é erro
     from app import domain
 
     monkeypatch.setattr(domain.active(), "PLANS", {"support": ["records"], "troubleshoot": ["records"],

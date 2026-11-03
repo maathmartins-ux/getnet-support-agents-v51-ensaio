@@ -1,7 +1,7 @@
 """Retrieval medido sem LLM: denso/híbrido com cache em disco, cross-encoder local, dedupe, escolha por medida.
 
-Getnet v4: Recall@3 0,486 · MRR 0,61 em 50 perguntas, híbrido nunca medido (fastembed ausente no eval) e rerank
-por LLM sem ganho. Tudo aqui roda com embedder/cross-encoder falsos: nenhum teste baixa ou carrega modelo.
+Ponto de partida medido: Recall@3 0,486 · MRR 0,61 em 50 perguntas, híbrido nunca medido (fastembed ausente no eval)
+e rerank por LLM sem ganho. Tudo aqui roda com embedder/cross-encoder falsos: nenhum teste baixa ou carrega modelo.
 """
 import json
 

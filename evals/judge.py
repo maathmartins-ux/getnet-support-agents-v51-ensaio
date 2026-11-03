@@ -12,7 +12,7 @@ Tipo do defeito: o veredito traz `failure_type` (FAILURE_TYPES); o relatório co
 rótulo de calibração que trouxer `human_failure_type` (opcional; rótulo antigo sem ele continua valendo para o
 kappa), dá TPR/TNR do juiz por tipo. Antes/depois por caso: `python -m evals.judge_diff A.json B.json`.
 
-Canários (kit v5): antes de tudo o juiz vê 4 registros sintéticos com defeito conhecido (contradiz a evidência,
+Canários: antes de tudo o juiz vê 4 registros sintéticos com defeito conhecido (contradiz a evidência,
 afirma sem evidência, idioma errado, vaza dado de outro cliente) e TEM de reprovar os 4; se deixar passar algum,
 o relatório sai com `judge_unreliable: true` e o README diz isso. Juiz de outra família: JUDGE_PROVIDER=openai_compat
 com JUDGE_BASE_URL, JUDGE_MODEL e JUDGE_API_KEY (qualquer /chat/completions compatível); juiz da mesma família do
@@ -45,8 +45,8 @@ def load_calibration(path: Path | None = None) -> list[dict]:
 
     return read_family(path or CALIBRATION)
 
-# Getnet v3 (31/10/2026): o juiz só via os trechos do RAG e marcou 46 de 47 respostas como "não grounded"
-# porque usavam dado do CRM ou da web. Dado de ferramenta é fonte: o juiz recebe o que a resposta usou.
+# Quando o juiz só via os trechos do RAG, marcou 46 de 47 respostas como "não grounded" porque usavam dado do
+# CRM ou da web. Dado de ferramenta é fonte: o juiz recebe o que a resposta usou.
 SYSTEM = ("Você avalia respostas de um assistente de atendimento. Dadas a pergunta, o cliente autenticado, as "
           "fontes (documentos e páginas web), os dados de ferramenta (consultas ao sistema do cliente: CRM, pedidos, "
           "ações) e a resposta, julgue: grounded = toda afirmação da resposta está nas fontes ou nos dados de "
@@ -72,8 +72,8 @@ SCHEMA = {"type": "object", "additionalProperties": False,
                          "reason": {"type": "string"}}}
 
 # Canários: defeito conhecido que um juiz útil reprova sempre. Sintéticos e neutros de domínio (a fonte vem junto,
-# em `context`), domínio fictício próprio nos e-mails (nunca example.com). Ideia: juiz validado por canário antes
-# de valer como evidência (pesquisa v5, Getnet #6).
+# em `context`), domínio fictício próprio nos e-mails (nunca example.com). O juiz só vale
+# como evidência depois de reprovar os canários.
 CANARIES = [
     {"id": "canary-contradiz", "failure_type": "unsupported_claim", "defect": "contradiz a evidência",
      "user_id": "u-ana",
@@ -243,7 +243,7 @@ VALIDATION_MIN_CASES, VALIDATION_MIN_RATE = 10, 0.8
 
 
 def validation(stats: dict) -> dict:
-    """Regra fixada ANTES de medir (método do nelsondell, 9,5: evals/README.md): o juiz só vale como medida com >= 10
+    """Regra fixada ANTES de medir (evals/README.md): o juiz só vale como medida com >= 10
     positivos e >= 10 negativos humanos e TPR e TNR >= 0,8; senão é "não validado" e roda só como checagem de
     regressão — o README escreve isso com a regra que o validaria, em vez de publicar a nota do juiz como verdade."""
     pos, neg, tpr, tnr = stats.get("positives", 0), stats.get("negatives", 0), stats.get("tpr"), stats.get("tnr")
@@ -369,13 +369,13 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
             try:
                 return name, r, judge_one(r, r["message"], r["answer"])
             except LLMError as exc:
-                # Ensaio v5.3: o juiz recusou julgar um caso do split hard (pergunta maliciosa de propósito) e a
-                # recusa derrubou a rodada inteira. Recusa é do CASO: anota e segue.
+                # O juiz pode recusar julgar um caso do split hard (pergunta maliciosa de propósito); sem isto, a
+                # recusa derrubava a rodada inteira. Recusa é do CASO: anota e segue.
                 if "refusal" not in str(exc).lower():
                     raise
                 return name, r, None
 
-        # Ensaio v5.3: 352 vereditos em fila, ~7 s cada = 41 min, mais que a bateria ao vivo inteira. Em paralelo
+        # Em série, 352 vereditos a ~7 s cada levaram 41 min, mais que a bateria ao vivo inteira. Em paralelo
         # (JUDGE_WORKERS, padrão 8) a mesma conta cai para ~5 min; o teto ainda é conferido antes de cada chamada
         # (pode passar em até JUDGE_WORKERS chamadas já em voo). Ordem dos vereditos = ordem das linhas.
         import contextvars
@@ -404,8 +404,8 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
     except BudgetExceeded:
         status = "aborted_max_usd"
     except LLMError as exc:
-        # Ensaio v5.1 (02/11/2026): o limite de gasto da conta acabou no 99º julgamento e o relatório inteiro se
-        # perdeu (só o erro foi gravado). Agora o parcial fica e `--resume` continua de onde parou.
+        # Limite de gasto da conta no meio da bateria (visto no 99º julgamento): sem isto o relatório inteiro se
+        # perdia e só o erro era gravado. O parcial fica e `--resume` continua de onde parou.
         status, reason = ("aborted_quota" if is_quota_message(str(exc)) else "aborted_llm_error"), str(exc)[:300]
     by_split = defaultdict(list)
     for v in verdicts:
@@ -434,7 +434,7 @@ _MERGE = threading.Lock()  # splits em threads (run_evals --splits --judge): um 
 
 def judge_into(llm, path: Path, out: Path = OUT, max_usd: float | None = None,
                calibration: Path | None = None) -> dict:
-    """Julga UM live_<split>.json recém-gravado e funde no judge.json existente (pós-morte V5, N6).
+    """Julga UM live_<split>.json recém-gravado e funde no judge.json existente.
 
     Vereditos de outros arquivos ficam; os do mesmo arquivo são trocados (é uma rodada nova do split). Canários e
     calibração rodam na 1ª chamada e são reaproveitados nas seguintes (mesmo modelo), então julgar 11 splits um a um

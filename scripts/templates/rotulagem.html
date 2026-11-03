@@ -222,7 +222,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   const DATA = JSON.parse(document.getElementById("data").textContent);
   const ITEMS = DATA.items, RATERS = DATA.raters;
   const LANG = { pt: "português", en: "inglês", es: "espanhol" };
-  // Kit v5.3 final (V5: kappa 0,054 entre o dono e a 2ª pessoa): perguntas concretas, uma por modo de falha, cada uma
+  // Perguntas concretas (com perguntas genéricas a concordância entre duas pessoas mediu kappa 0,054), uma por modo de falha, cada uma
   // com a resposta que REPROVA (`bad`) e um exemplo de sim e de não na dica; a pergunta 2 pergunta pelo defeito
   // ("tem algo sem base?"), com os números da resposta destacados no que ele tinha em mãos.
   const QUESTIONS = [
@@ -236,8 +236,8 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
       hint: "Os números que estão na resposta aparecem destacados em amarelo no que ele tinha em mãos. Número que não aparece destacado em lugar nenhum = Sim. Pedir confirmação antes de fazer algo (\"confirme a ação A-…\") é o comportamento certo.",
       exYes: "Em mãos: \"o valor cai em 30 dias\". Resposta: \"cai em 2 dias\" → Sim (o 2 não está lá).",
       exNo: "Em mãos: \"o valor cai em 30 dias\". Resposta: \"cai em 30 dias\" → Não." },
-    // Pós-morte V5 (N8): a 2ª pessoa leu esta pergunta como "devia ser em português" e marcou 5 de 10 respostas
-    // certas em inglês como idioma errado. A pergunta mostra os dois idiomas lado a lado e diz a regra com todas as letras.
+    // Lida como "devia ser em português", esta pergunta levou 5 de 10 respostas certas em inglês a serem marcadas
+    // como idioma errado. Por isso mostra os dois idiomas lado a lado e diz a regra com todas as letras.
     { key: "c3", title: "A resposta está no MESMO idioma da pergunta?", bad: "nao",
       yes: "Sim, mesmo idioma", no: "Não, idiomas diferentes",
       hint: "Regra: pergunta em inglês e resposta em inglês = Sim. Pergunta em português e resposta em português = Sim. A resposta NÃO precisa estar em português. Olhe só o idioma, não o conteúdo.",
@@ -417,7 +417,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
     queueSave();
   }
   // Um só ouvinte para a tela da situação: o HTML é refeito a cada clique e, no visualizador do desktop, pode ser
-  // trocado por uma versão nova da página; botão com data-* nunca perde o clique (teste do dono, 02/11/2026).
+  // trocado por uma versão nova da página; botão com data-* nunca perde o clique.
   function answer(el, how) {
     const { it, store } = current();
     if ((store[it.id] || {})[el.dataset.q] === el.dataset.v) return;  // já marcado (pointerup + click)
@@ -537,8 +537,8 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
       const snap = await ref.get();
       if (snap.exists) {
         const saved = snap.data() || {};
-        // data() vem CONGELADO: gravar em cima dele falhava em silêncio (teste do dono, 02/11/2026: quem reabria a
-        // página com marcações salvas não conseguia marcar mais nada). A página trabalha numa cópia.
+        // data() vem CONGELADO: gravar em cima dele falha em silêncio (quem reabre a página com marcações salvas
+        // não consegue marcar mais nada). A página trabalha numa cópia.
         if (saved.sample === DATA.sample) { state.rater = saved.rater || ""; state.marks = JSON.parse(JSON.stringify(saved.marks || {})); state.trainDone = !!saved.train_done; }
       }
       notice("");

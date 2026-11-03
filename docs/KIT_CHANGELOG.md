@@ -1,5 +1,17 @@
 # Kit — mudanças
 
+## v5.5 (03/11/2026, branch kit-v5.4.0) — perfil Skywalker (o bench que tirou 10)
+
+Estudo do 10 (`docs/kit/estudo/skywalker.md` §3): a nota veio da forma agentic visível, de nenhuma medida própria
+mostrando resposta ruim nos cenários e de um README que explica cada mecanismo; não de CI, testes ou números.
+- **Supervisor LLM decide todo turno** (`SUPERVISOR_FAST` desligado por padrão): o DEMO mostrava "atalho" nos
+  oficiais, e "regra decidindo" foi o que o avaliador puniu. Custo: ~2 chamadas e ~4 s a mais por turno de 1 passo.
+- **Manchete do README sem meta própria** (`scorecard.headline_markdown`): só oficiais resolvidas, pass^k, juiz
+  (fundamentadas, úteis), memória e busca, com o valor e como se mede. Diagnósticos do kit ficam em `docs/RESULTS.md`.
+- **Entrega** lista só as medidas do enunciado (as ruins entre elas continuam listadas).
+- **README**: mapeamento "requisito do enunciado → implementação → onde" com os 4 bônus, teste em 3 minutos,
+  avaliação descrita como capacidade (gabarito, camadas, o que é "resolvida") e limitações com efeito e o que faltaria.
+
 ## v5.4 (03/11/2026, branch kit-v5.4.0) — metodologia Skywalker (10) e nelsondell (9,5) em busca e memória
 
 - **Busca:** placar pelo caminho do agente (rerank incluso) com Recall@5, MRR@10, rank do 1º gold e origem; buscador
@@ -8,8 +20,10 @@
 - **Memória:** especialistas sem estado (pergunta reescrita pelo router + livro de fatos; `SPECIALIST_HISTORY=on`
   volta ao antigo); regra de demonstrativos no router. Ao vivo parcial (n=48): rota 96%, tools 94%.
 - **Docs:** gold com `origin`; casos de memória com os seguimentos da V5; prompt e PLAYBOOK apontam o v5.4.0.
-- Ensaio: [ENSAIO_V54.md](ENSAIO_V54.md) (a conta da API atingiu o limite no meio da bateria). Estimativa 9,54 central,
+- Ensaio: ENSAIO_V54.md (a conta da API atingiu o limite no meio da bateria). Estimativa 9,54 central,
   9,32 no pior caso.
+- **Evidência = produto (confirmação de 03/11):** o passo 1 instalava só `[dev]` (sem fastembed): a tentativa mediu tudo no BM25 do fallback e o CI, no denso + cross, reprovou "resultado commitado = código atual" (oficiais 33% × 83%). Instalação agora igual à do CI (`requirements-dev.lock` + `requirements-hybrid.lock`); `check.py` reprova buscador em fallback e o `live_eval.sh` recusa rodar nele. Router: pergunta sobre a própria empresa nunca fica em intenção sem escalada (`OWN_COMPANY`); cota do live pelo custo medido por caso.
+- **Ensaio pré-produção de 03/11 (correções):** CI vermelha por 3 defeitos do kit, agora corrigidos e testados — gitleaks acusava 1492 falsos positivos nas gravações (`evals/cassettes/` fora da varredura; teste próprio procura credencial real nelas), 6 testes exigiam fastembed no job offline (`importorskip`), `COPY var/embeddin[g]s` quebrava sem a pasta (bind do contexto). Gate de red team só ao vivo/replay (offline é a regex: 77,5% reprovava a CI). Placar: "juiz × gabarito de calibração" (dizia "humano" para rótulos de agente). `live_eval.sh` recusa com < 6 GB de RAM livre (OOM com 4 processos pesados) e ignora a guarda de disco no --dry-run; PLAYBOOK/prompt: 2º plano rastreado, nada pesado junto da rodada.
 - **Imagem = produto medido (ensaio v5.4):** o padrão do kit virou denso + cross, mas a imagem padrão seguia sem fastembed e o CI instalava só o lock de dev: no container a busca caía no BM25 e o eval via HTTP resolvia 3 de 10 oficiais (9 de 10 em processo); no CI o gate mediria outro produto. Agora `EXTRAS=auto` no Dockerfile segue a escolha (`fetch_models.py --extras`), os vetores do corpus vão prontos na imagem (`EMBED_CACHE_DIR=/opt/vectors`; sem eles o 1º pedido vetorizava o corpus, 2–4 min), o check reprova `/health` com fallback, o job `check` do CI instala o lock híbrido com modelos e vetores em cache, e o eval via HTTP do container roda os 10 oficiais (271 casos = 373 s em série). `check.py --warm-image` aquece a imagem no T+12.
 - **Tempo (revisão 2):** a medida da busca fica em `var/retrieval_cache.json` pela chave do que muda o número (gold, índice, glossário, buscador, código da busca; `RETRIEVAL_CACHE=off` mede sempre): 91 s → 0 s nas chamadas repetidas. Eval aquecido em 2º plano no T+12; `make eval` sem o `--compare-retrievers` (504 s, agora `make compare`); `fork_check` das frentes fora da K sem e5-large nem medida de busca; pré-voo e `live_eval.sh` param com < 5 GB livres.
 - **Do Skywalker (o que era melhor que o kit):** operador consultado DENTRO do turno com espera curta
@@ -27,7 +41,7 @@
 ## v5.3 (03/11/2026, branch kit-v5.3.0) — pós-morte da V5 + estudo Skywalker (10) e nelsondell (9,5)
 
 Medido ao vivo na bateria integral (11 splits, official e memory repeat 3) sobre o domínio da V5, com o motor do
-kit por cima ([ENSAIO_V53.md](ENSAIO_V53.md)). V5 → kit v5.3:
+kit por cima (ENSAIO_V53.md). V5 → kit v5.3:
 
 | O que pesava na V5 | O que mudou | V5 → v5.3 |
 |---|---|---|
@@ -40,7 +54,7 @@ kit por cima ([ENSAIO_V53.md](ENSAIO_V53.md)). V5 → kit v5.3:
 | splits abortados por teto; juiz cortado | aviso de teto antes de gastar; saldo único do juiz; juiz em 8 linhas paralelas; recusa do juiz anotada | 11/11 splits completos; juiz 41 → ~2 min |
 | tempo no limite | 12 conversas simultâneas (44 estouravam o timeout), 8 workers por split, cronograma com folga de 5 min | bateria integral com o juiz 16 → 12,8 min |
 
-Estimativa por critério no [ENSAIO_V53.md](ENSAIO_V53.md): central 9,51, pior caso 9,29 — pela regra do dono, ainda
+Estimativa por critério no ENSAIO_V53.md: central 9,51, pior caso 9,29 — pela regra do dono, ainda
 não basta para a V5.1 (RAG, memória e concordância humana puxam o pior caso).
 
 ## v5.2 (02/11/2026, branch kit-v5.1.0) — medido no ensaio sobre o domínio da v4
@@ -56,14 +70,14 @@ não basta para a V5.1 (RAG, memória e concordância humana puxam o pior caso).
 - **RAM/velocidade (frente R2):** eval ao vivo num processo; pico 7,7 → 4,8 GB; `--choose-retriever --fast`.
 - **Pré-voo:** seção "achados" do domínio de exemplo sem destino quebrava o T+0 (teste novo).
 - Ensaio v5.2 ao vivo: oficiais 100% fundamentadas e úteis, pass^3 0,90; memória pass@1 0,90, 97,4% fundamentada
-  ([ENSAIO_V51.md](ENSAIO_V51.md), seção v5.2).
+  (ENSAIO_V51.md, seção v5.2).
 
 ## v5.1.0 (02/11/2026) — correção formal da Getnet v4 (8,5)
 
 A correção da v4 disse onde estava a nota: qualidade das respostas, busca, memória, humano continuando o plano,
 avaliação independente e honestidade na entrega. O v5.1 ataca cada item e foi **ensaiado ao vivo sobre o repositório
-entregue da v4** antes de ser declarado ([ENSAIO_V51.md](ENSAIO_V51.md)). Detalhe por frente em
-[changelog.d/](changelog.d/). Testes: 487 → 656 passando.
+entregue da v4** antes de ser declarado (ENSAIO_V51.md). Detalhe por frente em
+changelog.d/. Testes: 487 → 656 passando.
 
 | Item da correção | O que mudou | Medida (ensaio no domínio da v4) |
 |---|---|---|
@@ -80,7 +94,7 @@ Limites que continuam: Recall@3 abaixo de 0,85; p95 da memória 52,8 s (frente L
 ## v5.0.0 (01/11/2026) — lições da Getnet v4 e de 28 soluções públicas
 
 Getnet v4: 34 min do 1º ao último commit, CI verde; nota honesta estimada 8,4 (faixa 7,5–8,8). O v5 ataca o que
-segurava a nota, na ordem do peso na Régua V4. Detalhe: [LICOES_V4.md](LICOES_V4.md) e [pesquisa/](pesquisa/).
+segurava a nota, na ordem do peso na Régua V4. Detalhe: LICOES_V4.md e pesquisa/.
 Testes do kit: 336 → 487 passando (e 459 → 487 só nesta segunda rodada de trabalho).
 
 | Causa na v4 (ou na pesquisa) | O que mudou | Onde |
@@ -115,7 +129,7 @@ Testes do kit: 336 → 487 passando (e 459 → 487 só nesta segunda rodada de t
 | só `/operator` e sem painel | `/ui` do lojista (testada num navegador real) e Grafana com 12 painéis provisionados (perfil `observability`), com teste que reprova painel de métrica que o código não emite | `static/ui.html`, `ops/grafana/` |
 | rodada com LLM fora do ar parecia medida; aborto sobrescrevia resultado completo | `degraded` e `aborted_quota`, arquivo à parte, saída 3; o limite de gasto da API vira erro `quota` | `run_evals.py`, `llm.py`, `live_eval.sh` |
 
-**Medido num ensaio** ([ENSAIO_V5.md](ENSAIO_V5.md)): o motor v5 sobre o domínio da v4, LLM real, 3 rodadas.
+**Medido num ensaio** (ENSAIO_V5.md): o motor v5 sobre o domínio da v4, LLM real, 3 rodadas.
 `official` ao vivo: pass^3 0,70 → 1,00, números 80% → 100%. `memory` ao vivo: números 64% → 92%, pass@1 0,54 → 0,79.
 O ensaio achou 3 regressões do próprio v5 (handoff do caso aberto, idioma, rodada degradada), todas corrigidas.
 

@@ -1,7 +1,7 @@
-"""Kit v5.4 (ensaio): a imagem docker serve o MESMO buscador que o eval mede.
+"""A imagem docker serve o MESMO buscador que o eval mede.
 
-O padrão do kit virou denso + cross, mas a imagem padrão seguia sem fastembed: no container a busca caía no BM25 e o
-eval via HTTP resolvia 3 de 10 oficiais (9 de 10 em processo). Agora o Dockerfile resolve EXTRAS=auto pela escolha.
+O padrão do kit é denso + cross; uma imagem sem fastembed cai no BM25 dentro do container e o eval via HTTP resolve
+3 de 10 oficiais (9 de 10 em processo). Por isso o Dockerfile resolve EXTRAS=auto pela escolha do buscador.
 """
 from __future__ import annotations
 

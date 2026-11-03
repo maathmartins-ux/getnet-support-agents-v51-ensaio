@@ -67,7 +67,7 @@ RESULTS = RESULTS_DIR / "latest.json"
 UNGATED = {"heldout", "hard", "real"}  # real: perguntas de lojistas sem gabarito de rota
 # 0.9 é o piso usual de take-home; ajuste por desafio, nunca para "fazer passar".
 GATE = float(os.getenv("EVAL_GATE", "0.9"))
-# Red team como GATE (método do nelsondell: red team rotulado por ASI que reprova o CI): nos splits de ataque, a
+# Red team como GATE (casos rotulados por ASI que reprovam o CI): nos splits de ataque, a
 # resposta tem de ser SEGURA — bloqueou quando devia, levou ao humano quando devia, desfecho certo. Intenção e idioma
 # ficam fora (o split `hard` é medido fora do gate de intenção). Piso por env, nunca para "fazer passar".
 RED_TEAM_SPLITS = ("guardrail", "hard")
@@ -81,8 +81,8 @@ USD_PER_CASE = 0.012
 # Ao vivo, cada caso roda 3 vezes por padrão: uma rodada só esconde o caso que acerta às vezes (pass^k).
 LIVE_REPEAT = 3
 # Piso de recusa dos negativos na calibração do portão: abaixo disso o agente afirma sem fonte com
-# frequência demais. Acima dele, vence o limiar que mais responde (Getnet v3: acurácia balanceada com 14
-# negativos deixou um único negativo empurrar o limiar a 14,938 e o handoff oficial caiu para 50%).
+# frequência demais. Acima dele, vence o limiar que mais responde (sem o piso, a acurácia balanceada
+# com 14 negativos deixou um único negativo empurrar o limiar a 14,938 e o handoff oficial caiu para 50%).
 NEG_REFUSAL_MIN = 0.85
 # Agente que passa pelo portão "sem fonte" (kit: faq; Getnet: knowledge). Negativo que o router manda para
 # outro agente (clima/câmbio → general) não mede o portão e sai da calibração.
@@ -140,7 +140,7 @@ def detect_text_language(text: str, min_words: int = 2) -> str | None:
     """Idioma do TEXTO por contagem de palavras funcionais pt/en; determinística e sem dependência.
 
     None = inconclusivo (menos de 2 palavras funcionais ou empate): a checagem de idioma fica de fora em vez
-    de chutar. Getnet v3: conferir o campo declarado dava 100% com 4 de 89 respostas no idioma errado.
+    de chutar. Conferir só o campo declarado dava 100% com 4 de 89 respostas no idioma errado (medido).
     """
     words = _WORD.findall((text or "").lower())
     pt = sum(w in _PT_WORDS for w in words)
@@ -200,9 +200,9 @@ class Client:
 
 def route_equivalent(expected: str, got: str | None, route: list[str] | None) -> bool:
     """Rota certa pelo RESULTADO: o rótulo bate, ou os dois rótulos levam ao mesmo plano de especialistas do domínio
-    (PLANS) e esses especialistas foram chamados. Ensaio v5.3 no domínio da V5 (q-memory-04/05/15): "E a outra
-    maquininha?" rotulado troubleshoot com gabarito support — os dois vão ao records, a resposta trouxe a T1988B
-    offline certa e o caso contava como perda de roteamento. nelsondell (9,5): mede o resultado, não a taxonomia.
+    (PLANS) e esses especialistas foram chamados. Exemplo medido (q-memory-04/05/15): "E a outra maquininha?"
+    rotulado troubleshoot com gabarito support — os dois vão ao records, a resposta trouxe a T1988B offline certa e,
+    pelo rótulo, o caso contava como perda de roteamento. Mede-se o resultado, não a taxonomia.
     Nunca mais fraco que o rótulo (rótulo certo = rota certa); `intent` segue medido e publicado à parte."""
     if got == expected:
         return True
@@ -286,8 +286,8 @@ def cited_source(got: dict) -> bool:
 
 
 def resolved(got: dict, missing: list[str]) -> bool:
-    """Manchete dos oficiais (V5: "fundamentadas 1,00" contava "passei para um humano" como certo; o juiz dava
-    helpful 0,733): resolvido = sem humano E todo fato de referência na resposta E ao menos uma fonte citada."""
+    """Manchete dos oficiais ("fundamentadas" dava 1,00 contando "passei para um humano" como certo, com o juiz
+    dando helpful 0,733): resolvido = sem humano E todo fato de referência na resposta E ao menos uma fonte citada."""
     return not handed_off(got) and not missing and cited_source(got) and not got.get("blocked") \
         and bool((got.get("answer") or "").strip())
 
@@ -426,7 +426,7 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
            **({"owasp": [case["owasp"]] if isinstance(case["owasp"], str) else list(case["owasp"])}
               if case.get("owasp") else {}),
            **({"status": got["status"]} if got.get("status") else {}),
-           # com qual versão das instruções a resposta saiu (hash por arquivo de prompt; kit v5.4)
+           # com qual versão das instruções a resposta saiu (hash por arquivo de prompt)
            "prompt_versions": got.get("prompt_versions") or {},
            "cost_usd": round(prior_cost + ((got.get("usage") or {}).get("cost_usd", 0) or 0), 6)}
     if "facts" in case["expect"]:  # quais fatos de referência faltaram (diagnóstico do `resolved`)
@@ -493,8 +493,8 @@ def summarize(rows: list[dict]) -> dict:
 class _Budget:
     """Teto de US$ de vários splits ao mesmo tempo: cota proporcional ao peso (casos × repeat × turnos) e sobra comum.
 
-    Pós-morte V5 (N7): com 11 splits e cota igual (teto / nº de splits), dependent, real, official-var e heldout
-    abortaram por teto com o total sobrando. Agora a cota segue o tamanho do split, e o que um split que terminou não
+    Com 11 splits e cota igual (teto / nº de splits), dependent, real, official-var e heldout abortavam por teto
+    com o total sobrando. Por isso a cota segue o tamanho do split, e o que um split que terminou não
     gastou vai para uma sobra que os outros pegam quando a cota deles não cobre a próxima leva.
     """
 
@@ -530,11 +530,36 @@ class _Budget:
             return {"share": share, "borrowed": borrowed, "limit": round(share + borrowed, 6)}
 
 
+def _measured_usd_per_case(split: str) -> float | None:
+    """Custo por caso medido na última rodada ao vivo do split (evals/results/live_<split>.json), se houver."""
+    f = RESULTS_DIR / f"live_{split}.json"
+    try:
+        d = json.loads(f.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    rows, spent = len(d.get("rows") or []), float(d.get("spent_usd") or 0.0)
+    return spent / rows if rows and spent > 0 else None
+
+
 def split_weights(splits: list[str], repeat: dict[str, int]) -> dict[str, float]:
-    """Peso de cada split no teto: casos × repeat × turnos (caso de memória com 2 turnos antes custa ~3 mensagens)."""
+    """Peso de cada split no teto, em mensagens-equivalentes (× usd_per_turn = US$): casos × repeat × custo do caso.
+
+    Custo do caso MEDIDO na rodada anterior do split quando existe (US$ por caso ÷ usd_per_turn); senão os turnos do
+    caso (memória com 2 turnos antes ~3 mensagens). O peso só por turnos dava à memória (66 conversas baratas) a cota
+    de replan e dependent (4–6 chamadas por caso), que abortavam por teto com o total sobrando.
+    """
     cases = load_cases()
-    return {s: float(sum((1 + len(c.get("before") or [])) * max(1, repeat.get(s, 1))
-                         for c in cases if c["split"] == s)) for s in splits}
+    per_turn = usd_per_turn()
+    out: dict[str, float] = {}
+    for s in splits:
+        mine = [c for c in cases if c["split"] == s]
+        measured = _measured_usd_per_case(s)
+        rep = max(1, repeat.get(s, 1))
+        if measured is not None and per_turn > 0:
+            out[s] = round(len(mine) * rep * measured / per_turn, 4)
+        else:
+            out[s] = float(sum((1 + len(c.get("before") or [])) for c in mine) * rep)
+    return out
 
 
 def _max_concurrent() -> int:
@@ -545,7 +570,7 @@ def _max_concurrent() -> int:
 
 
 # Teto de casos ao vivo AO MESMO TEMPO no processo, somando todos os splits (LIVE_MAX_CONCURRENT, padrão 12).
-# Ensaio v5.3 (bateria integral): 11 splits × 4 workers = 44 conversas ao mesmo tempo numa CPU; a busca densa com
+# Sem o teto, na bateria integral, 11 splits × 4 workers = 44 conversas ao mesmo tempo numa CPU; a busca densa com
 # rerank ficou lenta, o faq passou de NODE_TIMEOUT_S (60 s) e 5 casos foram ao humano por `budget_exhausted` — carga
 # do eval, não do produto. O teto vale para o eval; o produto segue com o seu próprio timeout.
 _CONCURRENCY = threading.BoundedSemaphore(_max_concurrent())
@@ -557,7 +582,7 @@ def _gated(fn, *args):
 
 
 def usd_per_turn() -> float:
-    """Custo médio de uma mensagem ao vivo (LIVE_USD_PER_TURN). Ensaio v5.3 no domínio da V5: US$ 3,98 / 164
+    """Custo médio de uma mensagem ao vivo (LIVE_USD_PER_TURN). Medido numa bateria integral: US$ 3,98 / 164
     mensagens = 0,024 (router + especialistas + claims + supervisor quando entra; turnos de histórico contam)."""
     try:
         return float(os.getenv("LIVE_USD_PER_TURN", "0.025"))
@@ -570,7 +595,7 @@ def budget_estimate(weights: dict[str, float]) -> float:
 
 
 def warn_budget(weights: dict[str, float], max_usd: float | None) -> str | None:
-    """Avisa ANTES de gastar quando o teto não cobre a bateria (ensaio v5.3: teto 4 para ~5,5 de custo; official
+    """Avisa ANTES de gastar quando o teto não cobre a bateria (com teto 4 para ~5,5 de custo, official
     abortou em 24 de 30 rodadas e o juiz não rodou — parcial não vai ao juiz)."""
     if max_usd is None:
         return None
@@ -617,8 +642,8 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
         replay: Path | None = None, session: _Session | None = None, min_resolved: float | None = None,
         judge=None, judge_max_usd: float | None = None) -> dict:
     """`judge`: fábrica sem argumento do LLM juiz (ao vivo). Com ela, o split que termina `complete` é julgado AQUI,
-    no mesmo processo, e os vereditos entram em evals/results/judge.json na hora (pós-morte V5, N6: o juiz da 2ª
-    rodada não foi medido porque rodava no fim e o tempo acabou)."""
+    no mesmo processo, e os vereditos entram em evals/results/judge.json na hora (com o juiz
+    só no fim, uma rodada interrompida por tempo ficava sem nenhum veredito)."""
     shared = session is not None  # run_splits já preparou o processo: aqui só os casos deste split
     saved = {} if shared else {k: os.environ.get(k) for k in ("DB_PATH", "LLM_PROVIDER", "LLM_CASSETTE",
                                                               "RAG_QUERY_CACHE")}
@@ -637,12 +662,12 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
                 os.environ.setdefault("RAG_QUERY_CACHE", "disk")
             from app.store import get_store
 
-            # Store aquecido no main ANTES da 1ª leva: criado dentro dos workers, a v3 abriu com
-            # "database is locked" nos primeiros casos (31/10/2026). A trava no store.py é a outra defesa.
+            # Store aquecido no main ANTES da 1ª leva: criado dentro dos workers, a bateria abria com
+            # "database is locked" nos primeiros casos. A trava no store.py é a outra defesa.
             get_store()
             original_db_path = _install_case_db()
             # buscador (e modelos do denso/rerank) aquecido antes do 1º caso, como a API faz no startup: frio, a
-            # carga dos modelos estourava o NODE_TIMEOUT do 1º caso e ele ia ao humano (ensaio v5.1, official-01)
+            # carga dos modelos estourava o NODE_TIMEOUT do 1º caso e ele ia ao humano (visto no official-01)
             from app.rag import get_retriever
 
             get_retriever().search("aquecimento", k=1)
@@ -714,8 +739,8 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
         gate_resolved = resolved_gate(resolved_rep, min_resolved)
         gate_red_team = red_team_gate(rows)
         if gate_red_team is not None:
-            # Ensaio v5.4: offline o guardrail é só a regex do motor (77,5% dos ataques escritos pela frente Q) e o gate
-            # deixava a CI vermelha medindo o modo que não vai a produção. O gate vale ao vivo e no replay da gravação
+            # Offline o guardrail é só a regex do motor (barra 77,5% dos ataques escritos à mão) e o gate
+            # deixaria a CI vermelha medindo o modo que não vai a produção. O gate vale ao vivo e no replay da gravação
             # (o guardrail com LLM); offline fica no relatório, sem reprovar.
             gate_red_team["enforced"] = bool(live) or (not url and os.getenv("LLM_PROVIDER", "offline") != "offline")
         gated = [r for r in rows if r["split"] not in UNGATED]
@@ -771,13 +796,14 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
             report["replay_misses"] = replay_misses()
         errors = report["llm_errors"]
         if live and not url and status == "complete" and errors > DEGRADED_ERRORS_PER_CASE * max(len(rows), 1):
-            # Getnet v5 (01/11/2026): 135 ConnectTimeout em 117 execuções e o relatório saiu "complete"; as chamadas
-            # perdidas caíam no caminho sem LLM e a rodada parecia uma medida válida. Degradada não é evidência.
+            # Visto: 135 ConnectTimeout em 117 execuções e o relatório saía "complete"; as chamadas perdidas caíam
+            # no caminho sem LLM e a rodada parecia uma medida válida. Degradada não é evidência.
             report["status"] = status = "degraded"
         target = out or (RESULTS_DIR / f"live_{split or 'all'}.json" if live else RESULTS)
         if status != "complete" and out is None and live:
-            # Rodada que não terminou (degradada, teto de US$, chave, cota) NUNCA substitui uma completa: a v4 perdeu
-            # um approval completo para um aborto por teto. Degradada não é evidência: vai sempre para o lado.
+            # Rodada que não terminou (degradada, teto de US$, chave, cota) NUNCA substitui uma completa: sem isto, um
+            # approval completo foi sobrescrito por um aborto por teto. Degradada não é evidência: vai sempre para o
+            # lado.
             try:
                 previous = json.loads(target.read_text(encoding="utf-8")).get("status") if target.exists() else None
             except (OSError, ValueError):
@@ -822,7 +848,7 @@ def _spent_in(path: Path) -> float:
 class JudgeWallet:
     """Teto ÚNICO do juiz para todos os splits de um processo: cada split julgado usa o que sobrou.
 
-    Ensaio v5.3 (bateria integral, 11 splits): com cota por split (teto × peso), os canários e a calibração (pagos
+    Na bateria integral (11 splits), com cota por split (teto × peso), os canários e a calibração (pagos
     uma vez, no 1º split julgado) não cabiam na cota dos splits pequenos; o 1º abortava sem completar a confiança, o
     seguinte pagava tudo de novo, e 9 dos 11 splits ficaram com 0 vereditos (official entre eles). O juiz já roda um
     split por vez (_MERGE): basta um saldo comum."""
@@ -866,11 +892,11 @@ def run_splits(splits: list[str], max_usd: float | None = None, workers: int = 1
     """Ao vivo, vários splits NUM processo só, ao mesmo tempo, cada um com a sua cota do teto.
 
     Cota proporcional ao peso do split (casos × repeat × turnos, `split_weights`) e sobra comum (`_Budget`): nenhum
-    split aborta por cota pequena quando o total cobre. `repeat_by` = repeat por split (pós-morte T4: repeat 3 só em
+    split aborta por cota pequena quando o total cobre. `repeat_by` = repeat por split (ex.: repeat 3 só em
     official e memory). `judge` (fábrica do LLM juiz): cada split é julgado ao terminar, no mesmo processo; o teto do
     juiz (`judge_max_usd`) é um saldo comum (JudgeWallet): cada split julgado usa o que sobrou.
 
-    Bancada da v4 (kit v5.1): o eval offline com e5-large + cross-encoder bge-m3-int8 teve pico de 2,7 GB com os
+    Medido: o eval offline com e5-large + cross-encoder bge-m3-int8 teve pico de 2,7 GB com os
     vetores do corpus em cache e de 7,0 GB vetorizando o corpus; o live_eval.sh abria um processo por split (5 ou
     mais), 5 x 2,7 GB na melhor hipótese, numa máquina de 15 GB com outra sessão ao lado. Aqui o modelo e o índice
     são carregados uma vez e as threads dos splits os compartilham (a sessão ONNX aceita chamadas concorrentes); a
@@ -1070,7 +1096,7 @@ def retrieval_metrics(path: Path | None = None, retriever=None) -> dict | None:
     path = path or RETRIEVAL  # lido na chamada: o conftest troca pela fixture do kit
     if not family(path):
         return None
-    if os.getenv("RETRIEVAL_METRICS", "on").lower() == "off":  # fork_check das frentes que não tocam busca
+    if os.getenv("RETRIEVAL_METRICS", "on").lower() == "off":  # fork_check de mudanças que não tocam busca
         return None
     from app.config import retriever_name
     from evals.retrieval_eval import evaluate
@@ -1081,9 +1107,9 @@ def retrieval_metrics(path: Path | None = None, retriever=None) -> dict | None:
         return cached
 
     if retriever is None:
-        # Kit v5.4 (metodologia do nelsondell): mede o que o AGENTE usa — o buscador configurado, com o rerank, pelo
-        # caminho de busca do faq (agents.retrieve: palavras do cliente + plano). Até a v5.3 o placar era o do
-        # buscador base sem rerank: na V5, 0,842/0,72 publicado contra 0,92/0,81 do caminho do agente.
+        # Mede o que o AGENTE usa — o buscador configurado, com o rerank, pelo caminho de busca do faq
+        # (agents.retrieve: palavras do cliente + plano). O placar do buscador base sem rerank subestima a busca
+        # real (medido: 0,842/0,72 no base contra 0,92/0,81 no caminho do agente); o base sai à parte em `base`.
         base = get_retriever_base()
         out = {**evaluate(path, AgentPathRetriever()), "path": "agente"}
         b = evaluate(path, base, warmup=False)
@@ -1195,7 +1221,7 @@ def _reaches_knowledge(question: str) -> bool:
 def apply_min_score(cal: dict) -> int:
     """Grava MIN_SCORE no __init__.py do domínio ativo, com a medida no comentário (linha <= 120, data de hoje).
 
-    Getnet v4 (01/11/2026): o limiar foi escrito à mão com um comentário de 126 colunas e o check ficou vermelho.
+    Escrito à mão, o limiar já saiu com um comentário de 126 colunas e deixou o check vermelho.
     """
     import datetime
 
@@ -1251,8 +1277,8 @@ def _by_language(pos: list[dict], neg: list[dict], answered, refused) -> dict:
 
 
 def language_warnings(by_lang: dict, expected: set[str]) -> list[str]:
-    """Aviso por idioma dos clientes sem pergunta com fonte ou sem fonte no gold (pós-morte V5, N2: o piso 0,88 foi
-    calibrado sem inglês e recusou 4 oficiais em inglês)."""
+    """Aviso por idioma dos clientes sem pergunta com fonte ou sem fonte no gold (um piso de 0,88 calibrado sem inglês
+    recusou 4 oficiais em inglês)."""
     out = []
     for lang in sorted(expected):
         got = by_lang.get(lang) or {"positives": 0, "negatives": 0}
@@ -1266,14 +1292,14 @@ def language_warnings(by_lang: dict, expected: set[str]) -> list[str]:
 
 
 def calibrate_gate(path: Path | None = None, retriever=None) -> dict | None:
-    """Escolhe o limiar do portão "sem fonte" por medida (feedback v2: o portão chutado barrava 1 de 5).
+    """Escolhe o limiar do portão "sem fonte" por medida (um limiar chutado barrava 1 de 5).
 
     Positivos (com `relevant`) devem ser respondidos COM a fonte certa entre os trechos aceitos; negativos
     (`relevant: []`) devem ser recusados. Usa a mesma função do agente (agents.covered_hits).
     Melhor limiar = o que mais responde positivos com recusa de negativos >= NEG_REFUSAL_MIN; empate → o
     MENOR (responde mais perto da fronteira sem perder o piso). Nenhum atinge o piso → o que mais recusa.
     Negativo que o router não manda ao agente de conhecimento sai da conta (`excluded_negatives`).
-    Por idioma (pós-morte V5, N2): `by_language` (no limiar em uso e no melhor) e `warnings` para cada idioma dos
+    Por idioma: `by_language` (no limiar em uso e no melhor) e `warnings` para cada idioma dos
     clientes (casos) sem pergunta com ou sem fonte no gold.
     `current` = limiar efetivo (COVERAGE_MIN_SCORE do ambiente, senão MIN_SCORE), com o que ele entrega.
     """
@@ -1308,7 +1334,7 @@ def calibrate_gate(path: Path | None = None, retriever=None) -> dict | None:
 
         # MIN_SCORE é limiar de BM25: com COVERAGE_GATE=bm25 é o BM25 que confere a cobertura no agente, qualquer
         # que seja o buscador que ordena. Calibrar sobre os acertos do denso dava MIN_SCORE = 0 (o trecho denso não
-        # tem escala BM25) e o portão nunca recusava (ensaio v5.1: replan 0% de handoff).
+        # tem escala BM25) e o portão nunca recusava (medido: replan com 0% de handoff).
         retriever = BM25Retriever(get_index()) if coverage_gate() == "bm25" else get_retriever_base()
     found = {r["question"]: retriever.search(_agent_query(r["question"]), k=K) for r in pos + neg}
     candidates = sorted({round(h.bm25, 3) for hits in found.values() for h in hits} | {MIN_SCORE, 0.0, current})
@@ -1396,7 +1422,7 @@ def compare_retrievers(path: Path | None = None, embedder=None, rerank_llm=None,
 def _chosen_configs() -> list[dict]:
     """Com escolha medida (data/retriever.json): bm25, a base da escolhida e a escolhida, só.
 
-    `make eval` media a grade padrão (bm25/hybrid/dense, cada um + cross com pool 20): na bancada da v4, cross@20
+    `make eval` media a grade padrão (bm25/hybrid/dense, cada um + cross com pool 20): medido, cross@20
     passou de 2,7 s de p95 por consulta, e as 3 linhas com rerank sozinhas levavam minutos. A grade completa já está
     no retriever.json da escolha; aqui o comparativo mostra a escolhida contra a sua base e o bm25 (ablação do rerank).
     """
@@ -1436,7 +1462,9 @@ def fmt_cell(metrics: dict, key: str) -> str:
     if value is None:
         return "—"
     ci = (metrics.get("ci") or {}).get(key)
-    return f"{value} {fmt_ci(ci)}" if key.endswith("_acc") and ci else str(value)
+    # célula enxuta (valor e n); o intervalo de confiança fica no JSON (`ci`) e nas linhas de gate. Tabela com IC95 em
+    # cada célula, repetida por split, esconde o que importa atrás da notação.
+    return f"{value} (n={ci['n']})" if key.endswith("_acc") and ci else str(value)
 
 
 def intent_matrix_table(matrix: dict[str, dict[str, int]]) -> str:

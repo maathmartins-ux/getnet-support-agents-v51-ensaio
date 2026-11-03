@@ -3,13 +3,13 @@
 Uso: python scripts/demo_md.py [--split official] [--out docs/DEMO.md]
      python scripts/demo_md.py --transcript evals/demo_transcript.jsonl [--out docs/DEMO_TRANSCRIPT.md]
 
-O avaliador da Régua V4 não executa o código nem assiste ao vídeo ("Não executei build nem testes"; "Vídeo … não
-assistido"): a prova de que o sistema responde tem de estar escrita e commitada. Este script lê
+Quem lê o repositório nem sempre executa o código ou assiste ao vídeo: a prova de que o sistema responde tem de
+estar escrita e commitada. Este script lê
 evals/results/live_<split>.json (1ª rodada de cada caso) e escreve, por cenário: pergunta, intenção, rota de
 agentes, ferramentas, fontes, números sem base, resposta e custo. O cabeçalho carimba o commit e a data.
 
-Árvore de passos (kit v5.4, ideia do Skywalker: o trace legível por caso): quando a linha traz `steps` (a resposta do
-/chat), cada cenário mostra agente → status/motivo → ms → ferramenta com args → prévia do resultado.
+Árvore de passos (o trace legível por caso): quando a linha traz `steps` (a resposta do /chat), cada cenário mostra
+agente → status/motivo → ms → ferramenta com args → prévia do resultado.
 `--transcript`: roda NO PROCESSO (o LLM que o ambiente tiver; sem chave, o modo offline) uma conversa multi-turno
 descrita em JSONL — {"user": "u1"} na 1ª linha; depois {"say": "..."}, {"confirm": true} (confirma a última ação
 proposta e mostra o antes/depois da escrita) e {"say": "...", "operator": "resposta", "wait_s": 5} (um operador

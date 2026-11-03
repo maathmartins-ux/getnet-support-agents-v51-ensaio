@@ -7,8 +7,8 @@ check:
 check-docker:
 	python scripts/check.py --docker
 
-# eval: o que o relógio precisa (gate offline + ablação do replanejamento). A comparação de buscadores (8 min medidos
-# no domínio da V5) é decisão de ANTES do relógio: `make compare`.
+# eval: o que roda a cada mudança (gate offline + ablação do replanejamento). A comparação de buscadores (8 min
+# medidos num corpus real) é decisão à parte, tomada antes: `make compare`.
 eval:
 	python -m evals.run_evals
 	python -m evals.run_evals --ablate-replan

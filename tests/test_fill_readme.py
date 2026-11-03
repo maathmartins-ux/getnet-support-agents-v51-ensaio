@@ -36,11 +36,11 @@ def test_render_fills_every_block_and_is_idempotent(results, tmp_path):
     assert once == twice
     assert "Gate (splits" in once and "Split `replan`" in once and "US$ 0.42" in once
     assert "kappa de Cohen **1.0**" in once
-    assert "| offline | 3 | 100.0 [IC95 43.9–100.0; n=3] |" in once and "faq:no_source->escalation" in once
+    assert "| offline | 3 | 100.0 (n=3) |" in once and "faq:no_source->escalation" in once
 
 
 def test_replan_and_judge_blocks_carry_ci_and_outcome_metric(results, tmp_path):
-    # itens 6 e 8 da auditoria v3: toda taxa com n e IC de Wilson; handoff por desfecho AO LADO do flag
+    # toda taxa com n e IC de Wilson; handoff por desfecho AO LADO do flag
     (results / "judge.json").write_text(json.dumps({
         "status": "ran", "model": "m", "live_files": [], "spent_usd": 0.1, "cases": 4, "grounded_rate": 0.5,
         "helpful_rate": 1.0, "mean_score": 4.0, "ci": {"grounded_rate": {"k": 2, "n": 4, "lo": 15.0, "hi": 85.0},
@@ -50,7 +50,7 @@ def test_replan_and_judge_blocks_carry_ci_and_outcome_metric(results, tmp_path):
                                         "by_split": {}}}), encoding="utf-8")
     text = fill_readme.render(TEMPLATE, results, root=tmp_path)
     replan = text.split("<!-- replan:begin -->")[1].split("<!-- replan:end -->")[0]
-    assert "handoff_outcome_acc" in replan and "IC95" in replan
+    assert "handoff_outcome_acc" in replan and "(n=" in replan  # célula com valor e n; o IC95 fica no JSON
     judge = text.split("<!-- judge:begin -->")[1].split("<!-- judge:end -->")[0]
     assert "0.5 [IC95 15.0–85.0; n=4]" in judge and "**1.0** [IC95 61.0–100.0; n=6]" in judge
 
@@ -66,7 +66,7 @@ def test_required_marker_missing_fails(results):
 
 
 def test_kit_block_measures_scaffold_versus_clock(tmp_path):
-    # pergunta 5 do feedback v2: "quanto do código veio do kit prévio?" — respondida com número do git
+    # quanto do código veio do scaffold do kit e quanto foi escrito depois: número tirado do git, não estimativa
     import subprocess
 
     def git(*args):
@@ -95,7 +95,7 @@ def test_kit_block_without_scaffold_is_declared(tmp_path):
 
 
 def test_since_block_maps_each_v4_gap_to_change_and_measured_proof(results, tmp_path):
-    """"Desde a última avaliação": as 5 lacunas da correção v4, cada uma com a prova lida das chaves do placar."""
+    """Bloco `since`: as 5 lacunas da tabela, cada uma com a mudança, o teste e a prova lida das chaves do placar."""
     from scripts import scorecard
 
     body = fill_readme.since_block(results)

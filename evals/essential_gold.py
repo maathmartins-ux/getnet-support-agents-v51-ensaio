@@ -1,4 +1,4 @@
-"""Gold de passagens ESSENCIAIS rotulado às cegas por 2+ rotuladores (kit v5.2).
+"""Gold de passagens ESSENCIAIS rotulado às cegas por 2+ rotuladores.
 
   python -m evals.essential_gold --export [--k 5] [--dir evals/essential]
       para cada pergunta com fonte do gold (linha sem "no_source": true), junta o top-k do BM25 e o top-k do buscador
@@ -10,10 +10,10 @@
       gold: uma regex por passagem essencial, feita da frase-resposta do trecho (sobrevive a re-ingest; a mesma FAQ
       copiada em outra página casa a mesma regra). Grava report.json ao lado do pool.
 
-Por que (ensaio v5.2 sobre o corpus da v4): o gold "todo trecho relacionado" da v4 media quantos relacionados cabem em
-3 vagas (teto 0,971; o melhor buscador parou em 0,78). Com 2 rotuladores cegos (Jaccard 0,81, 31/50 idênticos) o
-mesmo buscador acha 0,82–0,85 das passagens essenciais. Rotular VENDO o top-3 inflava o número (ilustração da R2:
-0,70 → 1,0 depois de ler o top-3); aqui o rotulador nunca vê a ordem da busca.
+Por quê (medido num corpus real de FAQ): um gold "todo trecho relacionado" mede quantos relacionados cabem em 3 vagas
+(teto 0,971; o melhor buscador parou em 0,78). Com 2 rotuladores cegos (Jaccard 0,81, 31/50 idênticos) o mesmo
+buscador acha 0,82–0,85 das passagens essenciais. Rotular VENDO o top-3 infla o número (num exemplo, 0,70 → 1,0
+depois de ler o top-3); aqui o rotulador nunca vê a ordem da busca.
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Kit v5.4 — consulta síncrona ao operador (ideia do Skywalker): o turno espera a resposta humana e o plano continua.
+"""Consulta síncrona ao operador: o turno espera a resposta humana e o plano continua.
 
 Operador simulado numa thread, pelo mesmo endpoint do console (/handoffs/{id}/reply). Dentro do prazo: a resposta e o
 passo pendente (faq) saem NO MESMO turno e a retomada assíncrona não manda a mensagem de novo. Fora do prazo: nada

@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 # Domínio do kit ANTES de importar qualquer módulo do app: os testes do kit nunca enxergam o domínio do desafio
-# (app/domain/challenge.py). Getnet v3: o domínio trocou o código e 59 testes do kit quebraram (CI vermelho).
+# (app/domain/challenge.py). Sem isso, um domínio que troca o código quebra dezenas de testes do kit (CI vermelho).
 os.environ["DOMAIN"] = "example"
 # Buscador BM25 também para fixtures de módulo/sessão (rodam antes do isolated_env): o padrão do app é o denso + cross
 # (config.KIT_RETRIEVER, ~2,8 GB de modelos) e o servidor do test_mcp montava os dois na subida.
@@ -24,7 +24,7 @@ from app.observability import configure_otel
 from evals import judge, run_evals
 
 # Dados do kit: os testes do kit nunca leem o que o domínio troca no relógio (data/, retrieval, calibração).
-# Getnet v3 (31/10/2026): trocar só os dados quebrava 24 de 187 testes e atrasou o G1 em 17 min (regra D2).
+# Sem isso, trocar só os dados quebrava 24 de 187 testes.
 KIT_DATA = Path(__file__).parent / "fixtures" / "kit_data"
 
 # Backends do store: os módulos abaixo rodam cada teste em SQLite E em Postgres (marcador `postgres`). O Postgres só
@@ -81,8 +81,8 @@ def isolated_env(tmp_path, monkeypatch, pg_schema):
     monkeypatch.setattr(run_evals, "CASES", KIT_DATA / "cases.jsonl")
     monkeypatch.setattr(run_evals, "HELDOUT", KIT_DATA / "heldout_blind.jsonl")  # o kit não tem held-out
     monkeypatch.setattr(run_evals, "RETRIEVAL", KIT_DATA / "retrieval.jsonl")
-    # Nenhum teste grava em evals/results/: lá mora a evidência commitada que o README cita (Getnet v3: rodar o
-    # pytest sobrescrevia latest.json com números da loja de exemplo).
+    # Nenhum teste grava em evals/results/: lá mora a evidência commitada que o README cita (sem este desvio, o
+    # pytest sobrescreveria latest.json com números da loja de exemplo).
     monkeypatch.setattr(run_evals, "RESULTS_DIR", tmp_path / "results")
     monkeypatch.setattr(run_evals, "RESULTS", tmp_path / "results" / "latest.json")
     monkeypatch.setattr(judge, "CALIBRATION", KIT_DATA / "judge_calibration.jsonl")

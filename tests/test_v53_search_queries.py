@@ -1,4 +1,4 @@
-"""Consultas do RAG escritas pelo router no idioma da base (kit v5.3, ensaio no domínio da V5)."""
+"""Consultas do RAG escritas pelo router no idioma da base, sem perder a pergunta original."""
 from app import agents, router
 
 
@@ -29,7 +29,7 @@ def test_retrieve_searches_customer_words_first_then_router_queries():
 
     agents.retrieve("Do I need a bank account to receive via Pix?", retriever=Fake(), k=5,
                     queries=["Pix conta corrente poupança conta de pagamento", "  "])
-    # ensaio v5.3 (official-04): a pergunta original achava o fato em 1º; as consultas do LLM, não
+    # a pergunta original vai primeiro: há caso oficial em que ela acha o fato em 1º e as consultas do LLM, não
     assert seen == ["Do I need a bank account to receive via Pix?", "Pix conta corrente poupança conta de pagamento"]
     seen.clear()
     agents.retrieve("e a taxa?", standalone="taxa do Pix", retriever=Fake(), k=5, queries=["taxa do Pix"])

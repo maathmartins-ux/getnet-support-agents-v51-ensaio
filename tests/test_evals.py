@@ -8,7 +8,7 @@ from evals import judge, run_evals
 from evals.run_evals import load_cases, run
 
 # rótulos do kit: o FakeJudge e os ids do teste são os dele. evals/judge_calibration.jsonl é do domínio e muda
-# no relógio (Getnet v3: 34 rótulos novos derrubaram 2 testes do juiz no CI)
+# no relógio (lendo o arquivo do domínio, 34 rótulos novos derrubavam 2 testes do juiz no CI)
 KIT_CAL = Path(__file__).parent / "fixtures" / "kit_data" / "judge_calibration.jsonl"
 
 
@@ -58,7 +58,7 @@ def test_live_stops_at_cost_cap_and_writes_partial(monkeypatch, tmp_path):
 
 
 def test_parallel_wave_shrinks_to_fit_the_cap(monkeypatch, tmp_path):
-    # smoke de 31/10/2026: leva de 3 casos lançada com US$ 0,0258 de saldo gastou 0,0275
+    # sem encolher, uma leva de 3 casos lançada com US$ 0,0258 de saldo gasta 0,0275 e passa do teto
     monkeypatch.setattr(run_evals, "RESULTS_DIR", tmp_path)
     client = PricedClient(cost=0.01)
     report = run(split="official", live=True, max_usd=0.03, workers=4, client=client)
@@ -198,7 +198,8 @@ def test_report_has_failure_matrix_and_gate_sections(monkeypatch, tmp_path):
 
 
 def test_live_run_with_many_lost_llm_calls_is_degraded_and_never_overwrites_a_good_result(tmp_path, monkeypatch):
-    """Getnet v5: 135 ConnectTimeout em 117 execuções e o relatório saiu `complete` por cima de uma rodada boa."""
+    """Rodada com muitas chamadas perdidas (ex.: 135 ConnectTimeout em 117 execuções) não pode sair `complete` nem
+    sobrescrever uma rodada boa."""
     import json
 
     from evals import run_evals
@@ -238,7 +239,7 @@ def test_aborted_run_never_replaces_a_complete_one_but_may_be_the_only_partial(t
     aborted = run_evals.run(None, None, "official", True, 1.0, 1, repeat=1)
     assert aborted["status"] == "aborted_quota" and aborted["path"].endswith("live_official.aborted_quota.json")
     assert json.loads(good.read_text(encoding="utf-8"))["marker"] == "boa"
-    # sem resultado completo anterior, o parcial grava no nome normal (a v3 declarava "parcial" no README)
+    # sem resultado completo anterior, o parcial grava no nome normal
     monkeypatch.setattr(run_evals, "_llm_errors", quota_hits_after_the_first_wave())
     only = run_evals.run(None, None, "memory", True, 1.0, 1, repeat=1)
     assert only["status"] == "aborted_quota" and only["path"].endswith("live_memory.json")

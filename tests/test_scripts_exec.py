@@ -1,5 +1,5 @@
-"""Getnet v4 (01/11/2026): scripts/live_eval.sh foi commitado sem o bit de execução e o eval ao vivo morreu com
-"Permission denied" (código 126) no meio do relógio. Todo .sh do kit precisa ir executável para o git."""
+"""Todo .sh do kit precisa ir executável para o git: um scripts/live_eval.sh commitado sem o bit de execução
+derruba o eval ao vivo com "Permission denied" (código 126) no meio do relógio."""
 import subprocess
 
 from app.config import ROOT

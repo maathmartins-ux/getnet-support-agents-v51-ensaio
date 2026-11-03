@@ -12,9 +12,9 @@ Confere:
 - máquina: núcleos, RAM e disco livres desta sessão;
 - git: a branch atual e se o remoto aceita leitura.
 
-Kit v3.7 (31/10/2026): a sessão de auditoria da v3 rodava num ambiente de rede LIMITADA que recusava o site da
-Getnet. Com a tentativa toda na nuvem, a frente K não conseguiria ingerir o corpus. Isso se resolve nas
-configurações do ambiente (acesso de rede e variável da chave), nunca no relógio.
+Um ambiente de rede LIMITADA recusa o site da empresa, e com a tentativa toda na nuvem a frente K não consegue
+ingerir o corpus. Isso se resolve nas configurações do ambiente (acesso de rede e variável da chave), nunca no
+relógio; por isso a conferência vem antes.
 """
 from __future__ import annotations
 

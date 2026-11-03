@@ -68,7 +68,7 @@ def test_llm_failure_falls_back_to_rules(monkeypatch, script):
 
 
 def test_clear_language_overrides_only_unambiguous_sentences():
-    """Getnet v4 ao vivo: termo pt entre parênteses numa frase inglesa não pode virar resposta em português."""
+    """Termo pt entre parênteses numa frase inglesa não pode virar resposta em português."""
     from app.router import clear_language
 
     assert clear_language("How does receivables advance (antecipação) work with Getnet?") == "en"

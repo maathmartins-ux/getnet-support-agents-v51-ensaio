@@ -340,8 +340,9 @@ _PROMPT_TERM_RE = re.compile(r"\b(" + "|".join(_PROMPT_TERMS) + r")\b", re.IGNOR
 def customer_terms(text: str) -> str:
     """"passagens"/"passages" é o nome que o PROMPT dá aos trechos; para o cliente são as fontes.
 
-    1º ensaio do atalho do supervisor: 15 respostas do faq diziam "The passages don't say..." direto ao cliente; antes
-    a redação final do supervisor trocava o termo. Mesmo gênero em pt (as passagens → as fontes); maiúscula preservada.
+    Sem esta troca, com o atalho do supervisor ligado, 15 respostas do faq diziam "The passages don't say..." direto ao
+    cliente (no caminho normal é a redação final do supervisor que troca o termo). Mesmo gênero em pt (as passagens →
+    as fontes); maiúscula preservada.
     """
     def swap(m: re.Match) -> str:
         new = _PROMPT_TERMS[m.group(1).lower()]

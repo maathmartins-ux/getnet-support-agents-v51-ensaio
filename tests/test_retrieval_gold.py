@@ -1,7 +1,7 @@
 """Gold de retrieval por regra (regex de URL / regex do texto) além do id, e métricas por página.
 
-Getnet v4 (01/11/2026): o re-ingest renomeou os ids e o gold por id quebrou; Recall@3 0,486 por trecho era lido
-como fraco sem o número por página ao lado.
+Gold só por id quebra quando o re-ingest renomeia os ids; e um Recall@3 de 0,486 por trecho parece fraco se não
+vier com o número por página ao lado.
 """
 import json
 

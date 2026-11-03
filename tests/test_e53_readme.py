@@ -1,8 +1,8 @@
 """E53 — README: títulos do enunciado, quickstart do 1º caso oficial e linha do tempo sem `{{`.
 
-V5: o quickstart trazia "pedido 1002" (sobra do domínio de exemplo); um título de commit com `{{N}}` foi para a linha do
-tempo do README e a CI do último commit ficou vermelha (pós-morte N9); o README não tinha "message workflow", "RAG
-pipeline ingestion → storage → retrieval → generation" nem "testing strategy" (estudo Skywalker §1.1).
+O quickstart não pode trazer sobra do domínio de exemplo ("pedido 1002"); um título de commit com `{{N}}` não pode ir
+para a linha do tempo do README (deixaria a CI do último commit vermelha); e o README precisa das seções "message
+workflow", "RAG pipeline ingestion → storage → retrieval → generation" e "testing strategy".
 """
 import json
 import re
@@ -62,7 +62,7 @@ def test_readme_template_has_every_heading_the_challenge_asks_for():
     old = "# P\n## 1. Como rodar\n## 2. Arquitetura\n## 4. Decisões e trade-offs\n"
     assert fill_readme.missing_headings(old) == list(fill_readme.REQUIRED_HEADINGS)
     if "{{" in readme:  # README ainda modelo (kit): o exemplo é o do 1º caso oficial do kit. Preenchido na tentativa,
-        # o exemplo é o caso oficial do DESAFIO e o conftest troca os casos pela fixture (ensaio v5.4: CI vermelha)
+        # o exemplo é o caso oficial do DESAFIO e o conftest troca os casos pela fixture (sem isso, a CI fica vermelha)
         assert fill_readme.quickstart_block() in readme
 
 

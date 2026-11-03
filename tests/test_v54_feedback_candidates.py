@@ -1,4 +1,4 @@
-"""Kit v5.4: 👎 vira candidato a caso com evidência e versão das instruções; só entra num split após revisão."""
+"""👎 vira candidato a caso com evidência e versão das instruções; só entra num split após revisão."""
 import json
 
 import pytest

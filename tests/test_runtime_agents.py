@@ -1,9 +1,9 @@
-"""Defeitos de runtime dos agentes achados na auditoria da Getnet v3 (31/10/2026).
+"""Defeitos de runtime dos agentes que estes testes impedem de voltar.
 
-4. Busca web: a v3 fazia `evidence=[text]` (a própria resposta como evidência) e a checagem de números
-   ficava vazia; o prompt não tinha a data de hoje ("tomorrow (Oct 30)" num dia 31).
-5. Busca entre idiomas: "How many installments in Crediário?" não achava o documento em português.
-6. Escolha do item para a ação: a v3 contestava a ÚLTIMA transação, mesmo recusada.
+4. Busca web: a evidência não pode ser a própria resposta (`evidence=[text]`), senão a checagem de números fica
+   vazia; o prompt leva a data de hoje (sem ela saía "tomorrow (Oct 30)" num dia 31).
+5. Busca entre idiomas: "How many installments in Crediário?" precisa achar o documento em português.
+6. Escolha do item para a ação: contestar a transação certa, não a ÚLTIMA (mesmo recusada).
 """
 import json
 from datetime import date

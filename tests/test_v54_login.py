@@ -1,4 +1,4 @@
-"""Kit v5.4: login com senha (ideia do Skywalker, nota 10) sobre o mesmo JWT; erro genérico; limite; logout revoga."""
+"""Login com senha sobre o mesmo JWT: erro genérico, limite de tentativas e logout que revoga o token."""
 import pytest
 from fastapi.testclient import TestClient
 

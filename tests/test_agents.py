@@ -63,8 +63,8 @@ def test_records_llm_failure_uses_deterministic_path(monkeypatch):
 
 
 def test_faq_llm_sees_its_own_part_of_a_compound_question(monkeypatch):
-    # smoke ao vivo de 31/10/2026: "prazo? E onde está meu pedido 1002?" — o FAQ via a mensagem inteira,
-    # não conseguia responder o pedido, devolvia NOT_IN_SOURCES e a conversa ia para humano sem precisar
+    # "prazo? E onde está meu pedido 1002?": vendo a mensagem inteira, o FAQ não consegue responder o pedido,
+    # devolve NOT_IN_SOURCES e a conversa vai para humano sem precisar
     llm, msgs = fake_llm([resp("end_turn", text("Capitais: 3 a 5 dias úteis [1]."))], effort="medium")
     monkeypatch.setattr(agents, "get_llm", lambda role="agent": llm)
     c = ctx("Qual o prazo de entrega? E onde está meu pedido 1002?")

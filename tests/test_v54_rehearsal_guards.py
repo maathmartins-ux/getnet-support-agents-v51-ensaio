@@ -1,4 +1,4 @@
-"""Ensaio pré-produção de 03/11: guardas de processo que o relógio pediu."""
+"""Guardas de processo da entrega cronometrada: RAM livre, buscador sem fallback, relógio e padrões do placar."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -22,7 +22,7 @@ def test_prompt_forbids_untracked_background_work_at_turn_end():
 
 
 def test_iso_datetime_from_a_tool_supports_the_hour_in_the_answer():
-    """memory-07/08 do ensaio: "às 09:16" virava "às [valor não confirmado]:16" (o T colava na hora ISO)."""
+    """Hora vinda da tool em ISO: "às 09:16" não pode virar "às [valor não confirmado]:16" (o T colado na hora)."""
     from app.grounding import unsupported_numbers
 
     ev = ['{"terminal": "T1988B", "last_contact": "2026-11-03T09:16:00", "offline_hours": 5}']
@@ -32,7 +32,7 @@ def test_iso_datetime_from_a_tool_supports_the_hour_in_the_answer():
 
 
 def test_expects_fact_accepts_literal_and_regex_like_expect_facts():
-    """q-mem-01..06 do ensaio: regex no expects_fact reprovava resposta certa (memória 0,67 → 0,94 no remedido)."""
+    """expects_fact aceita literal e regex: tratar tudo como regex reprovava resposta certa (memória 0,67 → 0,94)."""
     from evals.memory_metrics import facts_ok
 
     assert facts_ok(["129[,.]90"], "A Get Smart custa R$ 129,90/mês")
@@ -44,8 +44,8 @@ def test_expects_fact_accepts_literal_and_regex_like_expect_facts():
 
 
 def test_delivery_clock_starts_at_scaffold_and_names_the_commit(tmp_path, monkeypatch):
-    """Ensaio de 03/11: "41 min" (mensagem gerada no T+41) com o relógio fechando no T+47; e sem tag o início era o
-    1º commit do repositório (antes do relógio)."""
+    """O relógio vai do scaffold ao último commit: a mensagem gerada no T+41 não pode dizer "41 min" se o relógio
+    fecha no T+47, e sem tag o início não pode ser o 1º commit do repositório (anterior ao relógio)."""
     import subprocess
 
     from scripts import delivery_message
@@ -71,7 +71,8 @@ def test_delivery_clock_starts_at_scaffold_and_names_the_commit(tmp_path, monkey
 
 
 def test_check_and_live_eval_refuse_a_retriever_in_fallback():
-    """Ensaio de 03/11: só [dev] instalado → BM25 do fallback na tentativa × denso + cross no CI/docker."""
+    """Só com [dev] instalado, o buscador cai no BM25 do fallback enquanto o CI/docker mede denso + cross: os dois
+    scripts recusam rodar assim."""
     check = (ROOT / "scripts" / "check.py").read_text(encoding="utf-8")
     assert "buscador = o configurado (sem fallback)" in check and "requirements-hybrid.lock" in check
     sh = (ROOT / "scripts" / "live_eval.sh").read_text(encoding="utf-8")
@@ -79,7 +80,7 @@ def test_check_and_live_eval_refuse_a_retriever_in_fallback():
 
 
 def test_supervisor_llm_decides_every_turn_by_default(monkeypatch):
-    """Kit v5.5 (perfil Skywalker): sem atalho de tabela por padrão; o supervisor LLM decide e o DEMO mostra."""
+    """Sem atalho de tabela por padrão: o supervisor LLM decide todo turno e o DEMO mostra a decisão."""
     from app import config
 
     monkeypatch.delenv("SUPERVISOR_FAST", raising=False)
@@ -89,7 +90,7 @@ def test_supervisor_llm_decides_every_turn_by_default(monkeypatch):
 
 
 def test_readme_headline_has_no_self_targets(tmp_path):
-    """Kit v5.5 (perfil Skywalker): manchete do README sem meta própria nem status "abaixo"."""
+    """Manchete do README só com as medidas: sem meta inventada pelo próprio kit nem status "abaixo"."""
     import json
 
     from scripts import scorecard

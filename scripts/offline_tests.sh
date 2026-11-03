@@ -14,8 +14,8 @@ PY="${PYTHON:-python}"
 # hermético também no git: assinatura de commit ou credencial do usuário que dependem de rede ficam de fora
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 # Dois passos dentro do namespace. SUBIR a loopback exige ser root do namespace (CAP_NET_ADMIN); no caminho do
-# sudo o pytest roda como o usuário comum, então a loopback sobe ANTES de largar o root (CI de 01/11/2026:
-# PermissionError ao subir a loopback depois do setpriv). A sonda de rede roda já como o usuário que roda os testes.
+# sudo o pytest roda como o usuário comum, então a loopback sobe ANTES de largar o root (depois do
+# setpriv, subir a loopback dá PermissionError). A sonda de rede roda já como o usuário que roda os testes.
 lo_up='
 import fcntl, socket, struct
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

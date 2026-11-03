@@ -1,7 +1,7 @@
 """Item 5 — contaminação do held-out: regra do roteador nem exemplo do k-NN podem copiar frase do teste cego.
 
-Origem: v3 (31/10/2026). A frase do cego "uma pessoa de verdade" foi copiada para a regra _HUMAN e o número
-"cego" virou falso: a regra acertava porque tinha visto a prova. Teste de DOMÍNIO: roda sobre os arquivos
+Uma frase do cego ("uma pessoa de verdade") copiada para a regra _HUMAN torna o número "cego" falso: a regra
+acerta porque viu a prova. Teste de DOMÍNIO: roda sobre os arquivos
 REAIS do projeto (src/app/router.py e evals/heldout_blind.jsonl); no kit, sem held-out, pula com o motivo.
 """
 import json

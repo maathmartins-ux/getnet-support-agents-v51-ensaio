@@ -1,5 +1,4 @@
-"""Identidade de produção (feedback v2, 31/10/2026: "token sem expiração", "operador com token compartilhado",
-"rate limit em memória").
+"""Identidade de produção: token com expiração, operador com chave pessoal e limite de uso fora da memória.
 
 - token = JWT HS256 padrão (sub, iat, exp, jti, iss, aud), verificável por qualquer biblioteca JWT;
 - expirado, adulterado, `alg` diferente de HS256, `aud`/`iss` errados ou `jti` revogado → 401;

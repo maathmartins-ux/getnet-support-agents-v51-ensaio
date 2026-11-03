@@ -1,5 +1,5 @@
-"""Ensaio v5.4: as gravações ao vivo (evals/cassettes/) saem da varredura do gitleaks (falsos positivos aos milhares:
-hash do pedido e assinaturas do thinking). Em troca, este teste varre as gravações atrás de credencial de verdade."""
+"""As gravações ao vivo (evals/cassettes/) saem da varredura do gitleaks (falsos positivos aos milhares: hash do
+pedido e assinaturas do thinking). Em troca, este teste varre as gravações atrás de credencial de verdade."""
 from __future__ import annotations
 
 import re

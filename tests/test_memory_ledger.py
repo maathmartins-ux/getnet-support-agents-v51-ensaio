@@ -237,7 +237,7 @@ def test_aggregates_sum_by_date_across_methods():
     assert "por_method" in calc
 
 
-# --- seguimento sem tool no turno (ensaio v5.3, q-memory-08/09: "E qual foi o valor dela?") -------------------------
+# --- seguimento sem tool no turno ("E qual foi o valor dela?": o valor sai do registro já visto) ---------------------
 LEDGER = ("Fatos da conversa:\n- IDs citados pelo cliente: TX1006\n- Registros vistos nas ferramentas: TX1006 "
           "{method=credito, amount=900.00, amount_brl=R$ 900,00, status=aprovada}")
 

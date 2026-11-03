@@ -1,4 +1,4 @@
-"""v5 — replanejamento por ACHADO (needs) e orçamento por turno (MAX_MODEL_CALLS, MAX_TURN_USD, NODE_TIMEOUT_S).
+"""Replanejamento por ACHADO (needs) e orçamento por turno (MAX_MODEL_CALLS, MAX_TURN_USD, NODE_TIMEOUT_S).
 
 Caso "dependent" do domínio de exemplo: "Quando chega meu pedido 1002?" → o records vê "em separação" → a resposta
 só fica completa com o prazo da política (faq). Sem o achado, o plano do router ([records]) para no status.

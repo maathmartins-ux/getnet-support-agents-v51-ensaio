@@ -1,6 +1,5 @@
-"""Falsos positivos da checagem de números vistos no eval ao vivo da Getnet v3 (31/10/2026).
+"""Falsos positivos da checagem de números que não podem voltar (vistos no eval ao vivo do split approval).
 
-Casos reais de evals/results/live_approval.json da v3:
 - approval-01: "Venda de 30/10/2026" com a evidência da tool em ISO ("2026-10-30") → marcou 30, 10 e 2026;
 - resposta em inglês "R$ 5,000.00" com a evidência 5000.0 → "5,000.00" virava 5 (vírgula lida como decimal).
 """

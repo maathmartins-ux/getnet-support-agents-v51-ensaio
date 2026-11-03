@@ -1,7 +1,8 @@
 """R53 item 3 — supervisor: "partial" é resposta (nunca escala por si) e o insufficient do atalho vai ao LLM.
 
-V5 ao vivo: 24 de 30 execuções oficiais usaram a tabela (atalho de plano de 1 passo) e o faq "insufficient" escalou
-pelo FALLBACK fixo, sem decisão observada do supervisor LLM. Offline a tabela continua igual.
+Ao vivo, 24 de 30 execuções oficiais usaram a tabela (atalho de plano de 1 passo) e o faq "insufficient" escalou
+pelo FALLBACK fixo, sem decisão observada do supervisor LLM; por isso o insufficient vai ao LLM. Offline a tabela
+continua igual.
 """
 import pytest
 from fakes import fake_llm, resp, text, tool_use
@@ -14,7 +15,7 @@ from app.observability import new_trace_id, record_llm_usage
 
 @pytest.fixture(autouse=True)
 def _fast_path_on(monkeypatch):
-    """Estes testes cobrem o atalho de 1 passo, desligado por padrão desde o kit v5.5 (perfil Skywalker)."""
+    """Estes testes cobrem o atalho de 1 passo, que fica desligado por padrão (o supervisor LLM decide)."""
     monkeypatch.setenv("SUPERVISOR_FAST", "on")
 
 

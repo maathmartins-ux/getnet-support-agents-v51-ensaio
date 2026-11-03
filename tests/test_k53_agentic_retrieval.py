@@ -1,8 +1,8 @@
-"""K53: busca agentic do faq (pós-morte V5, N1/N2).
+"""K53: busca agentic do faq.
 
-V5: "What's the difference between X and Y?" ia crua ao denso, o trecho com o fato ficava fora do top-3 e o faq dizia
-NOT_IN_SOURCES. Agora: consultas no idioma do corpus, uma por item comparado, a partir de ctx.facts["standalone"],
-até 3 buscas por turno, fundidas por rodada; top-5 ao redator; com LLM, tool `search` com teto.
+Mandada crua ao denso, "What's the difference between X and Y?" deixa o trecho com o fato fora do top-3 e o faq
+responde NOT_IN_SOURCES. Por isso: consultas no idioma do corpus, uma por item comparado, a partir de
+ctx.facts["standalone"], até 3 buscas por turno, fundidas por rodada; top-5 ao redator; com LLM, tool `search` com teto.
 """
 import json
 
@@ -97,7 +97,7 @@ def test_english_question_is_searched_in_the_corpus_language(corpus):
     assert plan.queries == ["Do I need a conta corrente to receber my pagamentos?"] and plan.translated == [True]
     spy = SpyRetriever()
     found = agents.retrieve("Do I need a bank account to receive my payments?", retriever=spy)
-    # kit v5.4: as palavras do cliente vão cruas como 1ª busca; a tradução do plano vem logo depois
+    # as palavras do cliente vão cruas como 1ª busca; a tradução do plano vem logo depois
     assert spy.queries[0][0] == "Do I need a bank account to receive my payments?"
     assert spy.queries[1][0] == plan.queries[0]
     assert "conta" in [h.doc.id for h in found.hits]
@@ -118,7 +118,7 @@ def test_same_language_question_keeps_the_glossary_expansion(corpus):
 
 
 def test_glossary_with_text_values_is_read(corpus):
-    # V5: o glossário do desafio veio com texto em vez de lista e era ignorado inteiro
+    # glossário com texto em vez de lista nos valores não pode ser ignorado inteiro
     (corpus / "glossary.json").write_text(json.dumps({"conta corrente": "bank account"}), encoding="utf-8")
     assert agents.to_language("I have a bank account", "pt") == "I have a conta corrente"
 

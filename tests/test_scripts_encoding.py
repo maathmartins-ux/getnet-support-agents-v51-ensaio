@@ -1,6 +1,6 @@
 """Scripts .ps1 com acento precisam de BOM UTF-8: o PowerShell 5.1 lê .ps1 sem BOM como ANSI.
 
-Smoke de 31/10/2026: live_eval.ps1 sem BOM imprimia "nÃ£o rodado" no console do Windows.
+Sem BOM, live_eval.ps1 imprime "nÃ£o rodado" no console do Windows.
 """
 import codecs
 from pathlib import Path

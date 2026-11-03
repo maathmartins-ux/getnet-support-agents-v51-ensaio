@@ -1,4 +1,4 @@
-"""Scripts de evidência do v5: FAILURE_MODES, validação humana, DEMO.md e TIMESHEET (dados falsos, sem rede)."""
+"""Scripts de evidência: FAILURE_MODES, validação humana, DEMO.md e TIMESHEET (dados falsos, sem rede)."""
 
 import json
 import subprocess

@@ -1,4 +1,4 @@
-"""v5 — HITL que retoma o PLANO: depois da resposta do operador, os passos pendentes do plano original rodam.
+"""HITL que retoma o PLANO: depois da resposta do operador, os passos pendentes do plano original rodam.
 
 Ponta a ponta (TestClient): pedido composto; a parte de Knowledge (faq) estoura o tempo do nó → o cliente recebe a
 parte respondida (pedido) e o caso vai ao humano com budget_exhausted. Enquanto espera, nova mensagem é anexada ao

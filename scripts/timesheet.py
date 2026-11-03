@@ -3,9 +3,9 @@
 Uso: python scripts/timesheet.py [--out docs/TIMESHEET.md]
 
 Relógio = da tag `clock-start` à tag `clock-end`; sem as tags, do 1º ao último commit. Commits depois de
-`clock-end` aparecem marcados "pós-relógio" (o avaliador confere a autoria pelos commits; declarar o que veio
-depois é o que Eduardo Colissi fez e foi lido como honestidade). Mostra também a cadência: rajada de commits
-em poucos minutos é lida como trabalho pré-fabricado, então o relatório destaca a maior rajada.
+`clock-end` aparecem marcados "pós-relógio": a autoria se confere pelos commits, então o que veio depois do relógio
+fica declarado em vez de misturado. Mostra também a cadência: rajada de commits em poucos minutos sugere trabalho
+pré-fabricado, então o relatório destaca a maior rajada.
 """
 
 from __future__ import annotations
@@ -98,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
     rows = commits()
     t0, t1 = tag_time("clock-start"), tag_time("clock-end")
     basis = "tags clock-start/clock-end" if t0 and t1 else "1º e último commit (sem tags)"
-    if t0 is None:  # V5: o proxy da nuvem derruba push de tag e o repo tinha 1 commit da maestra antes do relógio
+    if t0 is None:  # o proxy da nuvem derruba push de tag, e o repo pode ter commits anteriores ao relógio
         t0 = scaffold_time(rows)
         if t0 is not None:
             basis = "commit de scaffold ('chore: scaffold') ao " + ("clock-end" if t1 else "último commit")

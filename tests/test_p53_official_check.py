@@ -1,6 +1,7 @@
 """scripts/official_check.py: cobertura do corpus por entidade oficial e fato oficial no top-k do buscador ativo.
 
-Pós-morte V5, N1: o fato de official-01 estava no corpus e fora do top-3; ninguém mediu antes da rodada ao vivo.
+Estar no corpus não basta: um fato oficial pode ficar fora do top-3 e só aparecer como erro na rodada ao vivo.
+O script mede isso antes da rodada.
 Corpus fictício (domínio próprio, sem API): BM25, o buscador que o conftest fixa nos testes.
 """
 import json

@@ -1,7 +1,7 @@
-"""Ao vivo com vários splits num processo só (frente R2, kit v5.1).
+"""Ao vivo com vários splits num processo só.
 
-Ensaio v5.1: com o buscador denso, cada processo do eval carrega e5-large + cross-encoder; o live_eval.sh abria um
-processo por split e estourava a memória. `run_evals --splits` roda os splits ao mesmo tempo, num processo, cada um
+Com o buscador denso, cada processo do eval carrega e5-large + cross-encoder; um processo por split estoura a
+memória. `run_evals --splits` roda os splits ao mesmo tempo, num processo, cada um
 com a sua cota, o seu live_<split>.json e o seu cassete.
 """
 import itertools
@@ -45,7 +45,7 @@ def test_each_split_gets_its_own_share_and_report():
     spent = 0.0
     for split, share in (("official", round(2.0 * 4 / 7, 6)), ("replan", round(2.0 * 3 / 7, 6))):
         saved = json.loads((run_evals.RESULTS_DIR / f"live_{split}.json").read_text(encoding="utf-8"))
-        assert saved["max_usd"] == share  # cota proporcional aos casos (E53; antes: 2,0 / 2 splits)
+        assert saved["max_usd"] == share  # cota proporcional aos casos, não 2,0 / 2 splits
         assert saved["spent_usd"] <= saved["budget"]["limit"] + 1e-9  # cota + o que pegou da sobra
         assert {r["id"] for r in saved["rows"]} <= _ids(split)  # nenhum caso do outro split
         assert reports[split]["status"] == saved["status"] in ("complete", "aborted_max_usd")

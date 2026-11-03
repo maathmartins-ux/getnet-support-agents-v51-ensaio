@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Vídeo legendado do walkthrough (sem narração), tudo na nuvem: respostas reais + números commitados → MP4.
-# Getnet v4 (01/11/2026): 1 min de captura (US$ ~0,10), 3 min de gravação em tempo real, 10 s de ffmpeg; 1,4 MB.
+# Medido: 1 min de captura (US$ ~0,10), 3 min de gravação em tempo real, 10 s de ffmpeg; 1,4 MB.
 # Requer: chave do LLM (captura), Playwright + Chromium (pré-instalados na nuvem), ffmpeg.
 # Uso: scripts/video/make_video.sh            # docs/video/demo.json + docs/video/walkthrough.mp4
 #      SKIP_CAPTURE=1 scripts/video/make_video.sh   # regrava com o demo.json já commitado

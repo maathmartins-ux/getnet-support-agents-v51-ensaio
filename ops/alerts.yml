@@ -1,4 +1,5 @@
-# Regras de alerta do Prometheus provisionadas (feedback v2, 31/10/2026: "alertas só documentados").
+# Regras de alerta do Prometheus provisionadas com o compose, não só documentadas: regra que o Prometheus não
+# carrega nunca dispara.
 # Cada alerta exige ação humana e tem histerese (`for:`), para não oscilar: alerta barulhento é desligado
 # e deixa de proteger. Os nomes de métrica são os de GET /metrics; tests/test_alerts.py garante que existem.
 groups:

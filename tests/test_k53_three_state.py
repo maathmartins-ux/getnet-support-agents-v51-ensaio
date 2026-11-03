@@ -1,8 +1,8 @@
-"""K53: resposta do faq em três estados (contrato v5.3): ok | partial | insufficient.
+"""K53: resposta do faq em três estados: ok | partial | insufficient.
 
-V5: 40 das 49 falhas de escalada foram escaladas sem precisar; a resposta que cobria parte da pergunta virava
-NOT_IN_SOURCES e ia ao humano inteira. partial responde o que a fonte cobre e diz o que falta (não escala por si);
-NOT_IN_SOURCES fica para "nada coberto".
+Com só dois estados, 40 das 49 falhas de escalada foram escaladas sem precisar: a resposta que cobria parte da
+pergunta virava NOT_IN_SOURCES e ia ao humano inteira. partial responde o que a fonte cobre e diz o que falta
+(não escala por si); NOT_IN_SOURCES fica para "nada coberto".
 """
 import json
 from typing import get_args

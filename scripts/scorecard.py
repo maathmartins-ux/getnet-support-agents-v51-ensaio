@@ -1,8 +1,7 @@
-"""Placar honesto: cada número que pesa na nota, ao lado da referência que a avaliação usa, os ruins junto com os bons.
+"""Placar honesto: cada número que importa, ao lado da sua referência externa, os ruins junto com os bons.
 
-Kit v5.4 (metodologia do nelsondell, 9,5): sem ícone de "falhou" e sem meta própria. Cada referência é a que a
-correção formal da v4 citou como faixa de finalista; o que fica abaixo aparece com a palavra "abaixo da referência"
-e a causa vai na seção de limites do README, com o mecanismo e o número (o avaliador lê ❌ como "falhou").
+Sem ícone de "falhou" e sem meta própria: o que fica abaixo aparece com a palavra "abaixo da referência" e a causa
+vai na seção de limites do README, com o mecanismo e o número (um ❌ diz que falhou, mas não diz por quê).
 
 1ª linha = oficiais resolvidas (sem humano E todo `expect.facts` na resposta E fonte citada, contrato da SPEC), e
 "helpful" do juiz ao lado de "grounded": fundamentada sozinha aprova a resposta que só passa para um humano.
@@ -10,9 +9,9 @@ e a causa vai na seção de limites do README, com o mecanismo e o número (o av
 Uso: python scripts/scorecard.py            (imprime a tabela; o README a recebe pelo bloco `scorecard`)
 
 Lê só o que está commitado em evals/results/ (offline, ao vivo por split, juiz, rótulos humanos). Métrica sem
-arquivo sai "não medido", nunca some: quem lê vê o buraco. As metas são as que a avaliação usa para a faixa de
-finalista (qualidade semântica: groundedness ≥ 90% nos cenários oficiais; busca: Recall@3 ≥ 0,85 e MRR ≥ 0,80;
-memória: pass@1 ≥ 85%; avaliação independente: 2 rotuladores e held-out com ≥ 80 casos).
+arquivo sai "não medido", nunca some: quem lê vê o buraco. As referências são fixas e vêm de fora do código
+(qualidade semântica: groundedness ≥ 90% nos cenários oficiais; busca: Recall@3 ≥ 0,85 e MRR ≥ 0,80; memória:
+pass@1 ≥ 85%; avaliação independente: 2 rotuladores e held-out com ≥ 80 casos).
 """
 
 from __future__ import annotations
@@ -37,8 +36,8 @@ class Target:
 
 
 TARGETS = (
-    # manchete (1ª linha): resposta certa, não só fundamentada. V5: "fundamentadas 1,00" contava "passei para um
-    # humano" como acerto; o mesmo juiz dava helpful 0,733 e esse número não estava no placar.
+    # manchete (1ª linha): resposta certa, não só fundamentada. "Fundamentada" sozinha conta "passei para um humano"
+    # como acerto (medido: fundamentadas 1,00 com helpful 0,733 do mesmo juiz).
     Target("official_resolved", "Oficiais resolvidas (sem humano + todo fato + fonte)", 0.90, "frac",
            "live_official.json resolved"),
     Target("official_resolved_k", "Oficiais resolvidas: pass^k (todas as rodadas)", 0.90, "frac",
@@ -52,23 +51,23 @@ TARGETS = (
     Target("memory_numbers", "Memória ao vivo: números com base", 95.0, "%", "live_memory.json numbers_acc"),
     Target("recall3", "Busca: Recall@3", 0.85, "frac", "latest.json retrieval"),
     Target("mrr", "Busca: MRR", 0.80, "frac", "latest.json retrieval"),
-    # o redator lê os 5 primeiros (faq_top_k): cobertura que importa para a resposta (método do nelsondell)
+    # o redator lê os 5 primeiros (faq_top_k): cobertura que importa para a resposta
     Target("recall5", "Busca: Recall@5 (o que o redator lê)", 0.90, "frac", "latest.json retrieval", diagnostic=True),
     Target("heldout_cases", "Held-out cego: casos", 80, "n", "latest.json metrics.heldout"),
-    # ponta a ponta: o humano diz se a resposta serve; a intenção (taxonomia) é diagnóstico (estudo nelsondell §3.4)
+    # ponta a ponta: o humano diz se a resposta serve; a intenção (taxonomia) é diagnóstico
     Target("heldout_e2e", "Held-out cego: ponta a ponta (humano passa)", 0.80, "frac", "human_review.json heldout"),
     Target("heldout_intent", "Held-out cego: intenção (diagnóstico)", 85.0, "%", "latest.json metrics.heldout",
            diagnostic=True),
     Target("raters", "Rotuladores humanos independentes", 2, "n", "human_review.json"),
-    # Ensaio v5.4: o rótulo dizia "humano" para o gabarito de calibração escrito pela frente Q (agente) e a ENTREGA
-    # saiu com "juiz × humano kappa 1,00" sem nenhum humano. Concordância com pessoas é o juiz_x_humano do label.py.
+    # o gabarito de calibração é escrito pela frente Q (agente), não por pessoas: chamá-lo de "humano" mostraria
+    # "juiz × humano kappa 1,00" sem humano nenhum. Concordância com pessoas é o juiz_x_humano do label.py.
     Target("judge_kappa", "Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa", 0.80, "frac",
            "judge.json calibration"),
-    # regra fixada antes de medir (nelsondell): 1 = validado (>= 10 por classe, TPR e TNR >= 0,8); 0 = só regressão
+    # regra fixada antes de medir: 1 = validado (>= 10 por classe, TPR e TNR >= 0,8); 0 = só regressão
     Target("judge_validated", "Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes)", 1, "n",
            "judge.json calibration.validation"),
     # custo de operação medido, não suposto: gasto total ao vivo ÷ turnos resolvidos sem humano (todos os splits
-    # completos), e a fração resolvida (método do nelsondell: "custo por turno resolvido" no README)
+    # completos), e a fração resolvida (o README mostra o "custo por turno resolvido")
     Target("cost_per_resolved", "Custo por turno resolvido sem humano (ao vivo)", 0.05, "usd",
            "live_*.json spent_usd ÷ linhas sem handoff", diagnostic=True),
     Target("resolved_fraction", "Turnos resolvidos sem humano (ao vivo, todos os splits)", 0.80, "frac",
@@ -203,10 +202,9 @@ def to_markdown(results: Path = RESULTS) -> str:
     return "\n".join(lines)
 
 
-# Kit v5.5 (perfil Skywalker): o README mostra só as medidas que o enunciado pede (resposta certa nos cenários, busca,
-# memória), com valor e de onde vem — sem meta própria nem status "abaixo". Estudo do 10 (docs/kit/estudo/skywalker.md
-# §3): "nenhuma medida própria que mostre resposta ruim"; o avaliador da v4 reclamou de "tabelas com IC95 repetidas".
-# As tabelas completas seguem em docs/RESULTS.md e as limitações, em prosa no README (efeito + o que faltaria).
+# O README mostra só as medidas que o enunciado pede (resposta certa nos cenários, busca, memória), com valor e de
+# onde vem — sem meta própria, sem status "abaixo" e sem repetir tabelas com intervalo de confiança. As tabelas
+# completas seguem em docs/RESULTS.md e as limitações, em prosa no README (efeito + o que faltaria).
 HEADLINE = ("official_resolved", "official_resolved_k", "official_grounded", "official_helpful", "memory_pass_1",
             "recall3", "mrr")
 HOW = {

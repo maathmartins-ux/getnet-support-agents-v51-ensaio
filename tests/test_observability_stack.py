@@ -1,4 +1,4 @@
-"""Painel do Grafana, Prometheus e /ui (v5): o dashboard só usa métricas que o código EMITE, o compose tem o perfil
+"""Painel do Grafana, Prometheus e /ui: o dashboard só usa métricas que o código EMITE, o compose tem o perfil
 `observability` e a tela do lojista é estática, sem CDN e sem token embutido."""
 import json
 import re

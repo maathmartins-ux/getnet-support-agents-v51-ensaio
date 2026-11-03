@@ -1,7 +1,7 @@
 # ADR 0004 — Buscador escolhido por medida com teto de latência E de RAM; eval ao vivo num processo só
 
 Status: aceito no kit v5.1 (02/11/2026), frente R2. Complementa a escolha medida da frente R
-(`run_evals --choose-retriever`, `data/retriever.json`).
+(`run_evals --choose-retriever --apply`, que grava a escolha em data/retriever.json).
 
 **Contexto.** Na bancada da v4 (corpus de 395 trechos depois do dedupe, gold de 50 perguntas com fonte e 16 sem),
 o denso e5-large com rerank local foi o melhor buscador medido, e também o mais pesado: um processo com e5-large +
@@ -14,7 +14,7 @@ configuração que não cabe na memória.
 - `choose()` aceita só configuração com p95 por consulta ≤ `--latency-budget-ms` (padrão 1500) **e** RAM ≤
   `--ram-budget-mb` (padrão 4096; 0 desliga) **e** portão que recusa ≥ 85% das perguntas sem fonte; entre elas, maior
   MRR. A RAM de cada configuração é medida no próprio comparativo: o processo antes do 1º modelo + o RSS que cada
-  modelo dela somou ao carregar. `data/retriever.json` grava os dois tetos e a RAM de cada linha.
+  modelo dela somou ao carregar. A escolha gravada (data/retriever.json) traz os dois tetos e a RAM de cada linha.
 - 4096 MB por processo: API + eval ao vivo cabem em 8 GB, metade da máquina, com a outra sessão ao lado.
 - O eval ao vivo roda todos os splits num processo só (`run_evals --live --splits a,b,c`), cada um com a sua cota,
   arquivo e cassete; os modelos carregam uma vez. `live_eval.sh` e `live_eval.ps1` usam esse modo sempre.
@@ -23,7 +23,7 @@ configuração que não cabe na memória.
 - `--choose-retriever --fast` mede só 3 configurações (bm25, dense[e5-large], dense[e5-large] + bge-m3-int8 com
   pool 10 e 600 caracteres por trecho), e `scripts/fetch_models.py --fast` baixa os dois modelos no T+0.
 
-**Prova** (bancada da v4, CPU de 4 vCPU compartilhada; arquivos em `docs/kit/ensaio/r2/`).
+**Prova** (medida antes do relógio, CPU de 4 vCPU compartilhada).
 
 | configuração | Recall@3 | MRR | p95 ms | RAM estimada MB |
 |---|---:|---:|---:|---:|

@@ -1,7 +1,7 @@
 """A §3 do README (cobertura da régua) só cita o que existe: arquivo citado existe, teste citado está definido.
 
-O avaliador da v1 (30/10/2026) não rodou o código nem assistiu ao vídeo; a nota veio do que ele leu. Um
-caminho quebrado no mapa de evidências custa exatamente a confiança que o mapa deveria dar.
+Quem lê o README nem sempre roda o código: um caminho quebrado no mapa de evidências custa exatamente a
+confiança que o mapa deveria dar.
 """
 import re
 from pathlib import Path

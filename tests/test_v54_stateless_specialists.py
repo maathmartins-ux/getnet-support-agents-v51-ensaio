@@ -1,4 +1,4 @@
-"""Kit v5.4: especialistas sem estado recebem a pergunta reescrita pelo router (metodologia Skywalker/nelsondell)."""
+"""Especialistas sem estado recebem a pergunta reescrita pelo router, completa, em vez do histórico da conversa."""
 from app import agents
 from app.agents import Context
 from app.domain import prompt

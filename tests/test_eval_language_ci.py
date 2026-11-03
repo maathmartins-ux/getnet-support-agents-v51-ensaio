@@ -1,7 +1,7 @@
-"""Itens 5 e 6: idioma medido no TEXTO da resposta e intervalo de confiança de Wilson em toda taxa.
+"""Idioma medido no TEXTO da resposta e intervalo de confiança de Wilson em toda taxa.
 
-Getnet v3 (31/10/2026): 4 de 89 respostas ao vivo saíram no idioma errado e language_acc mostrava 100%,
-porque conferia o campo declarado `language`, não o texto.
+language_acc não pode conferir só o campo declarado `language`: numa rodada ao vivo, 4 de 89 respostas saíram
+no idioma errado e a métrica lida do campo mostrava 100%.
 """
 import json
 

@@ -503,10 +503,11 @@ def route(text: str, history: list[dict]) -> RoutedDecision:
 def _own_company_guard(decision: RoutedDecision, text: str) -> RoutedDecision:
     """Pergunta sobre a PRÓPRIA empresa nunca fica numa intenção que não escala (ex.: `general`).
 
-    Ensaio de 03/11 (replan ao vivo): "Getnet stock price target", "a Getnet patrocina time de várzea?" e "salary of
-    a Getnet sales rep" iam ao `general` (NO_ESCALATION): o faq respondia pela web e o caso sem fonte nunca chegava ao
-    humano. O domínio declara `OWN_COMPANY` (regex do nome da empresa) e `OWN_COMPANY_INTENT` (padrão "knowledge"):
-    a busca na base decide e, sem fonte, o supervisor escala. Clima, câmbio e notícia sem o nome seguem no general.
+    Sem esta guarda (medido ao vivo, com replan), "Getnet stock price target", "a Getnet patrocina time de várzea?" e
+    "salary of a Getnet sales rep" iam ao `general` (NO_ESCALATION): o faq respondia pela web e o caso sem fonte nunca
+    chegava ao humano. O domínio declara `OWN_COMPANY` (regex do nome da empresa) e `OWN_COMPANY_INTENT` (padrão
+    "knowledge"): a busca na base decide e, sem fonte, o supervisor escala. Clima, câmbio e notícia sem o nome
+    seguem no general.
     """
     d = domain.active()
     pattern = getattr(d, "OWN_COMPANY", None)

@@ -65,7 +65,7 @@ def test_single_candidate_skips_the_llm():
 
 
 def test_llm_rerank_only_when_asked(monkeypatch):
-    """O rerank por LLM não muda o Recall@3 medido (Getnet v4) e custa latência: com LLM real ele NÃO liga sozinho;
+    """O rerank por LLM não mudou o Recall@3 medido e custa latência: com LLM real ele NÃO liga sozinho;
     só RERANK=llm o liga, e RERANK=off/auto sem escolha medida deixam o base."""
     assert not isinstance(get_retriever(), RerankRetriever)  # conftest: LLM_PROVIDER=offline (CI determinístico)
     monkeypatch.setenv("LLM_PROVIDER", "anthropic")

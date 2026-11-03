@@ -1,8 +1,8 @@
 """Dado ao vivo resolvido no código (PTAX do Banco Central e Open-Meteo), com HTTP trocado por mock.
 
-Getnet v4: clima e câmbio vinham da busca web, que cifra o corpo da página; o número da resposta não aparecia na
-evidência e a checagem numérica o acusava (numbers_acc 64-80% ao vivo). Aqui a resposta e a evidência vêm da mesma
-chamada de API, então todo número da resposta tem base.
+Pela busca web, que cifra o corpo da página, o número de clima ou câmbio não aparece na evidência e a checagem
+numérica o acusa (numbers_acc ficava em 64-80% ao vivo). Aqui a resposta e a evidência vêm da mesma chamada de API,
+então todo número da resposta tem base.
 """
 from datetime import date
 
@@ -96,7 +96,7 @@ def test_flag_off_and_unrelated_questions_skip_the_api(monkeypatch):
     ("And in Curitiba?", "Is it going to rain in Porto Alegre tomorrow?", "Curitiba amanhã"),
 ])
 def test_elliptical_followup_keeps_the_live_source(text, previous, expect):
-    """Seguimento de câmbio/clima usa a API oficial, não a busca web (ensaio v5.1: 4 casos de memória caíam na web)."""
+    """Seguimento elíptico de câmbio/clima ("E a do dólar?") continua na API oficial e não cai na busca web."""
     q = live_data.followup_query(text, previous)
     assert q and expect in q
 
@@ -137,7 +137,7 @@ def test_transient_errors_are_retried(monkeypatch):
 def test_rate_limit_is_not_retried_and_the_whole_lookup_has_a_deadline(monkeypatch):
     """429 não se repete (o limite não some em ms) e a consulta inteira tem teto: a busca web assume mais cedo.
 
-    Ensaio v5.1: clima com timeout/429 levou o live_data a 5–11 s antes de cair na busca web.
+    Sem o teto, clima com timeout/429 levava o live_data a 5–11 s antes de cair na busca web.
     """
     import httpx
 

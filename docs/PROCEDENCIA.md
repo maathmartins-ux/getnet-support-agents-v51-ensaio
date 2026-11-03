@@ -45,7 +45,7 @@ correspondente no kit e se ela foi feita **antes** do relógio (kit) ou **no** r
 | Item da correção da v4 | Mudança | Onde | Quando |
 |---|---|---|---|
 | 1. respostas oficiais sem fundamento (juiz 60%) | juiz recebe o texto que o redator viu; cartão de capacidades; checagem por frase; dado ao vivo de API oficial | `evals/context.py`, `src/app/capabilities.py`, `src/app/claims.py`, `src/app/live_data.py` | kit |
-| 1. idem, a correção caso a caso das respostas DESTE enunciado | reprovações do juiz lidas uma a uma e corrigidas na causa | commits `fix:` e `docs/JUDGE_DIFF.md` | relógio |
+| 1. idem, a correção caso a caso das respostas DESTE enunciado | reprovações do juiz lidas uma a uma e corrigidas na causa | commits `fix:` e a diferença do juiz entre as rodadas (judge_diff) | relógio |
 | 2. busca fraca (Recall@3 0,49) | denso + rerank local, tabelas inteiras, dedupe, escolha por medida | `src/app/rag.py`, `src/app/ingest.py` | kit |
 | 2. idem, corpus, glossário e gold DESTE enunciado | páginas, glossário, gold por passagem essencial | `data/`, `evals/retrieval.d/` | relógio |
 | 3. memória (pass@1 54%) | livro de fatos, números do histórico, seguimento elíptico | `src/app/memory.py`, `src/app/followup.py` | kit |
@@ -84,7 +84,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 5 | 3 | 1 |
 | `Makefile` | 38 | 0 | 0 | 0 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 135 | 38 | 1 |
+| `README.md` | 319 | 137 | 38 | 1 |
 | `data` | 34 | 45 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
 | `data/intent_examples.d` | 0 | 26 | 0 | 0 |
@@ -115,7 +115,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 556 | 12 | 8 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **8254** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 38. Fora da conta, por serem gerados: 132574 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **8256** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 38. Fora da conta, por serem gerados: 132574 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

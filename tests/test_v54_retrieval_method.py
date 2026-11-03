@@ -1,4 +1,4 @@
-"""Kit v5.4: placar de busca pelo método do nelsondell (top-5 do redator, rank do 1º gold, origem, caminho)."""
+"""Placar de busca medido no que o redator recebe: top-5, rank do 1º gold, origem do gold e caminho da busca."""
 from evals import retrieval_eval, run_evals
 
 

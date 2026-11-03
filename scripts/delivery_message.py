@@ -6,8 +6,8 @@ A mensagem tem três partes fixas, nesta ordem, e nenhuma pode ser apagada:
 1. o que o sistema faz e onde rodar;
 2. o placar inteiro (scripts/scorecard.py), com as métricas abaixo da referência escritas por extenso;
 3. a procedência do kit (docs/PROCEDENCIA.md) e os minutos do relógio.
-Destacar só os números bons e omitir os ruins, que estão no próprio README, custa nota de julgamento: a mensagem
-sai com os dois ou não sai.
+Destacar só os números bons e omitir os ruins, que estão no próprio README, faria a mensagem contradizer o
+repositório: ela sai com os dois ou não sai.
 """
 
 from __future__ import annotations
@@ -23,9 +23,9 @@ from scripts.timesheet import commits, scaffold_time, tag_time  # noqa: E402
 
 
 def minutes(root: Path = ROOT) -> int | None:
-    """Do scaffold (ou clock-start) ao último commit QUE JÁ EXISTE. Ensaio de 03/11: a mensagem gerada no T+41 dizia
-    "41 min do primeiro ao último commit" e o relógio fechou no T+47; o texto que vai ao dono sai do `make final`
-    (var/ENTREGA_final.md), DEPOIS do último commit."""
+    """Do scaffold (ou clock-start) ao último commit QUE JÁ EXISTE. Gerada antes do fim, a mensagem subestima o
+    relógio (medido: "41 min do primeiro ao último commit" com o relógio fechando no T+47); por isso o texto que vai
+    ao dono sai do `make final` (var/ENTREGA_final.md), DEPOIS do último commit."""
     rows = commits(root)
     if not rows:
         return None
@@ -42,8 +42,8 @@ def head_sha(root: Path = ROOT) -> str:
 
 
 def render(repo: str, video: str | None, results: Path, mins: int | None) -> str:
-    # kit v5.5 (perfil Skywalker): só as medidas que o enunciado pede (scorecard.HEADLINE); as de diagnóstico do kit
-    # ficam em docs/RESULTS.md. Os ruins entre ELAS continuam listados (regra do dono: nada de esconder número ruim).
+    # só as medidas que o enunciado pede (scorecard.HEADLINE); as de diagnóstico ficam em docs/RESULTS.md. Os ruins
+    # entre ELAS continuam listados: nenhum número ruim fica de fora.
     table = [r for r in scorecard.rows(results) if r["key"] in scorecard.HEADLINE]
     good = [r for r in table if r["status"] == "atinge"]
     weak = [r for r in table if r["status"] not in ("atinge", "diagnóstico")]

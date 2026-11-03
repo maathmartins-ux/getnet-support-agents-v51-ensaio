@@ -1,8 +1,8 @@
 """Ação pendente leva os argumentos propostos no resultado (evidência dos números e leitura do operador).
 
-Getnet v3 (31/10/2026), approval-06: "Preparei a proposta para antecipar R$ 5.000,00 (ação A-...)" foi marcado
-como número sem base. O valor era o argumento da tool, mas o resultado pendente só tinha
-{needs_confirmation, action_id, risk}: a evidência (json do resultado) não continha o 5000.
+Sem os argumentos, "Preparei a proposta para antecipar R$ 5.000,00 (ação A-...)" é marcado como número sem base:
+o valor é argumento da tool, mas um resultado pendente só com {needs_confirmation, action_id, risk} deixa a
+evidência (json do resultado) sem o 5000.
 """
 import json
 

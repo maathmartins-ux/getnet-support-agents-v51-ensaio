@@ -1,9 +1,9 @@
-"""Itens 1 e 2 da auditoria da Getnet v3 (31/10/2026): isolamento entre casos e Store aquecido antes da leva.
+"""Isolamento entre casos do eval e Store aquecido antes da leva paralela.
 
-1. Todos os casos usam o mesmo user_id num banco só; a memória de longo prazo é por usuário, então um caso
-   citou o valor de outro. Cada caso precisa começar sem a memória dos anteriores, sem trocar o user_id
+1. Todos os casos usam o mesmo user_id num banco só e a memória de longo prazo é por usuário: sem isolamento, um
+   caso cita o valor de outro. Cada caso precisa começar sem a memória dos anteriores, sem trocar o user_id
    (o CRM é por usuário: trocar o id quebraria as tools).
-2. A 1ª leva paralela criava o Store dentro dos workers: "database is locked" nos primeiros casos.
+2. Criado dentro dos workers, o Store da 1ª leva paralela dá "database is locked" nos primeiros casos.
 """
 import threading
 

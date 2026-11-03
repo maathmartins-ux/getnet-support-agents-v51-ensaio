@@ -87,7 +87,7 @@ def test_write_action_needs_owner_confirmation_and_runs_once():
     done = client.post(f"/actions/{action}/confirm", headers=auth("u1")).json()
     assert done["ok"] and {k: done["data"][k] for k in ("record_id", "status")} == {"record_id": "1001",
                                                                                    "status": "cancel_requested"}
-    assert done["data"]["changed"] == {"status": ["entregue", "cancel_requested"]}  # antes/depois (kit v5.4)
+    assert done["data"]["changed"] == {"status": ["entregue", "cancel_requested"]}  # antes/depois da escrita
     assert client.post(f"/actions/{action}/confirm", headers=auth("u1")).json()["error"] == "already_done"
 
 

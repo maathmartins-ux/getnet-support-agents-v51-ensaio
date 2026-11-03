@@ -1,7 +1,7 @@
 """Item 3 — generalização offline: k-NN de TF-IDF (n-gramas de caractere 3-5) quando nenhuma regra casa.
 
-Origem: v3 (31/10/2026). O roteador offline era regex sobre texto literal: 50% no held-out cego, 41,7% no hard.
-Paráfrase sem a palavra da regra ("my approved sales", "minha maquininha não liga") virava a intenção padrão.
+Só com regex sobre texto literal, o roteador offline acertava 50% no held-out cego e 41,7% no hard: paráfrase sem
+a palavra da regra ("my approved sales", "minha maquininha não liga") virava a intenção padrão.
 """
 import json
 

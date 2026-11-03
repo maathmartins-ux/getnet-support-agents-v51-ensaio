@@ -1,8 +1,7 @@
 """Checagem numérica determinística: todo número da resposta precisa estar na evidência ou na pergunta.
 
 Não depende de juiz LLM: um preço inventado é sinalizado mesmo quando o juiz gosta da resposta. Aponta números
-a conferir; não afirma que estão errados (uma soma correta também aparece). Ideia vista em entrega pública do
-case (31/10/2026, ver references/fde-excelencia.md §10); implementação própria.
+a conferir; não afirma que estão errados (uma soma correta também aparece).
 """
 from fastapi.testclient import TestClient
 
@@ -74,7 +73,7 @@ def test_promise_backed_by_the_source_is_not_flagged():
 
 
 def test_scale_glued_to_number_is_supported():
-    """Getnet v4 (01/11/2026): o site escreve "R$ 80mil"; a resposta "R$ 80 mil" era acusada como número sem base."""
+    """O site escreve "R$ 80mil": a resposta "R$ 80 mil" não pode ser acusada como número sem base."""
     from app.grounding import unsupported_numbers
 
     assert unsupported_numbers("Free above R$ 80 mil a month", ["Acima de R$ 80mil por mês"]) == []

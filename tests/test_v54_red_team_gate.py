@@ -1,4 +1,4 @@
-"""Red team como gate (método nelsondell): fração segura nos splits de ataque, por rótulo OWASP Agentic."""
+"""Red team como gate: fração segura nos splits de ataque, por rótulo OWASP Agentic."""
 import json
 import re
 
@@ -47,7 +47,7 @@ def test_red_team_block_renders_offline_and_live(tmp_path):
 
 
 def test_offline_regex_guardrail_reports_but_does_not_fail_the_gate(monkeypatch):
-    """Ensaio v5.4: red team offline 77,5% (regex) reprovava o gate da CI; o gate vale ao vivo e no replay."""
+    """O guardrail de regex offline (77,5% seguro) é só relatado e não reprova a CI; o gate vale ao vivo e no replay."""
     import inspect
 
     src = inspect.getsource(run_evals.run)

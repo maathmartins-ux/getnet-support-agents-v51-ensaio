@@ -1,8 +1,8 @@
-"""Escalada só com motivo real (kit v5.3 final): falta parcial ou de um só especialista vira OFERTA do humano.
+"""Escalada só com motivo real: falta parcial ou de um só especialista vira OFERTA do humano.
 
-Pós-morte V5: 40 de 49 falhas de handoff eram escalada sem precisar; Skywalker (nota 10) só leva ao humano decisão de
-caso, risco ou pedido do cliente. Ensaio v5.3: heldout 7, memory 8 e dependent 3 linhas ainda escalavam por
-faq_not_in_sources / records_no_data.
+Sem esta regra, 40 de 49 falhas de handoff eram escalada sem precisar. Só vão ao humano decisão de caso, risco ou
+pedido do cliente; faq_not_in_sources / records_no_data sozinhos não escalam (antes ainda escalavam 7 linhas do
+heldout, 8 do memory e 3 do dependent).
 """
 import pytest
 

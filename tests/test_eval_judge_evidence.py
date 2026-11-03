@@ -1,6 +1,6 @@
-"""Item 4: juiz cego para dados de ferramenta (Getnet v3, 31/10/2026).
+"""Juiz que enxerga os dados de ferramenta, não só os trechos do RAG.
 
-O juiz só recebia os trechos do RAG: 46 de 47 respostas "não grounded" usavam dado do CRM ou da web. Cada
+Lendo só os trechos do RAG, o juiz marcou 46 de 47 respostas "não grounded" que usavam dado do CRM ou da web. Cada
 linha do eval grava a evidência que a API devolve (tools chamadas, fontes com título/URL e, quando o
 contrato trouxer, o texto da evidência), e o juiz recebe isso como "Dados de ferramenta".
 """

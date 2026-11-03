@@ -1,6 +1,6 @@
-"""v5 — ablação por CONCLUSÃO de tarefa: completed_acc com × sem replanejamento por achado (split dependent).
+"""Ablação por CONCLUSÃO de tarefa: completed_acc com × sem replanejamento por achado (split dependent).
 
-A ablação da v4 (93% × 0%) era 0 por construção: o split replan só mede "escalou após falha". Aqui o modo
+Medida no split replan, a ablação (93% × 0%) dá 0 por construção: esse split só mede "escalou após falha". Aqui o modo
 no_needs mantém a reação à falha e desliga só o achado; o caso de controle (pedido já entregue) completa nos dois.
 """
 import json

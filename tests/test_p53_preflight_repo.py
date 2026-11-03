@@ -1,4 +1,4 @@
-"""Pré-voo confere o repositório da tentativa (pós-morte V5, T1): ramo padrão `main` e kit vindo de `kit-fonte`.
+"""Pré-voo confere o repositório da tentativa: ramo padrão `main` e kit vindo de `kit-fonte`.
 
 Repositórios git temporários: um `origin` bare (com HEAD apontando para o ramo padrão) e o clone da sessão.
 """
@@ -83,7 +83,7 @@ def test_default_branch_read_from_the_remote_when_origin_head_is_missing(tmp_pat
 def test_kit_branch_not_consumed_fails(tmp_path):
     [problem] = preflight.check_repo(attempt_repo(tmp_path, consume=False))
     assert "não foi consumido" in problem and "scripts/preflight.py" in problem
-    assert "docs/kit" in problem  # a correção copia sem docs/kit
+    assert "docs/kit" in problem  # a instrução de conserto já tira docs/kit do índice
 
 
 def test_kit_branch_missing_and_no_scaffold_fails(tmp_path):

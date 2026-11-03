@@ -1,8 +1,8 @@
-"""E53 — `--calibrate-gate` por idioma (pós-morte V5, N2).
+"""E53 — `--calibrate-gate` por idioma.
 
-V5: o piso de cosseno 0,88 foi calibrado sem perguntas em inglês; no denso, com e sem fonte ficavam em 0,82–0,88 e 4
-oficiais em inglês foram recusadas pelo portão na rodada 1. A calibração agora mostra responde/recusa por idioma e
-avisa quando um idioma dos clientes não tem pergunta no gold.
+Um piso de cosseno (0,88) calibrado sem perguntas em inglês não separa nada no denso: com e sem fonte, as perguntas
+em inglês ficavam em 0,82–0,88, e 4 oficiais em inglês com fonte foram recusadas pelo portão. Por isso a calibração
+mostra responde/recusa por idioma e avisa quando um idioma dos clientes não tem pergunta no gold.
 """
 import json
 from types import SimpleNamespace as NS
@@ -30,7 +30,7 @@ def _gold(tmp_path, rows, table):
 
 def test_rates_per_language_show_the_threshold_that_refuses_english(tmp_path):
     rows, table = [], {}
-    for i in range(6):  # português com fonte: BM25 alto; inglês com fonte: BM25 baixo (o caso da V5)
+    for i in range(6):  # português com fonte: BM25 alto; inglês com fonte: BM25 baixo (o caso que a taxa única esconde)
         rows.append({"question": f"qual o prazo da maquininha {i}?", "relevant": ["doc"]})
         table[rows[-1]["question"]] = [("doc", 20.0)]
     for i in range(3):

@@ -8,20 +8,20 @@ Blocos (texto entre <!-- tag:begin --> e <!-- tag:end -->):
   eval-live  opcional    · evals/results/live_<split>.json, uma tabela por split
   judge      opcional    · evals/results/judge.json (juiz sobre o ao vivo + calibração, kappa)
   replan     opcional    · split `replan` do offline e do ao vivo + exemplos de replanejamento
-  since      opcional    · "Desde a última avaliação": lacuna da correção v4 → mudança do kit → prova (chaves do
-             placar de scripts/scorecard.py + teste do mecanismo)
+  since      opcional    · "Desde a última avaliação": lacuna citada → o que mudou → prova (chaves do placar de
+             scripts/scorecard.py + teste do mecanismo)
   kit        opcional    · git: linhas do scaffold declarado × linhas escritas no relógio, por pasta
   quickstart obrigatório no --check · o `curl` do "Como rodar" com a 1ª mensagem do split `official` de
-             evals/cases.jsonl (V5: o exemplo era "pedido 1002", sobra do domínio de exemplo do kit)
+             evals/cases.jsonl (sem isso o exemplo fica "pedido 1002", sobra do domínio de exemplo do kit)
 Arquivo ausente vira "não rodado" (declarado, não escondido). Idempotente: rodar duas vezes dá o mesmo arquivo.
 
 `--check` (roda no scripts/check.py): NÃO escreve; falha se os blocos de número do README não forem exatamente o
 que `evals/results/` COMMITADO gera, ou se a linha do tempo não tiver todos os commits (tolera só o último, o do
-próprio README). Getnet v3: a §5 vinha de um eval não commitado (replan 80% no README, 10% no JSON) e a linha do
-tempo parou antes do último commit ("50 min" em vez de 54). Também falha se faltar um dos títulos que o enunciado
-pede que o README cubra (REQUIRED_HEADINGS) ou o bloco quickstart.
-Linha do tempo: `{{`/`}}` e `|` dos títulos de commit são neutralizados (V5: um título com `{{N}}` virou marcador de
-modelo no README e o check ficou vermelho).
+próprio README). Sem esta conferência a §5 já veio de um eval não commitado (replan 80% no README, 10% no JSON) e
+a linha do tempo parou antes do último commit ("50 min" em vez de 54). Também falha se faltar um dos títulos que o
+enunciado pede que o README cubra (REQUIRED_HEADINGS) ou o bloco quickstart.
+Linha do tempo: `{{`/`}}` e `|` dos títulos de commit são neutralizados (sem isso, um título com `{{N}}` vira
+marcador de modelo no README e o check fica vermelho).
 """
 from __future__ import annotations
 
@@ -102,7 +102,8 @@ def judge_block(results: Path) -> str:
     for split, s in {**j.get("by_split", {}), "ALL": j}.items():
         lines.append(f"| {split} | {s['cases']} | {s['grounded_rate']}{ci(s, 'grounded_rate')} | "
                      f"{s['helpful_rate']}{ci(s, 'helpful_rate')} | {s['mean_score']} |")
-    lines += ["", f"Calibração humana: {cal.get('cases')} rótulos · concordância **{cal.get('agreement')}**"
+    lines += ["", f"Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): {cal.get('cases')} rótulos"
+              f" · concordância **{cal.get('agreement')}**"
               f"{ci(cal, 'agreement')} · kappa de Cohen **{cal.get('cohen_kappa')}** · TPR {cal.get('tpr')}"
               f"{ci(cal, 'tpr')} ({cal.get('positives')} grounded) · TNR {cal.get('tnr')}{ci(cal, 'tnr')} "
               f"({cal.get('negatives')} não grounded) · discordâncias: {', '.join(cal.get('misses', [])) or '—'}"]
@@ -180,7 +181,7 @@ def replan_block(results: Path) -> str:
         (f"ao vivo ({f.name})", _load(f)) for f in sorted(results.glob("live_*.json"))] + [
         ("offline SEM replanejamento", _load(results / "ablation_replan.json")),
         ("ao vivo SEM replanejamento", _load(results / "ablation_replan_live.json"))]
-    # rota (agentes certos, método do Skywalker) e desfecho ao lado do rótulo da intenção (diagnóstico)
+    # rota (agentes certos) e desfecho ao lado do rótulo da intenção (diagnóstico)
     keys = ("replanned_acc", "handoff_acc", "handoff_outcome_acc", "route_acc", "intent_acc")
     lines = ["| fonte | casos | " + " | ".join(keys) + " |", "|---|---:|" + "---:|" * len(keys)]
     examples: list[str] = []
@@ -229,12 +230,13 @@ def _numstat(root: Path, a: str, b: str) -> list[tuple[int, int, str]]:
     return rows
 
 
-# Arquivos gerados não contam como "escrito no relógio": a v3 dizia 72% com 21.909 linhas de JSON de resultado.
+# Arquivos gerados não contam como "escrito no relógio": contadas, 21.909 linhas de JSON de resultado inflavam a
+# fração para 72% (medido).
 GENERATED = ("evals/results/",)
 
 
 def kit_block(root: Path = ROOT) -> str:
-    """Quanto veio do kit declarado e quanto foi escrito no relógio, medido pelo git (pergunta 5 do feedback v2)."""
+    """Quanto veio do kit declarado e quanto foi escrito no relógio, medido pelo git."""
     r = subprocess.run(["git", "log", "--reverse", "--format=%H|%s"], cwd=root, check=False, text=True,
                        capture_output=True, encoding="utf-8")
     commits = [line.split("|", 1) for line in r.stdout.splitlines() if "|" in line]
@@ -324,9 +326,9 @@ def scorecard_block(results: Path) -> str:
     return scorecard.headline_markdown(results)
 
 
-# "Desde a última avaliação": cada lacuna que a correção formal da v4 citou (nas palavras dela) → o que o kit mudou →
-# a prova medida, lida das MESMAS chaves do placar (scripts/scorecard.py) e do teste que prova o mecanismo. Gerado:
-# o número nunca é digitado, e o que não foi medido aparece como "não medido".
+# Bloco `since`: cada lacuna (com o número de antes) → o que mudou → a prova medida, lida das MESMAS chaves do placar
+# (scripts/scorecard.py) e do teste que prova o mecanismo. Gerado: o número nunca é digitado, e o que não foi medido
+# aparece como "não medido".
 SINCE = (
     ("Respostas oficiais: fundamentadas 60%, números 80%, pass^3 70%",
      "manchete **oficiais resolvidas** (sem humano + todo fato + fonte); toda frase e todo número conferidos contra "
@@ -368,7 +370,7 @@ def retrieval_block(results: Path, data: Path | None = None) -> str:
 
     chosen = _load((data or ROOT / "data") / "retriever.json")
     if not chosen:
-        return "_Não rodado: `python -m evals.run_evals --choose-retriever --apply` grava data/retriever.json._"
+        return "_Não rodado: buscador padrão do kit (denso + cross-encoder); `make compare` compara as alternativas._"
     budget = chosen.get("latency_budget_ms")
     return (f"Gold `{chosen.get('gold')}`, medido em {chosen.get('chosen_at')} (commit `{chosen.get('git_sha')}`), "
             f"CPU, sem LLM. Critério: {chosen.get('criterion')}; orçamento p95 {budget:g} ms.\n\n"
@@ -395,7 +397,7 @@ def red_team_block(results: Path) -> str:
         o = (offline.get("by_asi") or {}).get(asi) or {}
         lv = live.get(asi)
         # id entre crases: a tabela do mapa (docs/SECURITY_ASI.md) é a dona das linhas "| ASI0N " e o teste conta as
-        # categorias por elas (ensaio de 03/11: este bloco duplicava as linhas e o test_security_asi reprovava a CI)
+        # categorias por elas (com "| ASI0N " aqui também, as linhas saem duplicadas e o test_security_asi reprova)
         rows.append(f"| `{asi}` | {o.get('cases', '—')} | "
                     + (f"{o['safe_rate']:.0%}" if o else "—") + " | "
                     + (f"{sum(lv) / len(lv):.0%} (n={len(lv)})" if lv else "—") + " |")
@@ -440,7 +442,8 @@ def _block(text: str, tag: str) -> str | None:
 
 
 # o commit do próprio README pode não estar na linha do tempo
-README_ONLY = {"README.md", "ESTADO.md", "docs/RESULTS.md", "docs/PROCEDENCIA.md", "docs/SECURITY_ASI.md"}
+README_ONLY = {"README.md", "ESTADO.md", "docs/RESULTS.md", "docs/PROCEDENCIA.md", "docs/SECURITY_ASI.md",
+               "docs/ENTREGA.md"}
 
 
 def check(readme: Path, results: Path, root: Path = ROOT) -> list[str]:

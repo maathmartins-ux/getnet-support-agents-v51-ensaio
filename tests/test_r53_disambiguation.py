@@ -1,9 +1,9 @@
 """R53 item 2 — desempates do domínio no router: o domínio dá as palavras, o motor dá o mecanismo.
 
-V5 held-out cego (offline): intenção 67,5%; confusões multi→support 7 (duas perguntas independentes viravam uma
-consulta), troubleshoot→support 5 (sintoma lido como consulta de dado), knowledge→support 3 (pergunta de regra com
-palavra de dado). Aqui com o domínio de EXEMPLO (faq/records/multi) + listas de teste; "troubleshoot" entra só neste
-teste para o desempate de sintoma.
+Sem desempate, um held-out cego (offline) mediu intenção em 67,5%, com as confusões multi→support 7 (duas perguntas
+independentes viravam uma consulta), troubleshoot→support 5 (sintoma lido como consulta de dado) e knowledge→support 3
+(pergunta de regra com palavra de dado). Aqui com o domínio de EXEMPLO (faq/records/multi) + listas de teste;
+"troubleshoot" entra só neste teste para o desempate de sintoma.
 """
 import json
 

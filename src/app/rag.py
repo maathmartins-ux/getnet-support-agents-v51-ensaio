@@ -88,7 +88,7 @@ class Doc:
     def head(self) -> str:
         """Cabeçalho indexado: o título; o contexto do ingest ("título › seção") só com RAG_CONTEXT=on.
 
-        Ensaio: com o contexto no índice, o Recall@3 das passagens essenciais caiu de 0,82 para 0,75 no corpus
+        Medido: com o contexto no índice, o Recall@3 das passagens essenciais caiu de 0,82 para 0,75 no corpus
         real de FAQ (o "› seção" de FAQ repete o mesmo rótulo em dezenas de trechos e puxa o vizinho errado). Ver
         app/ingest.py, `cut_on_section`.
         """
@@ -552,7 +552,7 @@ def _reason(exc: Exception) -> str:
 _FALLBACKS: dict[tuple, str] = {}  # (diretório, stamp, modelo, fusão) → motivo: lembrado para /health e o eval
 
 
-# lru_cache não impede misses simultâneos: no ensaio os agentes em paralelo chegavam enquanto o 1º índice denso
+# lru_cache não impede misses simultâneos: sem a trava, agentes em paralelo chegavam enquanto o 1º índice denso
 # ainda era montado (minutos de e5-large em CPU) e cada um montava outro, com mais ~1 GB por montagem, até 14 GB.
 _BUILD_LOCK = threading.RLock()
 
@@ -561,7 +561,7 @@ _BUILD_LOCK = threading.RLock()
 def _embedder_for(model: str) -> FastEmbedEmbedder:
     """Um modelo de embedding por processo, reaproveitado por todo índice novo.
 
-    Ensaio: cada mudança nos .jsonl do diretório de dados criava índice novo E carregava o e5-large de novo
+    Sem isto, cada mudança nos .jsonl do diretório de dados criava índice novo E carregava o e5-large de novo
     (~2 GB); com 4 índices no cache o eval offline chegou a 14 GB e foi morto por falta de memória.
     """
     return FastEmbedEmbedder(model)

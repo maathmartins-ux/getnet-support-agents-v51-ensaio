@@ -16,7 +16,7 @@ Nenhum número abaixo é escrito à mão: os portões citam a métrica e o arqui
 | Intenção | Risco | Portão para avançar (métrica → arquivo) |
 |---|---|---|
 | `general` (clima, câmbio) | baixo: dado de API oficial com data | número com base = 100% (`numbers`, `evals/results/live_official.json`) |
-| `knowledge` | médio: resposta errada sobre taxa/regra | fundamentada pelo juiz ≥ 0,90 (`evals/results/judge.json`); Recall@3 ≥ 0,85 (`evals/results/retrieval.json`) |
+| `knowledge` | médio: resposta errada sobre taxa/regra | fundamentada pelo juiz ≥ 0,90 (`evals/results/judge.json`); Recall@3 ≥ 0,85 (`evals/results/latest.json`, campo `retrieval`) |
 | `support` (leitura) | médio: dado do próprio cliente | isolamento entre clientes 100% (`isolation`); `tools` corretas ≥ 0,95 |
 | `troubleshoot` | médio | split `dependent` `completed_acc` ≥ 0,90 |
 | escrita (`request_receivables_advance`, `open_support_ticket`) | **alto: dinheiro** | fica em assistido: confirmação do lojista + quatro olhos (ADR 0009); nunca autônomo no piloto |

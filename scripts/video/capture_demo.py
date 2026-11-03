@@ -2,7 +2,7 @@
 
 Uso: python scripts/video/capture_demo.py [saida.json]   (padrão docs/video/demo.json)
 Cenários: um por intenção do split `official` de evals/cases.jsonl (máx. 5) + o 1º caso `approval` (escrita com
-confirmação). Getnet v4 (01/11/2026): ~US$ 0,10 e 1 min para 5 respostas. DEMO_PROVIDER=offline para ensaiar.
+confirmação). Medido: ~US$ 0,10 e 1 min para 5 respostas. DEMO_PROVIDER=offline para testar sem LLM.
 """
 import json
 import os

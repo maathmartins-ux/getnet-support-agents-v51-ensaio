@@ -1,7 +1,7 @@
-"""Idioma da resposta final (v5): diretiva em todo pedido de agente e UMA reescrita quando a saída vem no idioma errado.
+"""Idioma da resposta final: diretiva em todo pedido de agente e UMA reescrita quando a saída vem no idioma errado.
 
-Medido na Getnet v4 sobre o motor v5 (01/11/2026, LLM real): pergunta em inglês com um termo em português
-("receivables advance (antecipação)") e o câmbio do euro saíam em português; language_acc ao vivo 100% → 76,7%.
+Medido com LLM real e sem esta regra: pergunta em inglês com um termo em português ("receivables advance
+(antecipação)") e o câmbio do euro saíam em português; language_acc ao vivo 100% → 76,7%.
 """
 from fakes import fake_llm, resp, text
 

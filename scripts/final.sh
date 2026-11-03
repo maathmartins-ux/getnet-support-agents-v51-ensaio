@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Último commit da tentativa: README (e ESTADO.md) gerados por fill_readme, SOZINHOS no commit, e push.
+# Último commit da entrega: README (e ESTADO.md) gerados por fill_readme, SOZINHOS no commit, e push.
 #
-# Getnet v4 (01/11/2026): dois commits misturaram README com evals/results e a CI ficou vermelha ("linha do tempo
-# com 36 commits, o git tem 37"): a linha do tempo do README conta os commits, então o README precisa ser o ÚLTIMO
-# e o único arquivo do último commit. Qualquer commit depois disto exige rodar este script de novo.
+# A linha do tempo do README conta os commits, então o README precisa ser o ÚLTIMO e o único arquivo do último
+# commit: misturado com evals/results num commit seguido de outro, a CI fica vermelha ("linha do tempo com 36
+# commits, o git tem 37"). Qualquer commit depois disto exige rodar este script de novo.
 #
 # Uso: scripts/final.sh            # recusa se houver outra mudança sem commit
 set -euo pipefail
@@ -11,13 +11,18 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 PY="${PY:-python}"
 # os arquivos que o fill_readme gera (fill_readme.README_ONLY): a tabela da PROCEDENCIA conta as linhas do git e muda
-# a cada commit (ensaio de 03/11: ficava um commit atrás e a CI comparava com a versão velha)
-GENERATED='README\.md|ESTADO\.md|docs/RESULTS\.md|docs/PROCEDENCIA\.md|docs/SECURITY_ASI\.md'
+# a cada commit (gerada fora deste passo, fica um commit atrás e a CI compara com a versão velha)
+GENERATED='README\.md|ESTADO\.md|docs/RESULTS\.md|docs/PROCEDENCIA\.md|docs/SECURITY_ASI\.md|docs/ENTREGA\.md'
 dirty="$(git status --porcelain --untracked-files=no | grep -v -E " (${GENERATED})$" || true)"
 if [[ -n "$dirty" ]]; then
   echo "Commite antes o que não é README/ESTADO/docs gerados (o README tem de ser o último commit):"; echo "$dirty"; exit 1
 fi
 "$PY" scripts/fill_readme.py
+# a mensagem de entrega commitada sai com os números deste commit (gerada no T+44 ela ficava velha: memória e relógio)
+if [[ -f docs/ENTREGA.md ]]; then
+  REPO_URL="$(git remote get-url origin 2>/dev/null | sed -E 's#^git@github.com:#https://github.com/#; s#\.git$##; s#https://[^@/]*@#https://#')"
+  "$PY" scripts/delivery_message.py --repo "${REPO_URL:-<url do repo>}" --out docs/ENTREGA.md > /dev/null && git add docs/ENTREGA.md
+fi
 git add README.md
 for f in ESTADO.md docs/RESULTS.md docs/PROCEDENCIA.md docs/SECURITY_ASI.md; do [[ -f "$f" ]] && git add "$f"; done
 if git diff --cached --quiet; then echo "README já está em dia com o git log."; else

@@ -1,4 +1,4 @@
-"""K53 (pós-morte V5, N3): o buscador padrão do kit é o denso e5-large + cross-encoder bge-m3-int8 (pool 10, 600
+"""K53: o buscador padrão do kit é o denso e5-large + cross-encoder bge-m3-int8 (pool 10, 600
 caracteres), decidido antes do relógio; data/retriever.json ou o ambiente trocam o pacote inteiro."""
 import json
 
@@ -50,7 +50,7 @@ def test_default_latency_comment_cites_its_source():
     import inspect
 
     src = inspect.getsource(config)
-    # a medida fica no comentário (número e condição); o caminho do arquivo de ensaio não (não existe no repo entregue)
+    # a medida fica no comentário (número e condição), sem apontar para docs/kit/, que não existe no repo entregue
     assert "1,1–1,25 s" in src and "measured[\"dense+cross\"]" in src and "docs/kit/" not in src
 
 

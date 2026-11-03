@@ -12,21 +12,21 @@ Modo: `in-process` · provedor `offline`
 | Métrica | official | replan | dependent | parallel | approval | memory | real | official-var | partial | hard | guardrail | heldout | ALL |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | cases | 10 | 20 | 14 | 4 | 4 | 22 | 40 | 12 | 5 | 5 | 35 | 80 | 251 |
-| resolved_acc | 83.3 [IC95 43.6–97.0; n=6] | — | — | — | — | — | — | 83.3 [IC95 55.2–95.3; n=12] | — | — | — | — | 83.3 [IC95 60.8–94.2; n=18] |
-| facts_acc | 83.3 [IC95 43.6–97.0; n=6] | — | — | — | — | — | — | 83.3 [IC95 55.2–95.3; n=12] | — | — | — | — | 83.3 [IC95 60.8–94.2; n=18] |
-| intent_acc | 100.0 [IC95 72.2–100.0; n=10] | 100.0 [IC95 83.9–100.0; n=20] | 100.0 [IC95 78.5–100.0; n=14] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 85.1–100.0; n=22] | — | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 56.6–100.0; n=5] | 60.0 [IC95 23.1–88.2; n=5] | 65.7 [IC95 49.2–79.2; n=35] | 86.2 [IC95 77.0–92.1; n=80] | 88.2 [IC95 83.1–91.8; n=211] |
-| handoff_acc | 100.0 [IC95 72.2–100.0; n=10] | 40.0 [IC95 21.9–61.3; n=20] | 100.0 [IC95 78.5–100.0; n=14] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 85.1–100.0; n=22] | — | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 56.6–100.0; n=5] | — | 100.0 [IC95 90.1–100.0; n=35] | 91.2 [IC95 83.0–95.7; n=80] | 90.8 [IC95 86.0–94.0; n=206] |
-| handoff_outcome_acc | 100.0 [IC95 72.2–100.0; n=10] | 40.0 [IC95 21.9–61.3; n=20] | 100.0 [IC95 78.5–100.0; n=14] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 85.1–100.0; n=22] | — | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 56.6–100.0; n=5] | — | 100.0 [IC95 90.1–100.0; n=35] | 91.2 [IC95 83.0–95.7; n=80] | 90.8 [IC95 86.0–94.0; n=206] |
-| blocked_acc | — | — | — | — | — | — | — | — | — | — | 74.3 [IC95 57.9–85.8; n=35] | — | 74.3 [IC95 57.9–85.8; n=35] |
-| language_acc | 30.0 [IC95 10.8–60.3; n=10] | 50.0 [IC95 29.9–70.1; n=20] | 57.1 [IC95 32.6–78.6; n=14] | 50.0 [IC95 15.0–85.0; n=4] | 75.0 [IC95 30.1–95.4; n=4] | 59.1 [IC95 38.7–76.7; n=22] | 100.0 [IC95 91.2–100.0; n=40] | 50.0 [IC95 25.4–74.6; n=12] | 60.0 [IC95 23.1–88.2; n=5] | 60.0 [IC95 23.1–88.2; n=5] | 88.6 [IC95 74.0–95.5; n=35] | 80.0 [IC95 70.0–87.3; n=80] | 74.1 [IC95 68.3–79.1; n=251] |
-| tools_acc | 100.0 [IC95 43.9–100.0; n=3] | 100.0 [IC95 67.6–100.0; n=8] | 92.9 [IC95 68.5–98.7; n=14] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] | — | — | 100.0 [IC95 34.2–100.0; n=2] | — | — | — | 67.7 [IC95 50.1–81.4; n=31] | 83.3 [IC95 72.6–90.4; n=66] |
-| pending_action_acc | — | — | — | — | 100.0 [IC95 51.0–100.0; n=4] | — | — | — | — | — | — | — | 100.0 [IC95 51.0–100.0; n=4] |
-| replanned_acc | — | 0.0 [IC95 0.0–16.1; n=20] | — | — | — | — | — | — | — | — | — | — | 0.0 [IC95 0.0–16.1; n=20] |
-| completed_acc | 100.0 [IC95 20.7–100.0; n=1] | 100.0 [IC95 67.6–100.0; n=8] | 100.0 [IC95 78.5–100.0; n=14] | — | — | — | — | 100.0 [IC95 34.2–100.0; n=2] | — | — | — | — | 100.0 [IC95 86.7–100.0; n=25] |
+| resolved_acc | 83.3 (n=6) | — | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | 83.3 (n=18) |
+| facts_acc | 83.3 (n=6) | — | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | 83.3 (n=18) |
+| intent_acc | 100.0 (n=10) | 100.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | 60.0 (n=5) | 65.7 (n=35) | 86.2 (n=80) | 88.2 (n=211) |
+| handoff_acc | 100.0 (n=10) | 40.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | — | 100.0 (n=35) | 91.2 (n=80) | 90.8 (n=206) |
+| handoff_outcome_acc | 100.0 (n=10) | 40.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | — | 100.0 (n=35) | 91.2 (n=80) | 90.8 (n=206) |
+| blocked_acc | — | — | — | — | — | — | — | — | — | — | 74.3 (n=35) | — | 74.3 (n=35) |
+| language_acc | 30.0 (n=10) | 50.0 (n=20) | 57.1 (n=14) | 50.0 (n=4) | 75.0 (n=4) | 59.1 (n=22) | 100.0 (n=40) | 50.0 (n=12) | 60.0 (n=5) | 60.0 (n=5) | 88.6 (n=35) | 80.0 (n=80) | 74.1 (n=251) |
+| tools_acc | 100.0 (n=3) | 100.0 (n=8) | 92.9 (n=14) | 100.0 (n=4) | 100.0 (n=4) | — | — | 100.0 (n=2) | — | — | — | 67.7 (n=31) | 83.3 (n=66) |
+| pending_action_acc | — | — | — | — | 100.0 (n=4) | — | — | — | — | — | — | — | 100.0 (n=4) |
+| replanned_acc | — | 0.0 (n=20) | — | — | — | — | — | — | — | — | — | — | 0.0 (n=20) |
+| completed_acc | 100.0 (n=1) | 100.0 (n=8) | 100.0 (n=14) | — | — | — | — | 100.0 (n=2) | — | — | — | — | 100.0 (n=25) |
 | no_leak_acc | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| numbers_acc | 100.0 [IC95 72.2–100.0; n=10] | 100.0 [IC95 83.9–100.0; n=20] | 100.0 [IC95 78.5–100.0; n=14] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 85.1–100.0; n=22] | 97.5 [IC95 87.1–99.6; n=40] | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 95.2–100.0; n=77] | 99.6 [IC95 97.5–99.9; n=225] |
-| memory_acc | — | — | — | — | — | 83.3 [IC95 55.2–95.3; n=12] | — | — | — | — | — | — | 83.3 [IC95 55.2–95.3; n=12] |
-| claims_acc | 90.0 [IC95 59.6–98.2; n=10] | 90.0 [IC95 69.9–97.2; n=20] | 92.9 [IC95 68.5–98.7; n=14] | 100.0 [IC95 51.0–100.0; n=4] | 75.0 [IC95 30.1–95.4; n=4] | 95.5 [IC95 78.2–99.2; n=22] | 95.0 [IC95 83.5–98.6; n=40] | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 56.6–100.0; n=5] | 80.0 [IC95 37.6–96.4; n=5] | 91.7 [IC95 64.6–98.5; n=12] | 93.5 [IC95 85.7–97.2; n=77] | 93.3 [IC95 89.3–95.9; n=225] |
+| numbers_acc | 100.0 (n=10) | 100.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | 97.5 (n=40) | 100.0 (n=12) | 100.0 (n=5) | 100.0 (n=5) | 100.0 (n=12) | 100.0 (n=77) | 99.6 (n=225) |
+| memory_acc | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | — | — | 83.3 (n=12) |
+| claims_acc | 90.0 (n=10) | 90.0 (n=20) | 92.9 (n=14) | 100.0 (n=4) | 75.0 (n=4) | 95.5 (n=22) | 95.0 (n=40) | 100.0 (n=12) | 100.0 (n=5) | 80.0 (n=5) | 91.7 (n=12) | 93.5 (n=77) | 93.3 (n=225) |
 | language_undetected | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | recall@3 | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | mrr | — | — | — | — | — | — | — | — | — | — | — | — | — |
@@ -73,19 +73,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.109161 (teto 0.134367)
 | cases | 4 | 4 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
-| handoff_acc | 75.0 [IC95 30.1–95.4; n=4] | 75.0 [IC95 30.1–95.4; n=4] |
-| handoff_outcome_acc | 75.0 [IC95 30.1–95.4; n=4] | 75.0 [IC95 30.1–95.4; n=4] |
+| intent_acc | 100.0 (n=4) | 100.0 (n=4) |
+| handoff_acc | 75.0 (n=4) | 75.0 (n=4) |
+| handoff_outcome_acc | 75.0 (n=4) | 75.0 (n=4) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
-| tools_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
-| pending_action_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
+| language_acc | 100.0 (n=4) | 100.0 (n=4) |
+| tools_acc | 100.0 (n=4) | 100.0 (n=4) |
+| pending_action_acc | 100.0 (n=4) | 100.0 (n=4) |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 75.0 [IC95 30.1–95.4; n=4] | 75.0 [IC95 30.1–95.4; n=4] |
+| numbers_acc | 75.0 (n=4) | 75.0 (n=4) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
+| claims_acc | 100.0 (n=4) | 100.0 (n=4) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -119,19 +119,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.067663 (teto 0.973262)
 | cases | 35 | 35 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 100.0 [IC95 90.1–100.0; n=35] | 100.0 [IC95 90.1–100.0; n=35] |
-| handoff_acc | 100.0 [IC95 90.1–100.0; n=35] | 100.0 [IC95 90.1–100.0; n=35] |
-| handoff_outcome_acc | 100.0 [IC95 90.1–100.0; n=35] | 100.0 [IC95 90.1–100.0; n=35] |
-| blocked_acc | 100.0 [IC95 90.1–100.0; n=35] | 100.0 [IC95 90.1–100.0; n=35] |
-| language_acc | 97.1 [IC95 85.5–99.5; n=35] | 97.1 [IC95 85.5–99.5; n=35] |
+| intent_acc | 100.0 (n=35) | 100.0 (n=35) |
+| handoff_acc | 100.0 (n=35) | 100.0 (n=35) |
+| handoff_outcome_acc | 100.0 (n=35) | 100.0 (n=35) |
+| blocked_acc | 100.0 (n=35) | 100.0 (n=35) |
+| language_acc | 97.1 (n=35) | 97.1 (n=35) |
 | tools_acc | — | — |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 100.0 [IC95 43.9–100.0; n=3] | 100.0 [IC95 43.9–100.0; n=3] |
+| numbers_acc | 100.0 (n=3) | 100.0 (n=3) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 43.9–100.0; n=3] | 100.0 [IC95 43.9–100.0; n=3] |
+| claims_acc | 100.0 (n=3) | 100.0 (n=3) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -167,19 +167,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.155 (teto 0.139037)
 | cases | 5 | 5 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| intent_acc | 100.0 (n=5) | 100.0 (n=5) |
 | handoff_acc | — | — |
 | handoff_outcome_acc | — | — |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| language_acc | 100.0 (n=5) | 100.0 (n=5) |
 | tools_acc | — | — |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| numbers_acc | 100.0 (n=5) | 100.0 (n=5) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| claims_acc | 100.0 (n=5) | 100.0 (n=5) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -215,19 +215,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 2.307368 (teto 2.224599)
 | cases | 80 | 80 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 98.8 [IC95 93.3–99.8; n=80] | 98.8 [IC95 93.3–99.8; n=80] |
-| handoff_acc | 97.5 [IC95 91.3–99.3; n=80] | 97.5 [IC95 91.3–99.3; n=80] |
-| handoff_outcome_acc | 97.5 [IC95 91.3–99.3; n=80] | 97.5 [IC95 91.3–99.3; n=80] |
+| intent_acc | 98.8 (n=80) | 98.8 (n=80) |
+| handoff_acc | 97.5 (n=80) | 97.5 (n=80) |
+| handoff_outcome_acc | 97.5 (n=80) | 97.5 (n=80) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 95.4–100.0; n=80] | 100.0 [IC95 95.4–100.0; n=80] |
-| tools_acc | 100.0 [IC95 89.0–100.0; n=31] | 100.0 [IC95 89.0–100.0; n=31] |
+| language_acc | 100.0 (n=80) | 100.0 (n=80) |
+| tools_acc | 100.0 (n=31) | 100.0 (n=31) |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 93.2 [IC95 85.1–97.1; n=74] | 93.2 [IC95 85.1–97.1; n=74] |
+| numbers_acc | 93.2 (n=74) | 93.2 (n=74) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 95.1–100.0; n=74] | 100.0 [IC95 95.1–100.0; n=74] |
+| claims_acc | 100.0 (n=74) | 100.0 (n=74) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -268,19 +268,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 3.213433 (teto 4.172093)
 | cases | 66 | 66 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 100.0 [IC95 94.5–100.0; n=66] | 100.0 [IC95 94.5–100.0; n=66] |
-| handoff_acc | 100.0 [IC95 94.5–100.0; n=66] | 100.0 [IC95 94.5–100.0; n=66] |
-| handoff_outcome_acc | 100.0 [IC95 94.5–100.0; n=66] | 100.0 [IC95 94.5–100.0; n=66] |
+| intent_acc | 100.0 (n=66) | 100.0 (n=66) |
+| handoff_acc | 100.0 (n=66) | 100.0 (n=66) |
+| handoff_outcome_acc | 100.0 (n=66) | 100.0 (n=66) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 94.5–100.0; n=66] | 100.0 [IC95 94.5–100.0; n=66] |
+| language_acc | 100.0 (n=66) | 100.0 (n=66) |
 | tools_acc | — | — |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 100.0 [IC95 94.5–100.0; n=66] | 100.0 [IC95 94.5–100.0; n=66] |
-| memory_acc | 86.1 [IC95 71.3–93.9; n=36] | 86.1 [IC95 71.3–93.9; n=36] |
-| claims_acc | 100.0 [IC95 94.5–100.0; n=66] | 100.0 [IC95 94.5–100.0; n=66] |
+| numbers_acc | 100.0 (n=66) | 100.0 (n=66) |
+| memory_acc | 86.1 (n=36) | 86.1 (n=36) |
+| claims_acc | 100.0 (n=66) | 100.0 (n=66) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -319,21 +319,21 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.221442 (teto 0.33369)
 | Métrica | official-var | ALL |
 |---|---:|---:|
 | cases | 12 | 12 |
-| resolved_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
-| facts_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
-| intent_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
-| handoff_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
-| handoff_outcome_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
+| resolved_acc | 100.0 (n=12) | 100.0 (n=12) |
+| facts_acc | 100.0 (n=12) | 100.0 (n=12) |
+| intent_acc | 100.0 (n=12) | 100.0 (n=12) |
+| handoff_acc | 100.0 (n=12) | 100.0 (n=12) |
+| handoff_outcome_acc | 100.0 (n=12) | 100.0 (n=12) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
-| tools_acc | 100.0 [IC95 34.2–100.0; n=2] | 100.0 [IC95 34.2–100.0; n=2] |
+| language_acc | 100.0 (n=12) | 100.0 (n=12) |
+| tools_acc | 100.0 (n=2) | 100.0 (n=2) |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
-| completed_acc | 100.0 [IC95 34.2–100.0; n=2] | 100.0 [IC95 34.2–100.0; n=2] |
+| completed_acc | 100.0 (n=2) | 100.0 (n=2) |
 | no_leak_acc | — | — |
-| numbers_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
+| numbers_acc | 100.0 (n=12) | 100.0 (n=12) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 75.8–100.0; n=12] | 100.0 [IC95 75.8–100.0; n=12] |
+| claims_acc | 100.0 (n=12) | 100.0 (n=12) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -365,21 +365,21 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.910835 (teto 1.95)
 | Métrica | official | ALL |
 |---|---:|---:|
 | cases | 30 | 30 |
-| resolved_acc | 100.0 [IC95 82.4–100.0; n=18] | 100.0 [IC95 82.4–100.0; n=18] |
-| facts_acc | 100.0 [IC95 82.4–100.0; n=18] | 100.0 [IC95 82.4–100.0; n=18] |
-| intent_acc | 100.0 [IC95 88.6–100.0; n=30] | 100.0 [IC95 88.6–100.0; n=30] |
-| handoff_acc | 100.0 [IC95 88.6–100.0; n=30] | 100.0 [IC95 88.6–100.0; n=30] |
-| handoff_outcome_acc | 100.0 [IC95 88.6–100.0; n=30] | 100.0 [IC95 88.6–100.0; n=30] |
+| resolved_acc | 100.0 (n=18) | 100.0 (n=18) |
+| facts_acc | 100.0 (n=18) | 100.0 (n=18) |
+| intent_acc | 100.0 (n=30) | 100.0 (n=30) |
+| handoff_acc | 100.0 (n=30) | 100.0 (n=30) |
+| handoff_outcome_acc | 100.0 (n=30) | 100.0 (n=30) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 88.6–100.0; n=30] | 100.0 [IC95 88.6–100.0; n=30] |
-| tools_acc | 100.0 [IC95 70.1–100.0; n=9] | 100.0 [IC95 70.1–100.0; n=9] |
+| language_acc | 100.0 (n=30) | 100.0 (n=30) |
+| tools_acc | 100.0 (n=9) | 100.0 (n=9) |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
-| completed_acc | 100.0 [IC95 43.9–100.0; n=3] | 100.0 [IC95 43.9–100.0; n=3] |
+| completed_acc | 100.0 (n=3) | 100.0 (n=3) |
 | no_leak_acc | — | — |
-| numbers_acc | 96.7 [IC95 83.3–99.4; n=30] | 96.7 [IC95 83.3–99.4; n=30] |
+| numbers_acc | 96.7 (n=30) | 96.7 (n=30) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 88.6–100.0; n=30] | 100.0 [IC95 88.6–100.0; n=30] |
+| claims_acc | 100.0 (n=30) | 100.0 (n=30) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -418,19 +418,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.099706 (teto 0.134367)
 | cases | 4 | 4 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
-| handoff_acc | 0.0 [IC95 0.0–49.0; n=4] | 0.0 [IC95 0.0–49.0; n=4] |
-| handoff_outcome_acc | 0.0 [IC95 0.0–49.0; n=4] | 0.0 [IC95 0.0–49.0; n=4] |
+| intent_acc | 100.0 (n=4) | 100.0 (n=4) |
+| handoff_acc | 0.0 (n=4) | 0.0 (n=4) |
+| handoff_outcome_acc | 0.0 (n=4) | 0.0 (n=4) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
-| tools_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
+| language_acc | 100.0 (n=4) | 100.0 (n=4) |
+| tools_acc | 100.0 (n=4) | 100.0 (n=4) |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 75.0 [IC95 30.1–95.4; n=4] | 75.0 [IC95 30.1–95.4; n=4] |
+| numbers_acc | 75.0 (n=4) | 75.0 (n=4) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 51.0–100.0; n=4] | 100.0 [IC95 51.0–100.0; n=4] |
+| claims_acc | 100.0 (n=4) | 100.0 (n=4) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -464,19 +464,19 @@ Provedor `anthropic` · status `complete` · gasto US$ 0.002138 (teto 0.167959)
 | cases | 5 | 5 |
 | resolved_acc | — | — |
 | facts_acc | — | — |
-| intent_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
-| handoff_acc | 0.0 [IC95 0.0–43.4; n=5] | 0.0 [IC95 0.0–43.4; n=5] |
-| handoff_outcome_acc | 0.0 [IC95 0.0–43.4; n=5] | 0.0 [IC95 0.0–43.4; n=5] |
+| intent_acc | 100.0 (n=5) | 100.0 (n=5) |
+| handoff_acc | 0.0 (n=5) | 0.0 (n=5) |
+| handoff_outcome_acc | 0.0 (n=5) | 0.0 (n=5) |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| language_acc | 100.0 (n=5) | 100.0 (n=5) |
 | tools_acc | — | — |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| numbers_acc | 100.0 (n=5) | 100.0 (n=5) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 56.6–100.0; n=5] | 100.0 [IC95 56.6–100.0; n=5] |
+| claims_acc | 100.0 (n=5) | 100.0 (n=5) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -514,15 +514,15 @@ Provedor `anthropic` · status `complete` · gasto US$ 1.534212 (teto 1.112299)
 | handoff_acc | — | — |
 | handoff_outcome_acc | — | — |
 | blocked_acc | — | — |
-| language_acc | 100.0 [IC95 91.2–100.0; n=40] | 100.0 [IC95 91.2–100.0; n=40] |
+| language_acc | 100.0 (n=40) | 100.0 (n=40) |
 | tools_acc | — | — |
 | pending_action_acc | — | — |
 | replanned_acc | — | — |
 | completed_acc | — | — |
 | no_leak_acc | — | — |
-| numbers_acc | 100.0 [IC95 91.2–100.0; n=40] | 100.0 [IC95 91.2–100.0; n=40] |
+| numbers_acc | 100.0 (n=40) | 100.0 (n=40) |
 | memory_acc | — | — |
-| claims_acc | 100.0 [IC95 91.2–100.0; n=40] | 100.0 [IC95 91.2–100.0; n=40] |
+| claims_acc | 100.0 (n=40) | 100.0 (n=40) |
 | language_undetected | 0 | 0 |
 | recall@3 | — | — |
 | mrr | — | — |
@@ -556,7 +556,7 @@ Modelo `claude-opus-5-5` · status `ran` · arquivos live_guardrail.json, live_h
 | real | 40 | 0.925 [IC95 80.1–97.4; n=40] | 1.0 [IC95 91.2–100.0; n=40] | 4.38 |
 | ALL | 266 | 0.906 [IC95 86.5–93.6; n=266] | 0.97 [IC95 94.2–98.5; n=266] | 4.46 |
 
-Calibração humana: 48 rótulos · concordância **1.0** [IC95 92.6–100.0; n=48] · kappa de Cohen **1.0** · TPR 1.0 [IC95 86.2–100.0; n=24] (24 grounded) · TNR 1.0 [IC95 86.2–100.0; n=24] (24 não grounded) · discordâncias: —
+Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): 48 rótulos · concordância **1.0** [IC95 92.6–100.0; n=48] · kappa de Cohen **1.0** · TPR 1.0 [IC95 86.2–100.0; n=24] (24 grounded) · TNR 1.0 [IC95 86.2–100.0; n=24] (24 não grounded) · discordâncias: —
 - official: concordância 1.0 [IC95 92.6–100.0; n=48] · kappa 1.0 (48 rótulos)
 
 Canários: o juiz reprovou **4/4** registros sintéticos com defeito conhecido (contradiz a evidência, afirma sem evidência, idioma errado, vaza dado de outro cliente).
@@ -569,10 +569,10 @@ Família: juiz `claude-opus-5-5` (anthropic) × gerador `claude-haiku-5-5`, `cla
 _Sem validação humana ainda (`python -m evals.label --export 30`)._
 <!-- human:end -->
 
-## Busca (sem LLM; escolha medida em `data/retriever.json`)
+## Busca (sem LLM; o buscador do agente e as alternativas medidas)
 
 <!-- retrieval:begin -->
-_Não rodado: `python -m evals.run_evals --choose-retriever --apply` grava data/retriever.json._
+_Não rodado: buscador padrão do kit (denso + cross-encoder); `make compare` compara as alternativas._
 <!-- retrieval:end -->
 
 ## Replanejamento (com × sem)
@@ -580,5 +580,5 @@ _Não rodado: `python -m evals.run_evals --choose-retriever --apply` grava data/
 <!-- replan:begin -->
 | fonte | casos | replanned_acc | handoff_acc | handoff_outcome_acc | route_acc | intent_acc |
 |---|---:|---:|---:|---:|---:|---:|
-| offline | 20 | 0.0 [IC95 0.0–16.1; n=20] | 40.0 [IC95 21.9–61.3; n=20] | 40.0 [IC95 21.9–61.3; n=20] | — | 100.0 [IC95 83.9–100.0; n=20] |
+| offline | 20 | 0.0 (n=20) | 40.0 (n=20) | 40.0 (n=20) | — | 100.0 (n=20) |
 <!-- replan:end -->

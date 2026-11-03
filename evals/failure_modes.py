@@ -5,8 +5,8 @@ Uso: python -m evals.failure_modes [--out docs/FAILURE_MODES.md]
 Lê evals/results/live_*.json (linhas com alguma checagem False) e agrupa pela PRIMEIRA checagem que falhou e pelo
 split, com contagem, os casos afetados e 1 exemplo (pergunta, resposta curta, números sem base). É o passo
 "olhar os traces antes de medir": cada modo vira uma correção ou uma checagem binária própria.
-Getnet v4 (01/11/2026): numbers (clima/câmbio e soma do LLM), language (termo pt numa pergunta en) e handoff
-(resposta direta onde se esperava humano) explicavam todas as falhas do official; foram corrigidas ou declaradas.
+Exemplo de saída: numbers (clima/câmbio e soma do LLM), language (termo pt numa pergunta en) e handoff (resposta
+direta onde se esperava humano) explicavam todas as falhas do official; cada uma foi corrigida ou declarada.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Cartão de capacidades: regra do veredito humano e formato dos ids viram evidência (ensaio v5.3, split real)."""
+"""Cartão de capacidades: regra do veredito humano e formato dos ids viram evidência (conferido no split real)."""
 from app import capabilities
 
 

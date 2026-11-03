@@ -142,8 +142,9 @@ class AnthropicLLM:
     def _hedged(self, sdk, fields: dict | None = None, **kwargs):
         """1ª tentativa com prazo curto; estourou, 1 nova tentativa com o prazo cheio do cliente.
 
-        Ensaio (memória, 255 chamadas Sonnet): mediana 1,7 s, mas chamadas isoladas de 19 a 46 s para ~150 tokens
-        de saída levavam o p95 do caso a 57 s. Repetir a chamada lenta corta a cauda sem mudar a resposta esperada.
+        Medido em 255 chamadas Sonnet (split de memória): mediana 1,7 s, mas chamadas isoladas de 19 a 46 s para
+        ~150 tokens de saída levavam o p95 do caso a 57 s. Repetir a chamada lenta corta a cauda sem mudar a resposta
+        esperada.
         Com busca web (tool do servidor, legitimamente lenta) o 1º prazo é maior.
         """
         first = llm_first_timeout_s(web="web_search" in str(kwargs.get("tools") or ""))

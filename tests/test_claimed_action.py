@@ -1,8 +1,8 @@
-"""Regras financeiras duras (kit v5): ação alegada sem execução, promessa de data futura e as regras no prompt.
+"""Regras financeiras duras: ação alegada sem execução, promessa de data futura e as regras no prompt.
 
 "Reiniciei sua maquininha" sem tool de reinício no turno é mentira operacional: vira `risk_flags: claimed_action`,
 uma reescrita com LLM e, se persistir (ou offline), a frase sai com o aviso de que nada foi feito. Ação proposta
-(pendente de confirmação) não é execução. Medido nas 177 respostas ao vivo da v4: 0 falso positivo.
+(pendente de confirmação) não é execução. Medido em 177 respostas ao vivo: 0 falso positivo.
 """
 import pytest
 from fakes import fake_llm, resp, text

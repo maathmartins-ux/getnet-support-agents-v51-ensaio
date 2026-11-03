@@ -1,8 +1,8 @@
 """Checagem de frases (app/claims.py): afirmação sem base e ação oferecida que nenhuma ferramenta faz.
 
-Getnet v4, juiz nos 10 cenários oficiais: "turn it off and on" e "move near a window" sem fonte (conselho genérico) e
-a oferta de um reinício remoto. Com LLM, um verificador barato aponta as frases e a política remove; sem LLM, o
-fallback léxico só sinaliza. Oferta de ação é determinística: casa com o registro de ferramentas ou sai.
+O juiz nos 10 cenários oficiais apontou "turn it off and on" e "move near a window" sem fonte (conselho genérico) e
+a oferta de um reinício remoto que não existe. Com LLM, um verificador barato aponta as frases e a política remove;
+sem LLM, o fallback léxico só sinaliza. Oferta de ação é determinística: casa com o registro de ferramentas ou sai.
 """
 import json
 
@@ -193,8 +193,8 @@ def test_pipeline_offline_default_only_flags(monkeypatch):
 
 
 def test_write_offer_is_unavailable_while_the_case_is_with_a_human(monkeypatch):
-    """Caso aberto: escrita suspensa (supervisor._hold); oferecer o reinício é oferecer o que não existe (ensaio
-    v5.1, q-mem-03). Consulta e humano continuam ofertas válidas."""
+    """Caso aberto: escrita suspensa (supervisor._hold); oferecer o reinício é oferecer o que não existe.
+    Consulta e humano continuam ofertas válidas."""
     monkeypatch.setenv("CLAIMS_POLICY", "remove")
     answer = "A T1988B segue sem sinal. Posso reiniciar a sua maquininha remotamente. Quer que eu chame o atendente?"
     _, found, _ = claims.check(answer, [TERMINALS], tools=GETNET_TOOLS, use_llm=False, writes_blocked=True)
@@ -212,7 +212,7 @@ def test_internal_agent_names_never_reach_the_customer():
 def test_capability_card_code_never_reaches_the_customer():
     from app.pipeline import _scrub_internal
 
-    # ensaio v5.2: 19 de 69 respostas ao vivo mostravam "[policy:capabilities]" ao cliente
+    # o código do cartão não pode vazar: sem esta limpeza, 19 de 69 respostas ao vivo mostravam "[policy:capabilities]"
     assert _scrub_internal("A proposta expira em 15 minutos [policy:capabilities].", "pt") == \
         "A proposta expira em 15 minutos."
     assert _scrub_internal("Nada é executado antes da sua confirmação ([policy:capabilities]).", "pt") == \

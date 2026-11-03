@@ -1,6 +1,6 @@
 """E53 — held-out ponta a ponta: a página cega sorteia o held-out, o passa/falha humano é a medida e a intenção vira
-linha de diagnóstico (estudo nelsondell §3.4; pós-morte V5, N4: intenção 67,5% punia resposta certa com rótulo de
-taxonomia diferente)."""
+linha de diagnóstico: medida sozinha, a intenção (67,5%) punia resposta certa dada com rótulo de taxonomia
+diferente."""
 import json
 
 import pytest
@@ -72,4 +72,4 @@ def test_scorecard_measures_heldout_by_the_human_and_shows_intent_as_diagnostic(
     weak = md.split("Abaixo da referência ou sem medida")[1]
     assert "intenção (diagnóstico)" not in weak and "ponta a ponta (humano passa) (0.79)" in weak
     msg = delivery_message.render("https://x.test/r", None, tmp_path, None)
-    assert "intenção (diagnóstico)" not in msg  # kit v5.5: só as medidas do enunciado vão à entrega
+    assert "intenção (diagnóstico)" not in msg  # só as medidas pedidas no enunciado vão à mensagem de entrega

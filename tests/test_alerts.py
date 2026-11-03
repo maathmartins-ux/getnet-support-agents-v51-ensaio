@@ -25,7 +25,7 @@ def test_alert_rules_are_valid_and_actionable():
 
 
 def test_every_alert_has_a_runbook_section():
-    """Alerta sem runbook não diz a quem é chamado o que fazer (método nelsondell: um runbook por alerta)."""
+    """Alerta sem runbook não diz a quem é chamado o que fazer: cada alerta tem a sua seção no runbook."""
     rules = yaml.safe_load((ROOT / "ops" / "alerts.yml").read_text(encoding="utf-8"))["groups"][0]["rules"]
     runbook = (ROOT / "docs" / "RUNBOOK.md").read_text(encoding="utf-8")
     sections = {m.group(1).lower(): m.start() for m in re.finditer(r"^## (\w+)\s*$", runbook, re.MULTILINE)}

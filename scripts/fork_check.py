@@ -10,8 +10,8 @@ Etapas:
 4. pytest só nos testes que a frente possui (tests/test_domain_*.py, test_tools.py ...), em série;
 5. se a frente mexeu em casos do eval: eval offline só dos splits dela, gravado em var/ (nunca em evals/results).
 
-Getnet v3: 8 forks rodando o check COMPLETO ao mesmo tempo afogaram a CPU (p95 de 21 s no teste de carga, que
-não valeu) e cada merge esperava minutos. Na nuvem cada sessão tem a sua máquina, mas o check completo continua
+Com 8 forks rodando o check COMPLETO ao mesmo tempo a CPU afoga (medido: p95 de 21 s no teste de carga, que
+deixa de valer) e cada merge espera minutos. Na nuvem cada sessão tem a sua máquina, mas o check completo continua
 sendo trabalho da integração: a frente prova a parte dela e devolve rápido.
 """
 from __future__ import annotations

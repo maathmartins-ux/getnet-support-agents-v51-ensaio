@@ -19,7 +19,7 @@ PRICES_PER_MTOK = {
 # Papel → (modelo, effort). Cada um troca por env: ROUTER_MODEL, ROUTER_EFFORT, SUPERVISOR_MODEL...
 # Effort é declarado sempre (output_config.effort): os padrões mudam entre modelos.
 # - router/guardrail: classificação curta com JSON schema → Haiku, low.
-# - supervisor: só escolhe o próximo especialista → Sonnet, low (o p95 ao vivo da v2 veio dele em medium).
+# - supervisor: só escolhe o próximo especialista → Sonnet, low (em medium, o p95 ao vivo vinha dele).
 # - agent: redige com fonte e usa tools → Sonnet, medium.
 # - judge: deve ser pelo menos tão capaz quanto o julgado → Opus, medium.
 ROLES = {
@@ -73,7 +73,7 @@ def effort_for(role: str) -> str:
 
 def data_dir() -> Path:
     # Caminho explícito: no container o pacote não mora ao lado de data/, e um índice vazio
-    # passa despercebido até o smoke test (lição do desafio de 30/10/2026).
+    # passaria despercebido até o smoke test.
     return Path(os.getenv("DATA_DIR", ROOT / "data"))
 
 
@@ -160,11 +160,11 @@ def rate_limit_per_min() -> int:
     return int(os.getenv("RATE_LIMIT_PER_MIN", "30"))
 
 
-# Buscador padrão do kit (decidido ANTES do relógio, não no relógio com a CPU cheia): denso
+# Buscador padrão do kit (decidido com a máquina parada, não com a CPU cheia): denso
 # multilingual-e5-large + cross-encoder bge-reranker-v2-m3-int8 sobre o top-10 do denso, lendo 600 caracteres por
 # trecho. Medido num corpus de pagamentos (50 perguntas com gold por fato, máquina SEM outra carga): Recall@3 0,93 /
 # MRR 0,94 contra 0,93 / 0,927 do denso sozinho, p95 por busca 1,1–1,25 s (`measured["dense+cross"]` p95 1251 ms).
-# Num relógio real, com 8 subagentes na mesma CPU, o mesmo rerank mediu p95 2,9–3,5 s e ficou de fora: latência só
+# Com 8 processos disputando a mesma CPU, o mesmo rerank mediu p95 2,9–3,5 s; por isso latência só
 # se mede com a máquina parada. Vale quando NADA escolheu o buscador: data/retriever.json (`--choose-retriever
 # --apply`) ou RETRIEVER no ambiente trocam o pacote inteiro (escolha sem `rerank` = sem rerank; RERANK=cross liga).
 # Escolha POR MEDIDA (medir no caminho do agente, top-5 do redator, e só então escolher). Gold real (38 perguntas),
@@ -248,7 +248,7 @@ def rerank_pool() -> int:
 
 
 def rerank_chars() -> int:
-    # Caracteres de cada trecho que o cross-encoder lê. Bancada medida (bge-m3-int8, CPU): 600 caracteres custaram
+    # Caracteres de cada trecho que o cross-encoder lê. Medido (bge-m3-int8, CPU): 600 caracteres custaram
     # ~1/5 do tempo por par de 1500 e, com pool 20, deram Recall@3 maior (0,777 × 0,764): o fato costuma estar no começo
     # do trecho (o ingest abre cada um com a pergunta da FAQ ou o título da seção).
     return int(os.getenv("RERANK_CHARS") or _bundle().get("rerank_chars") or KIT_RETRIEVER["rerank_chars"])
@@ -261,7 +261,7 @@ def embed_model() -> str:
 
 def embed_cache_dir() -> Path:
     # Vetores dos trechos por modelo + hash do corpus (rag.doc_vectors): a 2ª subida não recalcula o corpus.
-    # Num `git worktree` (frente do relógio), o padrão é o var/embeddings do repositório PRINCIPAL: a chave é modelo +
+    # Num `git worktree`, o padrão é o var/embeddings do repositório PRINCIPAL: a chave é modelo +
     # texto, então quem monta o corpus o vetoriza uma vez e o check da sessão principal, depois do merge, já o encontra
     # (sem isso, cada worktree vetorizava de novo: 2–4 min de CPU com o e5-large).
     value = os.getenv("EMBED_CACHE_DIR")
@@ -292,9 +292,9 @@ def supervisor_replan() -> bool:
 
 
 def supervisor_fast() -> bool:
-    # Atalho de 1 passo (sem o supervisor LLM): DESLIGADO por padrão desde o kit v5.5 (perfil Skywalker). O avaliador
-    # puniu "regra decidindo" e o DEMO mostrava "atalho" nos oficiais; com o supervisor LLM em todo turno a decisão e
-    # o motivo ficam visíveis. Custo: ~2 chamadas e ~4 s a mais por turno de 1 passo (medido). SUPERVISOR_FAST=on liga.
+    # Atalho de 1 passo (sem o supervisor LLM): DESLIGADO por padrão. Com o atalho, uma regra escolhe o próximo passo
+    # e o trace só mostra "atalho"; com o supervisor LLM em todo turno a decisão e o motivo ficam visíveis.
+    # Custo: ~2 chamadas e ~4 s a mais por turno de 1 passo (medido). SUPERVISOR_FAST=on liga.
     return os.getenv("SUPERVISOR_FAST", "off").lower() == "on"
 
 

@@ -1,8 +1,7 @@
 """Servidor MCP em /mcp, ponta a ponta: uvicorn de verdade + cliente MCP oficial (streamable HTTP).
 
-A vaga pede MCP; o avaliador não roda nada, então a prova é este teste: sem JWT → 401 (nem lista ferramentas);
-com JWT → `ask` atende como o dono do token, `crm_tool` não deixa um cliente ver dado de outro e escrita só
-cria ação pendente.
+O que este teste prova: sem JWT → 401 (nem lista ferramentas); com JWT → `ask` atende como o dono do token,
+`crm_tool` não deixa um cliente ver dado de outro e escrita só cria ação pendente.
 """
 import asyncio
 import socket

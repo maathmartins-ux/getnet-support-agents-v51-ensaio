@@ -1,6 +1,6 @@
 """Análise de erros em traces ao vivo: rascunho do modelo, revisão do dono linha a linha, modos com uma checagem cada.
 
-Fluxo (protocolo do estudo nelsondell §3.2–3.3; ideia, não código):
+Fluxo:
   python -m evals.error_analysis --export 60            # ~60 traces de evals/results/live_*.json, evidência inteira,
         # rascunho passa/falha + modo + motivo de uma linha (LLM juiz com os CRITÉRIOS abaixo; sem LLM: das checagens)
         # → evals/error_analysis.csv

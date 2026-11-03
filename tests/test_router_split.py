@@ -1,8 +1,8 @@
 """Item 1 — pergunta composta: divisão em ":", conjunções e "duas perguntas"; conversa não vira intenção.
 
-Origem: held-out cego da v3 (31/10/2026). "Me diz quanto eu vendi ontem e aproveita: o Link ... ?" e
-"Quick two questions: ..., and ...?" viraram uma intenção só; "Oi! Hoje tá frio, né? ... vendi ontem?" virou
-multi porque a cláusula de conversa contava como FAQ. Aqui no vocabulário do kit (pedido / prazo / troca).
+Sem a divisão, perguntas do held-out cego como "Me diz quanto eu vendi ontem e aproveita: o Link ... ?" e
+"Quick two questions: ..., and ...?" viram uma intenção só, e "Oi! Hoje tá frio, né? ... vendi ontem?" vira
+multi porque a cláusula de conversa conta como FAQ. Aqui no vocabulário do kit (pedido / prazo / troca).
 """
 import pytest
 

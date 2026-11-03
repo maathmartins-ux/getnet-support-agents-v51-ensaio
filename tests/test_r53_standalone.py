@@ -1,7 +1,8 @@
 """R53 item 1 — o router devolve a pergunta completa do turno (ctx.facts["standalone"]) e classifica ESSA pergunta.
 
-V5 ao vivo: memória pass@1 0,72 com 90,6% dos fatos certos; as 18 perdas eram de rota em seguimento curto
-("e a outra?"). Com LLM, a reescrita sai na mesma chamada que classifica e o código recusa a que inventa dado.
+Classificando só a mensagem crua, a memória ao vivo ficou em pass@1 0,72 com 90,6% dos fatos certos: as 18 perdas
+eram de rota em seguimento curto ("e a outra?"). Com LLM, a reescrita sai na mesma chamada que classifica e o
+código recusa a que inventa dado.
 """
 import json
 

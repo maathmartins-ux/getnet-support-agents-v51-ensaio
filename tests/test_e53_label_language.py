@@ -1,6 +1,6 @@
 """E53 — página de rotulagem, pergunta 3 (idioma): idioma da pergunta e da resposta lado a lado e a regra escrita.
 
-Pós-morte V5 (N8): kappa entre humanos 0,054 porque a 2ª pessoa leu a pergunta 3 como "devia ser em português" e
+Sem a regra escrita, o kappa entre humanos foi 0,054: a 2ª pessoa leu a pergunta 3 como "devia ser em português" e
 marcou 5 de 10 respostas certas em inglês como idioma errado.
 """
 import json

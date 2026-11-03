@@ -1,9 +1,9 @@
 """`context` da linha do eval: o texto da evidência que quem redigiu viu, com teto de tamanho, para o juiz ler.
 
-Getnet v4 (judge.json, cenários oficiais): 6 das 12 reprovações diziam "as fontes só têm título e URL". A linha
-guardava as fontes web como título/endereço e o juiz não via o número que a resposta citava. Aqui a linha carrega a
-evidência do turno como a API devolve (trechos do RAG com texto, resultado bruto das tools, texto da API de dado ao
-vivo, trechos citados da web e o cartão `policy:capabilities`), cortada em CONTEXT_CHARS. O cartão nunca sai por
+Por quê: quando a linha guardava as fontes web só como título/endereço, o juiz não via o número que a resposta
+citava (medido nos cenários oficiais: 6 das 12 reprovações diziam "as fontes só têm título e URL"). Aqui a linha
+carrega a evidência do turno como a API devolve (trechos do RAG com texto, resultado bruto das tools, texto da API de
+dado ao vivo, trechos citados da web e o cartão `policy:capabilities`), cortada em CONTEXT_CHARS. O cartão nunca sai por
 causa do teto: é a política que sustenta as frases sobre confirmação e aprovação.
 """
 from __future__ import annotations

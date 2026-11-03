@@ -1,7 +1,7 @@
 """A resposta da API carrega a evidência que sustentou a resposta (resultado de tool e trecho citado).
 
-Getnet v3 (31/10/2026): o juiz só recebia os trechos do RAG; 46 de 47 respostas "não grounded" usavam dado
-do CRM ou da web que ele nunca viu. Com `evidence` no contrato, o eval grava e o juiz lê o mesmo dado.
+Sem este campo o juiz só recebe os trechos do RAG: numa rodada medida, 46 de 47 respostas "não grounded" usavam
+dado do CRM ou da web que ele nunca viu. Com `evidence` no contrato, o eval grava e o juiz lê o mesmo dado.
 """
 from fastapi.testclient import TestClient
 
