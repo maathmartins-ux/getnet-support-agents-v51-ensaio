@@ -64,7 +64,7 @@ TARGETS = (
     Target("judge_kappa", "Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa", 0.80, "frac",
            "judge.json calibration"),
     # regra fixada antes de medir: 1 = validado (>= 10 por classe, TPR e TNR >= 0,8); 0 = só regressão
-    Target("judge_validated", "Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes)", 1, "n",
+    Target("judge_validated", "Juiz validado contra rótulos de pessoas (1 = sim, regra fixada antes)", 1, "n",
            "judge.json calibration.validation"),
     # custo de operação medido, não suposto: gasto total ao vivo ÷ turnos resolvidos sem humano (todos os splits
     # completos), e a fração resolvida (o README mostra o "custo por turno resolvido")
@@ -153,8 +153,10 @@ def measure(results: Path = RESULTS) -> dict[str, float | None]:
         "heldout_intent": held.get("intent_acc"),
         "raters": human.get("rotuladores") or (1 if human.get("rotulos") else None),
         "judge_kappa": (judge.get("calibration") or {}).get("cohen_kappa"),
+        # só vale com rótulo de pessoa: relatório sem labels_origin (antigo) conta como rótulo da SPEC
         "judge_validated": (None if not (judge.get("calibration") or {}).get("validation") else
-                            float(judge["calibration"]["validation"]["validated"])),
+                            float(judge["calibration"]["validation"]["validated"]
+                                  and judge["calibration"].get("labels_origin") == "human")),
         "cost_per_resolved": per_resolved,
         "resolved_fraction": resolved_frac,
     }

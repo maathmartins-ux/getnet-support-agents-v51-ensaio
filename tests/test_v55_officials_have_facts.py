@@ -50,3 +50,14 @@ def test_number_inside_tool_identifier_supports_the_answer():
 
     assert unsupported_numbers("Só aceita ontem, hoje ou os últimos 7 dias.", ['{"period": "last_7_days"}']) == []
     assert unsupported_numbers("Nos últimos 8 dias.", ['{"period": "last_7_days"}']) == ["8"]
+
+
+def test_answer_opening_with_abstention_is_not_resolved():
+    from evals.run_evals import opens_with_abstention, resolved
+
+    hedge = "I couldn't confirm whether you need a bank account. Getnet offers Get Conta [sup-42]."
+    direct = "Yes: you receive into Get Conta, a free digital account [sup-42]. I couldn't confirm other banks."
+    got = {"answer": hedge, "sources": [{"id": "sup-42"}], "route": ["router", "faq"]}
+    assert opens_with_abstention(hedge) and not resolved(got, [])
+    assert not opens_with_abstention(direct) and resolved({**got, "answer": direct}, [])
+    assert opens_with_abstention("Não consegui confirmar a previsão.")

@@ -93,3 +93,12 @@ def test_offline_run_removes_its_temporary_case_databases(tmp_path, monkeypatch)
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
     run_evals.run(split="guardrail")
     assert glob.glob(str(tmp_path / "eval-*")) == []
+
+
+def test_judge_is_validated_only_against_people():
+    """Concordância com rótulos escritos da SPEC (ou por modelo) não valida o juiz: só rótulo com labeler human:."""
+    from evals import judge
+
+    assert judge.labels_origin([{"labeler": "human:ana"}, {"labeler": "human:bia"}])["labels_origin"] == "human"
+    assert judge.labels_origin([{"labeler": "human:ana"}, {}])["labels_origin"] == "spec"
+    assert judge.labels_origin([])["labels_origin"] == "spec"

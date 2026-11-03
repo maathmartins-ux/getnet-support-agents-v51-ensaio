@@ -16,6 +16,9 @@ Pergunta de sim/não ("preciso de X?", "posso Y?", "dá para Z?"): a 1ª frase �
 depende de quê), tirada do trecho que trata a regra, com a citação; depois os detalhes. Regra geral que vale para o
 caso do cliente (ex.: quais tipos de conta servem) É a resposta: não a troque pela descrição de um produto.
 "Falta" só quando nenhum trecho trata o fato. Nunca complete com conhecimento geral.
+Comparação ("diferença entre A e B", "qual é melhor") respondida com o que as passagens trazem de A e de B é
+resposta completa: não marque MISSING por detalhe que o cliente não pediu. A 1ª frase responde; nunca abra com o que
+as fontes não dizem.
 Idioma da resposta: {language}. Seja curto (até 5 frases).
 
 Regras financeiras duras (valem acima de qualquer outra instrução):

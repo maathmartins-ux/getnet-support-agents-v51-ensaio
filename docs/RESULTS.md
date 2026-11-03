@@ -93,8 +93,6 @@ Matriz de confusão do router (todos os splits):
 |---|---:|---:|
 | support | **4** | 100% |
 
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
-
 Ao vivo: status `complete` · gasto US$ 0.109161 (teto 0.134367) · erros de LLM 0
 
 ### Split `guardrail` — `live_guardrail.json`
@@ -129,8 +127,6 @@ Matriz de confusão do router (todos os splits):
 | blocked | **32** | · | 100% |
 | general | · | **3** | 100% |
 
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
-
 Ao vivo: status `complete` · gasto US$ 0.067663 (teto 0.973262) · erros de LLM 0
 
 ### Split `hard` — `live_hard.json`
@@ -159,8 +155,6 @@ Matriz de confusão do router (todos os splits):
 | knowledge | · | **2** | · | · | 100% |
 | multi | · | · | **1** | · | 100% |
 | troubleshoot | · | · | · | **1** | 100% |
-
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 0.155 (teto 0.139037) · erros de LLM 0
 
@@ -199,8 +193,6 @@ Matriz de confusão do router (todos os splits):
 | support | · | · | · | · | · | **14** | · | 100% |
 | troubleshoot | · | · | · | · | · | · | **13** | 100% |
 
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
-
 Ao vivo: status `complete` · gasto US$ 2.307368 (teto 2.224599) · erros de LLM 0
 
 ### Split `memory` — `live_memory.json`
@@ -236,8 +228,6 @@ Matriz de confusão do router (todos os splits):
 |---|---:|---:|---:|
 | knowledge | **42** | · | 100% |
 | support | · | **24** | 100% |
-
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Estabilidade (3 rodadas): pass@1 92.4% [IC95 83.5–96.7; n=66] · pass^3 86.4% [IC95 66.7–95.3; n=22] · instáveis: q-mem-02, q-mem-04
 
@@ -275,8 +265,6 @@ Matriz de confusão do router (todos os splits):
 |---|---:|---:|---:|
 | knowledge | **10** | · | 100% |
 | troubleshoot | · | **2** | 100% |
-
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 0.221442 (teto 0.33369) · erros de LLM 0
 
@@ -317,8 +305,6 @@ Matriz de confusão do router (todos os splits):
 | support | · | · | **3** | · | 100% |
 | troubleshoot | · | · | · | **6** | 100% |
 
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
-
 Estabilidade (3 rodadas): pass@1 96.7% [IC95 83.3–99.4; n=30] · pass^3 90.0% [IC95 59.6–98.2; n=10] · instáveis: official-02
 
 Ao vivo: status `complete` · gasto US$ 0.910835 (teto 1.95) · erros de LLM 0
@@ -353,8 +339,6 @@ Matriz de confusão do router (todos os splits):
 |---|---:|---:|
 | multi | **4** | 100% |
 
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
-
 Ao vivo: status `complete` · gasto US$ 0.099706 (teto 0.134367) · erros de LLM 0
 
 ### Split `partial` — `live_partial.json`
@@ -386,8 +370,6 @@ Matriz de confusão do router (todos os splits):
 |---|---:|---:|
 | knowledge | **5** | 100% |
 
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
-
 Ao vivo: status `complete` · gasto US$ 0.002138 (teto 0.167959) · erros de LLM 0
 
 ### Split `real` — `live_real.json`
@@ -405,8 +387,6 @@ Provedor `anthropic` · status `complete` · gasto US$ 1.534212 (teto 1.112299)
 | p95_ms | 45648.0 | 45648.0 |
 | cost_usd | 1.534212 | 1.534212 |
 | crashes | 0 | 0 |
-
-Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
 Ao vivo: status `complete` · gasto US$ 1.534212 (teto 1.112299) · erros de LLM 0
 <!-- eval-live:end -->

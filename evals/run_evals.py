@@ -287,11 +287,25 @@ def cited_source(got: dict) -> bool:
     return bool(got.get("sources")) or any(c.get("ok", True) for c in got.get("tool_calls") or [])
 
 
+# 1ª frase que abre com abstenção: o cliente lê "não consegui confirmar" e não a resposta, mesmo com o fato embaixo.
+_ABSTAIN_OPENING = re.compile(
+    r"^\W*(?:i (?:couldn'?t|could not|can'?t|cannot) (?:confirm|find|answer)|the sources? (?:don'?t|do not|only)"
+    r"|here(?:'s| is) what the sources cover|i don'?t have (?:real-time|that)|não (?:consegui|encontrei|tenho)"
+    r"|as fontes (?:não|só)|a base (?:não|só))", re.IGNORECASE)
+
+
+def opens_with_abstention(answer: str) -> bool:
+    first = re.split(r"(?<=[.!?])\s|\n", (answer or "").strip(), maxsplit=1)[0]
+    return bool(_ABSTAIN_OPENING.search(first))
+
+
 def resolved(got: dict, missing: list[str]) -> bool:
     """Manchete dos oficiais ("fundamentadas" dava 1,00 contando "passei para um humano" como certo, com o juiz
-    dando helpful 0,733): resolvido = sem humano E todo fato de referência na resposta E ao menos uma fonte citada."""
+    dando helpful 0,733): resolvido = sem humano E todo fato de referência na resposta E ao menos uma fonte citada
+    E a 1ª frase não é abstenção ("I couldn't confirm…" com o fato embaixo contava como resolvido)."""
+    answer = (got.get("answer") or "").strip()
     return not handed_off(got) and not missing and cited_source(got) and not got.get("blocked") \
-        and bool((got.get("answer") or "").strip())
+        and bool(answer) and not opens_with_abstention(answer)
 
 
 def resolved_summary(rows: list[dict]) -> dict:
@@ -557,10 +571,12 @@ def split_weights(splits: list[str], repeat: dict[str, int]) -> dict[str, float]
         mine = [c for c in cases if c["split"] == s]
         measured = _measured_usd_per_case(s)
         rep = max(1, repeat.get(s, 1))
+        turns = float(sum((1 + len(c.get("before") or [])) for c in mine) * rep)
         if measured is not None and per_turn > 0:
-            out[s] = round(len(mine) * rep * measured / per_turn, 4)
+            # piso = os turnos: rodada anterior que morreu em timeout (US$ 0,002 por caso) não pode encolher a cota
+            out[s] = round(max(len(mine) * rep * measured / per_turn, turns), 4)
         else:
-            out[s] = float(sum((1 + len(c.get("before") or [])) for c in mine) * rep)
+            out[s] = turns
     return out
 
 
@@ -1552,8 +1568,8 @@ def to_markdown(report: dict, split_view: bool = False) -> str:
             for exp, got_map in sorted(fm["intent_confusion"].items())))
     if fm.get("intent_matrix"):
         out.append("\n" + intent_matrix_table(fm["intent_matrix"]))
-    gc = report.get("gate_calibration") or {}
-    thr = report.get("coverage_min_score")
+    gc = {} if split_view else report.get("gate_calibration") or {}  # o portão é do corpus: sai uma vez, no offline
+    thr = None if split_view else report.get("coverage_min_score")
     if thr or gc.get("best"):
         line = "\nPortão sem fonte:"
         if thr:

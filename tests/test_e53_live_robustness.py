@@ -136,3 +136,12 @@ def test_measured_cost_per_case_weighs_the_share(monkeypatch):
     monkeypatch.setenv("LIVE_USD_PER_TURN", "0.025")
     weights = run_evals.split_weights(["official", "replan"], {})
     assert weights["official"] == 4.0 and weights["replan"] == pytest.approx(3 * 0.2 / 0.025)
+
+
+def test_measured_cost_from_a_timed_out_run_does_not_shrink_the_share(monkeypatch):
+    """partial morreu em node_timeout (US$ 0,0004 por caso): a cota seguinte não pode cair a quase zero e abortar."""
+    run_evals.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    (run_evals.RESULTS_DIR / "live_official.json").write_text(json.dumps(
+        {"rows": [{}] * 4, "spent_usd": 0.0016}), encoding="utf-8")
+    monkeypatch.setenv("LIVE_USD_PER_TURN", "0.025")
+    assert run_evals.split_weights(["official"], {})["official"] == 4.0

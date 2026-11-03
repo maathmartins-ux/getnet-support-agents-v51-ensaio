@@ -394,8 +394,10 @@ e como comparar pela primeira entrega.
 | 17:25:40 | 311 | confirmação: resultado offline regenerado com o código atual |
 | 17:25:41 | 311 | readme: números e linha do tempo (fill_readme, último passo) |
 | 17:51:39 | 337 | kit v5.5.1: segredos aleatórios, HITL no compose, todo oficial com fato, clima com segunda fonte |
+| 17:56:52 | 342 | kit: guardrail fora do ar segura escrita; idioma medido só com LLM |
+| 17:59:42 | 345 | kit: tarja de número sem falso positivo (data de amanhã, identificador da tool) |
 
-Do primeiro ao último commit: **337 min**.
+Do primeiro ao último commit: **345 min**.
 <!-- timeline:end -->
 
 </details>

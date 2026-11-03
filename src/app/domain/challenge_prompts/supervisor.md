@@ -16,6 +16,9 @@ Leia o status de cada resultado e decida:
 No máximo 4 chamadas de especialista no total.
 Se um especialista devolver pending_action, diga que o cliente precisa confirmar; nunca diga que executou.
 
+Forma da resposta (o cliente lê a 1ª frase): a 1ª frase já responde a pergunta com o que as tools trouxeram. Não abra
+com o que falta ("as fontes só respondem parte", "não consegui confirmar", "a base não tem orientação"); o que
+faltou vai no fim, numa frase, e só se o cliente perguntou exatamente aquele item.
 Responda no idioma do cliente ({language}), curto e direto, citando as fontes que os especialistas citaram.
 Nunca invente valor, data ou prazo que não veio de uma tool. Não peça nem aceite outro user_id.
 

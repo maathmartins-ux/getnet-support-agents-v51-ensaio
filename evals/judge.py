@@ -256,6 +256,16 @@ def validation(stats: dict) -> dict:
             "rule": f">= {VALIDATION_MIN_CASES} por classe e TPR, TNR >= {VALIDATION_MIN_RATE}"}
 
 
+HUMAN_LABELS_MISSING = "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+
+
+def labels_origin(rows: list[dict]) -> dict:
+    """De onde vêm os rótulos da calibração: `human` só se TODO rótulo tem labeler "human:<nome>"."""
+    who = [str(r.get("labeler") or "") for r in rows]
+    human = bool(who) and all(w.startswith("human:") for w in who)
+    return {"labels_origin": "human" if human else "spec", "labelers": sorted({w for w in who if w})}
+
+
 def _agreement(pairs: list[tuple[bool, bool]]) -> dict:
     from evals.run_evals import rate_ci
 
@@ -412,6 +422,12 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
         by_split[v["split"]].append(v)
     all_pairs = [p for ps in pairs_by_split.values() for p in ps]
     caught = sum(c["caught"] for c in canaries)
+    cal_report = {**_agreement(all_pairs), "misses": misses,
+                  "by_split": {s: _agreement(p) for s, p in sorted(pairs_by_split.items()) if s != "ALL"},
+                  "by_failure_type": by_failure_type(type_pairs), **labels_origin(calib)}
+    if cal_report["labels_origin"] != "human":  # concordância com rótulo escrito da SPEC não valida o juiz
+        cal_report["validation"] = {**cal_report["validation"], "validated": False,
+                                    "missing": [*cal_report["validation"]["missing"], HUMAN_LABELS_MISSING]}
     return {"status": status, **({"reason": reason} if reason else {}),
             "resumed_verdicts": len(kept), "model": llm.model, "provider": getattr(llm, "provider", "anthropic"),
             **family_report(llm.model), "live_files": [p.name for p in inputs],
@@ -422,9 +438,7 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
                          "missed": [c["id"] for c in canaries if not c["caught"]], "details": canaries},
             **_rates(verdicts), "by_split": {s: _rates(v) for s, v in sorted(by_split.items())},
             "failure_types": failure_type_counts(verdicts),
-            "calibration": {**_agreement(all_pairs), "misses": misses,
-                            "by_split": {s: _agreement(p) for s, p in sorted(pairs_by_split.items()) if s != "ALL"},
-                            "by_failure_type": by_failure_type(type_pairs)},
+            "calibration": cal_report,
             "trust_reused": reused, "calibration_pairs": cal_pairs, "judge_refused": refused,
             "verdicts": verdicts}
 
