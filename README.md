@@ -344,9 +344,9 @@ e como comparar pela primeira entrega.
 | 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
 | 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
 | 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
-| 21:51:46 | 577 | corpus: páginas que vinham vazias renderizadas (ofertas, WhatsApp, taxas: +23 trechos, ids existentes intactos); fatos dos oficiais mais estritos |
+| 21:56:33 | 582 | README: §3 em uma linha por tema (tabela completa em docs/COBERTURA.md), linha do tempo só com marcos; transcrição com pedido duplo (humano + dado) |
 
-Do primeiro ao último commit: **577 min**, 103 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **582 min**, 104 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
