@@ -264,9 +264,8 @@ def rerank_mode() -> str:
 
 def rerank_order() -> str:
     # RERANK_ORDER=cross (padrão): a nota do cross-encoder reordena o top do base. base: a ordem do base fica e a nota
-    # só vai no trecho (o portão sem fonte usa a nota, MIN_RERANK). Escolha por medida no gold do domínio: num corpus
-    # real o denso sozinho ordenou melhor (Recall@3 0,898 × 0,856, MRR igual) e a nota do cross separou com × sem
-    # fonte um pouco melhor que o cosseno (AUC 0,93 × 0,92): ordem do base + portão pela nota.
+    # só vai no trecho (o portão sem fonte usa a nota, MIN_RERANK). Escolha por medida no gold do domínio
+    # (`--choose-retriever` mede as duas e grava a escolha e a tabela em data/retriever.json).
     mode = (os.getenv("RERANK_ORDER") or _bundle().get("rerank_order") or "cross").lower()
     return mode if mode in ("cross", "base") else "cross"
 
@@ -372,10 +371,14 @@ def coverage_min_cosine(default: float) -> float:
 def choice_gate() -> dict:
     # Limiares do portão calibrados para a escolha medida; só valem se o ambiente não trocou retriever, modelo ou
     # rerank (limiar de um retriever aplicado a outro deixaria passar pergunta sem fonte).
+    # Ordem, pool e caracteres lidos mudam a nota do cross (e o máximo do top-k que o portão compara): contam também.
     c = retriever_choice()
     same = (retriever_name() == c.get("retriever") and rerank_mode() == (c.get("rerank") or "off")
             and (not c.get("embed_model") or embed_model() == c.get("embed_model"))
-            and (not c.get("rerank_model") or rerank_model() == c.get("rerank_model")))
+            and (not c.get("rerank_model") or rerank_model() == c.get("rerank_model"))
+            and (not c.get("rerank") or rerank_order() == (c.get("rerank_order") or "cross"))
+            and (not c.get("rerank_pool") or rerank_pool() == int(c["rerank_pool"]))
+            and (not c.get("rerank_chars") or rerank_chars() == int(c["rerank_chars"])))
     gate = c.get("gate") if same else None
     return gate if isinstance(gate, dict) else {}
 

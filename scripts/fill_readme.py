@@ -453,8 +453,8 @@ def retrieval_block(results: Path, data: Path | None = None) -> str:
         head += f" Escolha do domínio: {chosen['_doc']}"
     gate = (chosen.get("choice") or {}).get("gate") or {}
     if gate.get("min_rerank") is not None:
-        head += (f" Portão sem fonte da escolha: nota do cross-encoder >= {gate['min_rerank']:g} (o MIN_RERANK do "
-                 "domínio, se houver, vence).")
+        head += (f" Portão sem fonte da escolha: nota do cross-encoder >= {gate['min_rerank']:g} (vale este enquanto "
+                 "a busca for a mesma; sem ele, o MIN_RERANK do domínio).")
     return head + "\n\n" + markdown(chosen.get("measured") or {}, chosen.get("chosen"))
 
 

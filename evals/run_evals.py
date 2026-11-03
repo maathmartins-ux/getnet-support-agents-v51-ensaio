@@ -1170,9 +1170,11 @@ def _retrieval_cache_key(path: Path) -> str | None:
         p = HERE.parent / name
         if p.exists():
             h.update(p.read_bytes())
+    # todo botão que muda a busca entra na chave (a ordem do rerank também: sem ela, RERANK_ORDER=cross devolvia o
+    # placar gravado da ordem base, e a comparação das duas ordens saía idêntica)
     h.update(repr((config.retriever_name(), config.embed_model(), config.rerank_mode(), config.rerank_model(),
-                   config.rerank_pool(), config.rerank_chars(), config.faq_top_k(), config.faq_max_searches(),
-                   os.getenv("HYBRID_LANG_GATE", "on"), os.getenv("DOMAIN", ""))).encode())
+                   config.rerank_pool(), config.rerank_chars(), config.rerank_order(), config.faq_top_k(),
+                   config.faq_max_searches(), os.getenv("HYBRID_LANG_GATE", "on"), os.getenv("DOMAIN", ""))).encode())
     for f in ("src/app/rag.py", "src/app/agents.py", "src/app/ingest.py", "evals/retrieval_eval.py"):
         p = HERE.parent / f
         if p.exists():
@@ -1276,7 +1278,26 @@ def apply_min_rerank(gate: dict) -> int:
         text = text.rstrip("\n") + "\n\n" + line + "\n"
     target.write_text(text, encoding="utf-8")
     print(f"MIN_RERANK = {gate['min_rerank']} gravado em {target.relative_to(HERE.parent)}")
+    _sync_choice_min_rerank(gate["min_rerank"])
     return 0
+
+
+def _sync_choice_min_rerank(value: float) -> None:
+    """A escolha gravada (data/retriever.json) vence o domínio quando a busca é a mesma (agents.rerank_threshold): a
+    calibração nova vai para os dois, senão o app seguiria com o limiar antigo da escolha sem aviso."""
+    from app import config
+
+    path = config.data_dir() / "retriever.json"
+    try:
+        saved = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    gate = (saved.get("choice") or {}).get("gate")
+    if not isinstance(gate, dict) or "min_rerank" not in gate or not config.choice_gate():
+        return
+    gate["min_rerank"] = value
+    path.write_text(json.dumps(saved, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"min_rerank da escolha em {path.name} atualizado para {value} (a mesma busca: vale o mais novo)")
 
 
 def apply_min_score(cal: dict) -> int:

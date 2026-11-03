@@ -1,0 +1,160 @@
+{
+  "_doc": "Caminho de busca do AGENTE (agents.retrieve: palavras do cliente + plano, fusão de até 3 buscas) nas duas ordens do cross-encoder, mesmo gold (evals/retrieval.jsonl) e mesmo corpus; gerado de evals/results/latest.json (ordem do denso, a escolhida) e de um run_evals offline com RERANK_ORDER=cross gravado fora de evals/results. O '-dirty' da medida cross é só a chave do cache da medida de busca em evals/run_evals.py, corrigida para levar a ordem (sem ela, RERANK_ORDER=cross devolvia o placar gravado da ordem base).",
+  "gold": "evals/retrieval.jsonl",
+  "base": {
+    "git_sha": "3f59e89",
+    "recorded_at": "2026-11-03T23:19:27Z",
+    "retriever": "dense+cross:base",
+    "path": "agente",
+    "cases": 59,
+    "recall@3": 0.881,
+    "recall@5": 0.915,
+    "mrr": 0.836,
+    "mrr@10": 0.845,
+    "hit@3": 0.898,
+    "hit@3_ci": {
+      "k": 53,
+      "n": 59,
+      "lo": 79.5,
+      "hi": 95.3
+    },
+    "page": {
+      "recall@3": 0.89,
+      "mrr": 0.912,
+      "hit@3": 0.949,
+      "hit@3_ci": {
+        "k": 56,
+        "n": 59,
+        "lo": 86.1,
+        "hi": 98.3
+      }
+    },
+    "by_origin": {
+      "official": {
+        "cases": 6,
+        "recall@3": 0.833,
+        "recall@5": 0.917,
+        "mrr@10": 0.708
+      },
+      "page": {
+        "cases": 39,
+        "recall@3": 0.897,
+        "recall@5": 0.923,
+        "mrr@10": 0.904
+      },
+      "real": {
+        "cases": 14,
+        "recall@3": 0.857,
+        "recall@5": 0.893,
+        "mrr@10": 0.738
+      }
+    },
+    "separation_rerank": {
+      "auc": 0.925,
+      "gap": -5.059,
+      "positives": 57,
+      "negatives": 4,
+      "enough": false
+    },
+    "rerank_gate": {
+      "min_rerank": 0.931,
+      "pos_answered": 0.789,
+      "neg_refused": 1.0,
+      "meets_floor": true,
+      "pos_ci": {
+        "k": 45,
+        "n": 57,
+        "lo": 66.7,
+        "hi": 87.5
+      },
+      "neg_ci": {
+        "k": 4,
+        "n": 4,
+        "lo": 51.0,
+        "hi": 100.0
+      },
+      "positives": 57,
+      "negatives": 4,
+      "neg_refusal_min": 0.85,
+      "enough": false
+    }
+  },
+  "cross": {
+    "git_sha": "ef0f16d-dirty",
+    "recorded_at": "2026-11-03T23:26:29Z",
+    "retriever": "dense+cross",
+    "path": "agente",
+    "cases": 59,
+    "recall@3": 0.856,
+    "recall@5": 0.907,
+    "mrr": 0.842,
+    "mrr@10": 0.857,
+    "hit@3": 0.864,
+    "hit@3_ci": {
+      "k": 51,
+      "n": 59,
+      "lo": 75.5,
+      "hi": 93.0
+    },
+    "page": {
+      "recall@3": 0.886,
+      "mrr": 0.915,
+      "hit@3": 0.932,
+      "hit@3_ci": {
+        "k": 55,
+        "n": 59,
+        "lo": 83.8,
+        "hi": 97.3
+      }
+    },
+    "by_origin": {
+      "official": {
+        "cases": 6,
+        "recall@3": 0.833,
+        "recall@5": 0.917,
+        "mrr@10": 0.875
+      },
+      "page": {
+        "cases": 39,
+        "recall@3": 0.897,
+        "recall@5": 0.923,
+        "mrr@10": 0.904
+      },
+      "real": {
+        "cases": 14,
+        "recall@3": 0.75,
+        "recall@5": 0.857,
+        "mrr@10": 0.72
+      }
+    },
+    "separation_rerank": {
+      "auc": 0.93,
+      "gap": -5.059,
+      "positives": 57,
+      "negatives": 4,
+      "enough": false
+    },
+    "rerank_gate": {
+      "min_rerank": 0.931,
+      "pos_answered": 0.807,
+      "neg_refused": 1.0,
+      "meets_floor": true,
+      "pos_ci": {
+        "k": 46,
+        "n": 57,
+        "lo": 68.7,
+        "hi": 88.9
+      },
+      "neg_ci": {
+        "k": 4,
+        "n": 4,
+        "lo": 51.0,
+        "hi": 100.0
+      },
+      "positives": 57,
+      "negatives": 4,
+      "neg_refusal_min": 0.85,
+      "enough": false
+    }
+  }
+}

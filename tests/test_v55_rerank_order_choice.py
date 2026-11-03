@@ -1,5 +1,5 @@
-"""v5.5.1: o comparativo do buscador mede a ordem do denso com a nota do cross só no portão, e a escolha automática
-desempata pela cobertura do portão (no domínio Getnet a ordem do denso venceu: Recall@3 0,898 × 0,856, MRR igual)."""
+"""v5.5.1: o comparativo do buscador mede a ordem do denso com a nota do cross só no portão; a escolha automática
+desempata pela cobertura do portão, e o limiar da nota gravado na escolha só vale para a mesma busca."""
 from __future__ import annotations
 
 import json
@@ -114,14 +114,14 @@ def test_choose_checks_the_floor_of_the_gate_the_app_uses():
     assert no["name"] == "bm25" and "portão" in no["rejected"]["dense+cross"]
 
 
-def test_rerank_threshold_falls_back_to_the_choice_gate(monkeypatch):
-    """Ambiente → MIN_RERANK do domínio → min_rerank da escolha gravada (o rag só entrega o gate sem queda)."""
+def test_rerank_threshold_follows_env_then_choice_then_domain(monkeypatch):
+    """Mesma ordem dos outros limiares: ambiente → escolha gravada (calibrada PARA a busca em uso) → domínio."""
     monkeypatch.delenv("COVERAGE_MIN_RERANK", raising=False)
     dom = type("D", (), {"MIN_SCORE": 0.5})()
     monkeypatch.setattr(agents.domain, "active", lambda: dom)
     assert agents.rerank_threshold() is None and agents.rerank_threshold({"min_rerank": -3.0}) == -3.0
     dom.MIN_RERANK = -5.5
-    assert agents.rerank_threshold({"min_rerank": -3.0}) == -5.5
+    assert agents.rerank_threshold({"min_rerank": -3.0}) == -3.0 and agents.rerank_threshold({}) == -5.5
     monkeypatch.setenv("COVERAGE_MIN_RERANK", "-1")
     assert agents.rerank_threshold({"min_rerank": -3.0}) == -1.0
     monkeypatch.delenv("COVERAGE_MIN_RERANK")
@@ -141,6 +141,71 @@ def test_readme_block_tolerates_a_choice_without_budget_and_shows_the_gate(tmp_p
         encoding="utf-8")
     block = retrieval_block(tmp_path, data=tmp_path)
     assert "Escolha do domínio: ordem do denso" in block and "nota do cross-encoder >= -5.5017" in block
+    assert "vale este enquanto a busca for a mesma" in block
     assert "dense+cross:base **← escolhida** | 0.915 | 0.898 | 0.842" in block and "98% / 86% (nota do cross)" in block
     assert "Recall@5 (o redator lê)" in block
     assert "`:base` = a ordem fica a do buscador base" in block
+
+
+def _choice_dir(tmp_path, monkeypatch, choice: dict):
+    from conftest import KIT_DATA
+
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "sample.jsonl").write_text((KIT_DATA / "data" / "sample.jsonl").read_text("utf-8"), encoding="utf-8")
+    (data / "retriever.json").write_text(json.dumps({"choice": choice}), encoding="utf-8")
+    monkeypatch.setenv("DATA_DIR", str(data))
+    for k in ("RETRIEVER", "RERANK", "RERANK_ORDER", "RERANK_POOL", "RERANK_CHARS", "EMBED_MODEL", "RERANK_MODEL"):
+        monkeypatch.delenv(k, raising=False)
+    return data
+
+
+def test_choice_gate_holds_only_for_the_same_search(tmp_path, monkeypatch):
+    """O min_rerank calibrado para ordem base, pool 10 e 600 caracteres não vale se o ambiente muda qualquer um."""
+    from app import config
+
+    _choice_dir(tmp_path, monkeypatch, {"retriever": "bm25", "rerank": "cross", "rerank_model": config.rerank_model(),
+                                        "rerank_pool": 10, "rerank_chars": 600, "rerank_order": "base",
+                                        "gate": {"min_rerank": -5.5}})
+    assert config.choice_gate() == {"min_rerank": -5.5}
+    for env, value in (("RERANK_ORDER", "cross"), ("RERANK_POOL", "30"), ("RERANK_CHARS", "1500")):
+        monkeypatch.setenv(env, value)
+        assert config.choice_gate() == {}, env
+        monkeypatch.delenv(env)
+    assert config.choice_gate() == {"min_rerank": -5.5}
+
+
+def test_recorded_base_order_reaches_the_app_retriever(tmp_path, monkeypatch):
+    """`rerank_order: base` gravado em data/retriever.json chega ao CrossRerankRetriever do app (order None →
+    config.rerank_order() pela escolha): a busca mantém a ordem do base e o nome diz isso."""
+    from app import config
+
+    _choice_dir(tmp_path, monkeypatch, {"retriever": "bm25", "rerank": "cross", "rerank_order": "base"})
+    assert config.rerank_order() == "base"
+    runtime = rag.CrossRerankRetriever(_Base(_hits()), _Scorer([0.1, 0.9, 0.5]), pool=3)
+    assert runtime.name == "dense+cross:base" and [h.doc.id for h in runtime.search("q", k=3)] == ["d-0", "d-1", "d-2"]
+
+
+def test_choose_rejects_noise_over_the_latency_budget_but_reader_recall_still_decides():
+    """A variante que passou 3,7 ms do orçamento sai rejeitada, e a escolha seria a mesma se ela coubesse."""
+    cross = {**_row(0.859, 0.873, 1503.7, gate=COS, rerank_gate=NOTE, rerank="cross"), "recall@5": 0.907}
+    base = {**_row(0.842, 0.898, 1308.8, gate=COS, rerank_gate=NOTE, rerank="cross", rerank_order="base"),
+            "recall@5": 0.915}
+    picked = rv.choose({"dense+cross": cross, "dense+cross:base": base}, budget_ms=1500)
+    assert picked["name"] == "dense+cross:base" and "1503.7" in picked["rejected"]["dense+cross"]
+    assert rv.choose({"dense+cross": cross, "dense+cross:base": base}, budget_ms=1600)["name"] == "dense+cross:base"
+
+
+def test_verify_flags_drift_in_reader_recall_and_gate():
+    rec = {"chosen": "x", "measured": {"x": {"mrr": 0.8, "recall@3": 0.8, "recall@5": 0.9,
+                                             "rerank_gate": {"pos_answered": 0.98, "neg_refused": 0.86,
+                                                             "positives": 59, "negatives": 22}}}}
+    same = {"x": {"mrr": 0.8, "recall@3": 0.8, "recall@5": 0.9,
+                  "rerank_gate": {"pos_answered": 0.983, "neg_refused": 0.864}}}
+    assert rv.verify(rec, same) == []
+    drift = {"x": {**same["x"], "recall@5": 0.5}}
+    assert any("recall@5" in p for p in rv.verify(rec, drift))
+    gate_drift = {"x": {**same["x"], "rerank_gate": {"pos_answered": 0.9, "neg_refused": 0.86}}}
+    assert any("pos_answered" in p for p in rv.verify(rec, gate_drift))
+    one_question = {"x": {**same["x"], "rerank_gate": {"pos_answered": 0.98, "neg_refused": 0.818}}}
+    assert rv.verify(rec, one_question) == []  # 1 de 22 trocando de lado do limiar: tolerado

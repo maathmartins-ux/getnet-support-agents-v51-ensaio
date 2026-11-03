@@ -33,3 +33,19 @@ def test_cache_keeps_last_eight_and_off_disables(tmp_path, monkeypatch):
 def test_metrics_off_skips_measure(monkeypatch):
     monkeypatch.setenv("RETRIEVAL_METRICS", "off")
     assert run_evals.retrieval_metrics() is None
+
+
+def test_cache_key_follows_every_retrieval_knob(tmp_path, monkeypatch):
+    """Cada botão que muda o resultado da busca muda a chave: a ordem do rerank, o pool e os caracteres lidos."""
+    monkeypatch.setenv("RETRIEVAL_CACHE", "on")
+    gold = tmp_path / "retrieval.jsonl"
+    gold.write_text(json.dumps({"q": "a", "relevant": ["x"]}) + "\n", encoding="utf-8")
+    keys = set()
+    for env in ({}, {"RERANK_ORDER": "base"}, {"RERANK_ORDER": "cross"}, {"RERANK_POOL": "30"},
+                {"RERANK_CHARS": "1500"}):
+        for k in ("RERANK_ORDER", "RERANK_POOL", "RERANK_CHARS"):
+            monkeypatch.delenv(k, raising=False)
+        for k, v in env.items():
+            monkeypatch.setenv(k, v)
+        keys.add(run_evals._retrieval_cache_key(gold))
+    assert len(keys) == 4  # sem RERANK_ORDER vale a ordem padrão (cross): mesma chave de RERANK_ORDER=cross

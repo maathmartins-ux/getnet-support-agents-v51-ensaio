@@ -271,19 +271,21 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
 
 # --- configurações -------------------------------------------------------------------------------------------
 def default_configs(embed_models: list[str], rerank_models: list[str],
-                    pool: int | list[int] | None = None) -> list[dict]:
+                    pool: int | list[int] | None = None, chars: int | None = None) -> list[dict]:
     """bm25, hybrid e dense por modelo de embedding, e cada um deles + cross-encoder por modelo de rerank e por
     tamanho do pool (o custo do cross-encoder é linear no pool: pool menor cabe no orçamento de latência). O denso
-    entra também com a ordem dele e a nota do cross só no portão (`rerank_order: base`): num domínio real ordenou
-    melhor que a ordem do cross (Recall@3 0,898 × 0,856, MRR igual)."""
+    entra também com a ordem dele e a nota do cross só no portão (`rerank_order: base`); qual ordem vale é medida de
+    cada domínio. Os caracteres lidos pelo cross ficam fixos (`chars`): sem isso, RERANK_CHARS no ambiente ou a escolha
+    anterior mudariam o comparativo por fora."""
     pools = pool if isinstance(pool, list) else [pool or 20]
+    chars = chars or KIT_CHARS
     bases = [{"retriever": "bm25"}]
     bases += [{"retriever": r, "embed_model": m} for m in embed_models for r in ("hybrid", "dense")]
     out = list(bases)
-    out += [{**b, "rerank": "cross", "rerank_model": rm, "rerank_pool": p} for b in bases
+    out += [{**b, "rerank": "cross", "rerank_model": rm, "rerank_pool": p, "rerank_chars": chars} for b in bases
             for rm in rerank_models for p in pools]
-    out += [{**b, "rerank": "cross", "rerank_model": rm, "rerank_pool": p, "rerank_order": "base"} for b in bases
-            if b["retriever"] == "dense" for rm in rerank_models for p in pools]
+    out += [{**b, "rerank": "cross", "rerank_model": rm, "rerank_pool": p, "rerank_chars": chars,
+             "rerank_order": "base"} for b in bases if b["retriever"] == "dense" for rm in rerank_models for p in pools]
     return out
 
 
@@ -293,6 +295,7 @@ def default_configs(embed_models: list[str], rerank_models: list[str],
 # vetorizar o corpus com o e5-large, uma vez; o cache em var/embeddings serve depois a API e o eval).
 FAST_EMBED = "intfloat/multilingual-e5-large"
 FAST_CROSS = "BAAI/bge-reranker-v2-m3-int8"
+KIT_CHARS = 600  # caracteres de cada trecho que o cross lê na grade (o mesmo do KIT_RETRIEVER do app)
 FAST_CONFIGS = (
     {"retriever": "bm25"},
     {"retriever": "dense", "embed_model": FAST_EMBED},
@@ -300,9 +303,8 @@ FAST_CONFIGS = (
     # 0,734 / 0,937 / 896 ms do pool 5 com 1500 caracteres; pool 20 subiu a 0,777 com p95 de 4,7 s (fora do teto)
     {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
      "rerank_chars": 600},
-    # a mesma busca com a ordem do denso; a nota do cross só decide o portão sem fonte. No gold de um domínio real
-    # (Getnet, 03/11/2026): Recall@3 0,898 × 0,856 da ordem do cross, MRR igual; a nota separou com × sem fonte um
-    # pouco melhor que o cosseno (AUC 0,93 × 0,92). O choose() desempata pela cobertura do portão antes do p95.
+    # a mesma busca com a ordem do denso; a nota do cross só decide o portão sem fonte. Qual das duas ordens lê melhor
+    # é medida de cada domínio (a tabela vai para data/retriever.json); o choose() desempata pela cobertura do portão.
     {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
      "rerank_chars": 600, "rerank_order": "base"},
 )
@@ -503,9 +505,10 @@ def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
     `ram_budget_mb` None desliga o teto.
 
     Por que o recall do redator vem antes do MRR: o redator lê os K_GEN trechos juntos, então a resposta depende de
-    o trecho certo estar entre eles, não da posição; e o recall não oscila entre medições, ao contrário do p95. No
-    domínio Getnet a ordem do cross tinha MRR 0,859 × 0,842 mas Recall@5 0,907 × 0,915, e a escolha por MRR
-    dependia de 3,7 ms de p95 (as duas variantes fazem a mesma conta no cross-encoder).
+    o trecho certo estar entre eles mais do que da posição; e o recall não oscila entre medições, ao contrário do p95
+    (duas variantes com a mesma conta no cross-encoder já mediram p95 dos dois lados do orçamento). Diferença de uma
+    pergunta no gold é empate técnico: a tabela gravada (data/retriever.json) mostra as métricas lado a lado, e o
+    caminho do agente (fusão das buscas) se mede à parte com `run_evals` por ordem (RERANK_ORDER).
 
     Nenhuma dentro do orçamento → bm25 (sem dependência e sem modelo). Devolve {name, config, reason, rejected}.
     """
@@ -638,9 +641,15 @@ def verify(recorded: dict, results: dict[str, dict]) -> list[str]:
         old, new = (recorded.get("measured") or {}).get(name, {}), results.get(name, {})
         if new.get("status") == "unavailable":
             problems.append(f"{name} indisponível agora: {new.get('reason')}")
-        for key in ("mrr", f"recall@{K}"):
+        for key in ("mrr", f"recall@{K}", f"recall@{K_GEN}"):
             if key in old and key in new and abs(old[key] - new[key]) > VERIFY_TOL:
                 problems.append(f"{key} de {name}: gravado {old[key]} × medido {new[key]}")
+        og, ng = old.get("rerank_gate") or {}, new.get("rerank_gate") or {}
+        for key, n in (("pos_answered", og.get("positives")), ("neg_refused", og.get("negatives"))):
+            # a nota do ONNX varia na 4ª casa entre CPUs: tolera 1 pergunta trocando de lado do limiar
+            tol = max(VERIFY_TOL, 1 / n) if n else VERIFY_TOL
+            if key in og and key in ng and abs(og[key] - ng[key]) > tol + 1e-9:
+                problems.append(f"portão da nota de {name}, {key}: gravado {og[key]} × medido {ng[key]}")
     return problems
 
 
@@ -684,7 +693,7 @@ def choose_cli(args, gold: Path, results_dir: Path, sha: str | None) -> int:
     ram_budget = ram_arg if ram_arg is not None else (recorded.get("ram_budget_mb") or RAM_BUDGET_MB)
     ram_budget = None if ram_budget <= 0 else ram_budget  # 0 = sem teto de RAM
     if getattr(args, "fast", False):
-        configs = [dict(c) for c in FAST_CONFIGS]  # 3 configurações: cabe no relógio (a grade leva quase 1 h)
+        configs = [dict(c) for c in FAST_CONFIGS]  # 4 configurações: cabe no relógio (a grade leva quase 1 h)
     else:
         embeds, crosses = recorded_models(recorded)  # --verify refaz as MESMAS configurações que a escolha gravada
         pools = [int(p) for p in split(getattr(args, "rerank_pools", None),

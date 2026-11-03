@@ -13,15 +13,16 @@ configuração que não cabe na memória.
 **Decisão.**
 - `choose()` aceita só configuração com p95 por consulta ≤ `--latency-budget-ms` (padrão 1500) **e** RAM ≤
   `--ram-budget-mb` (padrão 4096; 0 desliga) **e** portão que recusa ≥ 85% das perguntas sem fonte; entre elas, maior
-  MRR. A RAM de cada configuração é medida no próprio comparativo: o processo antes do 1º modelo + o RSS que cada
+  MRR (emenda abaixo: hoje, maior Recall@5). A RAM de cada configuração é medida no próprio comparativo: o processo antes do 1º modelo + o RSS que cada
   modelo dela somou ao carregar. A escolha gravada (data/retriever.json) traz os dois tetos e a RAM de cada linha.
 - 4096 MB por processo: API + eval ao vivo cabem em 8 GB, metade da máquina, com a outra sessão ao lado.
 - O eval ao vivo roda todos os splits num processo só (`run_evals --live --splits a,b,c`), cada um com a sua cota,
   arquivo e cassete; os modelos carregam uma vez. `live_eval.sh` e `live_eval.ps1` usam esse modo sempre.
 - Vetorização do corpus em lotes de 16 trechos ordenados por tamanho e sem a arena de memória do ONNX; vetor por
   trecho em disco (re-ingest só vetoriza o texto novo); cache compartilhado entre os worktrees do relógio.
-- `--choose-retriever --fast` mede só 3 configurações (bm25, dense[e5-large], dense[e5-large] + bge-m3-int8 com
-  pool 10 e 600 caracteres por trecho), e `scripts/fetch_models.py --fast` baixa os dois modelos no T+0.
+- `--choose-retriever --fast` mede 4 configurações (bm25, dense[e5-large], dense[e5-large] + bge-m3-int8 com
+  pool 10 e 600 caracteres por trecho, nas duas ordens: a do cross e a do denso com a nota só no portão), e
+  `scripts/fetch_models.py --fast` baixa os dois modelos no T+0.
 
 **Prova** (medida antes do relógio, CPU de 4 vCPU compartilhada).
 
@@ -58,3 +59,15 @@ configuração que não cabe na memória.
 **Não provado.** Latência em máquina dedicada (todas as medidas acima foram em máquina compartilhada, load 2–7,6; o
 mesmo pool 10 mediu p95 de 1130 ms e de 3345 ms em duas rodadas); RAM fora do Linux (sem `/proc`, a RAM sai `None`
 e não reprova); o teto de 4096 MB não foi testado contra uma falta real de memória; e5-large quantizado.
+
+**Emenda (03/11/2026, rodada 10 do ensaio): critério e ordem do rerank.**
+- Critério: maior Recall@5 (os trechos que o redator lê), empate → MRR → Recall@3 → cobertura do portão em uso → p95.
+  Mudou depois de ver a medida deste domínio, e isso fica dito: por MRR, a escolha entre as duas ordens do cross
+  dependia de alguns ms de p95 acima do orçamento entre duas variantes que fazem a mesma conta.
+- Ordem: a do denso, com a nota do cross só no portão sem fonte (`dense+cross:base`). A tabela da escolha está em
+  `data/retriever.json` e, por pergunta, em `evals/results/retrieval_compare.json`; o caminho do agente (fusão de até
+  3 buscas) nas duas ordens, em `evals/results/retrieval_order_agent.json`: a do denso põe mais trechos certos no que
+  o redator lê (Recall@3, Recall@5, hit@3 e, nas perguntas reais, Recall@5), com MRR praticamente igual. As
+  diferenças são de 1 a 2 perguntas em 59: empate técnico com vantagem no recall, não uma vitória medida com folga.
+- O limiar da nota gravado na escolha vale só para a mesma busca (modelo, ordem, pool e caracteres); precedência
+  ambiente → escolha → domínio, como os outros limiares.

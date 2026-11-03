@@ -210,12 +210,13 @@ def expand_query(text: str) -> str:
 
 # --- faq -------------------------------------------------------------------------------------
 def rerank_threshold(gate: dict | None = None) -> float | None:
-    """Limiar da nota do cross-encoder no portão sem fonte: COVERAGE_MIN_RERANK (env) → MIN_RERANK do domínio
-    (`run_evals --calibrate-rerank-gate --apply`) → `gate` do buscador escolhido (o `--choose-retriever` calibra o
-    `min_rerank` junto com a escolha; o rag só entrega o `gate` se nada caiu) → None (vale o portão BM25/cosseno)."""
-    own = getattr(domain.active(), "MIN_RERANK", None)
+    """Limiar da nota do cross-encoder no portão sem fonte, na mesma ordem dos outros limiares: COVERAGE_MIN_RERANK
+    (env) → `gate` do buscador escolhido (calibrado PARA ele; o rag só o entrega se nada caiu e a busca é a mesma:
+    modelo, ordem, pool e caracteres) → MIN_RERANK do domínio (`run_evals --calibrate-rerank-gate --apply`, que
+    também atualiza o da escolha) → None (vale o portão BM25/cosseno)."""
+    own = (gate or {}).get("min_rerank")
     if own is None:
-        own = (gate or {}).get("min_rerank")
+        own = getattr(domain.active(), "MIN_RERANK", None)
     return coverage_min_rerank(own)
 
 
