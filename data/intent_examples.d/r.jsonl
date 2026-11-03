@@ -1,0 +1,26 @@
+{"text": "Quais são as taxas da maquininha Get Mini?", "intent": "knowledge"}
+{"text": "Qual maquininha aceita aproximação?", "intent": "knowledge"}
+{"text": "Como faço para pedir uma Get Smart?", "intent": "knowledge"}
+{"text": "O Pix da Getnet tem tarifa?", "intent": "knowledge"}
+{"text": "Which card machine prints receipts?", "intent": "knowledge"}
+{"text": "Does the Payment Link accept installments?", "intent": "knowledge"}
+{"text": "What are the advance fees for credit sales?", "intent": "knowledge"}
+{"text": "Is there a monthly fee for the terminal?", "intent": "knowledge"}
+{"text": "Vai chover em Curitiba no sábado?", "intent": "general"}
+{"text": "Quanto está o dólar agora?", "intent": "general"}
+{"text": "Is it going to be hot in Recife this weekend?", "intent": "general"}
+{"text": "How much is the US dollar in reais today?", "intent": "general"}
+{"text": "Quanto eu recebo na próxima semana?", "intent": "support"}
+{"text": "Mostre as minhas vendas no crédito", "intent": "support"}
+{"text": "Show me the deposits scheduled for this week", "intent": "support"}
+{"text": "How much did I sell last Friday?", "intent": "support"}
+{"text": "Quais terminais estão ativos na minha conta?", "intent": "support"}
+{"text": "List my transactions from today", "intent": "support"}
+{"text": "A maquininha travou e não imprime o comprovante", "intent": "troubleshoot"}
+{"text": "O cartão do cliente não passa no terminal", "intent": "troubleshoot"}
+{"text": "The card machine screen shows a communication failure", "intent": "troubleshoot"}
+{"text": "My terminal keeps dropping the signal", "intent": "troubleshoot"}
+{"text": "Quero falar com um atendente", "intent": "human_request"}
+{"text": "Me transfere para uma pessoa, por favor", "intent": "human_request"}
+{"text": "I want to talk to a human agent", "intent": "human_request"}
+{"text": "Get me a real person on the line", "intent": "human_request"}
