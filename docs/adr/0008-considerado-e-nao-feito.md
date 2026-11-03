@@ -14,6 +14,15 @@ medida no relógio e responde "por que não X?" com número.
 | Juiz de outra família de modelo | — (não medido) | o juiz do kit é validado contra humanos com regra fixada antes (TPR 0,875, TNR 1,0, kappa 0,875); a troca existe (`JUDGE_PROVIDER=openai_compat`), mas exige outra chave e outra calibração no relógio, e a validação humana é o que garante a medida |
 | Escolher o buscador no relógio (`--choose-retriever`) | V5: com 8 subagentes na mesma CPU, p95 do rerank 2,9–3,5 s × 1,1–1,25 s com a máquina parada; foi o caminho crítico | latência só se mede com a máquina parada: a escolha é do kit, antes do relógio (ADR 0004) |
 
+**Gatilho para revisitar (Getnet).**
+
+| Item | Revisitar quando |
+|---|---|
+| Busca híbrida como padrão | o corpus da Getnet ganhar código de produto/termo exato (nome de maquininha, taxa, MCC) em que o denso erre no gold, ou chegar pergunta em PT sobre corpus em PT com Recall@5 do híbrido ≥ ao do denso numa nova medida |
+| Rerank pool 20 / trecho 1000 | máquina com GPU (latência do rerank deixa de ser o caminho crítico) |
+| Juiz de outra família | houver chave de outro provedor E uma nova rodada de rótulo humano para calibrar a regra |
+| Escolher o buscador no relógio | nunca no relógio; só no kit, com a máquina parada |
+
 **Decisão.** Padrão mantido: denso (e5-large) + cross-encoder (bge-reranker-v2-m3), top-10, 600 caracteres; juiz
 do kit com a regra de validação.
 
