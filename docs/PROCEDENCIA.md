@@ -110,12 +110,12 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
-| `scripts` | 4505 | 76 | 14 | 6 |
-| `src/app` | 10844 | 848 | 3 | 6 |
-| `tests` | 12008 | 519 | 10 | 4 |
+| `scripts` | 4505 | 111 | 20 | 6 |
+| `src/app` | 10844 | 852 | 5 | 7 |
+| `tests` | 12008 | 556 | 12 | 8 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **8087** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 33. Fora da conta, por serem gerados: 132216 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **8163** escritas no relógio (18% do total). Arquivos do kit alterados no relógio: 38. Fora da conta, por serem gerados: 132216 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

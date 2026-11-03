@@ -15,6 +15,47 @@ strategy (§6).
 
 ## 0. Resultado em uma tela
 
+O que o sistema entrega nos cenários do enunciado, medido ao vivo e gerado por `scripts/fill_readme.py` a partir de
+`evals/results/` commitado (o `check.py` reprova divergência). As respostas reais de cada cenário oficial, com os
+passos que o supervisor escolheu (agente, status, ferramentas, tempo), estão em [docs/DEMO.md](docs/DEMO.md); as
+tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em [docs/PROCEDENCIA.md](docs/PROCEDENCIA.md).
+
+<!-- scorecard:begin -->
+| medida | valor | como se mede |
+|---|---:|---|
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
+| Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Juiz: respostas oficiais úteis (helpful) | 0.97 | juiz LLM: a resposta resolve o que o lojista perguntou |
+| Memória ao vivo: pass@1 | 0.92 | conversas de vários turnos: o fato do turno anterior chega à resposta |
+| Busca: Recall@3 | 0.84 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
+| Busca: MRR | 0.82 | posição média da primeira página certa (1 = sempre em primeiro) |
+<!-- scorecard:end -->
+
+### 0.1 Mapeamento do desafio
+
+| Requisito do enunciado | Implementação | Onde |
+|---|---|---|
+| Router Agent: entrada, decide o agente ou a sequência | router LLM (intenção, pergunta completa do turno, buscas) e supervisor LLM que observa cada resultado e decide o próximo passo | `src/app/router.py`, `src/app/supervisor.py` |
+| Knowledge Agent: RAG sobre o site + busca para o geral | busca densa + reranker nas páginas oficiais da Getnet, resposta só com fonte citada; clima e câmbio por ferramenta de dado ao vivo | `src/app/rag.py`, `src/app/agents.py`, `data/knowledge/` |
+| Customer Support Agent com ≥ 2 tools | `get_settlements`, `get_transactions`, `get_terminal_status`, `request_advance` sobre os dados do próprio lojista (identidade pelo token) | `src/app/domain/challenge/tools.py` |
+| Comunicação entre agentes | especialistas como ferramentas do supervisor, passos registrados por turno | `src/app/supervisor.py` (`steps`) |
+| `POST` com `{"message", "user_id"}` → JSON | `/chat` | `src/app/api.py` |
+| Docker | `docker compose up -d --build` | `Dockerfile`, `docker-compose.yml` |
+| Testes e estratégia de integração | §6 | `tests/`, `evals/`, `scripts/check.py` |
+| Bônus: 4º agente humano | escalada com consulta ao operador dentro do turno e retomada do plano | `src/app/hitl_sync.py`, `src/app/resume.py` |
+| Bônus: guardrails | entrada (injeção, dado de outro cliente, fora do escopo) e saída (número e frase sem base) | `src/app/guardrails.py`, `src/app/grounding.py` |
+| Bônus: redirect/handoff | sem fonte ou sem dado → humano, com o motivo | `src/app/supervisor.py` |
+| Bônus: avaliação e observabilidade | gabarito por cenário, juiz, traces, métricas e alertas | §6, `src/app/observability.py`, `ops/` |
+
+### 0.2 Teste em 3 minutos
+
+1. `docker compose up -d --build` e abra `http://localhost:8000/docs`.
+2. Entre como o lojista de teste (§1, passo Entrar) e mande o 1º cenário oficial (o `curl` do §1).
+3. Mande um seguimento curto ("e quanto custa?"): a resposta usa o turno anterior.
+4. Pergunte algo que o site não cobre ("Vocês têm maquininha com impressora térmica colorida?"): a resposta diz o que
+   a fonte cobre e oferece o atendente; pedido sem fonte vai ao operador, que responde em `/operator`.
+
 **Desde a última avaliação** (cada lacuna que a correção anterior citou → o que mudou → a prova; a tabela e os
 números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
 
@@ -28,41 +69,7 @@ números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
 | Avaliação independente: um rotulador, held-out de 24 | 2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes | Rotuladores humanos independentes **não medido** · Held-out cego: casos **80** · Held-out cego: ponta a ponta (humano passa) **não medido** · Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) **1** · Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa **1.00**; `tests/test_v54_judge_validation_real.py` |
 <!-- since:end -->
 
-Nesta tentativa: **sem validação humana** (ensaio pré-produção sem rotuladores; J1, J1b e J2 não aconteceram) e **rodada 2 não medida** (corte do T+45).
-
-Cada número que pesa na avaliação, ao lado da referência que a própria avaliação usou. Os que ficam abaixo aparecem
-aqui, com a causa (mecanismo e número) em §7, não escondidos.
-Gerado por `scripts/fill_readme.py` a partir de `evals/results/` commitado (o `check.py` reprova divergência).
-Tabelas completas, com intervalo de confiança por split: [docs/RESULTS.md](docs/RESULTS.md). Respostas reais dos
-cenários oficiais: [docs/DEMO.md](docs/DEMO.md). O que veio do kit: [docs/PROCEDENCIA.md](docs/PROCEDENCIA.md).
-
-<!-- scorecard:begin -->
-| métrica | valor | referência da avaliação | situação | de onde vem |
-|---|---:|---:|---|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | 0.90 | na referência | `live_official.json resolved` |
-| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | 0.90 | na referência | `live_official.json resolved` |
-| Juiz: respostas oficiais úteis (helpful) | 0.97 | 0.90 | na referência | `judge.json by_split.official` |
-| Juiz: respostas oficiais fundamentadas | 1.00 | 0.90 | na referência | `judge.json by_split.official` |
-| Oficiais: números com base na evidência | 100.0% | 95.0% | na referência | `live_official.json numbers_acc` |
-| Oficiais: pass^k (todas as rodadas passam) | 1.00 | 0.90 | na referência | `live_official.json` |
-| Memória ao vivo: pass@1 | 0.92 | 0.85 | na referência | `live_memory.json stability` |
-| Memória ao vivo: números com base | 100.0% | 95.0% | na referência | `live_memory.json numbers_acc` |
-| Busca: Recall@3 | 0.84 | 0.85 | abaixo da referência (causa nos limites) | `latest.json retrieval` |
-| Busca: MRR | 0.82 | 0.80 | na referência | `latest.json retrieval` |
-| Busca: Recall@5 (o que o redator lê) | 0.89 | — | diagnóstico | `latest.json retrieval` |
-| Held-out cego: casos | 80 | 80 | na referência | `latest.json metrics.heldout` |
-| Held-out cego: ponta a ponta (humano passa) | não medido | 0.80 | não medido | `human_review.json heldout` |
-| Held-out cego: intenção (diagnóstico) | 86.2% | — | diagnóstico | `latest.json metrics.heldout` |
-| Rotuladores humanos independentes | não medido | 2 | não medido | `human_review.json` |
-| Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa | 1.00 | 0.80 | na referência | `judge.json calibration` |
-| Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) | 1 | 1 | na referência | `judge.json calibration.validation` |
-| Custo por turno resolvido sem humano (ao vivo) | US$ 0.0339 | — | diagnóstico | `live_*.json spent_usd ÷ linhas sem handoff` |
-| Turnos resolvidos sem humano (ao vivo, todos os splits) | 0.88 | — | diagnóstico | `live_*.json linhas sem handoff` |
-
-**Abaixo da referência ou sem medida (3 de 19), com a causa nos limites:** Busca: Recall@3 (0.84); Held-out cego: ponta a ponta (humano passa) (não medido); Rotuladores humanos independentes (não medido).
-<!-- scorecard:end -->
-
-Uma rodada ao vivo só (a 2ª não coube no relógio; `docs/JUDGE_DIFF.md` não medido). Oficiais: todas resolvidas sem humano, com o fato de referência e fonte, e o juiz (com o texto das fontes) as dá por fundamentadas. Abaixo da referência: memória (o seguimento cita o valor do turno anterior em metade dos casos com `expects_fact`), Recall@3 logo abaixo da meta e a validação humana, que não houve. Causas em §7.
+Nesta tentativa: **sem validação humana** (ensaio pré-produção sem rotuladores) e **rodada 2 não medida** (corte do T+45).
 
 ## 1. How to build, configure, run and test (construir, configurar, rodar e testar)
 
@@ -394,8 +401,10 @@ e como comparar pela primeira entrega.
 | 16:10:50 | 236 | confirmação: pergunta sobre a própria Getnet vai ao conhecimento (replan-06/11/12 iam ao general sem escalar) |
 | 16:10:51 | 236 | readme: números e linha do tempo (fill_readme, último passo) |
 | 16:16:09 | 241 | confirmação: check e live_eval recusam buscador em fallback (kit 83d17f7) |
+| 16:16:09 | 241 | readme: números e linha do tempo (fill_readme, último passo) |
+| 16:28:15 | 253 | confirmação: kit v5.5 (perfil Skywalker: supervisor LLM em todo turno, manchete sem meta própria) |
 
-Do primeiro ao último commit: **241 min**.
+Do primeiro ao último commit: **253 min**.
 <!-- timeline:end -->
 
 </details>
@@ -403,5 +412,5 @@ Do primeiro ao último commit: **241 min**.
 ## 9. Limitações e próximos passos
 
 - CRM (2 clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (Pix D+0, débito D+1 útil, crédito D+30) e a fila do operador.
-- **Memória pass@1 e números da memória:** o seguimento ('e qual foi o valor dela?') roteia certo, mas a resposta não repete o valor do turno anterior; corrigir = levar o fato já visto (`memory.py` fatos) ao prompt do records/faq e medir de novo (~1 rodada, US$ 3). **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana e held-out ponta a ponta:** não medidos, ninguém rotulou neste ensaio. **Portão sem fonte:** em uso, recusa pouco dos sem fonte; o calibrado recusaria os oficiais em inglês (decisão em §4). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
+- **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana e held-out ponta a ponta:** não medidos, ninguém rotulou neste ensaio. **Portão sem fonte:** em uso, recusa pouco dos sem fonte; o calibrado recusaria os oficiais em inglês (decisão em §4). **Guardrail offline:** a regex sozinha bloqueia 23 de 32 ataques; o ao vivo soma o classificador LLM.
 - Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana (ninguém até T+35: 'factual sem validação humana', 'sem rodada de consenso'); análise de erros não revisada (J2 não aconteceu); rodada 1 começou no T+25 (o gate ficou verde, mas o `--calibrate-gate` não foi adotado) e o 1º processo foi morto por falta de memória (4 processos pesados ao mesmo tempo); replan e dependent ao vivo abortaram por teto de gasto e ficaram fora; rodada 2 não medida (T+45); `check.py --docker --scale` não reconferido no relógio.
