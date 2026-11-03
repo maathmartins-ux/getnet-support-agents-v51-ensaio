@@ -1,0 +1,30 @@
+{
+  "_doc": "CRM de teste (frente T). Datas relativas a hoje: days_ago / hours_ago são resolvidos no código (tools.py).",
+  "cliente1988": {
+    "name": "Loja 1988",
+    "terminals": [
+      {"terminal_id": "T1988A", "model": "Get Smart", "connection": "Wi-Fi", "status": "online", "signal": "bom", "last_contact_hours_ago": 0},
+      {"terminal_id": "T1988B", "model": "Get Clássica", "connection": "chip", "status": "offline", "signal": "sem sinal", "last_contact_hours_ago": 5}
+    ],
+    "transactions": [
+      {"transaction_id": "TX1001", "days_ago": 1, "method": "debito", "status": "aprovada", "amount": 120.00, "terminal_id": "T1988A"},
+      {"transaction_id": "TX1002", "days_ago": 1, "method": "debito", "status": "aprovada", "amount": 80.50, "terminal_id": "T1988A"},
+      {"transaction_id": "TX1003", "days_ago": 1, "method": "credito", "status": "aprovada", "amount": 350.00, "terminal_id": "T1988A"},
+      {"transaction_id": "TX1004", "days_ago": 1, "method": "credito", "status": "aprovada", "amount": 199.90, "terminal_id": "T1988B"},
+      {"transaction_id": "TX1005", "days_ago": 1, "method": "pix", "status": "aprovada", "amount": 64.00, "terminal_id": "T1988A"},
+      {"transaction_id": "TX1006", "days_ago": 2, "method": "credito", "status": "aprovada", "amount": 500.00, "terminal_id": "T1988A"},
+      {"transaction_id": "TX1007", "days_ago": 1, "method": "credito", "status": "recusada", "amount": 210.00, "decline_code": "51", "terminal_id": "T1988A"},
+      {"transaction_id": "TX1008", "days_ago": 1, "method": "debito", "status": "recusada", "amount": 75.00, "decline_code": "05", "terminal_id": "T1988B"}
+    ]
+  },
+  "cliente2024": {
+    "name": "Loja 2024",
+    "terminals": [
+      {"terminal_id": "T2024A", "model": "Get Mini", "connection": "chip", "status": "online", "signal": "bom", "last_contact_hours_ago": 0}
+    ],
+    "transactions": [
+      {"transaction_id": "TX2001", "days_ago": 1, "method": "credito", "status": "aprovada", "amount": 990.00, "terminal_id": "T2024A"},
+      {"transaction_id": "TX2002", "days_ago": 1, "method": "debito", "status": "recusada", "amount": 42.00, "decline_code": "14", "terminal_id": "T2024A"}
+    ]
+  }
+}

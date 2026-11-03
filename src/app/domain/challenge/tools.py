@@ -1,170 +1,424 @@
 """Domínio do desafio — FERRAMENTAS (frente T): registro TOOLS e caminho offline do records.
 
-Contrato lido pelo motor: TOOLS, ELIGIBLE_STATUS, records(), records_offline(). Teste em
-tests/test_tools.py. Nenhuma tool da loja de exemplo pode sobrar aqui (check.py reprova).
+Contrato lido pelo motor: TOOLS, ELIGIBLE_STATUS, records(), users(), records_offline(), needs_for().
+Teste em tests/test_tools.py. Toda conta (total, contagem, data de depósito, dia útil, significado do código de
+recusa) é feita AQUI; o LLM só lê o resultado.
 """
 from __future__ import annotations
 
 import json
 import re
+from datetime import date, datetime, timedelta
 from functools import lru_cache
 
 from app.config import data_dir
 
-# --- ferramentas (registro lido por actions.py e mcp_server.py) ---------------------------------------------
-# Contrato de cada função: recebe os argumentos do schema + `user_id` (sempre o autenticado, injetado pelo
-# servidor) e devolve {ok, data} ou {ok: False, error}. Mesma resposta para inexistente e de outro dono.
-_ID = {"type": "string", "pattern": r"^\d{4}$", "description": "Número do registro (4 dígitos)"}
+# --- adaptador do CRM -----------------------------------------------------------------------------------------
 
 
 @lru_cache(maxsize=4)
-def _records(path: str) -> dict:
+def _crm(path: str) -> dict:
     return json.loads(open(path, encoding="utf-8").read())
 
 
 def records() -> dict:
-    """Adaptador do sistema de registro: hoje data/records.json; em produção, a API do CRM (mesma assinatura)."""
-    return _records(str(data_dir() / "records.json"))
+    """Adaptador do sistema de registro: hoje data/crm/merchants.json; em produção, a API do CRM."""
+    return {k: v for k, v in _crm(str(data_dir() / "crm" / "merchants.json")).items() if not k.startswith("_")}
 
 
-def _lookup(record_id: str, user_id: str) -> dict:
-    rec = records().get(record_id)
-    if not rec or rec["owner"] != user_id:  # mesma resposta para inexistente e de outro dono
+def users() -> list[str]:
+    """Usuários de teste do login: os clientes do CRM."""
+    return sorted(records())
+
+
+def _merchant(user_id: str) -> dict:
+    return records().get(user_id) or {"terminals": [], "transactions": []}
+
+
+# --- datas relativas e dia útil ---------------------------------------------------------------------------------
+
+
+def _today() -> date:
+    return date.today()
+
+
+def _business(d: date) -> date:
+    while d.weekday() >= 5:  # sábado/domingo → próximo dia útil (feriados: fora do CRM de teste)
+        d += timedelta(days=1)
+    return d
+
+
+def _add_business_days(d: date, n: int) -> date:
+    while n > 0:
+        d += timedelta(days=1)
+        if d.weekday() < 5:
+            n -= 1
+    return d
+
+
+def _relative(d: date) -> dict:
+    delta = (d - _today()).days
+    pt = {0: "hoje", 1: "amanhã", -1: "ontem"}.get(delta, f"em {delta} dias" if delta > 0 else f"há {-delta} dias")
+    en = {0: "today", 1: "tomorrow", -1: "yesterday"}.get(delta,
+                                                          f"in {delta} days" if delta > 0 else f"{-delta} days ago")
+    return {"date": d.isoformat(), "relative_pt": pt, "relative_en": en}
+
+
+# Regra de liquidação do CRM de teste: Pix D+0, débito D+1 dia útil, crédito D+30 (ajustado ao próximo dia útil).
+def _deposit_date(sale: date, method: str) -> date:
+    if method == "pix":
+        return sale
+    if method == "debito":
+        return _add_business_days(sale, 1)
+    return _business(sale + timedelta(days=30))
+
+
+METHOD_LABEL = {"debito": ("débito", "debit"), "credito": ("crédito", "credit"), "pix": ("Pix", "Pix")}
+
+# Significado dos códigos de recusa; o LLM não converte código, a tool devolve o texto.
+DECLINE_CODES = {
+    "51": {"pt": "saldo ou limite insuficiente no cartão do cliente",
+           "en": "insufficient funds or credit limit on the customer's card",
+           "action_pt": "peça outro cartão ou outra forma de pagamento",
+           "action_en": "ask for another card or payment method"},
+    "05": {"pt": "transação não autorizada pelo banco emissor (genérica)",
+           "en": "transaction not authorized by the issuing bank (generic)",
+           "action_pt": "o portador deve contatar o banco emissor; tente outro cartão",
+           "action_en": "the cardholder should contact the issuing bank; try another card"},
+    "14": {"pt": "número de cartão inválido", "en": "invalid card number",
+           "action_pt": "confira o cartão e tente de novo", "action_en": "check the card and try again"},
+}
+_UNKNOWN_CODE = {"pt": "código não catalogado", "en": "uncatalogued code", "action_pt": "", "action_en": ""}
+
+
+def _money(v: float) -> str:
+    return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+# --- ferramentas ---------------------------------------------------------------------------------------------
+# Contrato: argumentos do schema + `user_id` (do servidor, nunca do schema) → {ok, data} | {ok: False, error}.
+# Registro de outro cliente e inexistente devolvem a MESMA resposta: not_found.
+_PERIOD = {"type": "string", "enum": ["yesterday", "today", "last_7_days"],
+           "description": "Período das vendas (padrão: yesterday)"}
+_METHOD = {"type": "string", "enum": ["debito", "credito", "pix"], "description": "Forma de pagamento"}
+_TX_ID = {"type": "string", "pattern": r"^TX\d{4}$", "description": "Id da transação (ex.: TX1007)"}
+_TERM_ID = {"type": "string", "pattern": r"^T\d{4}[A-Z]$", "description": "Id do terminal (ex.: T1988A)"}
+
+
+def _in_period(days_ago: int, period: str) -> bool:
+    return {"today": days_ago == 0, "yesterday": days_ago == 1}.get(period, 0 <= days_ago <= 7)
+
+
+def _get_settlements(user_id: str, period: str = "yesterday", method: str | None = None) -> dict:
+    sales = [t for t in _merchant(user_id)["transactions"] if t["status"] == "aprovada"
+             and _in_period(t["days_ago"], period) and (method is None or t["method"] == method)]
+    groups: dict[tuple, dict] = {}
+    for t in sales:
+        sale = _today() - timedelta(days=t["days_ago"])
+        dep = _deposit_date(sale, t["method"])
+        g = groups.setdefault((t["method"], dep), {
+            "method": t["method"], "method_pt": METHOD_LABEL[t["method"]][0],
+            "method_en": METHOD_LABEL[t["method"]][1], "count": 0, "total": 0.0, "sale_date": _relative(sale),
+            "deposit_date": _relative(dep), "status": "pago" if dep <= _today() else "agendado"})
+        g["count"] += 1
+        g["total"] = round(g["total"] + t["amount"], 2)
+    items = sorted(groups.values(), key=lambda g: g["deposit_date"]["date"])
+    for g in items:
+        g["total_brl"] = _money(g["total"])
+    total = round(sum(g["total"] for g in items), 2)
+    return {"ok": True, "data": {"period": period, "items": items, "count": sum(g["count"] for g in items),
+                                 "total": total, "total_brl": _money(total),
+                                 "rule": "Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)"}}
+
+
+def _get_transactions(user_id: str, status: str = "all", transaction_id: str | None = None,
+                      period: str = "last_7_days") -> dict:
+    txs = _merchant(user_id)["transactions"]
+    if transaction_id:
+        txs = [t for t in txs if t["transaction_id"] == transaction_id]
+        if not txs:  # inexistente e de outro cliente: mesma resposta
+            return {"ok": False, "error": "not_found"}
+    else:
+        txs = [t for t in txs if _in_period(t["days_ago"], period)]
+    if status != "all":
+        txs = [t for t in txs if t["status"] == {"approved": "aprovada", "declined": "recusada"}[status]]
+    items = []
+    for t in txs:
+        item = {k: v for k, v in t.items() if k != "days_ago"}
+        item["date"] = _relative(_today() - timedelta(days=t["days_ago"]))
+        item["amount_brl"] = _money(t["amount"])
+        item["method_pt"], item["method_en"] = METHOD_LABEL[t["method"]]
+        if t.get("decline_code"):
+            item["decline_meaning"] = DECLINE_CODES.get(t["decline_code"], _UNKNOWN_CODE)
+        items.append(item)
+    declined = [i for i in items if i["status"] == "recusada"]
+    data = {"items": items, "count": len(items), "declined_count": len(declined),
+            "approved_count": len(items) - len(declined),
+            "approved_total": round(sum(i["amount"] for i in items if i["status"] == "aprovada"), 2),
+            "declined_total": round(sum(i["amount"] for i in declined), 2)}
+    data["approved_total_brl"] = _money(data["approved_total"])
+    data["declined_total_brl"] = _money(data["declined_total"])
+    out = {"ok": True, "data": data}
+    if declined:
+        out["needs"] = [dict(NEED_DECLINE)]
+    return out
+
+
+def _get_terminal_status(user_id: str, terminal_id: str | None = None) -> dict:
+    terms = _merchant(user_id)["terminals"]
+    if terminal_id:
+        terms = [t for t in terms if t["terminal_id"] == terminal_id]
+        if not terms:
+            return {"ok": False, "error": "not_found"}
+    now = datetime.now().replace(microsecond=0, second=0)
+    items = []
+    for t in terms:
+        item = {k: v for k, v in t.items() if k != "last_contact_hours_ago"}
+        h = t["last_contact_hours_ago"]
+        item["last_contact"] = (now - timedelta(hours=h)).isoformat(timespec="minutes")
+        item["offline_for_hours"] = h if t["status"] == "offline" else 0
+        items.append(item)
+    offline = [i["terminal_id"] for i in items if i["status"] == "offline"]
+    out = {"ok": True, "data": {"items": items, "count": len(items), "online_count": len(items) - len(offline),
+                                "offline_count": len(offline), "offline": offline}}
+    if offline:
+        out["needs"] = [dict(NEED_CONNECTION)]
+    return out
+
+
+def _request_advance(user_id: str, method: str = "credito") -> dict:
+    found = _get_settlements(user_id, "last_7_days", method)
+    sched = [g for g in found["data"]["items"] if g["status"] == "agendado"]
+    if not sched:
         return {"ok": False, "error": "not_found"}
-    return {"ok": True, "data": {"record_id": record_id, **{k: v for k, v in rec.items() if k != "owner"}}}
+    total = round(sum(g["total"] for g in sched), 2)
+    before = {"method": method, "status": "agendado", "total": total}
+    return {"ok": True, "data": {"status": "antecipacao_solicitada", "total": total, "total_brl": _money(total),
+                                 "before": before, "after": {**before, "status": "antecipacao_solicitada"}}}
 
 
-def _write(record_id: str, user_id: str, status: str) -> dict:
-    """Escrita do exemplo: devolve o registro antes e depois (o motor completa o que mudou, actions.record_change).
-    O exemplo não grava no arquivo; o CRM de verdade gravaria e devolveria o registro relido."""
-    found = _lookup(record_id, user_id)
+def _open_ticket(user_id: str, terminal_id: str, reason: str = "sem_conexao") -> dict:
+    found = _get_terminal_status(user_id, terminal_id)
     if not found["ok"]:
         return found
-    before = dict(found["data"])
-    return {"ok": True, "data": {"record_id": record_id, "status": status, "before": before,
-                                 "after": {**before, "status": status}}}
+    before = {"terminal_id": terminal_id, "ticket": None}
+    ticket = f"CH-{terminal_id}-{_today().strftime('%Y%m%d')}"
+    return {"ok": True, "data": {"ticket_id": ticket, "terminal_id": terminal_id, "reason": reason,
+                                 "status": "aberto", "before": before, "after": {**before, "ticket": ticket}}}
 
 
-def _cancel(record_id: str, user_id: str) -> dict:
-    return _write(record_id, user_id, "cancel_requested")
+def _obj(props: dict, required: list[str] | None = None) -> dict:
+    return {"type": "object", "properties": props, "required": required or [], "additionalProperties": False}
 
 
-def _refund(record_id: str, user_id: str) -> dict:
-    return _write(record_id, user_id, "refund_issued")
-
-
-_ONE_ID = {"type": "object", "properties": {"record_id": _ID}, "required": ["record_id"],
-           "additionalProperties": False}
 TOOLS = {
-    "lookup_record": {"description": "Consulta um registro do cliente autenticado.", "write": False,
-                      "input_schema": _ONE_ID, "fn": _lookup},
-    "cancel_record": {"description": "Solicita cancelamento. Exige confirmação do cliente.", "write": True,
-                      "input_schema": _ONE_ID, "fn": _cancel},
-    # risco alto: move dinheiro → confirmação do dono E aprovação de um operador (actions.py)
-    "refund_record": {"description": "Solicita estorno. Exige confirmação do cliente e aprovação de um atendente.",
-                      "write": True, "risk": "high", "input_schema": _ONE_ID, "fn": _refund},
+    "get_settlements": {"description": "Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de "
+                                       "depósito (dia útil), totais e contagens já calculados.", "write": False,
+                        "input_schema": _obj({"period": _PERIOD, "method": _METHOD}), "fn": _get_settlements},
+    "get_transactions": {"description": "Vendas e recusas do cliente autenticado, com o significado do código de "
+                                        "recusa, contagens e totais calculados.", "write": False,
+                         "input_schema": _obj({"status": {"type": "string", "enum": ["all", "approved", "declined"]},
+                                               "transaction_id": _TX_ID, "period": _PERIOD}),
+                         "fn": _get_transactions},
+    "get_terminal_status": {"description": "Terminais do cliente autenticado: conexão, sinal, último contato e há "
+                                           "quanto tempo está offline.", "write": False,
+                            "input_schema": _obj({"terminal_id": _TERM_ID}), "fn": _get_terminal_status},
+    # risco alto: mexe em dinheiro → confirmação do dono E aprovação de um operador (actions.py)
+    "request_receivables_advance": {"description": "Solicita antecipação dos recebíveis agendados. Exige confirmação "
+                                                   "do cliente e aprovação de um atendente.", "write": True,
+                                    "risk": "high", "input_schema": _obj({"method": _METHOD}),
+                                    "fn": _request_advance},
+    "open_support_ticket": {"description": "Abre chamado técnico para um terminal do cliente. Exige confirmação.",
+                            "write": True,
+                            "input_schema": _obj({"terminal_id": _TERM_ID,
+                                                  "reason": {"type": "string",
+                                                             "enum": ["sem_conexao", "sem_sinal", "erro_transacao",
+                                                                      "outro"]}}, ["terminal_id"]),
+                            "fn": _open_ticket},
 }
-# Ação de escrita -> status do item em que ela faz sentido. Medido: contestar escolhia a ÚLTIMA transação,
-# mesmo recusada; ali a regra seria {"open_chargeback": {"aprovada"}}. Aqui: estorno só de pedido que já saiu.
-ELIGIBLE_STATUS: dict[str, set[str]] = {"refund_record": {"enviado", "entregue"}}
+# Escrita → status do item em que faz sentido: só antecipa o que ainda está agendado; chamado para terminal offline.
+ELIGIBLE_STATUS: dict[str, set[str]] = {"request_receivables_advance": {"agendado"},
+                                        "open_support_ticket": {"offline"}}
 
-# --- achados que pedem outro especialista (replanejamento por ACHADO, não só por falha) ---------------------
-# Contrato: um agente devolve AgentResult.needs = [{"agent", "why", "hint"}]; uma tool pode devolver "needs" no
-# próprio resultado; e `needs_for(result, ctx)` (opcional) deriva o achado do resultado de tool, o que cobre o
-# caminho com LLM do records. O supervisor insere o passo se ALLOWED[de] tiver o agente e houver orçamento.
-# Exemplo (caso "dependent"): "Quando chega meu pedido 1002?" → o records vê "em separação" (ainda não saiu) →
-# a resposta só fica completa com o prazo da política de entrega → precisa do faq. Pedido "entregue": sem need.
-# Getnet: terminal offline → manual de conexão (knowledge); regra por modelo → modelo do terminal (support).
-NEEDS_BY_STATUS = {
-    "em separação": {"agent": "faq", "why": "pedido ainda não saiu: o prazo vem da política de entrega",
-                     "hint": "prazo de entrega"},
-}
-_WHEN = re.compile(r"\b(quando|prazo|demor\w*|cheg\w*|when|arriv\w*|how long)\b", re.IGNORECASE)
-
-
-def needs_from_status(ctx, status: str | None) -> list[dict]:
-    """Achado do registro + pergunta sobre prazo → precisa do especialista do NEEDS_BY_STATUS."""
-    need = NEEDS_BY_STATUS.get(status or "")
-    return [dict(need)] if need and _WHEN.search(ctx.text) else []
+# --- achados que pedem o Knowledge (replanejamento por ACHADO) -------------------------------------------------
+NEED_CONNECTION = {"agent": "faq", "why": "terminal offline/sem sinal: o passo a passo vem do manual de conexão",
+                   "hint": "manual de conexão da maquininha: chip, Wi-Fi, sinal"}
+NEED_DECLINE = {"agent": "faq", "why": "transação recusada: a orientação vem do Knowledge",
+                "hint": "transação recusada: orientação ao lojista"}
+_SYMPTOM = re.compile(r"(n[aã]o (conecta|liga)|sem sinal|offline|erro|recus|negad|won'?t|no signal|declin|losing|"
+                      r"reconnect|fix|what should|o que (eu )?fa[cç]o|resolv|evit|what now|significa|mean|why|"
+                      r"por ?que|houve|ajuda|error)", re.IGNORECASE)
 
 
 def needs_for(result, ctx) -> list[dict]:
-    """Deriva needs dos resultados de tool do records (caminho com LLM, que não monta `needs`)."""
-    if result.agent != "records":
+    """Deriva needs dos resultados de tool do records (caminho com LLM): só com sintoma na pergunta."""
+    if result.agent != "records" or not _SYMPTOM.search(ctx.text):
         return []
     for item in result.evidence:
         try:
             data = json.loads(item)
         except ValueError:
             continue
-        status = (data.get("data") or {}).get("status") if isinstance(data, dict) else None
-        if status:
-            return needs_from_status(ctx, status)
+        if isinstance(data, dict) and data.get("needs"):
+            return [dict(n) for n in data["needs"]]
     return []
 
 
-# --- caminho offline do agente records (sem LLM / provedor fora) -------------------------------------------
-_REC_ID = re.compile(r"\b(\d{4})\b")
-_CANCEL = re.compile(r"\bcancel", re.IGNORECASE)
-_REFUND = re.compile(r"\b(estorn|reembols|refund|devolu[cç][aã]o do (valor|dinheiro))", re.IGNORECASE)
+# --- caminho offline do agente records (sem LLM) ----------------------------------------------------------------
+_TERM = re.compile(r"\b(T\d{4}[A-Z])\b", re.IGNORECASE)
+_TXR = re.compile(r"\b(TX\d{4})\b", re.IGNORECASE)
+_ADVANCE = re.compile(r"(antecip|advance)", re.IGNORECASE)
+_TICKET = re.compile(r"(chamado|ticket)", re.IGNORECASE)
+_TERMINAL_Q = re.compile(r"(terminal|maquininha|m[aá]quina|machine|reader|get smart|get cl[aá]ssica|conect|connect|"
+                         r"wi-?fi|sinal|signal|chip|online|offline|fora|down)", re.IGNORECASE)
+_TX_Q = re.compile(r"(recus|negad|declin|c[oó]digo|code|erro|error|transa|valor|amount)", re.IGNORECASE)
+_OTHER = re.compile(r"\b(outr[oa]|other|segund[oa]|second)\b", re.IGNORECASE)
+_DEBIT, _CREDIT = re.compile(r"d[eé]bit", re.IGNORECASE), re.compile(r"cr[eé]dit", re.IGNORECASE)
 
 
-def _record_id(ctx) -> str | None:
-    found = _REC_ID.search(ctx.text)
-    if found:
-        return found.group(1)
-    for m in reversed(ctx.history):  # memória: "e pode cancelar ele?" usa o registro citado antes
-        found = _REC_ID.search(m["content"])
-        if found:
-            return found.group(1)
-    older = _REC_ID.findall(ctx.conversation_digest)  # citado antes da janela recente: o mais recente vale
-    return older[-1] if older else None
+def _context_text(ctx) -> str:
+    return " ".join([*(m["content"] for m in ctx.history[-4:]), ctx.facts.get("standalone") or ""])
 
 
-def records_offline(ctx, a):
-    """Atendimento determinístico do agente records. `a` = módulo app.agents (AgentResult, run_tool, _t...)."""
+def _norm(s: str) -> str:
+    return s.lower().replace("á", "a")
+
+
+def _offline_terminals(ctx, a, calls, ev) -> str:
+    t = a._t
+    text = ctx.facts.get("standalone") or ctx.text
+    tid = (_TERM.search(text) or [None, None])[1]
+    result, call = a.run_tool("get_terminal_status", {"terminal_id": tid.upper()} if tid else {}, ctx.user_id,
+                              ctx.conversation_id)
+    calls.append(call)
+    ev.append(json.dumps(result, ensure_ascii=False))
+    if not result.get("ok"):
+        return t(ctx, f"Não encontrei o terminal {tid} na sua conta.",
+                 f"I couldn't find terminal {tid} in your account.")
+    items = result["data"]["items"]
+    if not tid:
+        model = re.search(r"get (smart|cl[aá]ssica)", ctx.text, re.IGNORECASE)
+        if model:
+            items = [i for i in items if _norm(model.group(1)) in _norm(i["model"])] or items
+        elif _OTHER.search(ctx.text):  # "e o outro/segundo?": o terminal não citado na resposta anterior
+            prev = {m.upper() for m in _TERM.findall(_context_text(ctx))}
+            items = [i for i in items if i["terminal_id"] not in prev] or items[1:] or items
+    pt, en = [], []
+    for i in items:
+        if i["status"] == "offline":
+            pt.append(f"{i['terminal_id']} ({i['model']}, {i['connection']}) está offline, {i['signal']}, "
+                      f"há {i['offline_for_hours']} h (último contato {i['last_contact']})")
+            en.append(f"{i['terminal_id']} ({i['model']}, {i['connection']}) is offline with no signal for "
+                      f"{i['offline_for_hours']} h (last contact {i['last_contact']})")
+        else:
+            pt.append(f"{i['terminal_id']} ({i['model']}, {i['connection']}) está online")
+            en.append(f"{i['terminal_id']} ({i['model']}, {i['connection']}) is online")
+    return t(ctx, "; ".join(pt) + ".", "; ".join(en) + ".")
+
+
+def _offline_transactions(ctx, a, calls, ev) -> str:
+    t = a._t
+    text = ctx.facts.get("standalone") or ctx.text
+    txid = (_TXR.search(text) or [None, None])[1]
+    args = {"transaction_id": txid.upper()} if txid else {"status": "declined"}
+    result, call = a.run_tool("get_transactions", args, ctx.user_id, ctx.conversation_id)
+    calls.append(call)
+    ev.append(json.dumps(result, ensure_ascii=False))
+    if not result.get("ok"):
+        return t(ctx, f"Não encontrei a transação {txid} na sua conta.",
+                 f"I couldn't find transaction {txid} in your account.")
+    items = result["data"]["items"]
+    code = re.search(r"\b(?:c[oó]digo|code)\s*(\d{2})\b", ctx.text, re.IGNORECASE)
+    if code:
+        items = [i for i in items if i.get("decline_code") == code.group(1)] or items
+    elif _DEBIT.search(ctx.text) and not txid:
+        items = [i for i in items if i["method"] == "debito"] or items
+    if not items:
+        return t(ctx, "Não há vendas recusadas no período.", "There are no declined sales in the period.")
+    pt, en = [], []
+    for i in items:
+        m = i.get("decline_meaning") or {}
+        code_pt = f"recusada com código {i['decline_code']}: {m.get('pt')}; {m.get('action_pt')}"
+        code_en = f"declined with code {i['decline_code']}: {m.get('en')}; {m.get('action_en')}"
+        pt.append(f"{i['transaction_id']} ({i['method_pt']}, {i['amount_brl']}, {i['date']['relative_pt']}) "
+                  + (code_pt if i.get("decline_code") else "aprovada"))
+        en.append(f"{i['transaction_id']} ({i['method_en']}, {i['amount_brl']}, {i['date']['relative_en']}) "
+                  + (code_en if i.get("decline_code") else "approved"))
+    n = len(items)
+    return t(ctx, f"{n} venda(s): " + "; ".join(pt) + ".", f"{n} sale(s): " + "; ".join(en) + ".")
+
+
+def _offline_settlements(ctx, a, calls, ev) -> str:
+    t = a._t
+    method = "debito" if _DEBIT.search(ctx.text) else "credito" if _CREDIT.search(ctx.text) else None
+    result, call = a.run_tool("get_settlements", {"period": "yesterday", **({"method": method} if method else {})},
+                              ctx.user_id, ctx.conversation_id)
+    calls.append(call)
+    ev.append(json.dumps(result, ensure_ascii=False))
+    d = result["data"]
+    if not d["items"]:
+        return t(ctx, "Não há vendas aprovadas ontem.", "There were no approved sales yesterday.")
+    pt = [f"{g['method_pt']}: {g['total_brl']} ({g['count']} venda(s)) cai em {g['deposit_date']['date']} "
+          f"({g['deposit_date']['relative_pt']})" for g in d["items"]]
+    en = [f"{g['method_en']}: {g['total_brl']} ({g['count']} sale(s)) deposited on {g['deposit_date']['date']} "
+          f"({g['deposit_date']['relative_en']})" for g in d["items"]]
+    return t(ctx, f"Vendas de ontem, total {d['total_brl']}: " + "; ".join(pt) + ".",
+             f"Yesterday's sales, total {d['total_brl']}: " + "; ".join(en) + ".")
+
+
+def _offline_write(ctx, a, calls, ev):
     AgentResult, run_tool, t = a.AgentResult, a.run_tool, a._t
-    rid = _record_id(ctx)
-    if not rid:
-        return AgentResult("records", "ok", text=t(ctx, "Qual o número do pedido?", "What is the order number?"))
-    tool = ("refund_record" if _REFUND.search(ctx.text) else
-            "cancel_record" if _CANCEL.search(ctx.text) else "lookup_record")
-    calls: list = []
-    ev: list[str] = []
-    if tool in ELIGIBLE_STATUS:  # ação com regra de status: consulta antes de propor
-        found, lookup = run_tool("lookup_record", {"record_id": rid}, ctx.user_id, ctx.conversation_id)
-        calls.append(lookup)
-        ev.append(json.dumps(found, ensure_ascii=False))
-        if found.get("ok") and a.latest_eligible([found["data"]], tool) is None:
-            status = found["data"]["status"]
+    text = ctx.text
+    if _ADVANCE.search(text):
+        tool, args = "request_receivables_advance", {"method": "credito"}
+        what_pt, what_en = "antecipar os recebíveis de crédito agendados", "advance your scheduled credit receivables"
+    else:
+        status, call = run_tool("get_terminal_status", {}, ctx.user_id, ctx.conversation_id)
+        calls.append(call)
+        ev.append(json.dumps(status, ensure_ascii=False))
+        tid = (_TERM.search(text) or [None, None])[1]
+        if not tid:
+            off = a.latest_eligible((status.get("data") or {}).get("items", []), "open_support_ticket")
+            tid = off["terminal_id"] if off else None
+        if not tid:
             return AgentResult("records", "ok", tool_calls=calls, evidence=ev,
-                               facts={"record_id": rid, "status": status, "ineligible": tool},
-                               text=t(ctx, f'O pedido {rid} está "{status}": essa ação ainda não se aplica a ele. '
-                                           "Nada foi feito.",
-                                      f'Order {rid} is "{status}": this action does not apply to it yet. '
-                                      "Nothing has been done."))
-    result, call = run_tool(tool, {"record_id": rid}, ctx.user_id, ctx.conversation_id)
+                               text=t(ctx, "Qual terminal? Nenhum está offline.", "Which terminal? None is offline."))
+        tid = tid.upper()
+        tool, args = "open_support_ticket", {"terminal_id": tid, "reason": "sem_conexao"}
+        what_pt = f"abrir um chamado técnico para o terminal {tid}"
+        what_en = f"open a support ticket for terminal {tid}"
+    result, call = run_tool(tool, args, ctx.user_id, ctx.conversation_id)
     calls.append(call)
     ev.append(json.dumps(result, ensure_ascii=False))
     if result.get("needs_confirmation"):
         aid = result["action_id"]
-        verb_pt, verb_en = ("estornar", "refund") if tool == "refund_record" else ("cancelar", "cancel")
-        extra_pt = " Depois da sua confirmação, um atendente aprova." if result.get("risk") == "high" else ""
-        extra_en = " After you confirm, a human agent approves it." if result.get("risk") == "high" else ""
-        return AgentResult("records", "ok", tool_calls=calls, pending_action=aid, facts={"record_id": rid},
-                           evidence=ev,
-                           text=t(ctx, f"Para {verb_pt} o pedido {rid}, confirme a ação {aid}.{extra_pt} "
-                                       "Nada foi feito ainda.",
-                                  f"To {verb_en} order {rid}, confirm action {aid}.{extra_en} "
-                                  "Nothing has been done yet."))
-    if result.get("error") == "not_found":
-        return AgentResult("records", "ok", tool_calls=calls, facts={"record_not_found": rid}, evidence=ev,
-                           text=t(ctx, f"Não encontrei o pedido {rid} na sua conta.",
-                                  f"I couldn't find order {rid} in your account."))
-    if not result.get("ok"):
-        return AgentResult("records", "error", tool_calls=calls, reason="tool_error", evidence=ev)
-    data = result["data"]
-    return AgentResult("records", "ok", tool_calls=calls, facts={"record_id": rid, "status": data["status"]},
-                       evidence=ev, needs=needs_from_status(ctx, data["status"]),
-                       text=t(ctx, f"Pedido {rid} ({data['item']}): {data['status']}.",
-                              f"Order {rid} ({data['item']}): {data['status']}."))
+        high = result.get("risk") == "high"
+        extra_pt = " Depois da sua confirmação, um atendente aprova." if high else ""
+        extra_en = " After you confirm, a human agent approves it." if high else ""
+        return AgentResult("records", "ok", tool_calls=calls, pending_action=aid, evidence=ev,
+                           text=t(ctx, f"Para {what_pt}, confirme a ação {aid}.{extra_pt} Nada foi feito ainda.",
+                                  f"To {what_en}, confirm action {aid}.{extra_en} Nothing has been done yet."))
+    return AgentResult("records", "error", tool_calls=calls, reason="tool_error", evidence=ev)
+
+
+def records_offline(ctx, a):
+    """Atendimento determinístico do agente records. `a` = módulo app.agents (AgentResult, run_tool, _t...)."""
+    AgentResult = a.AgentResult
+    calls: list = []
+    ev: list[str] = []
+    text = ctx.text
+    if _ADVANCE.search(text) or _TICKET.search(text):
+        return _offline_write(ctx, a, calls, ev)
+    probe = f"{text} {ctx.facts.get('standalone') or ''}"
+    if _TERM.search(probe) or (_TERMINAL_Q.search(probe) and not _TX_Q.search(text)):
+        answer = _offline_terminals(ctx, a, calls, ev)
+    elif _TXR.search(probe) or _TX_Q.search(probe):
+        answer = _offline_transactions(ctx, a, calls, ev)
+    else:
+        answer = _offline_settlements(ctx, a, calls, ev)
+    last = json.loads(ev[-1])
+    if not last.get("ok"):
+        return AgentResult("records", "ok", tool_calls=calls, evidence=ev, facts={"record_not_found": True},
+                           text=answer)
+    needs = [dict(n) for n in last.get("needs", [])] if _SYMPTOM.search(text) else []
+    return AgentResult("records", "ok", tool_calls=calls, evidence=ev, needs=needs, text=answer)
