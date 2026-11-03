@@ -273,13 +273,17 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
 def default_configs(embed_models: list[str], rerank_models: list[str],
                     pool: int | list[int] | None = None) -> list[dict]:
     """bm25, hybrid e dense por modelo de embedding, e cada um deles + cross-encoder por modelo de rerank e por
-    tamanho do pool (o custo do cross-encoder é linear no pool: pool menor cabe no orçamento de latência)."""
+    tamanho do pool (o custo do cross-encoder é linear no pool: pool menor cabe no orçamento de latência). O denso
+    entra também com a ordem dele e a nota do cross só no portão (`rerank_order: base`): num domínio real ordenou
+    melhor que a ordem do cross (Recall@3 0,898 × 0,856, MRR igual)."""
     pools = pool if isinstance(pool, list) else [pool or 20]
     bases = [{"retriever": "bm25"}]
     bases += [{"retriever": r, "embed_model": m} for m in embed_models for r in ("hybrid", "dense")]
     out = list(bases)
     out += [{**b, "rerank": "cross", "rerank_model": rm, "rerank_pool": p} for b in bases
             for rm in rerank_models for p in pools]
+    out += [{**b, "rerank": "cross", "rerank_model": rm, "rerank_pool": p, "rerank_order": "base"} for b in bases
+            if b["retriever"] == "dense" for rm in rerank_models for p in pools]
     return out
 
 
@@ -296,11 +300,17 @@ FAST_CONFIGS = (
     # 0,734 / 0,937 / 896 ms do pool 5 com 1500 caracteres; pool 20 subiu a 0,777 com p95 de 4,7 s (fora do teto)
     {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
      "rerank_chars": 600},
+    # a mesma busca com a ordem do denso; a nota do cross só decide o portão sem fonte. No gold de um domínio real
+    # (Getnet, 03/11/2026): Recall@3 0,898 × 0,856 da ordem do cross, MRR igual; a nota separou com × sem fonte um
+    # pouco melhor que o cosseno (AUC 0,93 × 0,92). O choose() desempata pela cobertura do portão antes do p95.
+    {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
+     "rerank_chars": 600, "rerank_order": "base"},
 )
 
 
 def config_name(cfg: dict, verbose: bool = False) -> str:
-    """"hybrid+cross"; com `verbose` (mais de um modelo no comparativo), com os modelos: "dense[e5]+cross[jina@20]"."""
+    """"hybrid+cross"; com `verbose` (mais de um modelo no comparativo), com os modelos: "dense[e5]+cross[jina@20]".
+    ":base" = a ordem fica a do buscador base e a nota do cross-encoder só decide o portão sem fonte."""
     name = cfg["retriever"]
     if verbose and cfg.get("embed_model"):
         name += f"[{cfg['embed_model'].split('/')[-1]}]"
@@ -309,6 +319,8 @@ def config_name(cfg: dict, verbose: bool = False) -> str:
         if verbose and cfg.get("rerank_model"):
             chars = f"/{cfg['rerank_chars']}c" if cfg.get("rerank_chars") else ""
             name += f"[{cfg['rerank_model'].split('/')[-1]}@{cfg.get('rerank_pool', 20)}{chars}]"
+        if cfg.get("rerank_order") == "base":
+            name += ":base"
     return name
 
 
@@ -420,7 +432,7 @@ def build(cfg: dict, fx: _Factories):
                                "dense" if cfg["retriever"] == "dense" else "rrf")
     if cfg.get("rerank") == "cross":
         return CrossRerankRetriever(base, fx.cross(cfg["rerank_model"]), cfg.get("rerank_pool"),
-                                    cfg.get("rerank_chars"))
+                                    cfg.get("rerank_chars"), cfg.get("rerank_order") or "cross")
     if cfg.get("rerank") == "llm":
         if fx.rerank_llm is None:
             raise RuntimeError("rerank llm só com --rerank (chama o LLM)")
@@ -476,11 +488,18 @@ def compare(path: Path, configs: list[dict], embedder=None, scorer=None, rerank_
     return report
 
 
+def gate_in_use(res: dict) -> dict | None:
+    """O portão sem fonte que o app aplica com esta configuração: com nota do cross-encoder, o da nota
+    (`rerank_gate`, agents.covered_hits); senão o de BM25/cosseno (`gate`)."""
+    return res.get("rerank_gate") or res.get("gate")
+
+
 def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
            ram_budget_mb: float | None = RAM_BUDGET_MB) -> dict:
     """Maior MRR entre as configurações com p95 <= orçamento de latência, RAM <= orçamento de memória e portão que
-    recusa >= NEG_REFUSAL_MIN das perguntas sem fonte (calibrado por configuração); empate → maior Recall@3 → menor
-    p95 → mais simples. RAM não medida (sem /proc) não reprova; `ram_budget_mb` None desliga o teto.
+    recusa >= NEG_REFUSAL_MIN das perguntas sem fonte (calibrado por configuração; com cross-encoder, o da nota);
+    empate → maior Recall@3 → portão que responde mais perguntas com fonte no piso de recusa → menor p95 → mais
+    simples. RAM não medida (sem /proc) não reprova; `ram_budget_mb` None desliga o teto.
 
     Nenhuma dentro do orçamento → bm25 (sem dependência e sem modelo). Devolve {name, config, reason, rejected}.
     """
@@ -490,7 +509,7 @@ def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
             rejected[name] = res["reason"]
             continue
         p95 = (res.get("latency_ms") or {}).get("p95") or 0.0
-        gate = res.get("gate")
+        gate = gate_in_use(res)
         if gate is not None and not gate.get("meets_floor"):
             rejected[name] = (f"portão não recusa {gate['neg_refusal_min']:.0%} dos sem fonte em nenhum limiar "
                               f"(máx. {gate['neg_refused']:.0%})")
@@ -506,22 +525,29 @@ def choose(results: dict[str, dict], budget_ms: float = LATENCY_BUDGET_MS,
     if not ok:
         return {"name": BASELINE, "config": {"retriever": "bm25"}, "reason": "nenhuma dentro do orçamento",
                 "rejected": rejected}
-    name, res = max(ok, key=lambda x: (x[1]["mrr"], x[1][f"recall@{K}"], -(x[1]["latency_ms"]["p95"] or 0),
-                                       -len(x[0])))
+    def coverage(r: dict) -> float:  # perguntas com fonte que o portão em uso responde no piso de recusa
+        return (gate_in_use(r) or {}).get("pos_answered") or 0.0
+
+    name, res = max(ok, key=lambda x: (x[1]["mrr"], x[1][f"recall@{K}"], coverage(x[1]),
+                                       -(x[1]["latency_ms"]["p95"] or 0), -len(x[0])))
     gate = res.get("gate") or {}
     off = {"min_score": BM25_OFF, "min_cosine": COSINE_OFF}  # null de um comparativo antigo = caminho desligado
     config = {**res["config"], "gate": {k: off[k] if gate[k] is None else gate[k] for k in off if k in gate}}
+    if (res.get("rerank_gate") or {}).get("min_rerank") is not None:  # o app usa a nota quando o trecho a traz
+        config["gate"]["min_rerank"] = res["rerank_gate"]["min_rerank"]
     if not config["gate"]:
         config.pop("gate")
     ram = f" e RAM <= {ram_budget_mb:g} MB" if ram_budget_mb is not None else ""
     return {"name": name, "config": config, "rejected": rejected,
-            "reason": f"maior MRR com p95 <= {budget_ms:g} ms{ram} (empate: Recall@3, depois p95)"}
+            "reason": f"maior MRR com p95 <= {budget_ms:g} ms{ram} (empate: Recall@3, depois cobertura do portão, "
+                      "depois p95)"}
 
 
 def summary(res: dict) -> dict:
     """Linha enxuta de uma configuração (sem as perguntas): o que vai para data/retriever.json e o README."""
     keys = ("cases", f"recall@{K}", "mrr", f"hit@{K}", f"hit@{K}_ci", f"ndcg@{K}", "page", "latency_ms",
-            "memory_mb", "dedupe_aliases", "fallback", "config", "gate")
+            "memory_mb", "dedupe_aliases", "fallback", "config", "gate", "rerank_gate", "separation",
+            "separation_rerank")
     return {k: res[k] for k in keys if k in res} if res.get("status") != "unavailable" else dict(res)
 
 
@@ -540,19 +566,27 @@ def apply_choice(report: dict, picked: dict, target: Path, budget_ms: float, git
 
 
 def markdown(measured: dict[str, dict], chosen: str | None = None) -> str:
-    """Tabela das configurações medidas (README e saída do CLI)."""
-    lines = ["| configuração | Recall@3 | MRR | hit@3 | nDCG@3 | URL hit@3 | p50 ms | p95 ms | RAM MB |",
-             "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    """Tabela das configurações medidas (README e saída do CLI), com a cobertura do portão em uso de cada uma."""
+    lines = ["| configuração | Recall@3 | MRR | hit@3 | nDCG@3 | URL hit@3 | p50 ms | p95 ms | RAM MB "
+             "| portão: com fonte respondidas / sem fonte recusadas |",
+             "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"]
     for name, r in measured.items():
         if r.get("status") == "unavailable":
-            lines.append(f"| {name} | indisponível: {r['reason'][:80]} | | | | | | | |")
+            lines.append(f"| {name} | indisponível: {r['reason'][:80]} | | | | | | | | |")
             continue
         lat = r.get("latency_ms") or {}
         mark = " **← escolhida**" if name == chosen else ""
         mem = r.get("memory_mb")
-        lines.append(f"| {name}{mark} | {r[f'recall@{K}']} | {r['mrr']} | {r[f'hit@{K}']} | {r.get(f'ndcg@{K}', '—')} "
-                     f"| {r['page'][f'hit@{K}']} | {lat.get('p50', '—')} | {lat.get('p95', '—')} "
-                     f"| {'—' if mem is None else mem} |")
+        gate = gate_in_use(r) or {}
+        kind = "nota do cross" if r.get("rerank_gate") else "BM25/cosseno"
+        gate_cell = (f"{gate['pos_answered']:.0%} / {gate['neg_refused']:.0%} ({kind})"
+                     if gate.get("pos_answered") is not None and gate.get("neg_refused") is not None else "—")
+        lines.append(f"| {name}{mark} | {r.get(f'recall@{K}', '—')} | {r.get('mrr', '—')} | {r.get(f'hit@{K}', '—')} "
+                     f"| {r.get(f'ndcg@{K}', '—')} | {(r.get('page') or {}).get(f'hit@{K}', '—')} "
+                     f"| {lat.get('p50', '—')} | {lat.get('p95', '—')} | {'—' if mem is None else mem} | {gate_cell} |")
+    if any(name.endswith(":base") for name in measured):
+        lines.append("\n`:base` = a ordem fica a do buscador base; a nota do cross-encoder só decide o portão "
+                     "sem fonte.")
     return "\n".join(lines)
 
 

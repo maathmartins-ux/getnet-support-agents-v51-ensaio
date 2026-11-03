@@ -435,7 +435,9 @@ def test_first_run_and_cached_vectors_are_identical(tmp_path, monkeypatch):
 def test_grid_crosses_pool_sizes():
     cfgs = rv.default_configs(["e"], ["r"], [5, 20])
     pools = sorted(c["rerank_pool"] for c in cfgs if c.get("rerank"))
-    assert pools == [5, 5, 5, 20, 20, 20] and len(cfgs) == 9  # 3 bases + 3 x 2 pools
+    # 3 bases + 3 x 2 pools + o denso com a ordem dele (nota do cross só no portão) x 2 pools
+    assert pools == [5, 5, 5, 5, 20, 20, 20, 20] and len(cfgs) == 11
+    assert [c["retriever"] for c in cfgs if c.get("rerank_order") == "base"] == ["dense", "dense"]
 
 
 # --- R2: memória e tempo do denso no relógio --------------------------------------------------------------------
@@ -573,7 +575,7 @@ def test_fast_choice_measures_only_the_preselected_configs(tmp_path, monkeypatch
 
     monkeypatch.setattr(rv, "compare", fake_compare)
     assert run_evals.main(["--choose-retriever", "--fast", "--apply", "--ram-budget-mb", "3000"]) == 0
-    assert seen == list(rv.FAST_CONFIGS) and len(seen) == 3
+    assert seen == list(rv.FAST_CONFIGS) and len(seen) == 4
     saved = json.loads((data / "retriever.json").read_text(encoding="utf-8"))
     assert saved["ram_budget_mb"] == 3000 and "RAM <= 3000 MB" in saved["criterion"]
 

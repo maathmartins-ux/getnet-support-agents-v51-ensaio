@@ -388,9 +388,18 @@ def retrieval_block(results: Path, data: Path | None = None) -> str:
     if not chosen:
         return "_Não rodado: buscador padrão do kit (denso + cross-encoder); `make compare` compara as alternativas._"
     budget = chosen.get("latency_budget_ms")
-    return (f"Gold `{chosen.get('gold')}`, medido em {chosen.get('chosen_at')} (commit `{chosen.get('git_sha')}`), "
-            f"CPU, sem LLM. Critério: {chosen.get('criterion')}; orçamento p95 {budget:g} ms.\n\n"
-            + markdown(chosen.get("measured") or {}, chosen.get("chosen")))
+    head = (f"Gold `{chosen.get('gold')}`, medido em {chosen.get('chosen_at')} (commit `{chosen.get('git_sha')}`), "
+            "CPU, sem LLM.")
+    if chosen.get("criterion"):
+        head += f" Critério: {chosen['criterion']}"
+        head += f"; orçamento p95 {budget:g} ms." if isinstance(budget, (int, float)) else "."
+    elif chosen.get("_doc"):  # escolha gravada à mão pelo domínio: o motivo no lugar do critério automático
+        head += f" Escolha do domínio: {chosen['_doc']}"
+    gate = (chosen.get("choice") or {}).get("gate") or {}
+    if gate.get("min_rerank") is not None:
+        head += (f" Portão sem fonte da escolha: nota do cross-encoder >= {gate['min_rerank']:g} (o MIN_RERANK do "
+                 "domínio, se houver, vence).")
+    return head + "\n\n" + markdown(chosen.get("measured") or {}, chosen.get("chosen"))
 
 
 def red_team_block(results: Path) -> str:

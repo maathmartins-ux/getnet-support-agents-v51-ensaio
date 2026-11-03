@@ -209,8 +209,14 @@ def expand_query(text: str) -> str:
 
 
 # --- faq -------------------------------------------------------------------------------------
-def rerank_threshold() -> float | None:
-    return coverage_min_rerank(getattr(domain.active(), "MIN_RERANK", None))
+def rerank_threshold(gate: dict | None = None) -> float | None:
+    """Limiar da nota do cross-encoder no portão sem fonte: COVERAGE_MIN_RERANK (env) → MIN_RERANK do domínio
+    (`run_evals --calibrate-rerank-gate --apply`) → `gate` do buscador escolhido (o `--choose-retriever` calibra o
+    `min_rerank` junto com a escolha; o rag só entrega o `gate` se nada caiu) → None (vale o portão BM25/cosseno)."""
+    own = getattr(domain.active(), "MIN_RERANK", None)
+    if own is None:
+        own = (gate or {}).get("min_rerank")
+    return coverage_min_rerank(own)
 
 
 def covered_hits(found: list, min_score: float | None = None, min_cosine: float | None = None,
@@ -221,7 +227,7 @@ def covered_hits(found: list, min_score: float | None = None, min_cosine: float 
     --choose-retriever calibrou PARA o retriever escolhido; o rag só o entrega se nada caiu) → MIN_SCORE/MIN_COSINE.
     """
     gate = gate or {}
-    if min_score is None and min_cosine is None and (rr := rerank_threshold()) is not None:
+    if min_score is None and min_cosine is None and (rr := rerank_threshold(gate)) is not None:
         scores = [h.rerank for h in found if h.rerank is not None]
         if scores:  # buscador com rerank: a nota do cross-encoder decide (separa com × sem fonte melhor que o BM25)
             return list(found) if max(scores) >= rr else []
@@ -539,8 +545,9 @@ def covered_search(retriever, query: str, k: int, gate: dict | None = None) -> l
 
     `gate` (calibração) troca os limiares calibrados do buscador ({"min_score", "min_cosine"})."""
     found = retriever.search(query, k=k)
-    hits = covered_hits(found, gate=gate if gate is not None else getattr(retriever, "gate", None))
-    reranked = rerank_threshold() is not None and any(h.rerank is not None for h in found)
+    gate = gate if gate is not None else getattr(retriever, "gate", None)
+    hits = covered_hits(found, gate=gate)
+    reranked = rerank_threshold(gate) is not None and any(h.rerank is not None for h in found)
     if not hits and found and not reranked and coverage_gate() == "bm25" and not str(retriever.name).startswith("bm25"):
         # O portão do buscador escolhido (cosseno do denso) recusou; o BM25 com o limiar do domínio tem a última
         # palavra antes de "sem fonte". Só o portão do denso fazia o eval de ponta a ponta perder handoff (90,2% →

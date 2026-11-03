@@ -1612,8 +1612,9 @@ def _rerank_gate_in_use() -> float | None:
     from app.agents import rerank_threshold
     from app.rag import get_retriever
 
-    thr = rerank_threshold()
-    return thr if thr is not None and "cross" in str(getattr(get_retriever(), "name", "")) else None
+    retriever = get_retriever()
+    thr = rerank_threshold(getattr(retriever, "gate", None))
+    return thr if thr is not None and "cross" in str(getattr(retriever, "name", "")) else None
 
 
 def to_markdown(report: dict, split_view: bool = False) -> str:

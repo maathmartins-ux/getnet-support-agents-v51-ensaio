@@ -659,10 +659,12 @@ class CrossRerankRetriever:
     `last_latency_s`: tempo do rerank da última busca (o eval reporta p50/p95 por pergunta em CPU).
     """
 
-    def __init__(self, base, scorer: CrossScorer, pool: int | None = None, chars: int | None = None) -> None:
+    def __init__(self, base, scorer: CrossScorer, pool: int | None = None, chars: int | None = None,
+                 order: str | None = None) -> None:
         self.base, self.scorer = base, scorer
         self.pool = pool or rerank_pool()
         self.chars = chars or rerank_chars()  # custo do par cresce com o texto lido: pool maior pede trecho menor
+        self.order = order  # None = RERANK_ORDER / escolha gravada; o comparativo fixa a sua (o ambiente não vaza)
         self.name = f"{base.name}+cross"
         self.last_latency_s = 0.0
 
@@ -681,7 +683,7 @@ class CrossRerankRetriever:
             return cands[:k]
         finally:
             self.last_latency_s = time.perf_counter() - t0
-        if rerank_order() == "base":  # a nota vai no trecho (portão), a ordem é a do base (medida no domínio)
+        if (self.order or rerank_order()) == "base":  # a nota vai no trecho (portão), a ordem é a do base
             return diversify([replace(h, rerank=float(sc)) for h, sc in zip(cands, scores, strict=True)], k)
         order = sorted(range(len(cands)), key=lambda i: (-scores[i], i))  # empate: ordem do base
         return diversify([replace(cands[i], rerank=float(scores[i])) for i in order], k)
