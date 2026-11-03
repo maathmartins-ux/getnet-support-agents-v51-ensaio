@@ -11,3 +11,7 @@ Demonstrativos e elipses ("essa venda", "ela", "dela", "a outra", "e a outra maq
 "how long has it been down?"): referem-se à entidade da ÚLTIMA resposta do atendimento (inclusive a de um atendente
 humano); "a outra" = a entidade da mesma lista que a última resposta NÃO tratou. Escreva no standalone o nome ou o id
 dessa entidade, como apareceu na conversa.
+Pergunta sobre a PRÓPRIA empresa (produto que talvez não exista, pessoas, salários, finanças, ações, contratos,
+patrocínio, franquia, política): é do agente de conhecimento, mesmo que a base talvez não tenha — a busca decide e,
+sem fonte, o caso vai ao humano. Intenção que nunca escala (clima, câmbio de moeda, notícia) é só para assunto FORA
+da empresa.

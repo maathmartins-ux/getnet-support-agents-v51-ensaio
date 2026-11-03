@@ -13,7 +13,8 @@ Escolha: env DOMAIN; sem env, `challenge` se o módulo existir, senão `example`
 Contrato de um módulo de domínio (ver `example.py`): PLANS, FALLBACK, ALLOWED, DEPENDS, NO_ESCALATION,
 DEFAULT_INTENT, MULTI_PARTS, MIN_SCORE, TOOLS, ELIGIBLE_STATUS, PROMPTS_DIR, clause_intent(), states_subject(),
 combine(), records_offline(). Opcional: needs_for(result, ctx) (achado → outro especialista; ver example.py),
-RISK_POLICY (limite de valor por ação; ver app/risk.py), SPECIALTY_BY_AGENT/SPECIALTY_BY_INTENT (app/routing.py).
+RISK_POLICY (limite de valor por ação; ver app/risk.py), SPECIALTY_BY_AGENT/SPECIALTY_BY_INTENT (app/routing.py),
+OWN_COMPANY/OWN_COMPANY_INTENT (pergunta sobre a própria empresa nunca fica em intenção sem escalada; router).
 """
 from __future__ import annotations
 

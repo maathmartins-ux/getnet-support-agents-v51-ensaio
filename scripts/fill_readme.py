@@ -180,7 +180,8 @@ def replan_block(results: Path) -> str:
         (f"ao vivo ({f.name})", _load(f)) for f in sorted(results.glob("live_*.json"))] + [
         ("offline SEM replanejamento", _load(results / "ablation_replan.json")),
         ("ao vivo SEM replanejamento", _load(results / "ablation_replan_live.json"))]
-    keys = ("replanned_acc", "handoff_acc", "handoff_outcome_acc", "intent_acc")
+    # rota (agentes certos, método do Skywalker) e desfecho ao lado do rótulo da intenção (diagnóstico)
+    keys = ("replanned_acc", "handoff_acc", "handoff_outcome_acc", "route_acc", "intent_acc")
     lines = ["| fonte | casos | " + " | ".join(keys) + " |", "|---|---:|" + "---:|" * len(keys)]
     examples: list[str] = []
     for name, r in sources:

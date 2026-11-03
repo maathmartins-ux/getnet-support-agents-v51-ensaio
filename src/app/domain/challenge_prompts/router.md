@@ -16,8 +16,10 @@ Nada de id, valor ou data que não esteja na mensagem.
 
 intents:
 - knowledge: produto, taxa, prazo, regra da Getnet (maquininhas, Pix, antecipação, crediário, Link de Pagamento).
-  "Como funciona X", "preciso de Y", "posso...?" sobre produto é knowledge, mesmo com "eu"/"minha loja".
-- general: fora da Getnet mas inofensivo: clima, previsão do tempo, câmbio, cotação, notícia. Nunca é humano.
+  "Como funciona X", "preciso de Y", "posso...?" sobre produto é knowledge, mesmo com "eu"/"minha loja". Qualquer
+  outra pergunta sobre a própria Getnet (produto que talvez não exista, empresa, pessoas, salários, ações, patrocínio,
+  franquia, contratos) também é knowledge: a busca decide e, sem fonte, o caso vai ao humano.
+- general: FORA da Getnet e inofensivo: clima, previsão do tempo, câmbio de moeda, notícia. Nunca é humano.
 - support: dado do PRÓPRIO cliente sem sintoma (vendas, depósitos, agenda de recebíveis, transações, terminais) ou
   ação sobre ele (antecipar recebíveis, abrir chamado).
 - troubleshoot: sintoma na maquininha ("não conecta", "sem sinal", "offline", "erro", "recusa", "won't connect",

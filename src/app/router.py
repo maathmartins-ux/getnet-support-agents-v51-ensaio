@@ -497,6 +497,30 @@ def route(text: str, history: list[dict]) -> RoutedDecision:
     Sem LLM: `followup.complete` completa o seguimento com o último assunto; quando a completação é TROCA de
     entidade ("e a TX1008?" → a pergunta do assunto com TX1008), as regras classificam a pergunta completa.
     """
+    return _own_company_guard(_route_decision(text, history), text)
+
+
+def _own_company_guard(decision: RoutedDecision, text: str) -> RoutedDecision:
+    """Pergunta sobre a PRÓPRIA empresa nunca fica numa intenção que não escala (ex.: `general`).
+
+    Ensaio de 03/11 (replan ao vivo): "Getnet stock price target", "a Getnet patrocina time de várzea?" e "salary of
+    a Getnet sales rep" iam ao `general` (NO_ESCALATION): o faq respondia pela web e o caso sem fonte nunca chegava ao
+    humano. O domínio declara `OWN_COMPANY` (regex do nome da empresa) e `OWN_COMPANY_INTENT` (padrão "knowledge"):
+    a busca na base decide e, sem fonte, o supervisor escala. Clima, câmbio e notícia sem o nome seguem no general.
+    """
+    d = domain.active()
+    pattern = getattr(d, "OWN_COMPANY", None)
+    target = getattr(d, "OWN_COMPANY_INTENT", "knowledge")
+    if not pattern or decision.intent not in d.NO_ESCALATION or target not in _plans():
+        return decision
+    asked = f"{text} {decision.standalone or ''}"
+    if not re.search(pattern, asked, re.IGNORECASE):
+        return decision
+    METRICS.inc("router_own_company_total", from_intent=decision.intent)
+    return decision.model_copy(update={"intent": target, "plan": list(_plans()[target])})
+
+
+def _route_decision(text: str, history: list[dict]) -> RoutedDecision:
     from . import followup
 
     decided = _route(text, history)

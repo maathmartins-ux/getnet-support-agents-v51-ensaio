@@ -28,6 +28,11 @@ ALLOWED = {None: {"faq", "records", "escalation"}, "faq": {"records", "escalatio
 DEPENDS: dict[str, set[str]] = {}
 # Intents que nunca abrem caso humano (ex. Getnet: {"general"}, clima e câmbio).
 NO_ESCALATION: set[str] = set()
+# Nome da empresa (regex): pergunta sobre a PRÓPRIA empresa que caiu numa intenção de NO_ESCALATION vai para
+# OWN_COMPANY_INTENT (a busca decide; sem fonte, humano). Ex. Getnet: r"\bgetnet\b" (ensaio de 03/11: "stock price
+# target da Getnet" ia ao general e nunca escalava). None = sem guarda.
+OWN_COMPANY: str | None = None
+OWN_COMPANY_INTENT = "faq"
 DEFAULT_INTENT = "faq"  # cláusula com assunto do domínio e sem regra
 MULTI_PARTS = {"faq", "records"}  # o que uma frase-exemplo "multi" do k-NN soma às intenções da mensagem
 
