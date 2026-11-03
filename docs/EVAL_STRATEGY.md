@@ -3,6 +3,8 @@
 Casos da frente em `evals/cases.d/q.jsonl`; rótulos do juiz em `evals/judge_calibration.d/q.jsonl`.
 Nada aqui lê `evals/heldout_blind.jsonl`.
 
+**Held-out e a análise de erros (rodada 10, 03/11/2026).** As afirmações sem base que o juiz achou no held-out (e na memória) da rodada anterior foram lidas para achar causas no motor: lista em blocos colada numa linha só no trecho, cartão de capacidades sem os valores que as consultas aceitam, taxa de tabela geral atribuída a um produto e conclusão tirada de consulta filtrada. As correções são genéricas (chunker, cartão e duas regras dos prompts do kit) e nenhuma cita caso ou frase do held-out; mesmo assim, para essas quatro classes de erro o held-out deixou de ser cego: o número dele a partir desta rodada se lê como conjunto de desenvolvimento, não como generalização pura.
+
 | split | n | o que mede | campos de `expect` |
 |---|---|---|---|
 | official-var | 12 | paráfrase pt e en de 6 oficiais com fato verificável; mesmos `facts`/`entities` do oficial | intent, language, facts, entities, tools |
