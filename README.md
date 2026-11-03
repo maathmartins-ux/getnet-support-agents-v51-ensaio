@@ -25,8 +25,8 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 |---|---:|---|
 | Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
 | Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
-| Juiz: respostas oficiais úteis (helpful) | 0.97 | juiz LLM: a resposta resolve o que o lojista perguntou |
+| Juiz: respostas oficiais fundamentadas | 0.97 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
 | Memória ao vivo: pass@1 | 0.92 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.84 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
 | Busca: MRR | 0.82 | posição média da primeira página certa (1 = sempre em primeiro) |
@@ -62,7 +62,7 @@ números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
 <!-- since:begin -->
 | Lacuna citada | O que mudou | Prova |
 |---|---|---|
-| Respostas oficiais: fundamentadas 60%, números 80%, pass^3 70% | manchete **oficiais resolvidas** (sem humano + todo fato + fonte); toda frase e todo número conferidos contra fonte, ferramenta e pergunta; juiz no mesmo processo | Oficiais resolvidas (sem humano + todo fato + fonte) **1.00** · Juiz: respostas oficiais fundamentadas **1.00** · Oficiais: números com base na evidência **100.0%** · Oficiais: pass^k (todas as rodadas passam) **1.00**; `tests/test_e53_resolved.py` |
+| Respostas oficiais: fundamentadas 60%, números 80%, pass^3 70% | manchete **oficiais resolvidas** (sem humano + todo fato + fonte); toda frase e todo número conferidos contra fonte, ferramenta e pergunta; juiz no mesmo processo | Oficiais resolvidas (sem humano + todo fato + fonte) **1.00** · Juiz: respostas oficiais fundamentadas **0.97** · Oficiais: números com base na evidência **96.7%** · Oficiais: pass^k (todas as rodadas passam) **0.90**; `tests/test_e53_resolved.py` |
 | Busca: Recall@3 0,49, MRR 0,61 | denso + cross-encoder decidido por medida antes do relógio; tabelas inteiras; placar no caminho do agente | Busca: Recall@3 **0.84** · Busca: Recall@5 (o que o redator lê) **0.89** · Busca: MRR **0.82**; `tests/test_v54_retrieval_method.py` |
 | Memória: pass@1 54%, números 64% | especialistas sem estado (pergunta reescrita pelo router + livro de fatos); rota medida pelo resultado | Memória ao vivo: pass@1 **0.92** · Memória ao vivo: números com base **100.0%**; `tests/test_v54_stateless_specialists.py` |
 | A resposta do humano era só a próxima mensagem; operação (especialidade, Postgres, JWKS) | a resposta do operador vira evidência e os passos pendentes do plano rodam (no turno, com espera curta, ou na retomada); fila por especialidade; Postgres atrás da mesma interface; JWKS | Turnos resolvidos sem humano (ao vivo, todos os splits) **0.88**; `tests/test_v54_hitl_sync.py` |
@@ -403,8 +403,10 @@ e como comparar pela primeira entrega.
 | 16:16:09 | 241 | confirmação: check e live_eval recusam buscador em fallback (kit 83d17f7) |
 | 16:16:09 | 241 | readme: números e linha do tempo (fill_readme, último passo) |
 | 16:28:15 | 253 | confirmação: kit v5.5 (perfil Skywalker: supervisor LLM em todo turno, manchete sem meta própria) |
+| 16:28:16 | 253 | readme: números e linha do tempo (fill_readme, último passo) |
+| 16:54:26 | 279 | eval: confirmação v5.5 ao vivo, official repeat 3 com denso+cross (sem fallback): resolvidas 100%, pass^3 0,90, juiz fundamentadas 0,967 / úteis 1,00; official-02 run 0 com número sem base (clima não confirmado) |
 
-Do primeiro ao último commit: **253 min**.
+Do primeiro ao último commit: **279 min**.
 <!-- timeline:end -->
 
 </details>
