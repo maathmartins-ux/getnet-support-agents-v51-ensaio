@@ -8,12 +8,12 @@ Tudo aqui é gerado por `scripts/fill_readme.py` a partir de `evals/results/` co
 <!-- eval:begin -->
 Modo: `in-process` · provedor `offline`
 
-**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **83.3%** [IC95 43.6–97.0; n=6] (não resolvidos: official-06) · official-var **83.3%** [IC95 55.2–95.3; n=12] (não resolvidos: q-ov-06-en, q-ov-06-pt).
+**Resolvidas** (sem humano, todo fato de referência na resposta e fonte citada): official **83.3%** [IC95 43.6–97.0; n=6] (não resolvidos: official-06) · official-var **75.0%** [IC95 46.8–91.1; n=12] (não resolvidos: q-ov-01-pt, q-ov-06-en, q-ov-06-pt).
 | Métrica | official | replan | dependent | parallel | approval | memory | real | official-var | partial | hard | guardrail | heldout | ALL |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | cases | 10 | 20 | 14 | 4 | 4 | 22 | 40 | 12 | 5 | 5 | 35 | 80 | 251 |
-| resolved_acc | 83.3 (n=6) | — | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | 83.3 (n=18) |
-| facts_acc | 83.3 (n=6) | — | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | 83.3 (n=18) |
+| resolved_acc | 83.3 (n=6) | — | — | — | — | — | — | 75.0 (n=12) | — | — | — | — | 77.8 (n=18) |
+| facts_acc | 83.3 (n=6) | — | — | — | — | — | — | 75.0 (n=12) | — | — | — | — | 77.8 (n=18) |
 | intent_acc | 100.0 (n=10) | 100.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | 60.0 (n=5) | 65.7 (n=35) | 86.2 (n=80) | 88.2 (n=211) |
 | handoff_acc | 100.0 (n=10) | 40.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | — | 100.0 (n=35) | 91.2 (n=80) | 90.8 (n=206) |
 | handoff_outcome_acc | 100.0 (n=10) | 40.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | — | 100.0 (n=12) | 100.0 (n=5) | — | 100.0 (n=35) | 91.2 (n=80) | 90.8 (n=206) |
@@ -26,12 +26,12 @@ Modo: `in-process` · provedor `offline`
 | no_leak_acc | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | numbers_acc | 100.0 (n=10) | 100.0 (n=20) | 100.0 (n=14) | 100.0 (n=4) | 100.0 (n=4) | 100.0 (n=22) | 97.5 (n=40) | 100.0 (n=12) | 100.0 (n=5) | 100.0 (n=5) | 100.0 (n=12) | 100.0 (n=77) | 99.6 (n=225) |
 | memory_acc | — | — | — | — | — | 83.3 (n=12) | — | — | — | — | — | — | 83.3 (n=12) |
-| claims_acc | 90.0 (n=10) | 90.0 (n=20) | 92.9 (n=14) | 100.0 (n=4) | 75.0 (n=4) | 95.5 (n=22) | 95.0 (n=40) | 100.0 (n=12) | 100.0 (n=5) | 80.0 (n=5) | 91.7 (n=12) | 93.5 (n=77) | 93.3 (n=225) |
+| claims_acc | 90.0 (n=10) | 90.0 (n=20) | 92.9 (n=14) | 100.0 (n=4) | 75.0 (n=4) | 95.5 (n=22) | 95.0 (n=40) | 100.0 (n=12) | 100.0 (n=5) | 100.0 (n=5) | 100.0 (n=12) | 94.8 (n=77) | 94.7 (n=225) |
 | language_undetected | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | recall@3 | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | mrr | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| p50_ms | 49.0 | 39.0 | 42.1 | 50.1 | 42.4 | 83.3 | 40.4 | 40.1 | 37.2 | 38.6 | 5.9 | 40.6 | 40.1 |
-| p95_ms | 1232.5 | 50.8 | 49.0 | 50.9 | 44.4 | 122.3 | 65.0 | 43.0 | 38.2 | 43.3 | 43.4 | 1114.2 | 122.3 |
+| p50_ms | 45.5 | 43.4 | 42.2 | 52.9 | 50.0 | 79.7 | 42.6 | 40.9 | 31.6 | 40.8 | 5.3 | 37.1 | 39.7 |
+| p95_ms | 5332.3 | 53.9 | 55.8 | 55.8 | 51.8 | 103.0 | 68.1 | 50.0 | 32.8 | 46.7 | 44.7 | 1339.9 | 103.0 |
 | cost_usd | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 | crashes | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
@@ -41,7 +41,7 @@ Red team (splits guardrail, hard): seguras 77.5% de 40 (offline: só a regex do 
 Memória × roteamento:
 - split `memory` (n=22): **memória** 90.9% (fatos esperados 83.3% (n=12); números 100.0% (n=22)) · **roteamento** 100.0% (pelo resultado; rótulo da intenção 100.0%) · pass@1 50.0% (pelo rótulo 50.0%) · perdas só de roteamento: — · só de memória: memory-07, q-mem-01 · nas duas: —
 
-Falhas por checagem × split: blocked guardrail 9 · claims approval 1, dependent 1, guardrail 1, hard 1, heldout 5, memory 1, official 1, real 2, replan 2 · facts official 1, official-var 2 · handoff heldout 7, replan 12 · handoff_outcome heldout 7, replan 12 · intent guardrail 12, hard 2, heldout 11 · language approval 1, dependent 6, guardrail 4, hard 2, heldout 16, memory 9, official 7, official-var 6, parallel 2, partial 2, replan 10 · memory memory 2 · numbers real 1 · replanned replan 20 · resolved official 1, official-var 2 · route guardrail 9, hard 2, heldout 10 · tools dependent 1, heldout 10
+Falhas por checagem × split: blocked guardrail 9 · claims approval 1, dependent 1, heldout 4, memory 1, official 1, real 2, replan 2 · facts official 1, official-var 3 · handoff heldout 7, replan 12 · handoff_outcome heldout 7, replan 12 · intent guardrail 12, hard 2, heldout 11 · language approval 1, dependent 6, guardrail 4, hard 2, heldout 16, memory 9, official 7, official-var 6, parallel 2, partial 2, replan 10 · memory memory 2 · numbers real 1 · replanned replan 20 · resolved official 1, official-var 3 · route guardrail 9, hard 2, heldout 10 · tools dependent 1, heldout 10
 Confusão de intenção (esperada → obtida): blocked → knowledge 6, support 4, troubleshoot 2 · general → knowledge 4 · human_request → knowledge 2 · knowledge → support 1 · multi → support 1, knowledge 3 · troubleshoot → knowledge 2
 
 Matriz de confusão do router (todos os splits):
@@ -58,7 +58,7 @@ Matriz de confusão do router (todos os splits):
 
 Portão sem fonte: limiar efetivo 0.5 (MIN_SCORE) → responde 78.0% [IC95 65.9–86.6; n=59] dos com fonte, recusa 22.7% [IC95 10.1–43.4; n=22] dos sem fonte · recomendado 7.19 → responde 66.1% [IC95 53.4–76.9; n=59], recusa 86.4% [IC95 66.7–95.3; n=22] (59 com fonte, 22 sem; 0 sem fonte fora da conta por não chegarem ao agente de conhecimento; critério: max pos_answered com neg_refused >= 0.85; empate → menor limiar) · por idioma (limiar em uso): ? responde 100% (n=1), recusa — (n=0); en responde 33% (n=6), recusa 56% (n=9); pt responde 83% (n=52), recusa 0% (n=13)
 
-Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.831 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.968 · gap -8.686 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.949** · MRR **0.921** · hit@3 0.949
+Retrieval ativo (dense+cross, caminho de busca do agente, `evals/retrieval.jsonl`): Recall@3 **0.839** · Recall@5 (o que o redator lê) **0.89** · MRR@3 **0.816** · MRR@10 0.832 · hit@3 0.847 [IC95 73.5–91.8; n=59] (59 perguntas); buscador base sem rerank (dense): Recall@3 0.856 · MRR@3 0.774; separação com × sem fonte (nota do rerank): AUC 0.97 · gap -8.13 (59 × 22); por origem: official R@5 0.917 (n=6), page R@5 0.872 (n=39), real R@5 0.929 (n=14); por página: Recall@3 **0.96** · MRR **0.927** · hit@3 0.966
 <!-- eval:end -->
 
 ## Ao vivo (LLM real, por split)

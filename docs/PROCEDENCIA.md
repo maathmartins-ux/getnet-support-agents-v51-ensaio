@@ -84,7 +84,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 7 | 5 | 1 |
 | `Makefile` | 38 | 2 | 2 | 1 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 137 | 38 | 1 |
+| `README.md` | 319 | 150 | 53 | 1 |
 | `data` | 34 | 45 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
 | `data/intent_examples.d` | 0 | 26 | 0 | 0 |
@@ -115,7 +115,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 770 | 212 | 89 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **8840** escritas no relógio (19% do total). Arquivos do kit alterados no relógio: 158. Fora da conta, por serem gerados: 132574 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **8853** escritas no relógio (19% do total). Arquivos do kit alterados no relógio: 158. Fora da conta, por serem gerados: 132328 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

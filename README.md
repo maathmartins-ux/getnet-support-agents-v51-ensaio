@@ -403,8 +403,10 @@ e como comparar pela primeira entrega.
 | 16:54:26 | 279 | eval: confirmação v5.5 ao vivo, official repeat 3 com denso+cross (sem fallback): resolvidas 100%, pass^3 0,90, juiz fundamentadas 0,967 / úteis 1,00; official-02 run 0 com número sem base (clima não confirmado) |
 | 16:54:27 | 279 | readme: números e linha do tempo (fill_readme, último passo) |
 | 17:19:00 | 304 | confirmação: kit limpo (comentários sem procedência, docs só com links válidos, ADR 0005 atual) |
+| 17:19:00 | 304 | readme: números e linha do tempo (fill_readme, último passo) |
+| 17:25:40 | 311 | confirmação: resultado offline regenerado com o código atual |
 
-Do primeiro ao último commit: **304 min**.
+Do primeiro ao último commit: **311 min**.
 <!-- timeline:end -->
 
 </details>
