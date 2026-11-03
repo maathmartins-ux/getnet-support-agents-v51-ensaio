@@ -1,17 +1,17 @@
 {
   "mode": "in-process",
   "provider": "anthropic",
-  "recorded_at": "2026-11-03T14:12:42Z",
-  "git_sha": "21019ea",
+  "recorded_at": "2026-11-03T18:01:23Z",
+  "git_sha": "8ae89f4",
   "live": true,
   "split": "approval",
   "status": "complete",
-  "spent_usd": 0.109161,
-  "max_usd": 0.134367,
+  "spent_usd": 0.174106,
+  "max_usd": 0.164818,
   "budget": {
-    "share": 0.134367,
+    "share": 0.164818,
     "borrowed": 0.0,
-    "limit": 0.134367
+    "limit": 0.164818
   },
   "llm_errors": 0.0,
   "gate": 0.9,
@@ -47,8 +47,8 @@
       "resolved_acc": null,
       "facts_acc": null,
       "intent_acc": 100.0,
-      "handoff_acc": 75.0,
-      "handoff_outcome_acc": 75.0,
+      "handoff_acc": 100.0,
+      "handoff_outcome_acc": 100.0,
       "blocked_acc": null,
       "language_acc": 100.0,
       "tools_acc": 100.0,
@@ -56,15 +56,15 @@
       "replanned_acc": null,
       "completed_acc": null,
       "no_leak_acc": null,
-      "numbers_acc": 75.0,
+      "numbers_acc": 100.0,
       "memory_acc": null,
       "claims_acc": 100.0,
       "language_undetected": 0,
       "recall@3": null,
       "mrr": null,
-      "p50_ms": 72463.0,
-      "p95_ms": 79316.0,
-      "cost_usd": 0.109161,
+      "p50_ms": 43768.8,
+      "p95_ms": 45279.9,
+      "cost_usd": 0.174106,
       "crashes": 0,
       "ci": {
         "intent_acc": {
@@ -74,16 +74,16 @@
           "hi": 100.0
         },
         "handoff_acc": {
-          "k": 3,
+          "k": 4,
           "n": 4,
-          "lo": 30.1,
-          "hi": 95.4
+          "lo": 51.0,
+          "hi": 100.0
         },
         "handoff_outcome_acc": {
-          "k": 3,
+          "k": 4,
           "n": 4,
-          "lo": 30.1,
-          "hi": 95.4
+          "lo": 51.0,
+          "hi": 100.0
         },
         "language_acc": {
           "k": 4,
@@ -104,10 +104,10 @@
           "hi": 100.0
         },
         "numbers_acc": {
-          "k": 3,
+          "k": 4,
           "n": 4,
-          "lo": 30.1,
-          "hi": 95.4
+          "lo": 51.0,
+          "hi": 100.0
         },
         "claims_acc": {
           "k": 4,
@@ -122,8 +122,8 @@
       "resolved_acc": null,
       "facts_acc": null,
       "intent_acc": 100.0,
-      "handoff_acc": 75.0,
-      "handoff_outcome_acc": 75.0,
+      "handoff_acc": 100.0,
+      "handoff_outcome_acc": 100.0,
       "blocked_acc": null,
       "language_acc": 100.0,
       "tools_acc": 100.0,
@@ -131,15 +131,15 @@
       "replanned_acc": null,
       "completed_acc": null,
       "no_leak_acc": null,
-      "numbers_acc": 75.0,
+      "numbers_acc": 100.0,
       "memory_acc": null,
       "claims_acc": 100.0,
       "language_undetected": 0,
       "recall@3": null,
       "mrr": null,
-      "p50_ms": 72463.0,
-      "p95_ms": 79316.0,
-      "cost_usd": 0.109161,
+      "p50_ms": 43768.8,
+      "p95_ms": 45279.9,
+      "cost_usd": 0.174106,
       "crashes": 0,
       "ci": {
         "intent_acc": {
@@ -149,16 +149,16 @@
           "hi": 100.0
         },
         "handoff_acc": {
-          "k": 3,
+          "k": 4,
           "n": 4,
-          "lo": 30.1,
-          "hi": 95.4
+          "lo": 51.0,
+          "hi": 100.0
         },
         "handoff_outcome_acc": {
-          "k": 3,
+          "k": 4,
           "n": 4,
-          "lo": 30.1,
-          "hi": 95.4
+          "lo": 51.0,
+          "hi": 100.0
         },
         "language_acc": {
           "k": 4,
@@ -179,10 +179,10 @@
           "hi": 100.0
         },
         "numbers_acc": {
-          "k": 3,
+          "k": 4,
           "n": 4,
-          "lo": 30.1,
-          "hi": 95.4
+          "lo": 51.0,
+          "hi": 100.0
         },
         "claims_acc": {
           "k": 4,
@@ -198,7 +198,7 @@
       "id": "approval-01",
       "split": "approval",
       "message": "Quero antecipar meus recebíveis de crédito",
-      "ms": 8305.6,
+      "ms": 14486.5,
       "expected_intent": "support",
       "checks": {
         "intent": true,
@@ -218,8 +218,8 @@
         "records"
       ],
       "replans": [],
-      "engine": "fast_path",
-      "answer": "Proposta de antecipação do crédito criada (id **A-06913aa4**). Ela está aguardando sua confirmação.\n\nRecebíveis de crédito agendados:\n- 01/12/2026: R$ 500,00 (1 venda)\n- 02/12/2026: R$ 549,90 (2 vendas)\n- **Total: R$ 1.049,90**\n\nSe você confirmar, o pedido ainda precisa da aprovação de um atendente antes de ser executado. A proposta expira em 15 minutos se não for confirmada.\n\nNenhuma taxa ou valor líquido da antecipação veio dos registros, então não posso informar esses números.\n\nVocê confirma a antecipação?",
+      "engine": "llm",
+      "answer": "Estes são os seus recebíveis de crédito agendados:\n\n- 1 venda de 01/11/2026, no total de R$ 500,00. Depósito agendado para 01/12/2026.\n- 2 vendas de 02/11/2026, no total de R$ 549,90. Depósito agendado para 02/12/2026.\n- Total: 3 vendas, R$ 1.049,90.\n\nPropus a solicitação de antecipação desses recebíveis (ação A-9122cd90). **Ela ainda não foi executada e aguarda a sua confirmação.**\n\nDepois que você confirmar, a solicitação ainda precisa da aprovação de um atendente. A proposta expira em 15 minutos se não for confirmada.\n\nVocê confirma a solicitação?",
       "source_ids": [],
       "sources": [],
       "tool_calls": [
@@ -241,7 +241,7 @@
       ],
       "evidence": [
         "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-06913aa4\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}",
+        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-9122cd90\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}",
         "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -249,7 +249,7 @@
           "agent": "records",
           "status": "ok",
           "reason": null,
-          "ms": 4441.9,
+          "ms": 4925.4,
           "tools": [
             {
               "name": "get_settlements",
@@ -266,13 +266,13 @@
                 "method": "credito"
               },
               "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-06913aa4\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}"
+              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-9122cd90\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}"
             }
           ],
-          "pending_action": "A-06913aa4"
+          "pending_action": "A-9122cd90"
         }
       ],
-      "context": "- {\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-06913aa4\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- {\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-9122cd90\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "pt",
@@ -282,22 +282,23 @@
       "user_id": "cliente1988",
       "handoff_required": false,
       "handoff_reason": null,
-      "pending_action": "A-06913aa4",
+      "pending_action": "A-9122cd90",
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
         "guardrail.md": "0cb0e155d7",
         "records.md": "3f10ec308f",
-        "router.md": "f43965ed00"
+        "router.md": "b97c1ba623",
+        "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.018176,
+      "cost_usd": 0.033563,
       "run": 0
     },
     {
       "id": "approval-02",
       "split": "approval",
       "message": "Please advance my credit card receivables",
-      "ms": 8028.1,
+      "ms": 14792.3,
       "expected_intent": "support",
       "checks": {
         "intent": true,
@@ -317,15 +318,16 @@
         "records"
       ],
       "replans": [],
-      "engine": "fast_path",
-      "answer": "I've proposed an advance of your credit card receivables. It is waiting for your confirmation and hasn't been requested yet.\n\n- **Scheduled credit:** 2 sales from yesterday (2026-11-02), totaling R$ 549,90.\n- **Current deposit date:** 2026-12-02.\n- **Proposal ID:** A-db1bbb2b.\n\nIf you confirm, a human agent still has to approve it before anything runs. The proposal expires after 15 minutes if you don't confirm.\n\nDo you confirm the advance?",
+      "engine": "llm",
+      "answer": "I've drafted the advance request for your credit card receivables. **It is proposed and waiting for your confirmation** (action ID A-75da762d). Nothing has been requested yet.\n\nScheduled credit settlements:\n- R$ 500,00 (1 sale from 2026-11-01), deposit scheduled for 2026-12-01.\n- R$ 549,90 (2 sales from 2026-11-02), deposit scheduled for 2026-12-02.\n- **Total: R$ 1.049,90** (3 sales).\n\nAfter you confirm, a human agent still has to approve the request before it runs. I don't have a fee or net amount for the advance, so I can't give you one.\n\nDo you confirm the request?",
       "source_ids": [],
       "sources": [],
       "tool_calls": [
         {
           "name": "get_settlements",
           "args": {
-            "method": "credito"
+            "method": "credito",
+            "period": "last_7_days"
           },
           "ok": true
         },
@@ -338,8 +340,8 @@
         }
       ],
       "evidence": [
-        "{\"ok\": true, \"data\": {\"period\": \"yesterday\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 2, \"total\": 549.9, \"total_brl\": \"R$ 549,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1, \"soma\": {\"total\": 549.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-db1bbb2b\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}",
+        "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
+        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-75da762d\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}",
         "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -347,15 +349,16 @@
           "agent": "records",
           "status": "ok",
           "reason": null,
-          "ms": 3493.6,
+          "ms": 4869.3,
           "tools": [
             {
               "name": "get_settlements",
               "args": {
-                "method": "credito"
+                "method": "credito",
+                "period": "last_7_days"
               },
               "ok": true,
-              "preview": "{\"ok\": true, \"data\": {\"period\": \"yesterday\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt"
+              "preview": "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_"
             },
             {
               "name": "request_receivables_advance",
@@ -363,13 +366,13 @@
                 "method": "credito"
               },
               "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-db1bbb2b\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}"
+              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-75da762d\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}"
             }
           ],
-          "pending_action": "A-db1bbb2b"
+          "pending_action": "A-75da762d"
         }
       ],
-      "context": "- {\"ok\": true, \"data\": {\"period\": \"yesterday\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 2, \"total\": 549.9, \"total_brl\": \"R$ 549,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1, \"soma\": {\"total\": 549.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-db1bbb2b\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- {\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-75da762d\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "en",
@@ -379,28 +382,29 @@
       "user_id": "cliente1988",
       "handoff_required": false,
       "handoff_reason": null,
-      "pending_action": "A-db1bbb2b",
+      "pending_action": "A-75da762d",
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
         "guardrail.md": "0cb0e155d7",
         "records.md": "3f10ec308f",
-        "router.md": "f43965ed00"
+        "router.md": "b97c1ba623",
+        "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.017107,
+      "cost_usd": 0.031947,
       "run": 0
     },
     {
       "id": "approval-03",
       "split": "approval",
       "message": "Abre um chamado técnico para a maquininha T1988B",
-      "ms": 72463.0,
+      "ms": 43768.8,
       "expected_intent": "support",
       "checks": {
         "intent": true,
         "route": true,
-        "handoff": false,
-        "handoff_outcome": false,
+        "handoff": true,
+        "handoff_outcome": true,
         "language": true,
         "tools": true,
         "pending_action": true,
@@ -412,17 +416,47 @@
       "route": [
         "router",
         "records",
-        "faq",
-        "escalation"
+        "faq"
       ],
       "replans": [
-        "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)",
-        "budget:node_timeout->escalation"
+        "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)"
       ],
-      "engine": "fast_path",
-      "answer": "O chamado ainda não foi aberto. Ele está proposto e aguarda a sua confirmação.\n\n- **Terminal:** T1988B (Get Clássica)\n- **Situação:** offline há 5 horas, sem sinal, no chip. O último contato foi em 03/11/2026.\n- **Motivo do chamado:** sem sinal\n- **Código da proposta:** A-33c69011\n\nVocê confirma a abertura do chamado? A proposta não confirmada expira em 15 minutos.\n\nEncaminhei para um atendente humano (protocolo T-25f82583). A resposta aparece nesta conversa.",
-      "source_ids": [],
-      "sources": [],
+      "engine": "llm",
+      "answer": "O terminal T1988B (Get Clássica) está offline e sem sinal. Ele usa chip e está offline há 5 horas. O último contato foi em 2026-11-03T13:00.\n\n**Chamado técnico:** a proposta de abertura (motivo \"sem_sinal\", id A-99bfb20d) está **aguardando sua confirmação**. O chamado ainda não foi aberto. Se você não confirmar, a proposta expira em 15 minutos. Você confirma?\n\n**Enquanto isso, confira o chip** [sup-duvidas-06]:\n- Com a máquina desligada, abra a tampa traseira.\n- Coloque o chip em SIM1 ou SIM2, com a parte metálica voltada para baixo.\n- Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados.\n- Quando aparecer rede conectada (2G ou 3G), ela está pronta para uso.\n- Depois, faça um teste de comunicação.\n\n**O que as fontes não cobrem:** o passo a passo de Wi-Fi e as orientações sobre sinal fraco. Para o Wi-Fi, consulte o manual do seu modelo [sup-manual-maquinas-01]. Se quiser, posso encaminhar para um atendente humano.",
+      "source_ids": [
+        "sup-duvidas-06",
+        "sup-manual-maquinas-01",
+        "prod-todas-as-maquininhas-05",
+        "prod-todas-as-maquininhas-01",
+        "sup-duvidas-66"
+      ],
+      "sources": [
+        {
+          "id": "sup-duvidas-06",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
+        },
+        {
+          "id": "sup-manual-maquinas-01",
+          "title": "Manual Maquinas - Getnet",
+          "url": "https://site.getnet.com.br/boas-vindas/manual-maquinas/"
+        },
+        {
+          "id": "prod-todas-as-maquininhas-05",
+          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
+          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
+        },
+        {
+          "id": "prod-todas-as-maquininhas-01",
+          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
+          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
+        },
+        {
+          "id": "sup-duvidas-66",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
+        }
+      ],
       "tool_calls": [
         {
           "name": "get_terminal_status",
@@ -441,9 +475,13 @@
         }
       ],
       "evidence": [
-        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 1, \"online_count\": 0, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-33c69011\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
-        "Encaminhei para um atendente humano (protocolo T-25f82583). A resposta aparece nesta conversa.",
+        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_hours\": 5}], \"count\": 1, \"online_count\": 0, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
+        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-99bfb20d\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
+        "Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:",
+        "Manual Maquinas - Getnet: Qual a sua máquina? Portátil com Chip + Wi-Fi Baixar manual de uso Portátil com Chip + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Get Renova · Sem Bobina Baixar manual de uso Get Renova · Com Bobina Baixar manual de uso Fale já · Vamos começar",
+        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Escolha a melhor forma para finalizar sua contratação Falar com Especialista Continuar no site * Horario de funcionamento: Seg à sex das 7h as 23h Sábado das 9h as 15h Recebeu sua maquininha de outra pessoa? Cadastre-se aqui para ativá-la em seu nome Se você já adquiriu sua maquininha em nosso site, não precisa realizar este cadastro QUERO ME CADASTRAR Impulsione suas vendas de onde estiver Leve sua maquininha e ganhe os serviços abaixo para acelerar suas vendas Comece a vender agora e pague apenas a taxa de transação Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
+        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Como deseja continuar? Acelere suas vendas. Selecione o tipo de cadastro: Pessoa Física (CPF) Pessoa Jurídica (CNPJ) Nosso sistema de contratação está em manutenção no momento. Deixe seus dados e um especialista da Getnet entrará em contato para ajudar você a concluir seu pedido. Prepare seu negócio para vender mais na Black Friday com as maquininhas Getnet Aceite cartões em moedas estrangeiras Receba pagamentos pelo Pix de forma rápida e segura Conta e cartão grátis Recebimento em 2 dias úteis ESCOLHA SUA MAQUININHA Sua escolha inteligente para vender mais em 2026:",
+        "Dúvidas e Perguntas Frequentes | Getnet: ver mais · operacional Como ligo ou desligo minha máquina? Como ligo ou desligo minha máquina? Confira o modelo da sua maquininha e siga as instruções como mostra abaixo: LIGAR: Pressione a tecla verde DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR: Pressione a tecla “ ” (seta para cima) DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR E DESLIGAR:",
         "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -451,7 +489,7 @@
           "agent": "records",
           "status": "ok",
           "reason": null,
-          "ms": 4832.0,
+          "ms": 5544.4,
           "tools": [
             {
               "name": "get_terminal_status",
@@ -459,7 +497,7 @@
                 "terminal_id": "T1988B"
               },
               "ok": true,
-              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_ho"
+              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_ho"
             },
             {
               "name": "open_support_ticket",
@@ -468,28 +506,20 @@
                 "reason": "sem_sinal"
               },
               "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-33c69011\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
+              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-99bfb20d\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
             }
           ],
-          "pending_action": "A-33c69011"
+          "pending_action": "A-99bfb20d"
         },
         {
           "agent": "faq",
-          "status": "error",
-          "reason": "node_timeout",
-          "ms": null,
+          "status": "partial",
+          "reason": "partial_coverage",
+          "ms": 29098.7,
           "tools": []
-        },
-        {
-          "agent": "escalation",
-          "status": "ok",
-          "reason": null,
-          "ms": 388.2,
-          "tools": [],
-          "ticket_id": "T-25f82583"
         }
       ],
-      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 1, \"online_count\": 0, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-33c69011\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- Encaminhei para um atendente humano (protocolo T-25f82583). A resposta aparece nesta conversa.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_hours\": 5}], \"count\": 1, \"online_count\": 0, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-99bfb20d\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:\n- Manual Maquinas - Getnet: Qual a sua máquina? Portátil com Chip + Wi-Fi Baixar manual de uso Portátil com Chip + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Get Renova · Sem Bobina Baixar manual de uso Get Renova · Com Bobina Baixar manual de uso Fale já · Vamos começar\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Escolha a melhor forma para finalizar sua contratação Falar com Especialista Continuar no site * Horario de funcionamento: Seg à sex das 7h as 23h Sábado das 9h as 15h Recebeu sua maquininha de outra pessoa? Cadastre-se aqui para ativá-la em seu nome Se você já adquiriu sua maquininha em nosso site, não precisa realizar este cadastro QUERO ME CADASTRAR Impulsione suas vendas de onde estiver Leve sua maquininha e ganhe os serviços abaixo para acelerar suas vendas Comece a vender agora e pague apenas a taxa de transação Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Como deseja continuar? Acelere suas vendas. Selecione o tipo de cadastro: Pessoa Física (CPF) Pessoa Jurídica (CNPJ) Nosso sistema de contratação está em manutenção no momento. Deixe seus dados e um especialista da Getnet entrará em contato para ajudar você a concluir seu pedido. Prepare seu negócio para vender mais na Black Friday com as maquininhas Getnet Aceite cartões em moedas estrangeiras Receba pagamentos pelo Pix de forma rápida e segura Conta e cartão grátis Recebimento em 2 dias úteis ESCOLHA SUA MAQUININHA Sua escolha inteligente para vender mais em 2026:\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · operacional Como ligo ou desligo minha máquina? Como ligo ou desligo minha máquina? Confira o modelo da sua maquininha e siga as instruções como mostra abaixo: LIGAR: Pressione a tecla verde DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR: Pressione a tecla “ ” (seta para cima) DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR E DESLIGAR:\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "pt",
@@ -497,150 +527,32 @@
       "language_detected": "pt",
       "unsupported_numbers": [],
       "user_id": "cliente1988",
-      "handoff_required": true,
-      "handoff_reason": "budget_exhausted",
-      "pending_action": "A-33c69011",
+      "handoff_required": false,
+      "handoff_reason": null,
+      "pending_action": "A-99bfb20d",
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
+        "faq.md": "bab264dda0",
         "guardrail.md": "0cb0e155d7",
         "records.md": "3f10ec308f",
-        "rewrite.md": "3ed41ff166",
-        "router.md": "f43965ed00"
+        "router.md": "b97c1ba623",
+        "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.029389,
+      "cost_usd": 0.05547,
       "run": 0
     },
     {
       "id": "approval-04",
       "split": "approval",
       "message": "Open a support ticket for my offline terminal",
-      "ms": 79316.0,
+      "ms": 45279.9,
       "expected_intent": "support",
       "checks": {
         "intent": true,
         "route": true,
         "handoff": true,
         "handoff_outcome": true,
-        "language": true,
-        "tools": true,
-        "pending_action": true,
-        "numbers": false,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "support",
-      "route": [
-        "router",
-        "records",
-        "faq"
-      ],
-      "replans": [
-        "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)"
-      ],
-      "engine": "llm",
-      "answer": "Your terminal T1988B (Get Clássica, chip) is offline. It has no signal, its last contact was 2026-11-03 at [unconfirmed value]:11, and it has been offline for 5 hours. Your other terminal, T1988A, is online.\n\nI've proposed a support ticket for T1988B with the reason \"no signal\" (action A-cc304b2a). **I haven't opened it yet. It's waiting for your confirmation.** Please confirm if you want me to go ahead. A proposal that isn't confirmed expires after 15 minutes.\n\nI can hand your case to a human agent if you'd like.\n\nI couldn't confirm one of the values; I can hand this to a human agent to confirm it.",
-      "source_ids": [],
-      "sources": [],
-      "tool_calls": [
-        {
-          "name": "get_terminal_status",
-          "args": {},
-          "ok": true
-        },
-        {
-          "name": "open_support_ticket",
-          "args": {
-            "terminal_id": "T1988B",
-            "reason": "sem_sinal"
-          },
-          "ok": false
-        }
-      ],
-      "evidence": [
-        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:11\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-cc304b2a\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
-        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "records",
-          "status": "ok",
-          "reason": null,
-          "ms": 4726.0,
-          "tools": [
-            {
-              "name": "get_terminal_status",
-              "args": {},
-              "ok": true,
-              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:11\", \"offline_for_hours\": 0},"
-            },
-            {
-              "name": "open_support_ticket",
-              "args": {
-                "terminal_id": "T1988B",
-                "reason": "sem_sinal"
-              },
-              "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-cc304b2a\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
-            }
-          ],
-          "pending_action": "A-cc304b2a"
-        },
-        {
-          "agent": "faq",
-          "status": "error",
-          "reason": "node_timeout",
-          "ms": null,
-          "tools": []
-        }
-      ],
-      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:11\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-cc304b2a\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [
-        {
-          "index": 6,
-          "sentence": "I also tried to look up the connection troubleshooting steps (chip, Wi-Fi, signal), but that lookup failed, so I have no steps to give you.",
-          "reason": "not_in_evidence",
-          "source": "llm",
-          "action": "removed"
-        }
-      ],
-      "claims_action": "removed",
-      "expected_language": "en",
-      "language_declared": "en",
-      "language_detected": "en",
-      "unsupported_numbers": [
-        "09"
-      ],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": "A-cc304b2a",
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "guardrail.md": "0cb0e155d7",
-        "records.md": "3f10ec308f",
-        "rewrite.md": "3ed41ff166",
-        "router.md": "f43965ed00",
-        "supervisor.md": "7628bf0f0e"
-      },
-      "cost_usd": 0.044489,
-      "run": 0
-    }
-  ],
-  "failures": [
-    {
-      "id": "approval-03",
-      "split": "approval",
-      "message": "Abre um chamado técnico para a maquininha T1988B",
-      "ms": 72463.0,
-      "expected_intent": "support",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": false,
-        "handoff_outcome": false,
         "language": true,
         "tools": true,
         "pending_action": true,
@@ -652,136 +564,47 @@
       "route": [
         "router",
         "records",
-        "faq",
-        "escalation"
-      ],
-      "replans": [
-        "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)",
-        "budget:node_timeout->escalation"
-      ],
-      "engine": "fast_path",
-      "answer": "O chamado ainda não foi aberto. Ele está proposto e aguarda a sua confirmação.\n\n- **Terminal:** T1988B (Get Clássica)\n- **Situação:** offline há 5 horas, sem sinal, no chip. O último contato foi em 03/11/2026.\n- **Motivo do chamado:** sem sinal\n- **Código da proposta:** A-33c69011\n\nVocê confirma a abertura do chamado? A proposta não confirmada expira em 15 minutos.\n\nEncaminhei para um atendente humano (protocolo T-25f82583). A resposta aparece nesta conversa.",
-      "source_ids": [],
-      "sources": [],
-      "tool_calls": [
-        {
-          "name": "get_terminal_status",
-          "args": {
-            "terminal_id": "T1988B"
-          },
-          "ok": true
-        },
-        {
-          "name": "open_support_ticket",
-          "args": {
-            "terminal_id": "T1988B",
-            "reason": "sem_sinal"
-          },
-          "ok": false
-        }
-      ],
-      "evidence": [
-        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 1, \"online_count\": 0, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-33c69011\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
-        "Encaminhei para um atendente humano (protocolo T-25f82583). A resposta aparece nesta conversa.",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "records",
-          "status": "ok",
-          "reason": null,
-          "ms": 4832.0,
-          "tools": [
-            {
-              "name": "get_terminal_status",
-              "args": {
-                "terminal_id": "T1988B"
-              },
-              "ok": true,
-              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_ho"
-            },
-            {
-              "name": "open_support_ticket",
-              "args": {
-                "terminal_id": "T1988B",
-                "reason": "sem_sinal"
-              },
-              "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-33c69011\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
-            }
-          ],
-          "pending_action": "A-33c69011"
-        },
-        {
-          "agent": "faq",
-          "status": "error",
-          "reason": "node_timeout",
-          "ms": null,
-          "tools": []
-        },
-        {
-          "agent": "escalation",
-          "status": "ok",
-          "reason": null,
-          "ms": 388.2,
-          "tools": [],
-          "ticket_id": "T-25f82583"
-        }
-      ],
-      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 1, \"online_count\": 0, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 1}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-33c69011\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- Encaminhei para um atendente humano (protocolo T-25f82583). A resposta aparece nesta conversa.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": true,
-      "handoff_reason": "budget_exhausted",
-      "pending_action": "A-33c69011",
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "guardrail.md": "0cb0e155d7",
-        "records.md": "3f10ec308f",
-        "rewrite.md": "3ed41ff166",
-        "router.md": "f43965ed00"
-      },
-      "cost_usd": 0.029389,
-      "run": 0
-    },
-    {
-      "id": "approval-04",
-      "split": "approval",
-      "message": "Open a support ticket for my offline terminal",
-      "ms": 79316.0,
-      "expected_intent": "support",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "tools": true,
-        "pending_action": true,
-        "numbers": false,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "support",
-      "route": [
-        "router",
-        "records",
         "faq"
       ],
       "replans": [
         "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)"
       ],
       "engine": "llm",
-      "answer": "Your terminal T1988B (Get Clássica, chip) is offline. It has no signal, its last contact was 2026-11-03 at [unconfirmed value]:11, and it has been offline for 5 hours. Your other terminal, T1988A, is online.\n\nI've proposed a support ticket for T1988B with the reason \"no signal\" (action A-cc304b2a). **I haven't opened it yet. It's waiting for your confirmation.** Please confirm if you want me to go ahead. A proposal that isn't confirmed expires after 15 minutes.\n\nI can hand your case to a human agent if you'd like.\n\nI couldn't confirm one of the values; I can hand this to a human agent to confirm it.",
-      "source_ids": [],
-      "sources": [],
+      "answer": "Your terminal T1988B (Get Clássica, chip) is offline. It has no signal, and its last contact was 2026-11-03 at 13:00, about 5 hours ago. Your other terminal, T1988A, is online.\n\n**Ticket:** I drafted a support ticket for T1988B with the reason \"no signal\". It is **proposed and waiting for your confirmation** (action ID A-672da11b). I haven't opened it yet. Please confirm if you want me to go ahead. The proposal expires after 15 minutes.\n\n**Chip check:** these steps come from the manual [sup-duvidas-06].\n- Turn the machine off and open the cover on the back.\n- Insert the chip in the SIM1 or SIM2 slot, with the metal side facing down.\n- Close the cover and turn the machine on. Wait for it to connect to the data network.\n- When it shows a connected network (2G or 3G), the machine is ready.\n\nThe sources don't cover Wi-Fi setup, weak-signal troubleshooting, or the full communication test steps. Getnet has downloadable manuals for each machine type [sup-manual-maquinas-01]. I can also hand your case to a human agent if you'd like.",
+      "source_ids": [
+        "prod-crediario-08",
+        "sup-duvidas-06",
+        "sup-duvidas-get-smart-06",
+        "sup-manual-maquinas-01",
+        "sup-duvidas-93"
+      ],
+      "sources": [
+        {
+          "id": "prod-crediario-08",
+          "title": "Crediário - Getnet",
+          "url": "https://site.getnet.com.br/crediario/"
+        },
+        {
+          "id": "sup-duvidas-06",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
+        },
+        {
+          "id": "sup-duvidas-get-smart-06",
+          "title": "Arquivos Get Smart - Getnet",
+          "url": "https://site.getnet.com.br/duvidas/get-smart/"
+        },
+        {
+          "id": "sup-manual-maquinas-01",
+          "title": "Manual Maquinas - Getnet",
+          "url": "https://site.getnet.com.br/boas-vindas/manual-maquinas/"
+        },
+        {
+          "id": "sup-duvidas-93",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
+        }
+      ],
       "tool_calls": [
         {
           "name": "get_terminal_status",
@@ -798,8 +621,13 @@
         }
       ],
       "evidence": [
-        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:11\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-cc304b2a\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
+        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T18:00\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
+        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-672da11b\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
+        "Crediário - Getnet: . Você também pode contatar a Central de Atendimento para verificar se o seu Estabelecimento está habilitado para operar com a modalidade. Caso a modalidade esteja habilitada, mas a opção Crediário ainda não esteja disponível em sua máquina, é importante realizar uma transação de adquirência (bandeiras Mastercard, Visa, Elo e Amex) ou proceder com a inicialização do terminal (Suporte > Bandeiras > Funções Técnicas > Inicialização). A taxa de desconto do Crediário é parte integrante do seu contrato de Adesão ao Sistema Getnet e pode ser consultada no Portal do Cliente e/ou no Aplicativo Getnet Brasil. Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?",
+        "Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:",
+        "Arquivos Get Smart - Getnet: Aproxime o cartão na parte superior central do terminal, em uma distância inferior a 1cm. Após processo da transação, aparecerá uma mensagem de sucesso e a opção de impressão de comprovante de transação. Quais tipos de pagamentos são aceitos na Get Smart? Quais tipos de pagamentos são aceitos na Get Smart?",
+        "Manual Maquinas - Getnet: Qual a sua máquina? Portátil com Chip + Wi-Fi Baixar manual de uso Portátil com Chip + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Get Renova · Sem Bobina Baixar manual de uso Get Renova · Com Bobina Baixar manual de uso Fale já · Vamos começar",
+        "Dúvidas e Perguntas Frequentes | Getnet: Portal Recargas http://portal.getnet-tecnologia.com.br 2. Preencha seu login e senha para acessar a área restrita do Portal; 3. No menu à esquerda, clique em Menu Telefonia; 4. Clique em Financeiro e na sequência, em Soluções de Dívidas; 5. Na tela Títulos, selecione Abertos; 6. Na tela Negociação, você poderá simular a negociação e enviar uma contraproposta ou então concluir.",
         "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -807,13 +635,13 @@
           "agent": "records",
           "status": "ok",
           "reason": null,
-          "ms": 4726.0,
+          "ms": 4481.9,
           "tools": [
             {
               "name": "get_terminal_status",
               "args": {},
               "ok": true,
-              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:11\", \"offline_for_hours\": 0},"
+              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T18:00\", \"offline_for_hours\": 0},"
             },
             {
               "name": "open_support_ticket",
@@ -822,69 +650,60 @@
                 "reason": "sem_sinal"
               },
               "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-cc304b2a\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
+              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-672da11b\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
             }
           ],
-          "pending_action": "A-cc304b2a"
+          "pending_action": "A-672da11b"
         },
         {
           "agent": "faq",
-          "status": "error",
-          "reason": "node_timeout",
-          "ms": null,
+          "status": "partial",
+          "reason": "partial_coverage",
+          "ms": 29724.7,
           "tools": []
         }
       ],
-      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:11\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:11\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-cc304b2a\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [
-        {
-          "index": 6,
-          "sentence": "I also tried to look up the connection troubleshooting steps (chip, Wi-Fi, signal), but that lookup failed, so I have no steps to give you.",
-          "reason": "not_in_evidence",
-          "source": "llm",
-          "action": "removed"
-        }
-      ],
-      "claims_action": "removed",
+      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T18:00\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-672da11b\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- Crediário - Getnet: . Você também pode contatar a Central de Atendimento para verificar se o seu Estabelecimento está habilitado para operar com a modalidade. Caso a modalidade esteja habilitada, mas a opção Crediário ainda não esteja disponível em sua máquina, é importante realizar uma transação de adquirência (bandeiras Mastercard, Visa, Elo e Amex) ou proceder com a inicialização do terminal (Suporte > Bandeiras > Funções Técnicas > Inicialização). A taxa de desconto do Crediário é parte integrante do seu contrato de Adesão ao Sistema Getnet e pode ser consultada no Portal do Cliente e/ou no Aplicativo Getnet Brasil. Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?\n- Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:\n- Arquivos Get Smart - Getnet: Aproxime o cartão na parte superior central do terminal, em uma distância inferior a 1cm. Após processo da transação, aparecerá uma mensagem de sucesso e a opção de impressão de comprovante de transação. Quais tipos de pagamentos são aceitos na Get Smart? Quais tipos de pagamentos são aceitos na Get Smart?\n- Manual Maquinas - Getnet: Qual a sua máquina? Portátil com Chip + Wi-Fi Baixar manual de uso Portátil com Chip + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Get Renova · Sem Bobina Baixar manual de uso Get Renova · Com Bobina Baixar manual de uso Fale já · Vamos começar\n- Dúvidas e Perguntas Frequentes | Getnet: Portal Recargas http://portal.getnet-tecnologia.com.br 2. Preencha seu login e senha para acessar a área restrita do Portal; 3. No menu à esquerda, clique em Menu Telefonia; 4. Clique em Financeiro e na sequência, em Soluções de Dívidas; 5. Na tela Títulos, selecione Abertos; 6. Na tela Negociação, você poderá simular a negociação e enviar uma contraproposta ou então concluir.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "unsupported_claims": [],
+      "claims_action": "none",
       "expected_language": "en",
       "language_declared": "en",
       "language_detected": "en",
-      "unsupported_numbers": [
-        "09"
-      ],
+      "unsupported_numbers": [],
       "user_id": "cliente1988",
       "handoff_required": false,
       "handoff_reason": null,
-      "pending_action": "A-cc304b2a",
+      "pending_action": "A-672da11b",
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
+        "faq.md": "bab264dda0",
         "guardrail.md": "0cb0e155d7",
         "records.md": "3f10ec308f",
-        "rewrite.md": "3ed41ff166",
-        "router.md": "f43965ed00",
+        "router.md": "b97c1ba623",
         "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.044489,
+      "cost_usd": 0.053126,
       "run": 0
     }
   ],
+  "failures": [],
   "stability": {
     "runs": 1,
-    "pass_at_1": 0.5,
-    "pass_hat_k": 0.5,
+    "pass_at_1": 1.0,
+    "pass_hat_k": 1.0,
     "ci": {
       "pass_at_1": {
-        "k": 2,
+        "k": 4,
         "n": 4,
-        "lo": 15.0,
-        "hi": 85.0
+        "lo": 51.0,
+        "hi": 100.0
       },
       "pass_hat_k": {
-        "k": 2,
+        "k": 4,
         "n": 4,
-        "lo": 15.0,
-        "hi": 85.0
+        "lo": 51.0,
+        "hi": 100.0
       }
     },
     "unstable": [],
@@ -898,27 +717,17 @@
         "runs": 1
       },
       "approval-03": {
-        "passes": 0,
+        "passes": 1,
         "runs": 1
       },
       "approval-04": {
-        "passes": 0,
+        "passes": 1,
         "runs": 1
       }
     }
   },
   "failure_matrix": {
-    "by_check": {
-      "handoff": {
-        "approval": 1
-      },
-      "handoff_outcome": {
-        "approval": 1
-      },
-      "numbers": {
-        "approval": 1
-      }
-    },
+    "by_check": {},
     "intent_confusion": {},
     "intent_matrix": {
       "support": {
@@ -5141,7 +4950,7 @@
     "mrr": 0.816,
     "hit@3": 0.847,
     "recall@5": 0.89,
-    "mrr@10": 0.831,
+    "mrr@10": 0.832,
     "first_gold_rank": {
       "What's the difference between the Get Clássica and the Get Smart?": 1,
       "Do I need a bank account to receive my sales via Pix?": 3,
@@ -5169,7 +4978,7 @@
       "Como realizar pagamento por aproximação?": 1,
       "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 1,
       "Gestão na palma da sua mão Já tem o seu Get Tap?": 1,
-      "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 8,
+      "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 6,
       "Qualquer estabelecimento pode ter o Crediário?": 1,
       "A Get Smart aceita pagamento com auxilio emergencial?": 1,
       "Quais tipos de pagamentos são aceitos na Get Smart?": 1,
@@ -5214,7 +5023,7 @@
         "cases": 39,
         "recall@3": 0.872,
         "recall@5": 0.872,
-        "mrr@10": 0.875
+        "mrr@10": 0.876
       },
       "real": {
         "cases": 14,
@@ -5231,20 +5040,20 @@
     },
     "ndcg@3": 0.821,
     "page": {
-      "recall@3": 0.949,
-      "mrr": 0.921,
-      "hit@3": 0.949,
+      "recall@3": 0.96,
+      "mrr": 0.927,
+      "hit@3": 0.966,
       "hit@3_ci": {
-        "k": 56,
+        "k": 57,
         "n": 59,
-        "lo": 86.1,
-        "hi": 98.3
+        "lo": 88.5,
+        "hi": 99.1
       }
     },
     "latency_ms": {
-      "p50": 3381.7,
-      "p95": 11019.1,
-      "mean": 4383.6
+      "p50": 2203.3,
+      "p95": 5222.7,
+      "mean": 2586.6
     },
     "gate": {
       "min_score": 5.969,
@@ -5276,8 +5085,8 @@
       "enough": true
     },
     "separation_rerank": {
-      "auc": 0.968,
-      "gap": -8.686,
+      "auc": 0.97,
+      "gap": -8.13,
       "positives": 59,
       "negatives": 22,
       "enough": true
@@ -5299,20 +5108,28 @@
   },
   "cassette": {
     "file": "evals/cassettes/approval.jsonl",
-    "requests": 27,
+    "requests": 32,
     "errors": 0,
     "repeat": 1,
     "floors": {
       "intent_acc": 100.0,
-      "handoff_acc": 75.0,
-      "handoff_outcome_acc": 75.0,
+      "handoff_acc": 100.0,
+      "handoff_outcome_acc": 100.0,
       "language_acc": 100.0,
       "tools_acc": 100.0,
       "pending_action_acc": 100.0,
-      "numbers_acc": 75.0,
+      "numbers_acc": 100.0,
       "claims_acc": 100.0,
-      "pass_at_1": 50.0,
+      "pass_at_1": 100.0,
       "max_crashes": 0
     }
+  },
+  "judge": {
+    "status": "ran",
+    "file": "judge.json",
+    "verdicts": 4,
+    "grounded": 4,
+    "helpful": 4,
+    "judge_unreliable": false
   }
 }

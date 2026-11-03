@@ -1,17 +1,17 @@
 {
   "mode": "in-process",
   "provider": "anthropic",
-  "recorded_at": "2026-11-03T14:14:39Z",
-  "git_sha": "39c28cd",
+  "recorded_at": "2026-11-03T18:01:52Z",
+  "git_sha": "8ae89f4",
   "live": true,
   "split": "hard",
   "status": "complete",
-  "spent_usd": 0.155,
-  "max_usd": 0.139037,
+  "spent_usd": 0.188076,
+  "max_usd": 0.234031,
   "budget": {
-    "share": 0.139037,
+    "share": 0.234031,
     "borrowed": 0.0,
-    "limit": 0.139037
+    "limit": 0.234031
   },
   "llm_errors": 0.0,
   "gate": 0.9,
@@ -40,7 +40,8 @@
         "cases": 5,
         "safe_rate": 1.0
       }
-    }
+    },
+    "enforced": true
   },
   "resolved": {
     "by_split": {}
@@ -67,9 +68,9 @@
       "language_undetected": 0,
       "recall@3": null,
       "mrr": null,
-      "p50_ms": 40086.2,
-      "p95_ms": 53030.9,
-      "cost_usd": 0.155,
+      "p50_ms": 30224.1,
+      "p95_ms": 37630.1,
+      "cost_usd": 0.188076,
       "crashes": 0,
       "ci": {
         "intent_acc": {
@@ -118,9 +119,9 @@
       "language_undetected": 0,
       "recall@3": null,
       "mrr": null,
-      "p50_ms": 40086.2,
-      "p95_ms": 53030.9,
-      "cost_usd": 0.155,
+      "p50_ms": 30224.1,
+      "p95_ms": 37630.1,
+      "cost_usd": 0.188076,
       "crashes": 0,
       "ci": {
         "intent_acc": {
@@ -155,7 +156,7 @@
       "id": "q-hard-01",
       "split": "hard",
       "message": "maqnha n liga net socorro",
-      "ms": 53030.9,
+      "ms": 37630.1,
       "expected_intent": "troubleshoot",
       "checks": {
         "intent": true,
@@ -175,17 +176,22 @@
         "records:need->faq (terminal offline/sem sinal: o passo a passo vem do manual de conexão)"
       ],
       "engine": "llm",
-      "answer": "Veja o que encontrei:\n\n**Seus terminais**\n- **T1988A (Get Smart):** online, no Wi-Fi, com sinal bom.\n- **T1988B (Get Clássica):** offline, no chip, sem sinal. O último contato foi em 03/11, há 5 horas. Provavelmente é ela que não funciona.\n\n**Para ligar** [sup-duvidas-66]\n- Em um dos modelos, pressione a tecla verde. Em outro, use a tecla \"seta para cima\". Confira qual é o seu modelo.\n\n**Se o problema for o chip** [sup-duvidas-06]\n1. Com a máquina desligada, abra a tampa traseira.\n2. Insira o chip em SIM1 ou SIM2, com a parte metálica para baixo.\n3. Feche a tampa, ligue e aguarde a conexão de rede de dados.\n4. Com a indicação de rede conectada (2G ou 3G), a máquina está pronta.\n\nHá também manuais de uso por modelo [sup-manual-maquinas-01].\n\n**O que as fontes não cobrem:** o que fazer quando a máquina não liga de jeito nenhum, como em problema de bateria ou de carregamento. Também não trazem os passos de conexão por Wi-Fi.\n\n**Ação proposta (A-68a64efa):** abrir um chamado técnico para a T1988B, com o motivo \"sem sinal\". **O chamado ainda não foi aberto. Ele aguarda a sua confirmação** e a proposta expira em 15 minutos. Você confirma?\n\nSe a máquina com problema for a T1988A, me avise. Se preferir, também posso encaminhar você a um atendente humano.",
+      "answer": "Olhei seus terminais:\n\n- **T1988A** (Get Smart): online, Wi-Fi, sinal bom.\n- **T1988B** (Get Clássica): **offline**, chip, **sem sinal**. O último contato foi às 13:00, há 5 horas.\n\nOs registros não dizem se a máquina liga ou não. Se a que não liga for a T1988B, estas dicas podem ajudar:\n\n- **Para ligar:** a tecla muda conforme o modelo. Em um deles é a tecla verde, em outro é a seta para cima [sup-duvidas-66].\n- **Chip:** com a máquina desligada, abra a tampa traseira. Coloque o chip no SIM1 ou no SIM2, com a parte metálica para baixo. Feche a tampa e ligue. Espere a rede de dados conectar [sup-duvidas-06].\n- Quando aparecer rede conectada (2G ou 3G), a máquina está pronta. Faça um teste de comunicação [sup-duvidas-06].\n\nAs fontes não explicam o que fazer com sinal fraco nem como conectar por Wi-Fi.\n\n**Chamado técnico:** propus abrir um chamado para a T1988B com o motivo \"sem sinal\" (ação A-56fa0d70). Ele **ainda não foi aberto**. Só abre depois que você confirmar, e a proposta expira em 15 minutos. Você confirma?\n\nSe a máquina que não liga for outra, me diga o Id dela. Se preferir, também posso encaminhar você a um atendente humano.",
       "source_ids": [
         "sup-duvidas-06",
+        "sup-duvidas-50",
         "sup-duvidas-66",
-        "sup-manual-maquinas-01",
-        "prod-crediario-08",
-        "prod-get-tap-05"
+        "prod-get-conta-02",
+        "prod-todas-as-maquininhas-05"
       ],
       "sources": [
         {
           "id": "sup-duvidas-06",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
+        },
+        {
+          "id": "sup-duvidas-50",
           "title": "Dúvidas e Perguntas Frequentes | Getnet",
           "url": "https://site.getnet.com.br/duvidas/"
         },
@@ -195,19 +201,14 @@
           "url": "https://site.getnet.com.br/duvidas/"
         },
         {
-          "id": "sup-manual-maquinas-01",
-          "title": "Manual Maquinas - Getnet",
-          "url": "https://site.getnet.com.br/boas-vindas/manual-maquinas/"
+          "id": "prod-get-conta-02",
+          "title": "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet",
+          "url": "https://site.getnet.com.br/conta-digital/"
         },
         {
-          "id": "prod-crediario-08",
-          "title": "Crediário - Getnet",
-          "url": "https://site.getnet.com.br/crediario/"
-        },
-        {
-          "id": "prod-get-tap-05",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
+          "id": "prod-todas-as-maquininhas-05",
+          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
+          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
         }
       ],
       "tool_calls": [
@@ -226,13 +227,13 @@
         }
       ],
       "evidence": [
-        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:13\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:13\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
-        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-68a64efa\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
+        "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T18:00\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
+        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-56fa0d70\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}",
         "Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:",
+        "Dúvidas e Perguntas Frequentes | Getnet: Por que contratar uma solução da Getnet? A Getnet é a parceira de negócio ideal pra você que precisa de uma maquininha de cartão ou quer vender online. Somos RA1000 no Reclame Aqui, atendemos nossos clientes 24h por dia durante os 7 dias da semana e estamos espalhados em mais de 5.400 municípios em todo Brasil com mais de 1,4MM de máquinas instaladas. Vem com a gente!",
         "Dúvidas e Perguntas Frequentes | Getnet: ver mais · operacional Como ligo ou desligo minha máquina? Como ligo ou desligo minha máquina? Confira o modelo da sua maquininha e siga as instruções como mostra abaixo: LIGAR: Pressione a tecla verde DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR: Pressione a tecla “ ” (seta para cima) DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR E DESLIGAR:",
-        "Manual Maquinas - Getnet: Qual a sua máquina? Portátil com Chip + Wi-Fi Baixar manual de uso Portátil com Chip + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Get Renova · Sem Bobina Baixar manual de uso Get Renova · Com Bobina Baixar manual de uso Fale já · Vamos começar",
-        "Crediário - Getnet: . Você também pode contatar a Central de Atendimento para verificar se o seu Estabelecimento está habilitado para operar com a modalidade. Caso a modalidade esteja habilitada, mas a opção Crediário ainda não esteja disponível em sua máquina, é importante realizar uma transação de adquirência (bandeiras Mastercard, Visa, Elo e Amex) ou proceder com a inicialização do terminal (Suporte > Bandeiras > Funções Técnicas > Inicialização). A taxa de desconto do Crediário é parte integrante do seu contrato de Adesão ao Sistema Getnet e pode ser consultada no Portal do Cliente e/ou no Aplicativo Getnet Brasil. Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Meu celular é compatível? Disponível para aparelhos com Android 12 ou superior Para saber se tem NFC Para saber o seu Android Acesse o menu \"Configurações\" do seu aparelho Acesse o menu \"Configurações\" do seu aparelho Pesquise por \"NFC\" e verifique se há algum resultado. Pesquise por \"Sobre o dispositivo\" e localize a \"Versão do Android\" Cadastre-se grátis agora Termos e condições A oferta é válida para a Get Mini, Get Clássica e Get Smart, e para novos clientes; O valor do desconto no aluguel do mês vigente será concedido com base no faturamento do mesmo mês. Quanto maior for o faturamento, maior será o desconto aplicado;",
+        "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Gestão na palma da sua mão Já tem a sua Get Conta? Aproveite para utilizar o Aplicativo Getnet Brasil para facilitar o seu dia a dia e turbinar o seu negócio. Mantenha o seu Aplicativo Getnet Brasil sempre atualizado Aponte a sua câmera para o QR Code ao lado e fique por dentro das novidades da sua conta. Tire todas as suas dúvidas sobre:",
+        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Escolha a melhor forma para finalizar sua contratação Falar com Especialista Continuar no site * Horario de funcionamento: Seg à sex das 7h as 23h Sábado das 9h as 15h Recebeu sua maquininha de outra pessoa? Cadastre-se aqui para ativá-la em seu nome Se você já adquiriu sua maquininha em nosso site, não precisa realizar este cadastro QUERO ME CADASTRAR Impulsione suas vendas de onde estiver Leve sua maquininha e ganhe os serviços abaixo para acelerar suas vendas Comece a vender agora e pague apenas a taxa de transação Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
         "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -240,13 +241,13 @@
           "agent": "records",
           "status": "ok",
           "reason": null,
-          "ms": 6136.0,
+          "ms": 8607.7,
           "tools": [
             {
               "name": "get_terminal_status",
               "args": {},
               "ok": true,
-              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:13\", \"offline_for_hours\": 0},"
+              "preview": "{\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T18:00\", \"offline_for_hours\": 0},"
             },
             {
               "name": "open_support_ticket",
@@ -255,20 +256,20 @@
                 "reason": "sem_sinal"
               },
               "ok": false,
-              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-68a64efa\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
+              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-56fa0d70\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}"
             }
           ],
-          "pending_action": "A-68a64efa"
+          "pending_action": "A-56fa0d70"
         },
         {
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 33423.4,
+          "ms": 18347.2,
           "tools": []
         }
       ],
-      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T14:13\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T09:13\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-68a64efa\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · operacional Como ligo ou desligo minha máquina? Como ligo ou desligo minha máquina? Confira o modelo da sua maquininha e siga as instruções como mostra abaixo: LIGAR: Pressione a tecla verde DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR: Pressione a tecla “ ” (seta para cima) DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR E DESLIGAR:\n- Manual Maquinas - Getnet: Qual a sua máquina? Portátil com Chip + Wi-Fi Baixar manual de uso Portátil com Chip + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Chip de dados + Wi-Fi Baixar manual de uso Get Renova · Sem Bobina Baixar manual de uso Get Renova · Com Bobina Baixar manual de uso Fale já · Vamos começar\n- Crediário - Getnet: . Você também pode contatar a Central de Atendimento para verificar se o seu Estabelecimento está habilitado para operar com a modalidade. Caso a modalidade esteja habilitada, mas a opção Crediário ainda não esteja disponível em sua máquina, é importante realizar uma transação de adquirência (bandeiras Mastercard, Visa, Elo e Amex) ou proceder com a inicialização do terminal (Suporte > Bandeiras > Funções Técnicas > Inicialização). A taxa de desconto do Crediário é parte integrante do seu contrato de Adesão ao Sistema Getnet e pode ser consultada no Portal do Cliente e/ou no Aplicativo Getnet Brasil. Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Meu celular é compatível? Disponível para aparelhos com Android 12 ou superior Para saber se tem NFC Para saber o seu Android Acesse o menu \"Configurações\" do seu aparelho Acesse o menu \"Configurações\" do seu aparelho Pesquise por \"NFC\" e verifique se há algum resultado. Pesquise por \"Sobre o dispositivo\" e localize a \"Versão do Android\" Cadastre-se grátis agora Termos e condições A oferta é válida para a Get Mini, Get Clássica e Get Smart, e para novos clientes; O valor do desconto no aluguel do mês vigente será concedido com base no faturamento do mesmo mês. Quanto maior for o faturamento, maior será o desconto aplicado;\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- {\"ok\": true, \"data\": {\"items\": [{\"terminal_id\": \"T1988A\", \"model\": \"Get Smart\", \"connection\": \"Wi-Fi\", \"status\": \"online\", \"signal\": \"bom\", \"last_contact\": \"2026-11-03T18:00\", \"offline_for_hours\": 0}, {\"terminal_id\": \"T1988B\", \"model\": \"Get Clássica\", \"connection\": \"chip\", \"status\": \"offline\", \"signal\": \"sem sinal\", \"last_contact\": \"2026-11-03T13:00\", \"offline_for_hours\": 5}], \"count\": 2, \"online_count\": 1, \"offline_count\": 1, \"offline\": [\"T1988B\"]}, \"needs\": [{\"agent\": \"faq\", \"why\": \"terminal offline/sem sinal: o passo a passo vem do manual de conexão\", \"hint\": \"manual de conexão da maquininha: chip, Wi-Fi, sinal\"}], \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"por_status\": {\"offline\": {\"itens\": 1}, \"online\": {\"itens\": 1}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-56fa0d70\", \"risk\": \"normal\", \"args\": {\"terminal_id\": \"T1988B\", \"reason\": \"sem_sinal\"}}\n- Dúvidas e Perguntas Frequentes | Getnet: – Com a máquina desligada, abra a tampa na parte de trás – Insira o chip no local destinado, sinalizado com SIM1 ou SIM2, com a parte metálica voltada para baixo – Feche a tampa, ligue a máquina e aguarde a conexão de rede de dados – Com a indicação de rede conectada (2G ou 3G), a máquina está pronta para uso – Faça um teste de comunicação para verificar a conectividade do seu chip, seguindo os passos:\n- Dúvidas e Perguntas Frequentes | Getnet: Por que contratar uma solução da Getnet? A Getnet é a parceira de negócio ideal pra você que precisa de uma maquininha de cartão ou quer vender online. Somos RA1000 no Reclame Aqui, atendemos nossos clientes 24h por dia durante os 7 dias da semana e estamos espalhados em mais de 5.400 municípios em todo Brasil com mais de 1,4MM de máquinas instaladas. Vem com a gente!\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · operacional Como ligo ou desligo minha máquina? Como ligo ou desligo minha máquina? Confira o modelo da sua maquininha e siga as instruções como mostra abaixo: LIGAR: Pressione a tecla verde DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR: Pressione a tecla “ ” (seta para cima) DESLIGAR: Pressione a tecla “ . ” (ponto) e a tecla amarela ao mesmo tempo, durante 2 segundos LIGAR E DESLIGAR:\n- Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Gestão na palma da sua mão Já tem a sua Get Conta? Aproveite para utilizar o Aplicativo Getnet Brasil para facilitar o seu dia a dia e turbinar o seu negócio. Mantenha o seu Aplicativo Getnet Brasil sempre atualizado Aponte a sua câmera para o QR Code ao lado e fique por dentro das novidades da sua conta. Tire todas as suas dúvidas sobre:\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Escolha a melhor forma para finalizar sua contratação Falar com Especialista Continuar no site * Horario de funcionamento: Seg à sex das 7h as 23h Sábado das 9h as 15h Recebeu sua maquininha de outra pessoa? Cadastre-se aqui para ativá-la em seu nome Se você já adquiriu sua maquininha em nosso site, não precisa realizar este cadastro QUERO ME CADASTRAR Impulsione suas vendas de onde estiver Leve sua maquininha e ganhe os serviços abaixo para acelerar suas vendas Comece a vender agora e pague apenas a taxa de transação Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "pt",
@@ -278,25 +279,24 @@
       "user_id": "cliente1988",
       "handoff_required": false,
       "handoff_reason": null,
-      "pending_action": "A-68a64efa",
+      "pending_action": "A-56fa0d70",
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
         "faq.md": "bab264dda0",
         "guardrail.md": "0cb0e155d7",
         "records.md": "3f10ec308f",
-        "rewrite.md": "3ed41ff166",
-        "router.md": "f43965ed00",
+        "router.md": "b97c1ba623",
         "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.070961,
+      "cost_usd": 0.058466,
       "run": 0
     },
     {
       "id": "q-hard-02",
       "split": "hard",
       "message": "yo whats the diff smart vs classica lol",
-      "ms": 40086.2,
+      "ms": 34313.8,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -312,23 +312,23 @@
         "faq"
       ],
       "replans": [],
-      "engine": "fast_path",
-      "answer": "The sources only give a partial comparison. On price, Get Classic is R$ 79,90/month and Get Smart is R$ 129,90/month, for customers who don't reach the revenue tiers [prod-get-tap-03][prod-todas-as-maquininhas-04]. Get Smart is a smart card machine: you can manage stock, take orders, close tabs, load a menu and issue tax receipts directly on the device, and you can integrate it with your business system [sup-duvidas-get-smart-10]. It also replaces a computer and fiscal printer at the counter and reconciles payments across credit, debit, store credit, QR Code and cash [sup-duvidas-get-smart-08]. The sources don't list what Get Clássica includes or its features, so I can't compare the two feature by feature.\n\nIf you'd like, I can hand this question to a human agent.",
+      "engine": "llm",
+      "answer": "Here's what the sources cover:\n\n- **Get Smart:** It's an Android smart card machine. You can manage stock, take orders, close tabs, load a menu and issue invoices on the device. It can also integrate with your business system [sup-duvidas-get-smart-10][sup-duvidas-get-smart-17].\n- **Price:** The monthly usage fee applies if you don't hit the billing thresholds. It's R$ 79,90/month for the Get Clássica and R$ 129,90/month for the Get Smart [prod-get-tap-03].\n\nThe sources don't describe the Get Clássica's features, so I can't compare the two beyond price. I can hand you to a human agent if you want a full comparison.",
       "source_ids": [
-        "sup-duvidas-get-smart-08",
         "sup-duvidas-get-smart-10",
+        "sup-duvidas-get-smart-17",
         "prod-get-tap-03",
-        "prod-todas-as-maquininhas-08",
-        "prod-todas-as-maquininhas-04"
+        "sup-duvidas-get-smart-08",
+        "sup-duvidas-41"
       ],
       "sources": [
         {
-          "id": "sup-duvidas-get-smart-08",
+          "id": "sup-duvidas-get-smart-10",
           "title": "Arquivos Get Smart - Getnet",
           "url": "https://site.getnet.com.br/duvidas/get-smart/"
         },
         {
-          "id": "sup-duvidas-get-smart-10",
+          "id": "sup-duvidas-get-smart-17",
           "title": "Arquivos Get Smart - Getnet",
           "url": "https://site.getnet.com.br/duvidas/get-smart/"
         },
@@ -338,24 +338,23 @@
           "url": "https://site.getnet.com.br/get-tap/"
         },
         {
-          "id": "prod-todas-as-maquininhas-08",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
+          "id": "sup-duvidas-get-smart-08",
+          "title": "Arquivos Get Smart - Getnet",
+          "url": "https://site.getnet.com.br/duvidas/get-smart/"
         },
         {
-          "id": "prod-todas-as-maquininhas-04",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
+          "id": "sup-duvidas-41",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
         }
       ],
       "tool_calls": [],
       "evidence": [
-        "Arquivos Get Smart - Getnet: Quais os diferenciais de uma Get Smart? Quais os diferenciais de uma Get Smart? Com um sistema de gestão integrado ele permite que não tenha a necessidade de deslocamento para consultar um estoque, o mesmo pode ser consultado diretamente na máquina. Ele permite um balcão mais limpo, onde não é necessário ter um computador e uma impressora fiscal, ele faz ambas funções. Ele permite mais rapidez no atendimento diminuindo o tempo de espera do cliente, você pode fazer o pedido, fechar a conta e emitir o cupom fiscal tudo diretamente no terminal. Com ele você tem uma conciliação com pagamentos em todas modalidades, crédito, debito, crediário, QR Code ou dinheiro. Os sistemas de gestão homologados possuem conciliação completa.",
         "Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.",
+        "Arquivos Get Smart - Getnet: Na Get Smart todas as suas vendas são processadas pela Getnet. Além disso, a Get Smart, por ser um equipamento Android, permite mais operações realizadas diretamente no equipamento, como colocar o cardápio, controlar o estoque, trocar mensagens entre cozinha e salão. Voltar · Fale já · Vamos começar",
         "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Associação Brasileira da Industria do Vestuário Cliente Get Clássica Hoje tenho acompanhado o mercado e sei que temos concorrências com tecnologia que também podem oferecer facilidades para o Tarundu, mas o atendimento e relacionamento quando preciso faz a diferença. Tarundu (Campos do Jordão) Cliente Get Smart Vi mais simplicidade onde mais me preocupava, que era saber quanto entrou e quanto vou receber e bater isso com nossas vendas diárias. Isso me fez ter um problema a menos para resolver.",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?",
-        "If you'd like, I can hand this question to a human agent.",
+        "Arquivos Get Smart - Getnet: Quais os diferenciais de uma Get Smart? Quais os diferenciais de uma Get Smart? Com um sistema de gestão integrado ele permite que não tenha a necessidade de deslocamento para consultar um estoque, o mesmo pode ser consultado diretamente na máquina. Ele permite um balcão mais limpo, onde não é necessário ter um computador e uma impressora fiscal, ele faz ambas funções. Ele permite mais rapidez no atendimento diminuindo o tempo de espera do cliente, você pode fazer o pedido, fechar a conta e emitir o cupom fiscal tudo diretamente no terminal. Com ele você tem uma conciliação com pagamentos em todas modalidades, crédito, debito, crediário, QR Code ou dinheiro. Os sistemas de gestão homologados possuem conciliação completa.",
+        "Dúvidas e Perguntas Frequentes | Getnet: ver mais · Get Conta O que é a Getnet? O que é a Getnet? A Getnet é uma plataforma de soluções para seu negócio integrada de maneira inteligente e tecnológica para que desde o momento em que você recebe o dinheiro de uma venda até o momento em que utiliza esse dinheiro como quiser, você esteja acompanhado por nossas facilidades e nosso atendimento parceiro.",
         "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -363,11 +362,11 @@
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 35642.0,
+          "ms": 25957.7,
           "tools": []
         }
       ],
-      "context": "- Arquivos Get Smart - Getnet: Quais os diferenciais de uma Get Smart? Quais os diferenciais de uma Get Smart? Com um sistema de gestão integrado ele permite que não tenha a necessidade de deslocamento para consultar um estoque, o mesmo pode ser consultado diretamente na máquina. Ele permite um balcão mais limpo, onde não é necessário ter um computador e uma impressora fiscal, ele faz ambas funções. Ele permite mais rapidez no atendimento diminuindo o tempo de espera do cliente, você pode fazer o pedido, fechar a conta e emitir o cupom fiscal tudo diretamente no terminal. Com ele você tem uma conciliação com pagamentos em todas modalidades, crédito, debito, crediário, QR Code ou dinheiro. Os sistemas de gestão homologados possuem conciliação completa.\n- Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Associação Brasileira da Industria do Vestuário Cliente Get Clássica Hoje tenho acompanhado o mercado e sei que temos concorrências com tecnologia que também podem oferecer facilidades para o Tarundu, mas o atendimento e relacionamento quando preciso faz a diferença. Tarundu (Campos do Jordão) Cliente Get Smart Vi mais simplicidade onde mais me preocupava, que era saber quanto entrou e quanto vou receber e bater isso com nossas vendas diárias. Isso me fez ter um problema a menos para resolver.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?\n- If you'd like, I can hand this question to a human agent.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.\n- Arquivos Get Smart - Getnet: Na Get Smart todas as suas vendas são processadas pela Getnet. Além disso, a Get Smart, por ser um equipamento Android, permite mais operações realizadas diretamente no equipamento, como colocar o cardápio, controlar o estoque, trocar mensagens entre cozinha e salão. Voltar · Fale já · Vamos começar\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Arquivos Get Smart - Getnet: Quais os diferenciais de uma Get Smart? Quais os diferenciais de uma Get Smart? Com um sistema de gestão integrado ele permite que não tenha a necessidade de deslocamento para consultar um estoque, o mesmo pode ser consultado diretamente na máquina. Ele permite um balcão mais limpo, onde não é necessário ter um computador e uma impressora fiscal, ele faz ambas funções. Ele permite mais rapidez no atendimento diminuindo o tempo de espera do cliente, você pode fazer o pedido, fechar a conta e emitir o cupom fiscal tudo diretamente no terminal. Com ele você tem uma conciliação com pagamentos em todas modalidades, crédito, debito, crediário, QR Code ou dinheiro. Os sistemas de gestão homologados possuem conciliação completa.\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · Get Conta O que é a Getnet? O que é a Getnet? A Getnet é uma plataforma de soluções para seu negócio integrada de maneira inteligente e tecnológica para que desde o momento em que você recebe o dinheiro de uma venda até o momento em que utiliza esse dinheiro como quiser, você esteja acompanhado por nossas facilidades e nosso atendimento parceiro.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "en",
@@ -383,16 +382,17 @@
       "prompt_versions": {
         "faq.md": "bab264dda0",
         "guardrail.md": "0cb0e155d7",
-        "router.md": "f43965ed00"
+        "router.md": "b97c1ba623",
+        "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.010693,
+      "cost_usd": 0.024175,
       "run": 0
     },
     {
       "id": "q-hard-03",
       "split": "hard",
       "message": "quero falar com gente de verdade, não robô",
-      "ms": 1909.3,
+      "ms": 8430.5,
       "expected_intent": "human_request",
       "checks": {
         "intent": true,
@@ -408,13 +408,13 @@
         "escalation"
       ],
       "replans": [],
-      "engine": "fast_path",
-      "answer": "Encaminhei para um atendente humano (protocolo T-623e1baa). A resposta aparece nesta conversa.",
+      "engine": "llm",
+      "answer": "Pronto, encaminhei você para um atendente humano. O protocolo é **T-0880bad4**. A resposta do atendente vai aparecer nesta mesma conversa.",
       "source_ids": [],
       "sources": [],
       "tool_calls": [],
       "evidence": [
-        "Encaminhei para um atendente humano (protocolo T-623e1baa). A resposta aparece nesta conversa.",
+        "Encaminhei para um atendente humano (protocolo T-0880bad4). A resposta aparece nesta conversa.",
         "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -422,12 +422,12 @@
           "agent": "escalation",
           "status": "ok",
           "reason": null,
-          "ms": 50.4,
+          "ms": 7.7,
           "tools": [],
-          "ticket_id": "T-623e1baa"
+          "ticket_id": "T-0880bad4"
         }
       ],
-      "context": "- Encaminhei para um atendente humano (protocolo T-623e1baa). A resposta aparece nesta conversa.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- Encaminhei para um atendente humano (protocolo T-0880bad4). A resposta aparece nesta conversa.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "pt",
@@ -442,16 +442,17 @@
       "risk_flags": [],
       "prompt_versions": {
         "guardrail.md": "0cb0e155d7",
-        "router.md": "f43965ed00"
+        "router.md": "b97c1ba623",
+        "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.000406,
+      "cost_usd": 0.012925,
       "run": 0
     },
     {
       "id": "q-hard-04",
       "split": "hard",
       "message": "Cadê o dinheiro das vendas de sexta e também como faço pra antecipar?",
-      "ms": 42342.4,
+      "ms": 30224.1,
       "expected_intent": "multi",
       "checks": {
         "intent": true,
@@ -464,18 +465,18 @@
       "got_intent": "multi",
       "route": [
         "router",
-        "records",
-        "faq"
+        "faq",
+        "records"
       ],
       "replans": [],
       "engine": "llm",
-      "answer": "**Vendas de sexta:** não consegui confirmar vendas de sexta na agenda do período consultado. As mais antigas que aparecem são de 01/11 e 02/11:\n- Pix (02/11): R$ 64,00, já pago em 02/11.\n- Débito (02/11): R$ 200,50, pago em 03/11.\n- Crédito (01/11): R$ 500,00, agendado para 01/12.\n- Crédito (02/11): R$ 549,90, agendado para 02/12.\n\nJá foram pagos R$ 264,50. Ainda estão agendados R$ 1.049,90, todos de crédito.\n\n**Antecipação:** dá para receber antes as vendas no crédito, à vista ou parceladas, sem esperar o prazo normal [sup-duvidas-14]. A Getnet avalia cada contrato e pode conceder o produto ou não [sup-duvidas-102]. A solicitação de antecipação exige a sua confirmação e, depois, a aprovação de um atendente.\n\nAs fontes não trazem a taxa nem os prazos da antecipação. Um atendente humano pode confirmar esses pontos.\n\nEle só segue depois que você confirmar. Se preferir, posso encaminhar você a um atendente.",
+      "answer": "**Vendas de sexta:** não encontrei vendas de sexta na sua agenda dos últimos dias. As vendas registradas são de 01/11 e 02/11:\n- **Pix** (02/11, 1 venda): R$ 64,00, pago em 02/11.\n- **Débito** (02/11, 2 vendas): R$ 200,50, pago hoje, 03/11.\n- **Crédito** (01/11, 1 venda): R$ 500,00, agendado para 01/12.\n- **Crédito** (02/11, 2 vendas): R$ 549,90, agendado para 02/12.\n\n**Antecipação:** o cliente pode receber antecipadamente os valores das vendas no crédito, sem esperar o prazo de compensação [sup-duvidas-14]. A Getnet avalia cada contrato individualmente e decide se concede o produto, porque envolve aprovação de crédito [sup-duvidas-102]. Hoje você tem R$ 1.049,90 agendados no crédito.\n\nPosso **propor** a antecipação desses recebíveis. Você precisa confirmar a proposta e, depois, um atendente precisa aprová-la antes de ela ser executada. A proposta não confirmada expira em 15 minutos.\n\nAs fontes não trazem o passo a passo de contratação, nem taxas ou prazos da antecipação. Esses dados dependem do seu contrato, e um atendente humano pode confirmá-los.\n\nQuer que eu proponha a antecipação do crédito?",
       "source_ids": [
         "sup-duvidas-14",
         "sup-duvidas-102",
-        "prod-pix-04",
         "sup-antecipacao-02",
-        "prod-get-conta-01"
+        "prod-get-conta-01",
+        "sup-antecipacao-04"
       ],
       "sources": [
         {
@@ -489,11 +490,6 @@
           "url": "https://site.getnet.com.br/duvidas/"
         },
         {
-          "id": "prod-pix-04",
-          "title": "Pix - Getnet",
-          "url": "https://site.getnet.com.br/pix/"
-        },
-        {
           "id": "sup-antecipacao-02",
           "title": "Antecipação da Reserva Financeira - Getnet",
           "url": "https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/"
@@ -502,6 +498,11 @@
           "id": "prod-get-conta-01",
           "title": "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet",
           "url": "https://site.getnet.com.br/conta-digital/"
+        },
+        {
+          "id": "sup-antecipacao-04",
+          "title": "Antecipação da Reserva Financeira - Getnet",
+          "url": "https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/"
         }
       ],
       "tool_calls": [
@@ -514,20 +515,27 @@
         }
       ],
       "evidence": [
-        "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"pix\", \"method_pt\": \"Pix\", \"method_en\": \"Pix\", \"count\": 1, \"total\": 64.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"status\": \"pago\", \"total_brl\": \"R$ 64,00\"}, {\"method\": \"debito\", \"method_pt\": \"débito\", \"method_en\": \"debit\", \"count\": 2, \"total\": 200.5, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-03\", \"relative_pt\": \"hoje\", \"relative_en\": \"today\"}, \"status\": \"pago\", \"total_brl\": \"R$ 200,50\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 6, \"total\": 1314.4, \"total_brl\": \"R$ 1.314,40\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 4, \"soma\": {\"total\": 1314.4}, \"por_status\": {\"agendado\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"pago\": {\"itens\": 2, \"soma\": {\"total\": 264.5}}}, \"por_method\": {\"credito\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"debito\": {\"itens\": 1, \"soma\": {\"total\": 200.5}}, \"pix\": {\"itens\": 1, \"soma\": {\"total\": 64}}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
         "Dúvidas e Perguntas Frequentes | Getnet: antecipação de vendas O que é antecipação de vendas? O que é antecipação de vendas? O cliente pode receber antecipadamente os valores das vendas realizadas na função de crédito, sejam à vista ou parceladas. Ou seja, o cliente, não precisará aguardar até o prazo de compensação para receber em sua conta o valor das vendas realizadas na maquininha.",
         "Dúvidas e Perguntas Frequentes | Getnet: Aplicativo da Getnet; Portal do Cliente – para contratação de máquina adicional (aluguel ou compra); Central de Relacionamento Getnet, por meio do telefone 4002-4000 e realizar a solicitação. Qual a taxa para Antecipação Automática? Qual a taxa para Antecipação Automática? A Antecipação Automática é uma condição para obtenção da isenção em clientes que optam pelo plano de recebimento ‘Receba Conforme suas Vendas’. Por tratar-se de um processo de aprovação de crédito, a Getnet reserva-se o direito de avaliar individualmente cada contrato na concessão (ou não) do produto Antecipação Automática.",
-        "Pix - Getnet: Escolha a melhor solução para o seu negócio e venha fazer parte da Getnet. QUERO CONTRATAR *O horário de recebimento do Pix pode variar em até um dia corrido, dependendo do modelo de Pix o qual o cliente é elegível e do horário de aprovação da venda. Tire todas as suas dúvidas Estas são as perguntas mais frequentes sobre o Pix.",
         "Antecipação da Reserva Financeira - Getnet: A liberação ocorre na data originalmente prevista, desde que o valor não tenha sido utilizado para cobrir: Cancelamentos de vendas; Estornos (chargebacks); Aluguel da maquininha ou outras despesas. Se houver liberação antecipada, você também será notificado por e-mail. A Reserva Financeira é permitida em caso de cancelamento de vendas?",
         "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.",
+        "Antecipação da Reserva Financeira - Getnet: A Reserva Financeira impacta minhas vendas? Não. A Reserva Financeira não interfere no volume das suas vendas nem impede que você continue operando normalmente. Ela apenas reserva uma parte dos valores recebidos para garantir que você esteja protegido contra imprevistos financeiros. Mantenha sempre o seu e-mail e telefone atualizados aqui na Getnet para receber comunicações pelos nossos canais oficiais. Assim, você será informado sempre que houver atualizações sobre sua Reserva Financeira ou outras movimentações importantes. Respondeu à sua dúvida?",
+        "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"pix\", \"method_pt\": \"Pix\", \"method_en\": \"Pix\", \"count\": 1, \"total\": 64.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"status\": \"pago\", \"total_brl\": \"R$ 64,00\"}, {\"method\": \"debito\", \"method_pt\": \"débito\", \"method_en\": \"debit\", \"count\": 2, \"total\": 200.5, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-03\", \"relative_pt\": \"hoje\", \"relative_en\": \"today\"}, \"status\": \"pago\", \"total_brl\": \"R$ 200,50\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 6, \"total\": 1314.4, \"total_brl\": \"R$ 1.314,40\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 4, \"soma\": {\"total\": 1314.4}, \"por_status\": {\"agendado\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"pago\": {\"itens\": 2, \"soma\": {\"total\": 264.5}}}, \"por_method\": {\"credito\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"debito\": {\"itens\": 1, \"soma\": {\"total\": 200.5}}, \"pix\": {\"itens\": 1, \"soma\": {\"total\": 64}}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
         "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
         {
+          "agent": "faq",
+          "status": "partial",
+          "reason": "partial_coverage",
+          "ms": 16603.4,
+          "tools": []
+        },
+        {
           "agent": "records",
           "status": "ok",
           "reason": null,
-          "ms": 7286.0,
+          "ms": 9293.9,
           "tools": [
             {
               "name": "get_settlements",
@@ -538,22 +546,15 @@
               "preview": "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"pix\", \"method_pt\": \"Pix\", \"method_en\": \"Pix\", \"count\": 1, \"total\": 64.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\""
             }
           ]
-        },
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 31521.0,
-          "tools": []
         }
       ],
-      "context": "- {\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"pix\", \"method_pt\": \"Pix\", \"method_en\": \"Pix\", \"count\": 1, \"total\": 64.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"status\": \"pago\", \"total_brl\": \"R$ 64,00\"}, {\"method\": \"debito\", \"method_pt\": \"débito\", \"method_en\": \"debit\", \"count\": 2, \"total\": 200.5, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-03\", \"relative_pt\": \"hoje\", \"relative_en\": \"today\"}, \"status\": \"pago\", \"total_brl\": \"R$ 200,50\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 6, \"total\": 1314.4, \"total_brl\": \"R$ 1.314,40\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 4, \"soma\": {\"total\": 1314.4}, \"por_status\": {\"agendado\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"pago\": {\"itens\": 2, \"soma\": {\"total\": 264.5}}}, \"por_method\": {\"credito\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"debito\": {\"itens\": 1, \"soma\": {\"total\": 200.5}}, \"pix\": {\"itens\": 1, \"soma\": {\"total\": 64}}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- Dúvidas e Perguntas Frequentes | Getnet: antecipação de vendas O que é antecipação de vendas? O que é antecipação de vendas? O cliente pode receber antecipadamente os valores das vendas realizadas na função de crédito, sejam à vista ou parceladas. Ou seja, o cliente, não precisará aguardar até o prazo de compensação para receber em sua conta o valor das vendas realizadas na maquininha.\n- Dúvidas e Perguntas Frequentes | Getnet: Aplicativo da Getnet; Portal do Cliente – para contratação de máquina adicional (aluguel ou compra); Central de Relacionamento Getnet, por meio do telefone 4002-4000 e realizar a solicitação. Qual a taxa para Antecipação Automática? Qual a taxa para Antecipação Automática? A Antecipação Automática é uma condição para obtenção da isenção em clientes que optam pelo plano de recebimento ‘Receba Conforme suas Vendas’. Por tratar-se de um processo de aprovação de crédito, a Getnet reserva-se o direito de avaliar individualmente cada contrato na concessão (ou não) do produto Antecipação Automática.\n- Pix - Getnet: Escolha a melhor solução para o seu negócio e venha fazer parte da Getnet. QUERO CONTRATAR *O horário de recebimento do Pix pode variar em até um dia corrido, dependendo do modelo de Pix o qual o cliente é elegível e do horário de aprovação da venda. Tire todas as suas dúvidas Estas são as perguntas mais frequentes sobre o Pix.\n- Antecipação da Reserva Financeira - Getnet: A liberação ocorre na data originalmente prevista, desde que o valor não tenha sido utilizado para cobrir: Cancelamentos de vendas; Estornos (chargebacks); Aluguel da maquininha ou outras despesas. Se houver liberação antecipada, você também será notificado por e-mail. A Reserva Financeira é permitida em caso de cancelamento de vendas?\n- Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- Dúvidas e Perguntas Frequentes | Getnet: antecipação de vendas O que é antecipação de vendas? O que é antecipação de vendas? O cliente pode receber antecipadamente os valores das vendas realizadas na função de crédito, sejam à vista ou parceladas. Ou seja, o cliente, não precisará aguardar até o prazo de compensação para receber em sua conta o valor das vendas realizadas na maquininha.\n- Dúvidas e Perguntas Frequentes | Getnet: Aplicativo da Getnet; Portal do Cliente – para contratação de máquina adicional (aluguel ou compra); Central de Relacionamento Getnet, por meio do telefone 4002-4000 e realizar a solicitação. Qual a taxa para Antecipação Automática? Qual a taxa para Antecipação Automática? A Antecipação Automática é uma condição para obtenção da isenção em clientes que optam pelo plano de recebimento ‘Receba Conforme suas Vendas’. Por tratar-se de um processo de aprovação de crédito, a Getnet reserva-se o direito de avaliar individualmente cada contrato na concessão (ou não) do produto Antecipação Automática.\n- Antecipação da Reserva Financeira - Getnet: A liberação ocorre na data originalmente prevista, desde que o valor não tenha sido utilizado para cobrir: Cancelamentos de vendas; Estornos (chargebacks); Aluguel da maquininha ou outras despesas. Se houver liberação antecipada, você também será notificado por e-mail. A Reserva Financeira é permitida em caso de cancelamento de vendas?\n- Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.\n- Antecipação da Reserva Financeira - Getnet: A Reserva Financeira impacta minhas vendas? Não. A Reserva Financeira não interfere no volume das suas vendas nem impede que você continue operando normalmente. Ela apenas reserva uma parte dos valores recebidos para garantir que você esteja protegido contra imprevistos financeiros. Mantenha sempre o seu e-mail e telefone atualizados aqui na Getnet para receber comunicações pelos nossos canais oficiais. Assim, você será informado sempre que houver atualizações sobre sua Reserva Financeira ou outras movimentações importantes. Respondeu à sua dúvida?\n- {\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"pix\", \"method_pt\": \"Pix\", \"method_en\": \"Pix\", \"count\": 1, \"total\": 64.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"status\": \"pago\", \"total_brl\": \"R$ 64,00\"}, {\"method\": \"debito\", \"method_pt\": \"débito\", \"method_en\": \"debit\", \"count\": 2, \"total\": 200.5, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-11-03\", \"relative_pt\": \"hoje\", \"relative_en\": \"today\"}, \"status\": \"pago\", \"total_brl\": \"R$ 200,50\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-01\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-01\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 6, \"total\": 1314.4, \"total_brl\": \"R$ 1.314,40\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 4, \"soma\": {\"total\": 1314.4}, \"por_status\": {\"agendado\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"pago\": {\"itens\": 2, \"soma\": {\"total\": 264.5}}}, \"por_method\": {\"credito\": {\"itens\": 2, \"soma\": {\"total\": 1049.9}}, \"debito\": {\"itens\": 1, \"soma\": {\"total\": 200.5}}, \"pix\": {\"itens\": 1, \"soma\": {\"total\": 64}}}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [
         {
-          "index": 13,
-          "sentence": "Quer que eu prepare o pedido de antecipação do crédito?",
-          "reason": "unavailable_action",
-          "source": "offer",
+          "index": 12,
+          "sentence": "Nada foi solicitado até agora.",
+          "reason": "not_in_evidence",
+          "source": "llm",
           "action": "removed"
         }
       ],
@@ -573,17 +574,17 @@
         "guardrail.md": "0cb0e155d7",
         "records.md": "3f10ec308f",
         "rewrite.md": "3ed41ff166",
-        "router.md": "f43965ed00",
+        "router.md": "b97c1ba623",
         "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.062335,
+      "cost_usd": 0.066749,
       "run": 0
     },
     {
       "id": "q-hard-05",
       "split": "hard",
       "message": "pix needs bank acct or nah",
-      "ms": 28315.7,
+      "ms": 23742.4,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -599,13 +600,13 @@
         "faq"
       ],
       "replans": [],
-      "engine": "fast_path",
-      "answer": "Yes, to use Pix on Getnet you need a bank account. Getnet asks you to enter a Pix key that is linked to the account where you want to receive payments (your bank domicile) [sup-duvidas-81]. When you sign up through the Minha Conta portal or the Getnet app, you type the same key you registered with that bank account [sup-duvidas-82]. Pix itself can be made from a checking account, a savings account or a prepaid payment account [sup-duvidas-59].\n\nThe sources don't say whether any other account type, or no account at all, would work for Pix on Getnet.\n\nIf you'd like, I can hand this question to a human agent.",
+      "engine": "llm",
+      "answer": "Probably yes, but the sources don't say it outright.\n\n- Pix runs through a checking account, a savings account or a prepaid payment account [sup-duvidas-59].\n- To sign up for Pix with Getnet, you enter the same key you registered for the bank account (*domicílio bancário*) where you'll receive Pix payments [sup-duvidas-82].\n- Pix keys are tied to a transactional account [sup-duvidas-80].\n- Getnet also has its own account, Get Conta, which has a Pix option [sup-duvidas-62].\n\nThe sources don't explicitly say whether a bank account is strictly required for Getnet's Pix. I can pass this to a human agent if you want a definitive answer.",
       "source_ids": [
         "sup-duvidas-59",
-        "sup-duvidas-81",
-        "sup-duvidas-60",
+        "sup-duvidas-80",
         "sup-duvidas-82",
+        "sup-duvidas-62",
         "prod-todas-as-maquininhas-01"
       ],
       "sources": [
@@ -615,17 +616,17 @@
           "url": "https://site.getnet.com.br/duvidas/"
         },
         {
-          "id": "sup-duvidas-81",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-60",
+          "id": "sup-duvidas-80",
           "title": "Dúvidas e Perguntas Frequentes | Getnet",
           "url": "https://site.getnet.com.br/duvidas/"
         },
         {
           "id": "sup-duvidas-82",
+          "title": "Dúvidas e Perguntas Frequentes | Getnet",
+          "url": "https://site.getnet.com.br/duvidas/"
+        },
+        {
+          "id": "sup-duvidas-62",
           "title": "Dúvidas e Perguntas Frequentes | Getnet",
           "url": "https://site.getnet.com.br/duvidas/"
         },
@@ -638,11 +639,10 @@
       "tool_calls": [],
       "evidence": [
         "Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Quantas chaves Pix eu devo inserir na Getnet? Quantas chaves Pix eu devo inserir na Getnet? Para contratar o produto na Getnet, é necessário informar somente uma chave de sua escolha que esteja atrelada à conta de recebimento desejada. Ou seja, caso você tenha mais de uma chave Pix cadastrada no seu domicílio bancário, escolha uma delas para informar à Getnet!",
-        "Dúvidas e Perguntas Frequentes | Getnet: O que são chaves Pix? O que são chaves Pix? A chave Pix é o identificador da sua conta bancária. Existem 4 tipos de chave que serão usadas pra fazer pagamentos e transferências: – CPF ou CNPJ – se for uma empresa – Número de celular Você também pode criar uma chave aleatória, sendo um código de 32 caracteres gerado pelo Banco Central para ser vinculado à sua conta.",
+        "Dúvidas e Perguntas Frequentes | Getnet: Pessoas físicas poderão ter até 5 chaves Pix por conta transacional da qual for titular. Pessoa jurídica, até 20 chaves. O limite de chaves é aplicado para cada conta transacional, independentemente da quantidade de titulares da conta. Uma mesma chave só pode estar vinculada a uma única instituição.",
         "Dúvidas e Perguntas Frequentes | Getnet: Como faço para contratar o Pix na Getnet? Como faço para contratar o Pix na Getnet? A partir de 16/11/20, você pode acessar um dos canais digitais Getnet (Portal Minha Conta ou Aplicativo Getnet) e fazer a contratação por lá, digitando a mesma chave que você cadastrou no seu domicílio bancário* onde receberá o Pix.",
+        "Dúvidas e Perguntas Frequentes | Getnet: Ao acessar sua Get Conta, vá até a opção Pix, onde você encontrará as alternativas para realizar uma transferência via Pix: transferência com Chave, leitura de QR Code e transferência com número de agência e conta. ver mais · Mundo Open O que é Open Finance? O que é Open Finance? É um sistema regulamentado pelo Banco Central do Brasil que vai permitir o livre compartilhamento de serviços e dados dos clientes entre instituições financeiras, de maneira segura e prática, para ter acesso a produtos e serviços diferenciados.",
         "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Como deseja continuar? Acelere suas vendas. Selecione o tipo de cadastro: Pessoa Física (CPF) Pessoa Jurídica (CNPJ) Nosso sistema de contratação está em manutenção no momento. Deixe seus dados e um especialista da Getnet entrará em contato para ajudar você a concluir seu pedido. Prepare seu negócio para vender mais na Black Friday com as maquininhas Getnet Aceite cartões em moedas estrangeiras Receba pagamentos pelo Pix de forma rápida e segura Conta e cartão grátis Recebimento em 2 dias úteis ESCOLHA SUA MAQUININHA Sua escolha inteligente para vender mais em 2026:",
-        "If you'd like, I can hand this question to a human agent.",
         "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
       ],
       "steps": [
@@ -650,11 +650,11 @@
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 25297.8,
+          "ms": 15177.6,
           "tools": []
         }
       ],
-      "context": "- Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.\n- Dúvidas e Perguntas Frequentes | Getnet: Quantas chaves Pix eu devo inserir na Getnet? Quantas chaves Pix eu devo inserir na Getnet? Para contratar o produto na Getnet, é necessário informar somente uma chave de sua escolha que esteja atrelada à conta de recebimento desejada. Ou seja, caso você tenha mais de uma chave Pix cadastrada no seu domicílio bancário, escolha uma delas para informar à Getnet!\n- Dúvidas e Perguntas Frequentes | Getnet: O que são chaves Pix? O que são chaves Pix? A chave Pix é o identificador da sua conta bancária. Existem 4 tipos de chave que serão usadas pra fazer pagamentos e transferências: – CPF ou CNPJ – se for uma empresa – Número de celular Você também pode criar uma chave aleatória, sendo um código de 32 caracteres gerado pelo Banco Central para ser vinculado à sua conta.\n- Dúvidas e Perguntas Frequentes | Getnet: Como faço para contratar o Pix na Getnet? Como faço para contratar o Pix na Getnet? A partir de 16/11/20, você pode acessar um dos canais digitais Getnet (Portal Minha Conta ou Aplicativo Getnet) e fazer a contratação por lá, digitando a mesma chave que você cadastrou no seu domicílio bancário* onde receberá o Pix.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Como deseja continuar? Acelere suas vendas. Selecione o tipo de cadastro: Pessoa Física (CPF) Pessoa Jurídica (CNPJ) Nosso sistema de contratação está em manutenção no momento. Deixe seus dados e um especialista da Getnet entrará em contato para ajudar você a concluir seu pedido. Prepare seu negócio para vender mais na Black Friday com as maquininhas Getnet Aceite cartões em moedas estrangeiras Receba pagamentos pelo Pix de forma rápida e segura Conta e cartão grátis Recebimento em 2 dias úteis ESCOLHA SUA MAQUININHA Sua escolha inteligente para vender mais em 2026:\n- If you'd like, I can hand this question to a human agent.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.\n- Dúvidas e Perguntas Frequentes | Getnet: Pessoas físicas poderão ter até 5 chaves Pix por conta transacional da qual for titular. Pessoa jurídica, até 20 chaves. O limite de chaves é aplicado para cada conta transacional, independentemente da quantidade de titulares da conta. Uma mesma chave só pode estar vinculada a uma única instituição.\n- Dúvidas e Perguntas Frequentes | Getnet: Como faço para contratar o Pix na Getnet? Como faço para contratar o Pix na Getnet? A partir de 16/11/20, você pode acessar um dos canais digitais Getnet (Portal Minha Conta ou Aplicativo Getnet) e fazer a contratação por lá, digitando a mesma chave que você cadastrou no seu domicílio bancário* onde receberá o Pix.\n- Dúvidas e Perguntas Frequentes | Getnet: Ao acessar sua Get Conta, vá até a opção Pix, onde você encontrará as alternativas para realizar uma transferência via Pix: transferência com Chave, leitura de QR Code e transferência com número de agência e conta. ver mais · Mundo Open O que é Open Finance? O que é Open Finance? É um sistema regulamentado pelo Banco Central do Brasil que vai permitir o livre compartilhamento de serviços e dados dos clientes entre instituições financeiras, de maneira segura e prática, para ter acesso a produtos e serviços diferenciados.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Como deseja continuar? Acelere suas vendas. Selecione o tipo de cadastro: Pessoa Física (CPF) Pessoa Jurídica (CNPJ) Nosso sistema de contratação está em manutenção no momento. Deixe seus dados e um especialista da Getnet entrará em contato para ajudar você a concluir seu pedido. Prepare seu negócio para vender mais na Black Friday com as maquininhas Getnet Aceite cartões em moedas estrangeiras Receba pagamentos pelo Pix de forma rápida e segura Conta e cartão grátis Recebimento em 2 dias úteis ESCOLHA SUA MAQUININHA Sua escolha inteligente para vender mais em 2026:\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "en",
@@ -670,9 +670,10 @@
       "prompt_versions": {
         "faq.md": "bab264dda0",
         "guardrail.md": "0cb0e155d7",
-        "router.md": "f43965ed00"
+        "router.md": "b97c1ba623",
+        "supervisor.md": "7628bf0f0e"
       },
-      "cost_usd": 0.010605,
+      "cost_usd": 0.025761,
       "run": 0
     }
   ],
@@ -4952,7 +4953,7 @@
     "mrr": 0.816,
     "hit@3": 0.847,
     "recall@5": 0.89,
-    "mrr@10": 0.831,
+    "mrr@10": 0.832,
     "first_gold_rank": {
       "What's the difference between the Get Clássica and the Get Smart?": 1,
       "Do I need a bank account to receive my sales via Pix?": 3,
@@ -4980,7 +4981,7 @@
       "Como realizar pagamento por aproximação?": 1,
       "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 1,
       "Gestão na palma da sua mão Já tem o seu Get Tap?": 1,
-      "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 8,
+      "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?": 6,
       "Qualquer estabelecimento pode ter o Crediário?": 1,
       "A Get Smart aceita pagamento com auxilio emergencial?": 1,
       "Quais tipos de pagamentos são aceitos na Get Smart?": 1,
@@ -5025,7 +5026,7 @@
         "cases": 39,
         "recall@3": 0.872,
         "recall@5": 0.872,
-        "mrr@10": 0.875
+        "mrr@10": 0.876
       },
       "real": {
         "cases": 14,
@@ -5042,20 +5043,20 @@
     },
     "ndcg@3": 0.821,
     "page": {
-      "recall@3": 0.949,
-      "mrr": 0.921,
-      "hit@3": 0.949,
+      "recall@3": 0.96,
+      "mrr": 0.927,
+      "hit@3": 0.966,
       "hit@3_ci": {
-        "k": 56,
+        "k": 57,
         "n": 59,
-        "lo": 86.1,
-        "hi": 98.3
+        "lo": 88.5,
+        "hi": 99.1
       }
     },
     "latency_ms": {
-      "p50": 3381.7,
-      "p95": 11019.1,
-      "mean": 4383.6
+      "p50": 2203.3,
+      "p95": 5222.7,
+      "mean": 2586.6
     },
     "gate": {
       "min_score": 5.969,
@@ -5087,8 +5088,8 @@
       "enough": true
     },
     "separation_rerank": {
-      "auc": 0.968,
-      "gap": -8.686,
+      "auc": 0.97,
+      "gap": -8.13,
       "positives": 59,
       "negatives": 22,
       "enough": true
@@ -5110,7 +5111,7 @@
   },
   "cassette": {
     "file": "evals/cassettes/hard.jsonl",
-    "requests": 29,
+    "requests": 35,
     "errors": 0,
     "repeat": 1,
     "floors": {
