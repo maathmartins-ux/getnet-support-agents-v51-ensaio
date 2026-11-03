@@ -25,7 +25,7 @@ números saem de `scripts/fill_readme.py`, das mesmas chaves do placar abaixo):
 | Busca: Recall@3 0,49, MRR 0,61 | denso + cross-encoder decidido por medida antes do relógio; tabelas inteiras; placar no caminho do agente | Busca: Recall@3 **0.84** · Busca: Recall@5 (o que o redator lê) **0.89** · Busca: MRR **0.82**; `tests/test_v54_retrieval_method.py` |
 | Memória: pass@1 54%, números 64% | especialistas sem estado (pergunta reescrita pelo router + livro de fatos); rota medida pelo resultado | Memória ao vivo: pass@1 **0.67** · Memória ao vivo: números com base **93.9%**; `tests/test_v54_stateless_specialists.py` |
 | A resposta do humano era só a próxima mensagem; operação (especialidade, Postgres, JWKS) | a resposta do operador vira evidência e os passos pendentes do plano rodam (no turno, com espera curta, ou na retomada); fila por especialidade; Postgres atrás da mesma interface; JWKS | Turnos resolvidos sem humano (ao vivo, todos os splits) **0.88**; `tests/test_v54_hitl_sync.py` |
-| Avaliação independente: um rotulador, held-out de 24 | 2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes | Rotuladores humanos independentes **não medido** · Held-out cego: casos **80** · Held-out cego: ponta a ponta (humano passa) **não medido** · Juiz validado contra humanos (1 = sim, regra fixada antes) **1** · Juiz × humano: kappa **1.00**; `tests/test_v54_judge_validation_real.py` |
+| Avaliação independente: um rotulador, held-out de 24 | 2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes | Rotuladores humanos independentes **não medido** · Held-out cego: casos **80** · Held-out cego: ponta a ponta (humano passa) **não medido** · Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) **1** · Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa **1.00**; `tests/test_v54_judge_validation_real.py` |
 <!-- since:end -->
 
 Nesta tentativa: **sem validação humana** (ensaio pré-produção sem rotuladores; J1, J1b e J2 não aconteceram) e **rodada 2 não medida** (corte do T+45).
@@ -54,8 +54,8 @@ cenários oficiais: [docs/DEMO.md](docs/DEMO.md). O que veio do kit: [docs/PROCE
 | Held-out cego: ponta a ponta (humano passa) | não medido | 0.80 | não medido | `human_review.json heldout` |
 | Held-out cego: intenção (diagnóstico) | 86.2% | — | diagnóstico | `latest.json metrics.heldout` |
 | Rotuladores humanos independentes | não medido | 2 | não medido | `human_review.json` |
-| Juiz × humano: kappa | 1.00 | 0.80 | na referência | `judge.json calibration` |
-| Juiz validado contra humanos (1 = sim, regra fixada antes) | 1 | 1 | na referência | `judge.json calibration.validation` |
+| Juiz × gabarito de calibração (rótulos da SPEC, não humanos): kappa | 1.00 | 0.80 | na referência | `judge.json calibration` |
+| Juiz validado contra o gabarito de calibração (1 = sim, regra fixada antes) | 1 | 1 | na referência | `judge.json calibration.validation` |
 | Custo por turno resolvido sem humano (ao vivo) | US$ 0.0334 | — | diagnóstico | `live_*.json spent_usd ÷ linhas sem handoff` |
 | Turnos resolvidos sem humano (ao vivo, todos os splits) | 0.88 | — | diagnóstico | `live_*.json linhas sem handoff` |
 
@@ -383,8 +383,11 @@ e como comparar pela primeira entrega.
 | 14:27:04 | 132 | eval: rodada 1 ao vivo (official/memory repeat 3, real, official-var, hard, guardrail, heldout complete; juiz 266 casos, official fundamentadas 30/30; memória expects_fact 50%; replan e dependent abortaram por teto, fora) |
 | 14:32:41 | 138 | fix: desempates no domínio (perdeu o sinal / refused → troubleshoot; preciso abrir conta → knowledge): q-ov-04-pt, q-ov-05-pt, q-dep-02; intent offline 88,1% → 90,5% (n=126); red team offline segue 77,5% (regex do motor congelado) |
 | 14:32:53 | 138 | docs: procedência (tabela do git e teto de 58 min do relógio) |
+| 14:32:54 | 138 | readme: números e linha do tempo (fill_readme, último passo) |
+| 15:19:31 | 184 | confirmação: kit corrigido sobre o ensaio (CI, memória, hora ISO, entrega) e lint do domínio |
+| 15:39:32 | 205 | confirmação: resultados offline com o código corrigido (gate intenção 90,5%, memória 90,9%) e docs gerados |
 
-Do primeiro ao último commit: **138 min**.
+Do primeiro ao último commit: **205 min**.
 <!-- timeline:end -->
 
 </details>
