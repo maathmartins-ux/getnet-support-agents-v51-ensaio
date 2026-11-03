@@ -25,9 +25,9 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 |---|---:|---|
 | Oficiais resolvidas (sem humano + todo fato + fonte) | 0.97 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
 | Oficiais resolvidas: pass^k (todas as rodadas) | 0.90 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 0.93 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Juiz: respostas oficiais fundamentadas | 0.97 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
-| Memória ao vivo: pass@1 | 0.92 | conversas de vários turnos: o fato do turno anterior chega à resposta |
+| Memória ao vivo: pass@1 | 0.97 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.84 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
 | Busca: MRR | 0.82 | posição média da primeira página certa (1 = sempre em primeiro) |
 <!-- scorecard:end -->
@@ -397,8 +397,12 @@ e como comparar pela primeira entrega.
 | 17:56:52 | 342 | kit: guardrail fora do ar segura escrita; idioma medido só com LLM |
 | 17:59:42 | 345 | kit: tarja de número sem falso positivo (data de amanhã, identificador da tool) |
 | 18:43:39 | 389 | kit: resposta abre com a resposta; juiz validado só com rótulo de pessoa; resolvido sem abertura de abstenção |
+| 18:50:56 | 396 | eval: oficiais ao vivo (1fa7c26, repeat 3, denso+cross): resolvidas 29/30, pass^3 0,90, juiz fundamentadas 0,933 / úteis 1,00, sem tarja |
+| 18:50:27 | 395 | eval: bateria ao vivo completa (kit v5.5) |
+| 18:50:28 | 395 | readme: números e linha do tempo (fill_readme, último passo) |
+| 18:52:31 | 398 | eval: remove abortos substituídos por rodadas completas |
 
-Do primeiro ao último commit: **389 min**.
+Do primeiro ao último commit: **398 min**.
 <!-- timeline:end -->
 
 </details>
