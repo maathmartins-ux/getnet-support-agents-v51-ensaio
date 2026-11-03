@@ -23,13 +23,13 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 <!-- scorecard:begin -->
 | medida | valor | como se mede |
 |---|---:|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
-| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 0.97 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.87 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 0.80 | o mesmo, em todas as rodadas de cada cenário |
+| Juiz: respostas oficiais fundamentadas | 0.93 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
-| Memória ao vivo: pass@1 | 0.97 | conversas de vários turnos: o fato do turno anterior chega à resposta |
-| Busca: Recall@3 | 0.84 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
-| Busca: MRR | 0.82 | posição média da primeira página certa (1 = sempre em primeiro) |
+| Memória ao vivo: pass@1 | 0.95 | conversas de vários turnos: o fato do turno anterior chega à resposta |
+| Busca: Recall@3 | 0.82 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
+| Busca: MRR | 0.81 | posição média da primeira página certa (1 = sempre em primeiro) |
 <!-- scorecard:end -->
 
 ### 0.1 Mapeamento do desafio
@@ -420,8 +420,12 @@ e como comparar pela primeira entrega.
 | 20:23:56 | 489 | readme: números e linha do tempo (fill_readme, último passo) |
 | 20:32:26 | 497 | docs: README sem número escrito à mão que envelhece (portão, juiz); transcrição HITL regenerada sem frase quebrada; senha de exemplo barrada em produção |
 | 20:32:27 | 497 | readme: números e linha do tempo (fill_readme, último passo) |
+| 20:41:24 | 506 | domínio: faixa de faturamento não é preço nem limite (faq); fora do escopo sem resposta de conteúdo; official-04 exige a Get Conta; ENTREGA regenerada |
+| 20:48:29 | 513 | domínio: glossário 'bank account' → Get Conta (a busca do official-04 traz a conta digital da Getnet) |
+| 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
+| 21:09:29 | 534 | domínio: 'preciso de conta?' responde com a Get Conta; clima sempre com temperaturas |
 
-Do primeiro ao último commit: **497 min**.
+Do primeiro ao último commit: **534 min**.
 <!-- timeline:end -->
 
 </details>
