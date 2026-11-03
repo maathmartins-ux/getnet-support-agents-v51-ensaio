@@ -416,8 +416,9 @@ e como comparar pela primeira entrega.
 | 19:44:14 | 449 | readme: números e linha do tempo (fill_readme, último passo) |
 | 19:52:33 | 458 | kit: portão sem fonte pela nota do cross-encoder (MIN_RERANK -5,2247 calibrado no gold do desafio); README sem contradição nos rótulos humanos; frase sem citação quebrada |
 | 20:17:17 | 482 | router: exemplos rotulados de duas perguntas sobre o MESMO produto (knowledge, não multi); rotulagem com amostra enriquecida |
+| 20:23:56 | 489 | eval: oficiais (30/30, pass^3 1,00, juiz 0,967/1,00), real e partial (100%) ao vivo no código novo; offline regenerado |
 
-Do primeiro ao último commit: **482 min**.
+Do primeiro ao último commit: **489 min**.
 <!-- timeline:end -->
 
 </details>
