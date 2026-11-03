@@ -115,7 +115,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 1140 | 220 | 92 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **9645** escritas no relógio (21% do total). Arquivos do kit alterados no relógio: 176. Fora da conta, por serem gerados: 139331 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **9645** escritas no relógio (21% do total). Arquivos do kit alterados no relógio: 176. Fora da conta, por serem gerados: 139339 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).
