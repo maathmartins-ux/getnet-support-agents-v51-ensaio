@@ -90,10 +90,13 @@ def _slash_values(a: str, b: str, year: str | None) -> set[str]:
 # Data e hora ISO das tools ("2026-11-03T09:16:00"): o "T" colava na hora e o "09" não era lido como número; a resposta
 # "às 09:16" virava "às [valor não confirmado]:16" (casos memory-07/08, nas 3 rodadas).
 _ISO_T = re.compile(r"(\d{4}-\d{2}-\d{2})T(?=\d)")
+# Número dentro de identificador da tool ("last_7_days", "d_plus_30"): o "_" colava o número na palavra e a resposta
+# "últimos 7 dias" virava tarja (heldout H1-29/35/37 ao vivo).
+_SNAKE_NUM = re.compile(r"(?<=[A-Za-z])_(\d+)(?=_|\b)")
 
 
 def _items(text: str) -> list[_Item]:
-    text = _ISO_T.sub(r"\1 ", _LIST_MARK.sub(" ", _CITATION.sub(" ", text)))
+    text = _SNAKE_NUM.sub(r" \1 ", _ISO_T.sub(r"\1 ", _LIST_MARK.sub(" ", _CITATION.sub(" ", text))))
     items: list[_Item] = []
 
     def take_date(m: re.Match, values: set[str]) -> str:
@@ -251,11 +254,18 @@ def is_calendar_day(raw: str, answer: str, today=None) -> bool:
     if not raw.isdigit():
         return False
     base = today or _dt.date.today()
-    if int(raw) not in {(base + _dt.timedelta(days=d)).day for d in (-1, 0, 1)}:
-        return False
+    days = [base + _dt.timedelta(days=d) for d in (-1, 0, 1)]
     n = re.escape(raw)
+    # "Nov 4, 2026" / "4 de novembro de 2026": o ano da data de ontem/hoje/amanhã escrito logo depois do dia e mês
+    if int(raw) in {d.year for d in days}:
+        dated = "|".join(str(d.day) for d in days)
+        year_after = (rf"\b(?:{_MONTHS})\.?\s+(?:{dated})(?:st|nd|rd|th)?,?\s+{n}\b"
+                      rf"|\b(?:{dated})\s+(?:de\s+)?(?:{_MONTHS})\.?,?\s+(?:de\s+)?{n}\b")
+        return re.search(year_after, answer, re.IGNORECASE) is not None
+    if int(raw) not in {d.day for d in days}:
+        return False
     day_month = rf"(?<![\d,.])\b{n}(?:st|nd|rd|th)?\s+(?:de\s+)?(?:{_MONTHS})\b"
-    month_day = rf"\b(?:{_MONTHS})\.?\s+{n}\b(?![\d,.])"
+    month_day = rf"\b(?:{_MONTHS})\.?\s+{n}\b(?![\d.]|,\d)"
     return re.search(f"{day_month}|{month_day}", answer, re.IGNORECASE) is not None
 
 
