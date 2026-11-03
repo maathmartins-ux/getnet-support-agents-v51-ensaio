@@ -1,20 +1,25 @@
 {
   "mode": "in-process",
   "provider": "anthropic",
-  "recorded_at": "2026-11-03T20:19:58Z",
-  "git_sha": "9635ae5",
+  "recorded_at": "2026-11-03T20:52:18Z",
+  "git_sha": "8fc2c32",
   "live": true,
   "split": "partial",
   "status": "complete",
-  "spent_usd": 0.383026,
-  "max_usd": 1.0,
-  "llm_errors": 0,
+  "spent_usd": 0.131371,
+  "max_usd": 0.161603,
+  "budget": {
+    "share": 0.161603,
+    "borrowed": 0.0,
+    "limit": 0.161603
+  },
+  "llm_errors": 0.0,
   "gate": 0.9,
   "intent_acc": 1.0,
   "intent_ci": {
-    "k": 15,
-    "n": 15,
-    "lo": 79.6,
+    "k": 5,
+    "n": 5,
+    "lo": 56.6,
     "hi": 100.0
   },
   "isolation": "db_per_case",
@@ -39,7 +44,7 @@
   "gate_resolved": null,
   "metrics": {
     "partial": {
-      "cases": 15,
+      "cases": 5,
       "resolved_acc": null,
       "facts_acc": null,
       "intent_acc": 100.0,
@@ -58,51 +63,51 @@
       "language_undetected": 0,
       "recall@3": null,
       "mrr": null,
-      "p50_ms": 10171.8,
-      "p95_ms": 13359.4,
-      "cost_usd": 0.383026,
+      "p50_ms": 20863.0,
+      "p95_ms": 22115.5,
+      "cost_usd": 0.131371,
       "crashes": 0,
       "ci": {
         "intent_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "handoff_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "handoff_outcome_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "language_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "numbers_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "claims_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         }
       }
     },
     "ALL": {
-      "cases": 15,
+      "cases": 5,
       "resolved_acc": null,
       "facts_acc": null,
       "intent_acc": 100.0,
@@ -121,45 +126,45 @@
       "language_undetected": 0,
       "recall@3": null,
       "mrr": null,
-      "p50_ms": 10171.8,
-      "p95_ms": 13359.4,
-      "cost_usd": 0.383026,
+      "p50_ms": 20863.0,
+      "p95_ms": 22115.5,
+      "cost_usd": 0.131371,
       "crashes": 0,
       "ci": {
         "intent_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "handoff_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "handoff_outcome_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "language_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "numbers_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         },
         "claims_acc": {
-          "k": 15,
-          "n": 15,
-          "lo": 79.6,
+          "k": 5,
+          "n": 5,
+          "lo": 56.6,
           "hi": 100.0
         }
       }
@@ -170,7 +175,7 @@
       "id": "q-partial-01",
       "split": "partial",
       "message": "Quanto custa a Get Smart e qual a garantia dela em meses?",
-      "ms": 9583.9,
+      "ms": 21112.3,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -189,7 +194,7 @@
       ],
       "replans": [],
       "engine": "llm",
-      "answer": "A Get Smart custa R$ 129,90/mês [prod-todas-as-maquininhas-04][prod-get-tap-03].\n\nAs fontes não informam o prazo de garantia dela em meses, então não posso confirmar esse dado. Se quiser, posso encaminhar você a um atendente humano para esclarecer a garantia.",
+      "answer": "A Get Smart custa R$ 129,90 por mês [prod-todas-as-maquininhas-04][prod-get-tap-03]. Esse valor vale para quem não atinge os faturamentos mensais que dão isenção ou desconto no aluguel [prod-get-tap-03]. Quem vende até R$ 60 mil por mês pode usar a Get Smart sem pagar aluguel [prod-get-tap-02].\n\nAs fontes consultadas não informam o prazo de garantia da Get Smart em meses. Se quiser, posso encaminhar você a um atendente humano para confirmar esse prazo.",
       "source_ids": [
         "prod-todas-as-maquininhas-04",
         "prod-get-tap-03",
@@ -238,7 +243,7 @@
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 4946.5,
+          "ms": 14697.6,
           "tools": []
         }
       ],
@@ -258,19 +263,19 @@
         "promessa_financeira"
       ],
       "prompt_versions": {
-        "faq.md": "435616a1b1",
+        "faq.md": "ee07a9eb48",
         "guardrail.md": "0cb0e155d7",
         "router.md": "b97c1ba623",
         "supervisor.md": "64112db478"
       },
-      "cost_usd": 0.023032,
+      "cost_usd": 0.025848,
       "run": 0
     },
     {
       "id": "q-partial-02",
       "split": "partial",
       "message": "What is the Get Clássica price and its battery life in hours?",
-      "ms": 13047.1,
+      "ms": 22115.5,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -289,7 +294,7 @@
       ],
       "replans": [],
       "engine": "llm",
-      "answer": "The Get Clássica costs R$ 79,90/month if you don't reach the revenue that waives the rental [prod-todas-as-maquininhas-04][prod-get-tap-03]. The rental is waived above R$ 20 mil in monthly revenue for the Get Clássica [prod-todas-as-maquininhas-02].\n\nI couldn't find the Get Clássica's battery life in hours in our sources. The only battery information I found is for the Get Smart, which should be charged for at least 3 hours straight [sup-duvidas-get-smart-03]. That's a charging recommendation, not the Clássica's battery life.\n\nI can pass you to a human agent if you'd like to confirm the battery life.",
+      "answer": "The Get Clássica costs R$ 79,90/month if you don't reach the revenue thresholds for rent exemption [prod-todas-as-maquininhas-04][prod-get-tap-03]. With monthly sales above R$ 20 mil, the rental is waived [prod-todas-as-maquininhas-02].\n\nI couldn't find the Get Clássica's battery life in hours in the sources. If you'd like, I can hand your case to a human agent to confirm it.",
       "source_ids": [
         "prod-get-tap-02",
         "prod-todas-as-maquininhas-04",
@@ -338,7 +343,7 @@
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 6066.7,
+          "ms": 15482.5,
           "tools": []
         }
       ],
@@ -356,19 +361,19 @@
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
-        "faq.md": "435616a1b1",
+        "faq.md": "ee07a9eb48",
         "guardrail.md": "0cb0e155d7",
         "router.md": "b97c1ba623",
         "supervisor.md": "64112db478"
       },
-      "cost_usd": 0.025921,
+      "cost_usd": 0.024612,
       "run": 0
     },
     {
       "id": "q-partial-03",
       "split": "partial",
       "message": "O crediário aceita até quantas parcelas e qual a taxa de juros para o cliente?",
-      "ms": 12316.7,
+      "ms": 18900.7,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -387,502 +392,10 @@
       ],
       "replans": [],
       "engine": "llm",
-      "answer": "O Crediário da Getnet permite parcelar em até 48 vezes no cartão de crédito [prod-crediario-03][prod-crediario-02]. O prazo máximo e a taxa de juros variam conforme o emissor do cartão.\n\nAs fontes não trazem um percentual fixo de juros para o cliente, só dizem que ele depende do emissor. Para você, como lojista, a taxa de desconto (MDR) aparece no Aplicativo Getnet Brasil ou no Portal do cliente. Você recebe o valor total da venda em até 2 dias úteis, com taxa única e sem custo de antecipação [prod-crediario-02].\n\nSe quiser, posso encaminhar para um atendente humano confirmar o percentual.",
+      "answer": "O Crediário da Getnet permite parcelar em até 48 vezes no cartão de crédito [prod-crediario-03].\n\nNão há uma taxa de juros fixa para o cliente. Ela varia conforme o emissor do cartão [prod-crediario-03], e a fonte não informa o percentual. A taxa de desconto (MDR) cobrada do lojista aparece no Aplicativo Getnet Brasil ou no Portal do cliente [prod-crediario-03].\n\nSe quiser, posso encaminhar você a um atendente humano para detalhar a taxa.",
       "source_ids": [
         "prod-crediario-03",
-        "sup-duvidas-103",
-        "prod-crediario-02",
-        "sup-duvidas-55",
-        "sup-duvidas-77"
-      ],
-      "sources": [
-        {
-          "id": "prod-crediario-03",
-          "title": "Crediário - Getnet",
-          "url": "https://site.getnet.com.br/crediario/"
-        },
-        {
-          "id": "sup-duvidas-103",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "prod-crediario-02",
-          "title": "Crediário - Getnet",
-          "url": "https://site.getnet.com.br/crediario/"
-        },
-        {
-          "id": "sup-duvidas-55",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-77",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —",
-        "Crediário - Getnet: para o seu cliente Receba o valor total de suas vendas: em até 2 dias úteis com taxa única e sem custo de antecipação Ofereça parcelamento: em até 48x* para o seu cliente. *O prazo máximo e a taxa de juros do parcelamento variam de acordo com o emissor do cartão mais vendas para você, mais vantagens para o seu cliente para o seu negócio para o seu negócio O Crediário é mais uma opção de pagamento que você pode oferecer para vender mais. E você recebe o valor da venda em até 2 dias úteis e com taxa única¹, aumentando seu capital de giro!",
-        "Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?",
-        "Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 6196.4,
-          "tools": []
-        }
-      ],
-      "context": "- Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.\n- Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —\n- Crediário - Getnet: para o seu cliente Receba o valor total de suas vendas: em até 2 dias úteis com taxa única e sem custo de antecipação Ofereça parcelamento: em até 48x* para o seu cliente. *O prazo máximo e a taxa de juros do parcelamento variam de acordo com o emissor do cartão mais vendas para você, mais vantagens para o seu cliente para o seu negócio para o seu negócio O Crediário é mais uma opção de pagamento que você pode oferecer para vender mais. E você recebe o valor da venda em até 2 dias úteis e com taxa única¹, aumentando seu capital de giro!\n- Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.027865,
-      "run": 0
-    },
-    {
-      "id": "q-partial-04",
-      "split": "partial",
-      "message": "Can the Payment Link go via WhatsApp, and what is its daily sales cap?",
-      "ms": 10074.6,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "Yes. You can use the Payment Link to sell through WhatsApp or your social media [prod-link-de-pagamento-01].\n\nThe sources I have don't state a daily sales cap for the Payment Link, so I can't give you a figure. If you'd like, I can hand your case to a human agent to confirm the cap.",
-      "source_ids": [
-        "prod-link-de-pagamento-01",
-        "prod-get-tap-03",
-        "prod-link-de-pagamento-03",
-        "sup-duvidas-52",
-        "prod-link-de-pagamento-02"
-      ],
-      "sources": [
-        {
-          "id": "prod-link-de-pagamento-01",
-          "title": "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet",
-          "url": "https://site.getnet.com.br/link-de-pagamento/"
-        },
-        {
-          "id": "prod-get-tap-03",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-link-de-pagamento-03",
-          "title": "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet",
-          "url": "https://site.getnet.com.br/link-de-pagamento/"
-        },
-        {
-          "id": "sup-duvidas-52",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "prod-link-de-pagamento-02",
-          "title": "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet",
-          "url": "https://site.getnet.com.br/link-de-pagamento/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Prepare-se com Link de Pagamento para Black Friday Link personalizável Segurança antifraude Aceite débito, crédito, Pix, Wallet e boleto Quero contratar Benefícios para você vender mais com Link de Pagamento na Black Friday Expanda seu negócio Venda para estrangeiros com documento de identificação (RNE) no pagamento Venda de onde estiver Faça vendas usando o WhatsApp ou sua rede social Novo · Link completo Insira diversos produtos no mesmo carrinho Novo · Personalizável Personalize o link com a imagem do produto Conte com a segurança do Antifraude da Getnet Você pode optar por deixar seu comprador escolher entre débito, crédito, Pix, Wallet e boleto Mais opções de venda Com o Link de Pagamento inicial você pode vender também através do aplicativo com o antifraude da Getnet",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Condição válida somente para Pessoa Física, MEI (Microempreendedor Individual), Pessoa Jurídica que faturar até R$ 3 milhões por ano e novos clientes. Clientes Getnet, devem fazer a simulação via App Getnet. Condição não cumulativa com outras negociações disponíveis pela Getnet Adquirência e Serviços para Meios de Pagamento SA ou pelo Banco Santander Brasil SA. Sujeito à análise cadastral. Todas as vendas feitas com crédito pré-pago tem recebimento em até 2 dias úteis e débito pré-pago em até 1 dia útil. Taxas sujeitas a alteração de acordo com as condições dos produtos e serviços contratados.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Se o cliente parar de transacionar por um período de tempo, e depois tentar gerar um Link de pagamento novamente, ele pode? O lojista pode ficar até 4 meses sem transacionar, se ele passar desse período, o Link de pagamento será desabilitado e ele terá que passar por todas as aprovações novamente O cliente já tem os pacotes recorrência ou loja virtual. Como ele pode usar o Link de pagamento?",
-        "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Opção de inclusão do valor de frete de cobrança Quero contratar Venda online de forma prática e segura com Link de Pagamento Recomendado · Leve agora Link de pagamento Inicial R$1,00 por link pago. Pague somente quando o pagamento do link for aprovado. Taxas exclusivas para você. Quero contratar Básico · Por · R$28 · /mês 60 transações de cartão por mês + R$0,50 por transação excedente Taxas exclusivas para você.",
-        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 4939.4,
-          "tools": []
-        }
-      ],
-      "context": "- Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Prepare-se com Link de Pagamento para Black Friday Link personalizável Segurança antifraude Aceite débito, crédito, Pix, Wallet e boleto Quero contratar Benefícios para você vender mais com Link de Pagamento na Black Friday Expanda seu negócio Venda para estrangeiros com documento de identificação (RNE) no pagamento Venda de onde estiver Faça vendas usando o WhatsApp ou sua rede social Novo · Link completo Insira diversos produtos no mesmo carrinho Novo · Personalizável Personalize o link com a imagem do produto Conte com a segurança do Antifraude da Getnet Você pode optar por deixar seu comprador escolher entre débito, crédito, Pix, Wallet e boleto Mais opções de venda Com o Link de Pagamento inicial você pode vender também através do aplicativo com o antifraude da Getnet\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Condição válida somente para Pessoa Física, MEI (Microempreendedor Individual), Pessoa Jurídica que faturar até R$ 3 milhões por ano e novos clientes. Clientes Getnet, devem fazer a simulação via App Getnet. Condição não cumulativa com outras negociações disponíveis pela Getnet Adquirência e Serviços para Meios de Pagamento SA ou pelo Banco Santander Brasil SA. Sujeito à análise cadastral. Todas as vendas feitas com crédito pré-pago tem recebimento em até 2 dias úteis e débito pré-pago em até 1 dia útil. Taxas sujeitas a alteração de acordo com as condições dos produtos e serviços contratados.\n- Dúvidas e Perguntas Frequentes | Getnet: Se o cliente parar de transacionar por um período de tempo, e depois tentar gerar um Link de pagamento novamente, ele pode? O lojista pode ficar até 4 meses sem transacionar, se ele passar desse período, o Link de pagamento será desabilitado e ele terá que passar por todas as aprovações novamente O cliente já tem os pacotes recorrência ou loja virtual. Como ele pode usar o Link de pagamento?\n- Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Opção de inclusão do valor de frete de cobrança Quero contratar Venda online de forma prática e segura com Link de Pagamento Recomendado · Leve agora Link de pagamento Inicial R$1,00 por link pago. Pague somente quando o pagamento do link for aprovado. Taxas exclusivas para você. Quero contratar Básico · Por · R$28 · /mês 60 transações de cartão por mês + R$0,50 por transação excedente Taxas exclusivas para você.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "en",
-      "language_declared": "en",
-      "language_detected": "en",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.023031,
-      "run": 0
-    },
-    {
-      "id": "q-partial-05",
-      "split": "partial",
-      "message": "Preciso de conta para Pix e quanto tempo leva a abertura da Get Conta?",
-      "ms": 13359.4,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "Sim, você precisa de uma conta para usar o Pix. Ela pode ser conta corrente, poupança ou conta de pagamento pré-paga [sup-duvidas-59].\n\nA Get Conta é uma conta digital gratuita. Com ela você envia e recebe dinheiro e vende por Pix [sup-duvidas-42].\n\nA abertura da Get Conta é feita na hora [sup-duvidas-44].\n\nPara abrir, escolha uma máquina de aluguel ou compra e opte por receber suas vendas na Conta. Também dá para abrir a conta sem máquina, para transferências, pagamento de boletos e cartão pré-pago [sup-duvidas-44].",
-      "source_ids": [
-        "sup-duvidas-42",
-        "sup-duvidas-44",
-        "sup-duvidas-80",
-        "sup-duvidas-59",
-        "prod-get-conta-01"
-      ],
-      "sources": [
-        {
-          "id": "sup-duvidas-42",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-44",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-80",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-59",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "prod-get-conta-01",
-          "title": "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet",
-          "url": "https://site.getnet.com.br/conta-digital/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Dúvidas e Perguntas Frequentes | Getnet: O que é a Get Conta? Quais os benefícios? O que é a Get Conta? Quais os benefícios? É uma conta digital gratuita para sua empresa, sem burocracia e taxas escondidas, através de uma parceria com a Dock IP, você tem sua própria agência e conta. Aqui, você pode: Ter um cartão gratuito para realizar compras online ou físicas Consegue enviar e receber dinheiro, além de vender por meio do Pix Receber suas vendas em até 2 dias uteis no período da manhã no seu cartão* Realizar transferências e pagamentos de contas Efetuar saque em qualquer Banco 24Horas *Caso escolha a opção de recebimento em dois dias depois da venda feita Quem pode abrir uma Get Conta?",
-        "Dúvidas e Perguntas Frequentes | Getnet: Para abrir uma Get Conta, basta acessar o , escolher uma máquina de aluguel ou compra e optar por receber suas vendas na Conta. A abertura da conta é feita na hora e você terá acesso a um cartão pré-pago gratuitamente para fazer compras nas lojas de todo Brasil e online. Caso não queira ter uma máquina, você pode abrir uma conta para realizar transferências, pagamentos de boletos e ter com um cartão pré-pago.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Pessoas físicas poderão ter até 5 chaves Pix por conta transacional da qual for titular. Pessoa jurídica, até 20 chaves. O limite de chaves é aplicado para cada conta transacional, independentemente da quantidade de titulares da conta. Uma mesma chave só pode estar vinculada a uma única instituição.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.",
-        "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "ok",
-          "reason": null,
-          "ms": 5902.3,
-          "tools": []
-        }
-      ],
-      "context": "- Dúvidas e Perguntas Frequentes | Getnet: O que é a Get Conta? Quais os benefícios? O que é a Get Conta? Quais os benefícios? É uma conta digital gratuita para sua empresa, sem burocracia e taxas escondidas, através de uma parceria com a Dock IP, você tem sua própria agência e conta. Aqui, você pode: Ter um cartão gratuito para realizar compras online ou físicas Consegue enviar e receber dinheiro, além de vender por meio do Pix Receber suas vendas em até 2 dias uteis no período da manhã no seu cartão* Realizar transferências e pagamentos de contas Efetuar saque em qualquer Banco 24Horas *Caso escolha a opção de recebimento em dois dias depois da venda feita Quem pode abrir uma Get Conta?\n- Dúvidas e Perguntas Frequentes | Getnet: Para abrir uma Get Conta, basta acessar o , escolher uma máquina de aluguel ou compra e optar por receber suas vendas na Conta. A abertura da conta é feita na hora e você terá acesso a um cartão pré-pago gratuitamente para fazer compras nas lojas de todo Brasil e online. Caso não queira ter uma máquina, você pode abrir uma conta para realizar transferências, pagamentos de boletos e ter com um cartão pré-pago.\n- Dúvidas e Perguntas Frequentes | Getnet: Pessoas físicas poderão ter até 5 chaves Pix por conta transacional da qual for titular. Pessoa jurídica, até 20 chaves. O limite de chaves é aplicado para cada conta transacional, independentemente da quantidade de titulares da conta. Uma mesma chave só pode estar vinculada a uma única instituição.\n- Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.\n- Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.025763,
-      "run": 0
-    },
-    {
-      "id": "q-partial-01",
-      "split": "partial",
-      "message": "Quanto custa a Get Smart e qual a garantia dela em meses?",
-      "ms": 6110.7,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "A Get Smart custa R$ 129,90/mês [prod-todas-as-maquininhas-04][prod-get-tap-03].\n\nAs fontes não informam o prazo de garantia dela em meses. Posso encaminhar você a um atendente humano para confirmar esse dado, se quiser.",
-      "source_ids": [
-        "prod-todas-as-maquininhas-04",
-        "prod-get-tap-03",
-        "sup-duvidas-get-smart-10",
-        "prod-get-tap-02",
-        "sup-duvidas-get-smart-13"
-      ],
-      "sources": [
-        {
-          "id": "prod-todas-as-maquininhas-04",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        },
-        {
-          "id": "prod-get-tap-03",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "sup-duvidas-get-smart-10",
-          "title": "Arquivos Get Smart - Getnet",
-          "url": "https://site.getnet.com.br/duvidas/get-smart/"
-        },
-        {
-          "id": "prod-get-tap-02",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "sup-duvidas-get-smart-13",
-          "title": "Arquivos Get Smart - Getnet",
-          "url": "https://site.getnet.com.br/duvidas/get-smart/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%",
-        "Arquivos Get Smart - Getnet: Como pedir uma Get Smart? Como pedir uma Get Smart? Você pode pedir pelo site através do https://site.getnet.com.br/maquininha/get-smart/ , por meio do nosso Call Center, no número: 4020-4011 ou solicite com seu gerente Santander. As vendas que eu fizer na Get Smart estarão no conciliador que eu já uso?",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 2101.2,
-          "tools": []
-        }
-      ],
-      "context": "- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%\n- Arquivos Get Smart - Getnet: Como pedir uma Get Smart? Como pedir uma Get Smart? Você pode pedir pelo site através do https://site.getnet.com.br/maquininha/get-smart/ , por meio do nosso Call Center, no número: 4020-4011 ou solicite com seu gerente Santander. As vendas que eu fizer na Get Smart estarão no conciliador que eu já uso?\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [
-        "promessa_financeira"
-      ],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.022892,
-      "run": 1
-    },
-    {
-      "id": "q-partial-02",
-      "split": "partial",
-      "message": "What is the Get Clássica price and its battery life in hours?",
-      "ms": 10052.6,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "The Get Clássica costs R$ 79,90/month if you don't reach the revenue thresholds that waive the rental [prod-todas-as-maquininhas-04][prod-get-tap-03]. If your monthly revenue is above R$ 20 mil, it's available as a free machine [prod-todas-as-maquininhas-02].\n\nI couldn't find the Get Clássica's battery life in hours in the sources. The only battery information I found is a tip for the Get Smart, which is a different model [sup-duvidas-get-smart-03]. I can pass this to a human agent if you'd like.",
-      "source_ids": [
-        "prod-get-tap-02",
-        "prod-todas-as-maquininhas-04",
-        "sup-duvidas-get-smart-03",
-        "prod-get-tap-03",
-        "prod-todas-as-maquininhas-02"
-      ],
-      "sources": [
-        {
-          "id": "prod-get-tap-02",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-todas-as-maquininhas-04",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        },
-        {
-          "id": "sup-duvidas-get-smart-03",
-          "title": "Arquivos Get Smart - Getnet",
-          "url": "https://site.getnet.com.br/duvidas/get-smart/"
-        },
-        {
-          "id": "prod-get-tap-03",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-todas-as-maquininhas-02",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?",
-        "Arquivos Get Smart - Getnet: Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Deixe a bateria carregando sempre que possível e, de preferência, por pelo menos 3 horas seguidas. Não espere a bateria descarregar completamente para recarregá-la. O ideal é carregar a bateria quando o nível estiver em 20%.",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Maquininha + conta integrada Getnet Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel *Termos e condições Selecione para ver as taxas Faturamento: · Até R$ 10 mil Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil",
-        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 4558.2,
-          "tools": []
-        }
-      ],
-      "context": "- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?\n- Arquivos Get Smart - Getnet: Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Deixe a bateria carregando sempre que possível e, de preferência, por pelo menos 3 horas seguidas. Não espere a bateria descarregar completamente para recarregá-la. O ideal é carregar a bateria quando o nível estiver em 20%.\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Maquininha + conta integrada Getnet Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel *Termos e condições Selecione para ver as taxas Faturamento: · Até R$ 10 mil Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "en",
-      "language_declared": "en",
-      "language_detected": "en",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.024723,
-      "run": 1
-    },
-    {
-      "id": "q-partial-03",
-      "split": "partial",
-      "message": "O crediário aceita até quantas parcelas e qual a taxa de juros para o cliente?",
-      "ms": 11199.3,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "O Crediário da Getnet permite parcelar em até 48 vezes no cartão de crédito [prod-crediario-03].\n\nA taxa de juros para o cliente não tem percentual fixo. Ela varia conforme o emissor do cartão, e o prazo máximo também [prod-crediario-02].\n\nPara o lojista, o valor da venda é recebido em até 2 dias úteis, com taxa única e sem custo de antecipação [prod-crediario-02]. A taxa de desconto (MDR) aparece no Aplicativo Getnet Brasil ou no Portal do cliente [prod-crediario-03].\n\nSe quiser o percentual exato de um caso específico, posso encaminhar você a um atendente humano.",
-      "source_ids": [
-        "prod-crediario-03",
-        "prod-crediario-02",
+        "prod-crediario-05",
         "sup-duvidas-77",
         "sup-duvidas-103",
         "sup-duvidas-55"
@@ -894,7 +407,7 @@
           "url": "https://site.getnet.com.br/crediario/"
         },
         {
-          "id": "prod-crediario-02",
+          "id": "prod-crediario-05",
           "title": "Crediário - Getnet",
           "url": "https://site.getnet.com.br/crediario/"
         },
@@ -917,7 +430,7 @@
       "tool_calls": [],
       "evidence": [
         "Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.",
-        "Crediário - Getnet: para o seu cliente Receba o valor total de suas vendas: em até 2 dias úteis com taxa única e sem custo de antecipação Ofereça parcelamento: em até 48x* para o seu cliente. *O prazo máximo e a taxa de juros do parcelamento variam de acordo com o emissor do cartão mais vendas para você, mais vantagens para o seu cliente para o seu negócio para o seu negócio O Crediário é mais uma opção de pagamento que você pode oferecer para vender mais. E você recebe o valor da venda em até 2 dias úteis e com taxa única¹, aumentando seu capital de giro!",
+        "Crediário - Getnet: Selecione a opção 1. CREDITO e aperte o botão de confirmação. Insira o valor desejado e aperte o botão de confirmação. Selecione a opção 4. CREDIARIO e aperte o botão de confirmação. Insira o número de parcelas desejado e aperte o botão de confirmação. Aguarde o processamento. Escolha a opção de parcelamento desejada e aperte o botão de confirmação.",
         "Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.",
         "Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —",
         "Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?",
@@ -928,11 +441,11 @@
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 3625.7,
+          "ms": 12757.2,
           "tools": []
         }
       ],
-      "context": "- Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.\n- Crediário - Getnet: para o seu cliente Receba o valor total de suas vendas: em até 2 dias úteis com taxa única e sem custo de antecipação Ofereça parcelamento: em até 48x* para o seu cliente. *O prazo máximo e a taxa de juros do parcelamento variam de acordo com o emissor do cartão mais vendas para você, mais vantagens para o seu cliente para o seu negócio para o seu negócio O Crediário é mais uma opção de pagamento que você pode oferecer para vender mais. E você recebe o valor da venda em até 2 dias úteis e com taxa única¹, aumentando seu capital de giro!\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.\n- Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —\n- Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
+      "context": "- Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.\n- Crediário - Getnet: Selecione a opção 1. CREDITO e aperte o botão de confirmação. Insira o valor desejado e aperte o botão de confirmação. Selecione a opção 4. CREDIARIO e aperte o botão de confirmação. Insira o número de parcelas desejado e aperte o botão de confirmação. Aguarde o processamento. Escolha a opção de parcelamento desejada e aperte o botão de confirmação.\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.\n- Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —\n- Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
       "unsupported_claims": [],
       "claims_action": "none",
       "expected_language": "pt",
@@ -946,19 +459,19 @@
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
-        "faq.md": "435616a1b1",
+        "faq.md": "ee07a9eb48",
         "guardrail.md": "0cb0e155d7",
         "router.md": "b97c1ba623",
         "supervisor.md": "64112db478"
       },
-      "cost_usd": 0.027786,
-      "run": 1
+      "cost_usd": 0.026633,
+      "run": 0
     },
     {
       "id": "q-partial-04",
       "split": "partial",
       "message": "Can the Payment Link go via WhatsApp, and what is its daily sales cap?",
-      "ms": 8933.7,
+      "ms": 20863.0,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -977,7 +490,7 @@
       ],
       "replans": [],
       "engine": "llm",
-      "answer": "Yes, you can use the Payment Link through WhatsApp. The Getnet page says you can sell using WhatsApp or your social media [prod-link-de-pagamento-01].\n\nThe sources I found don't state a daily sales cap for the Payment Link, so I can't give you a number. They do mention two related points:\n- The Inicial plan costs R$1,00 per paid link [prod-link-de-pagamento-02].\n- If you go more than 4 months without transacting, the link is disabled and you have to go through approvals again [sup-duvidas-52].\n\nI can hand your case to a human agent to confirm the cap for your account if you'd like.",
+      "answer": "Yes, you can use the Payment Link through WhatsApp. Getnet's page says you can sell from wherever you are using WhatsApp or your social media [prod-link-de-pagamento-01].\n\nThe sources don't state a daily sales cap for the Payment Link. The only related limit they mention is inactivity. If you go 4 months without transacting, the link is disabled and you have to go through all approvals again [sup-duvidas-52].\n\nI can pass your case to a human agent to confirm the daily cap if you'd like.",
       "source_ids": [
         "prod-link-de-pagamento-01",
         "prod-get-tap-03",
@@ -1026,7 +539,7 @@
           "agent": "faq",
           "status": "partial",
           "reason": "partial_coverage",
-          "ms": 3344.5,
+          "ms": 15313.0,
           "tools": []
         }
       ],
@@ -1044,19 +557,19 @@
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
-        "faq.md": "435616a1b1",
+        "faq.md": "ee07a9eb48",
         "guardrail.md": "0cb0e155d7",
         "router.md": "b97c1ba623",
         "supervisor.md": "64112db478"
       },
-      "cost_usd": 0.02472,
-      "run": 1
+      "cost_usd": 0.024563,
+      "run": 0
     },
     {
       "id": "q-partial-05",
       "split": "partial",
       "message": "Preciso de conta para Pix e quanto tempo leva a abertura da Get Conta?",
-      "ms": 11668.2,
+      "ms": 20757.7,
       "expected_intent": "knowledge",
       "checks": {
         "intent": true,
@@ -1075,7 +588,7 @@
       ],
       "replans": [],
       "engine": "llm",
-      "answer": "Sim, você precisa de uma conta para usar o Pix. Ela pode ser conta corrente, poupança ou conta de pagamento pré-paga [sup-duvidas-59].\n\nA abertura da Get Conta é feita na hora [sup-duvidas-44]. Com ela, você envia e recebe dinheiro e vende por Pix [sup-duvidas-42].\n\nNa Getnet, a contratação do Pix é feita pelo Portal Minha Conta ou pelo Aplicativo Getnet. Você digita a mesma chave cadastrada no domicílio bancário em que vai receber o Pix [sup-duvidas-82].",
+      "answer": "Sim, você precisa de uma conta para usar o Pix na Getnet. Ela precisa ser um domicílio bancário com a chave Pix cadastrada. A contratação é feita no Portal Minha Conta ou no Aplicativo Getnet, com a mesma chave cadastrada no domicílio onde você vai receber o Pix [sup-duvidas-82]. O Pix pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga [sup-duvidas-59].\n\nA abertura da Get Conta é feita na hora. Basta escolher uma máquina (aluguel ou compra) e optar por receber as vendas na Conta. Você já ganha um cartão pré-pago gratuito [sup-duvidas-44]. Sem máquina, também dá para abrir a conta para transferências, pagamento de boletos e cartão pré-pago [sup-duvidas-44]. Com a Get Conta você também pode enviar e receber dinheiro e vender por Pix [sup-duvidas-42].\n\nAs fontes não dizem se o Pix exige especificamente uma Get Conta ou se outro tipo de conta serve. Se quiser confirmar isso, posso encaminhar você a um atendente humano.",
       "source_ids": [
         "sup-duvidas-42",
         "sup-duvidas-82",
@@ -1122,9 +635,9 @@
       "steps": [
         {
           "agent": "faq",
-          "status": "ok",
-          "reason": null,
-          "ms": 4927.5,
+          "status": "partial",
+          "reason": "partial_coverage",
+          "ms": 14145.6,
           "tools": []
         }
       ],
@@ -1142,525 +655,25 @@
       "blocked": false,
       "risk_flags": [],
       "prompt_versions": {
-        "faq.md": "435616a1b1",
+        "faq.md": "ee07a9eb48",
         "guardrail.md": "0cb0e155d7",
         "router.md": "b97c1ba623",
         "supervisor.md": "64112db478"
       },
-      "cost_usd": 0.025318,
-      "run": 1
-    },
-    {
-      "id": "q-partial-01",
-      "split": "partial",
-      "message": "Quanto custa a Get Smart e qual a garantia dela em meses?",
-      "ms": 10171.8,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "A Get Smart custa R$ 129,90/mês [prod-todas-as-maquininhas-04][prod-get-tap-03]. O aluguel pode ser isento conforme o faturamento mensal. A Get Smart aparece entre as máquinas com isenção nas faixas acima de R$ 40 mil e de R$ 60 mil por mês [prod-get-tap-02][prod-todas-as-maquininhas-02]. Vouchers (VA/VR) e crediário não contam como faturamento para essa isenção.\n\nNão encontrei a garantia da Get Smart em meses nas fontes consultadas. Se quiser, posso encaminhar você a um atendente humano para confirmar esse prazo.",
-      "source_ids": [
-        "prod-todas-as-maquininhas-04",
-        "prod-get-tap-03",
-        "prod-get-tap-02",
-        "sup-duvidas-get-smart-10",
-        "prod-todas-as-maquininhas-02"
-      ],
-      "sources": [
-        {
-          "id": "prod-todas-as-maquininhas-04",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        },
-        {
-          "id": "prod-get-tap-03",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-get-tap-02",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "sup-duvidas-get-smart-10",
-          "title": "Arquivos Get Smart - Getnet",
-          "url": "https://site.getnet.com.br/duvidas/get-smart/"
-        },
-        {
-          "id": "prod-todas-as-maquininhas-02",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%",
-        "Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Maquininha + conta integrada Getnet Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel *Termos e condições Selecione para ver as taxas Faturamento: · Até R$ 10 mil Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 3961.1,
-          "tools": []
-        }
-      ],
-      "context": "- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%\n- Arquivos Get Smart - Getnet: O que é a Get Smart? O que é a Get Smart? A Get Smart é uma máquina de cartões inteligente. Com ela, seu dia a dia fica mais simples, fácil e muito mais digital. Você pode controlar o estoque, fazer pedidos, fechar conta, embarcar cardápio, emitir nota fiscal, tudo diretamente na máquina. A Get Smart permite que você integre o terminal com o sistema de seu estabelecimento e assim terá todos os aparelhos que seu negócio precisa em um único lugar.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Maquininha + conta integrada Getnet Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel *Termos e condições Selecione para ver as taxas Faturamento: · Até R$ 10 mil Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [
-        "promessa_financeira"
-      ],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.028631,
-      "run": 2
-    },
-    {
-      "id": "q-partial-02",
-      "split": "partial",
-      "message": "What is the Get Clássica price and its battery life in hours?",
-      "ms": 10943.3,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "The Get Clássica costs R$ 79,90/month if you don't reach the revenue thresholds that waive the rental [prod-todas-as-maquininhas-04][prod-get-tap-03]. With enough monthly revenue, it can be free. Above R$ 20 mil per month, the Get Clássica has no rental charge [prod-get-tap-02][prod-todas-as-maquininhas-02]. The sources also mention R$ 10 mil per month as the threshold for the Get Mini or Get Clássica, and they don't explain how that differs from the R$ 20 mil figure.\n\nThe sources don't give the Get Clássica's battery life in hours. I can pass your question to a human agent if you'd like.",
-      "source_ids": [
-        "prod-get-tap-02",
-        "prod-todas-as-maquininhas-04",
-        "sup-duvidas-get-smart-03",
-        "prod-get-tap-03",
-        "prod-todas-as-maquininhas-02"
-      ],
-      "sources": [
-        {
-          "id": "prod-get-tap-02",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-todas-as-maquininhas-04",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        },
-        {
-          "id": "sup-duvidas-get-smart-03",
-          "title": "Arquivos Get Smart - Getnet",
-          "url": "https://site.getnet.com.br/duvidas/get-smart/"
-        },
-        {
-          "id": "prod-get-tap-03",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-todas-as-maquininhas-02",
-          "title": "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis",
-          "url": "https://site.getnet.com.br/todas-as-maquininhas/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?",
-        "Arquivos Get Smart - Getnet: Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Deixe a bateria carregando sempre que possível e, de preferência, por pelo menos 3 horas seguidas. Não espere a bateria descarregar completamente para recarregá-la. O ideal é carregar a bateria quando o nível estiver em 20%.",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Maquininha + conta integrada Getnet Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel *Termos e condições Selecione para ver as taxas Faturamento: · Até R$ 10 mil Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil",
-        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 3500.3,
-          "tools": []
-        }
-      ],
-      "context": "- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Maquininha + conta integrada Getnet Recomendado para PF ou CNPJ que querem alavancar seus negócios vendendo mais sem pagar aluguel Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular R$ 2mil por mês | Get Mini R$ 10mil por mês | Get Mini ou Get Clássica R$ 60mil por mês | Get Mini, Get Clássica ou Get Smart Taxa única para as bandeiras A partir de: · Débito · 1,69% · Crédito 1x · 3,79% · Crédito 2x · 7,98% · Crédito 3x · 8,47% · Crédito 4x · 8,96% · Crédito 5x · 9,45% · Crédito 6x · 9,94% · Crédito 7x · 10,43% · Crédito 8x · 10,92% · Crédito 9x · 11,41% · Crédito 10x · 11,90% · Crédito 11x · 12,39% · Crédito 12x · 12,88%\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Venda pelo celular R$ 0,00/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Acelere suas vendas na Black Friday: ofertas especiais em maquininhas selecionadas Selecione sua faixa de faturamento e encontre as melhores taxas para sua empresa Até R$ 10 mil · NOVO Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil 0,85%Débito · 2,69%Crédito · 9,07% ˅ · Crédito 6x Baseado em seu faturamento, você tem R$ 319,60 de desconto no aluguel das maquininhas Como você prefere continuar?\n- Arquivos Get Smart - Getnet: Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração? Deixe a bateria carregando sempre que possível e, de preferência, por pelo menos 3 horas seguidas. Não espere a bateria descarregar completamente para recarregá-la. O ideal é carregar a bateria quando o nível estiver em 20%.\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Maquininha de cartão: Melhores taxas e opções grátisMaquininha de cartão: Melhores taxas e opções grátis: Maquininha + conta integrada Getnet Onde você recebe Get Conta com cartão grátis Quando recebe · 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel *Termos e condições Selecione para ver as taxas Faturamento: · Até R$ 10 mil Acima de R$ 10 mil Acima de R$ 20 mil Acima de R$ 40 mil Acima de R$ 80 mil\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "en",
-      "language_declared": "en",
-      "language_detected": "en",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.025786,
-      "run": 2
-    },
-    {
-      "id": "q-partial-03",
-      "split": "partial",
-      "message": "O crediário aceita até quantas parcelas e qual a taxa de juros para o cliente?",
-      "ms": 8136.6,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "O Crediário da Getnet permite parcelar em até 48 vezes no cartão de crédito [prod-crediario-03].\n\nA taxa de juros para o cliente varia conforme o emissor do cartão, e as fontes não trazem um percentual fixo [prod-crediario-02, prod-crediario-03]. O prazo máximo do parcelamento também varia conforme o emissor.\n\nPara o lojista, a venda é recebida em até 2 dias úteis, com taxa única [prod-crediario-02]. Você pode consultar a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente [prod-crediario-03].\n\nSe quiser o percentual exato de juros, posso encaminhar você a um atendente humano.",
-      "source_ids": [
-        "prod-crediario-03",
-        "prod-crediario-02",
-        "sup-duvidas-77",
-        "sup-duvidas-103",
-        "sup-duvidas-55"
-      ],
-      "sources": [
-        {
-          "id": "prod-crediario-03",
-          "title": "Crediário - Getnet",
-          "url": "https://site.getnet.com.br/crediario/"
-        },
-        {
-          "id": "prod-crediario-02",
-          "title": "Crediário - Getnet",
-          "url": "https://site.getnet.com.br/crediario/"
-        },
-        {
-          "id": "sup-duvidas-77",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-103",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-55",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.",
-        "Crediário - Getnet: para o seu cliente Receba o valor total de suas vendas: em até 2 dias úteis com taxa única e sem custo de antecipação Ofereça parcelamento: em até 48x* para o seu cliente. *O prazo máximo e a taxa de juros do parcelamento variam de acordo com o emissor do cartão mais vendas para você, mais vantagens para o seu cliente para o seu negócio para o seu negócio O Crediário é mais uma opção de pagamento que você pode oferecer para vender mais. E você recebe o valor da venda em até 2 dias úteis e com taxa única¹, aumentando seu capital de giro!",
-        "Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —",
-        "Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 2239.8,
-          "tools": []
-        }
-      ],
-      "context": "- Crediário - Getnet: para o seu cliente para o seu cliente Com o Crediário, ele pode parcelar em até 48 vezes² no cartão de crédito com taxas que cabem no bolso. Você oferece mais comodidade e poder de compra. ¹ Consulte a taxa de desconto (MDR) no Aplicativo Getnet Brasil ou no Portal do cliente ²As taxas de juros podem variar de acordo com o emissor do cartão.\n- Crediário - Getnet: para o seu cliente Receba o valor total de suas vendas: em até 2 dias úteis com taxa única e sem custo de antecipação Ofereça parcelamento: em até 48x* para o seu cliente. *O prazo máximo e a taxa de juros do parcelamento variam de acordo com o emissor do cartão mais vendas para você, mais vantagens para o seu cliente para o seu negócio para o seu negócio O Crediário é mais uma opção de pagamento que você pode oferecer para vender mais. E você recebe o valor da venda em até 2 dias úteis e com taxa única¹, aumentando seu capital de giro!\n- Dúvidas e Perguntas Frequentes | Getnet: ver mais · Parcelado Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Quais modalidades de Crédito Parcelado estão disponíveis na Getnet? Na Getnet, estão disponíveis as modalidades Parcelado Emissor e Parcelado Lojista. No Parcelado Emissor, o seu cliente parcela as compras e assume as despesas relacionadas aos juros do parcelamento, pois o financiamento é feito diretamente com o banco emissor ou pela administradora do cartão. A modalidade admite até 24 parcelas, recebidas de uma vez dentro de 2 a 31 dias conforme seu plano de recebimento; sendo a taxa aplicada somente uma vez.\n- Dúvidas e Perguntas Frequentes | Getnet: Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Comprei/Aluguei uma Getnet, onde vejo as taxas do crédito parcelado? Informações de taxas para venda no débito e crédito Para maior transparência disponibilizamos todas as taxas cobradas em suas transações de vendas.\nPlano de recebimento | 2 dias úteis* | Receba conforme suas vendas\nDébito — 2 dias úteis*: 1,89%; Receba conforme suas vendas: 1,95%\nCrédito à vista — 2 dias úteis*: 3,99%; Receba conforme suas vendas: 3,09%\nVenda parcelada — 2 dias úteis*: 1,98%; Receba conforme suas vendas: 6,40%\nTaxa adicional por mês** — 2 dias úteis*: 2,73%; Receba conforme suas vendas: —\n- Dúvidas e Perguntas Frequentes | Getnet: Crédito 2x a 6x: 3% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Crédito 7x a 12x: 3,15% + 0,90 por transação (Antifraude) Recebimento em 31 dias + 30 dias por parcela. Eu quero mudar para um plano que se adeque melhor para as minhas necessidades. Como eu faço isso?\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.027903,
-      "run": 2
-    },
-    {
-      "id": "q-partial-04",
-      "split": "partial",
-      "message": "Can the Payment Link go via WhatsApp, and what is its daily sales cap?",
-      "ms": 7996.2,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "Yes. You can sell with the Payment Link through WhatsApp or your social media [prod-link-de-pagamento-01].\n\nThe sources I found don't state a daily sales cap for the Payment Link. They only cover these related points:\n- A link is disabled after 4 months without transactions [sup-duvidas-52].\n\nIf you want, I can pass your question to a human agent to confirm the cap.",
-      "source_ids": [
-        "prod-link-de-pagamento-01",
-        "prod-get-tap-03",
-        "prod-link-de-pagamento-03",
-        "sup-duvidas-52",
-        "prod-link-de-pagamento-02"
-      ],
-      "sources": [
-        {
-          "id": "prod-link-de-pagamento-01",
-          "title": "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet",
-          "url": "https://site.getnet.com.br/link-de-pagamento/"
-        },
-        {
-          "id": "prod-get-tap-03",
-          "title": "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet",
-          "url": "https://site.getnet.com.br/get-tap/"
-        },
-        {
-          "id": "prod-link-de-pagamento-03",
-          "title": "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet",
-          "url": "https://site.getnet.com.br/link-de-pagamento/"
-        },
-        {
-          "id": "sup-duvidas-52",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "prod-link-de-pagamento-02",
-          "title": "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet",
-          "url": "https://site.getnet.com.br/link-de-pagamento/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Prepare-se com Link de Pagamento para Black Friday Link personalizável Segurança antifraude Aceite débito, crédito, Pix, Wallet e boleto Quero contratar Benefícios para você vender mais com Link de Pagamento na Black Friday Expanda seu negócio Venda para estrangeiros com documento de identificação (RNE) no pagamento Venda de onde estiver Faça vendas usando o WhatsApp ou sua rede social Novo · Link completo Insira diversos produtos no mesmo carrinho Novo · Personalizável Personalize o link com a imagem do produto Conte com a segurança do Antifraude da Getnet Você pode optar por deixar seu comprador escolher entre débito, crédito, Pix, Wallet e boleto Mais opções de venda Com o Link de Pagamento inicial você pode vender também através do aplicativo com o antifraude da Getnet",
-        "Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.",
-        "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Condição válida somente para Pessoa Física, MEI (Microempreendedor Individual), Pessoa Jurídica que faturar até R$ 3 milhões por ano e novos clientes. Clientes Getnet, devem fazer a simulação via App Getnet. Condição não cumulativa com outras negociações disponíveis pela Getnet Adquirência e Serviços para Meios de Pagamento SA ou pelo Banco Santander Brasil SA. Sujeito à análise cadastral. Todas as vendas feitas com crédito pré-pago tem recebimento em até 2 dias úteis e débito pré-pago em até 1 dia útil. Taxas sujeitas a alteração de acordo com as condições dos produtos e serviços contratados.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Se o cliente parar de transacionar por um período de tempo, e depois tentar gerar um Link de pagamento novamente, ele pode? O lojista pode ficar até 4 meses sem transacionar, se ele passar desse período, o Link de pagamento será desabilitado e ele terá que passar por todas as aprovações novamente O cliente já tem os pacotes recorrência ou loja virtual. Como ele pode usar o Link de pagamento?",
-        "Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Opção de inclusão do valor de frete de cobrança Quero contratar Venda online de forma prática e segura com Link de Pagamento Recomendado · Leve agora Link de pagamento Inicial R$1,00 por link pago. Pague somente quando o pagamento do link for aprovado. Taxas exclusivas para você. Quero contratar Básico · Por · R$28 · /mês 60 transações de cartão por mês + R$0,50 por transação excedente Taxas exclusivas para você.",
-        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "partial",
-          "reason": "partial_coverage",
-          "ms": 2210.7,
-          "tools": []
-        }
-      ],
-      "context": "- Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Prepare-se com Link de Pagamento para Black Friday Link personalizável Segurança antifraude Aceite débito, crédito, Pix, Wallet e boleto Quero contratar Benefícios para você vender mais com Link de Pagamento na Black Friday Expanda seu negócio Venda para estrangeiros com documento de identificação (RNE) no pagamento Venda de onde estiver Faça vendas usando o WhatsApp ou sua rede social Novo · Link completo Insira diversos produtos no mesmo carrinho Novo · Personalizável Personalize o link com a imagem do produto Conte com a segurança do Antifraude da Getnet Você pode optar por deixar seu comprador escolher entre débito, crédito, Pix, Wallet e boleto Mais opções de venda Com o Link de Pagamento inicial você pode vender também através do aplicativo com o antifraude da Getnet\n- Getnet | Maquininha no celular: Receba pelo celular- GetnetMaquininha no celular: Receba pelo celular- Getnet: Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Get Tap · Grátis Link de Pagamento Grátis · Get Mini · R$ 14,90/mês · Get Clássica · R$ 79,90/mês · Get Smart · R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet? e saiba como começar a vender com Get Tap. Get Tap · WhatsApp Simule suas vendas Aqui, você encontra taxas especiais para todas as bandeiras de cartões.\n- Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Condição válida somente para Pessoa Física, MEI (Microempreendedor Individual), Pessoa Jurídica que faturar até R$ 3 milhões por ano e novos clientes. Clientes Getnet, devem fazer a simulação via App Getnet. Condição não cumulativa com outras negociações disponíveis pela Getnet Adquirência e Serviços para Meios de Pagamento SA ou pelo Banco Santander Brasil SA. Sujeito à análise cadastral. Todas as vendas feitas com crédito pré-pago tem recebimento em até 2 dias úteis e débito pré-pago em até 1 dia útil. Taxas sujeitas a alteração de acordo com as condições dos produtos e serviços contratados.\n- Dúvidas e Perguntas Frequentes | Getnet: Se o cliente parar de transacionar por um período de tempo, e depois tentar gerar um Link de pagamento novamente, ele pode? O lojista pode ficar até 4 meses sem transacionar, se ele passar desse período, o Link de pagamento será desabilitado e ele terá que passar por todas as aprovações novamente O cliente já tem os pacotes recorrência ou loja virtual. Como ele pode usar o Link de pagamento?\n- Getnet | Link de Pagamento: venda mais online | GetnetLink de Pagamento: venda mais online | Getnet: Opção de inclusão do valor de frete de cobrança Quero contratar Venda online de forma prática e segura com Link de Pagamento Recomendado · Leve agora Link de pagamento Inicial R$1,00 por link pago. Pague somente quando o pagamento do link for aprovado. Taxas exclusivas para você. Quero contratar Básico · Por · R$28 · /mês 60 transações de cartão por mês + R$0,50 por transação excedente Taxas exclusivas para você.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [
-        {
-          "index": 4,
-          "sentence": "The Inicial plan costs R$1,00 per paid link [prod-link-de-pagamento-02].",
-          "reason": "contradicts_evidence",
-          "source": "llm",
-          "action": "removed"
-        }
-      ],
-      "claims_action": "removed",
-      "expected_language": "en",
-      "language_declared": "en",
-      "language_detected": "en",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.024072,
-      "run": 2
-    },
-    {
-      "id": "q-partial-05",
-      "split": "partial",
-      "message": "Preciso de conta para Pix e quanto tempo leva a abertura da Get Conta?",
-      "ms": 10511.9,
-      "expected_intent": "knowledge",
-      "checks": {
-        "intent": true,
-        "route": true,
-        "handoff": true,
-        "handoff_outcome": true,
-        "language": true,
-        "numbers": true,
-        "claims": true
-      },
-      "crash": null,
-      "got_intent": "knowledge",
-      "route": [
-        "router",
-        "faq"
-      ],
-      "replans": [],
-      "engine": "llm",
-      "answer": "Sim, você precisa de uma conta para usar o Pix. Ela pode ser conta corrente, poupança ou conta de pagamento pré-paga [sup-duvidas-59]. A Get Conta é aberta na hora [sup-duvidas-44].\n\n- A Get Conta é uma conta digital gratuita. Com ela você envia e recebe dinheiro e vende por Pix [sup-duvidas-42].\n- Na Getnet, você contrata pelo Portal Minha Conta ou pelo Aplicativo Getnet. Digite a mesma chave cadastrada no domicílio bancário onde vai receber o Pix [sup-duvidas-82].",
-      "source_ids": [
-        "sup-duvidas-42",
-        "sup-duvidas-82",
-        "sup-duvidas-44",
-        "sup-duvidas-59",
-        "prod-get-conta-01"
-      ],
-      "sources": [
-        {
-          "id": "sup-duvidas-42",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-82",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-44",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "sup-duvidas-59",
-          "title": "Dúvidas e Perguntas Frequentes | Getnet",
-          "url": "https://site.getnet.com.br/duvidas/"
-        },
-        {
-          "id": "prod-get-conta-01",
-          "title": "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet",
-          "url": "https://site.getnet.com.br/conta-digital/"
-        }
-      ],
-      "tool_calls": [],
-      "evidence": [
-        "Dúvidas e Perguntas Frequentes | Getnet: O que é a Get Conta? Quais os benefícios? O que é a Get Conta? Quais os benefícios? É uma conta digital gratuita para sua empresa, sem burocracia e taxas escondidas, através de uma parceria com a Dock IP, você tem sua própria agência e conta. Aqui, você pode: Ter um cartão gratuito para realizar compras online ou físicas Consegue enviar e receber dinheiro, além de vender por meio do Pix Receber suas vendas em até 2 dias uteis no período da manhã no seu cartão* Realizar transferências e pagamentos de contas Efetuar saque em qualquer Banco 24Horas *Caso escolha a opção de recebimento em dois dias depois da venda feita Quem pode abrir uma Get Conta?",
-        "Dúvidas e Perguntas Frequentes | Getnet: Como faço para contratar o Pix na Getnet? Como faço para contratar o Pix na Getnet? A partir de 16/11/20, você pode acessar um dos canais digitais Getnet (Portal Minha Conta ou Aplicativo Getnet) e fazer a contratação por lá, digitando a mesma chave que você cadastrou no seu domicílio bancário* onde receberá o Pix.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Para abrir uma Get Conta, basta acessar o , escolher uma máquina de aluguel ou compra e optar por receber suas vendas na Conta. A abertura da conta é feita na hora e você terá acesso a um cartão pré-pago gratuitamente para fazer compras nas lojas de todo Brasil e online. Caso não queira ter uma máquina, você pode abrir uma conta para realizar transferências, pagamentos de boletos e ter com um cartão pré-pago.",
-        "Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.",
-        "Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.",
-        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A)."
-      ],
-      "steps": [
-        {
-          "agent": "faq",
-          "status": "ok",
-          "reason": null,
-          "ms": 3263.4,
-          "tools": []
-        }
-      ],
-      "context": "- Dúvidas e Perguntas Frequentes | Getnet: O que é a Get Conta? Quais os benefícios? O que é a Get Conta? Quais os benefícios? É uma conta digital gratuita para sua empresa, sem burocracia e taxas escondidas, através de uma parceria com a Dock IP, você tem sua própria agência e conta. Aqui, você pode: Ter um cartão gratuito para realizar compras online ou físicas Consegue enviar e receber dinheiro, além de vender por meio do Pix Receber suas vendas em até 2 dias uteis no período da manhã no seu cartão* Realizar transferências e pagamentos de contas Efetuar saque em qualquer Banco 24Horas *Caso escolha a opção de recebimento em dois dias depois da venda feita Quem pode abrir uma Get Conta?\n- Dúvidas e Perguntas Frequentes | Getnet: Como faço para contratar o Pix na Getnet? Como faço para contratar o Pix na Getnet? A partir de 16/11/20, você pode acessar um dos canais digitais Getnet (Portal Minha Conta ou Aplicativo Getnet) e fazer a contratação por lá, digitando a mesma chave que você cadastrou no seu domicílio bancário* onde receberá o Pix.\n- Dúvidas e Perguntas Frequentes | Getnet: Para abrir uma Get Conta, basta acessar o , escolher uma máquina de aluguel ou compra e optar por receber suas vendas na Conta. A abertura da conta é feita na hora e você terá acesso a um cartão pré-pago gratuitamente para fazer compras nas lojas de todo Brasil e online. Caso não queira ter uma máquina, você pode abrir uma conta para realizar transferências, pagamentos de boletos e ter com um cartão pré-pago.\n- Dúvidas e Perguntas Frequentes | Getnet: Mais respostas sobre o Pix​ O que é o Pix? E quais as vantagens? O que é o Pix? E quais as vantagens? O Pix é um meio de pagamento criado pelo Banco Central para fazer pagamentos e receber transferências de forma instantânea e gratuita. Diferente da TED, o Pix permite transações 24h por dia, 7 dias por semana, fins de semana e feriados. Pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga entre diferentes bancos. As vantagens do Pix vai desde ser rápido, seguro, disponibilização imediata dos recursos.\n- Getnet | Maquininha + Conta Digital - GetnetMaquininha + Conta Digital - Getnet: Com a conta digital, vai dar negócio Você no controle da operação Cartão virtual grátis Receba todos os pagamentos na mesma conta Antecipação de recebíveis Mais benefícios Escolha o melhor produto e abra a sua conta A Getnet tem soluções físicas e digitais para alavancar o seu negócio. Confira os benefícios da Get Conta Saiba mais sobre os principais benefícios da conta Getnet.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).",
-      "unsupported_claims": [],
-      "claims_action": "none",
-      "expected_language": "pt",
-      "language_declared": "pt",
-      "language_detected": "pt",
-      "unsupported_numbers": [],
-      "user_id": "cliente1988",
-      "handoff_required": false,
-      "handoff_reason": null,
-      "pending_action": null,
-      "blocked": false,
-      "risk_flags": [],
-      "prompt_versions": {
-        "faq.md": "435616a1b1",
-        "guardrail.md": "0cb0e155d7",
-        "router.md": "b97c1ba623",
-        "supervisor.md": "64112db478"
-      },
-      "cost_usd": 0.025583,
-      "run": 2
+      "cost_usd": 0.029715,
+      "run": 0
     }
   ],
   "failures": [],
   "stability": {
-    "runs": 3,
+    "runs": 1,
     "pass_at_1": 1.0,
     "pass_hat_k": 1.0,
     "ci": {
       "pass_at_1": {
-        "k": 15,
-        "n": 15,
-        "lo": 79.6,
+        "k": 5,
+        "n": 5,
+        "lo": 56.6,
         "hi": 100.0
       },
       "pass_hat_k": {
@@ -1673,24 +686,24 @@
     "unstable": [],
     "by_case": {
       "q-partial-01": {
-        "passes": 3,
-        "runs": 3
+        "passes": 1,
+        "runs": 1
       },
       "q-partial-02": {
-        "passes": 3,
-        "runs": 3
+        "passes": 1,
+        "runs": 1
       },
       "q-partial-03": {
-        "passes": 3,
-        "runs": 3
+        "passes": 1,
+        "runs": 1
       },
       "q-partial-04": {
-        "passes": 3,
-        "runs": 3
+        "passes": 1,
+        "runs": 1
       },
       "q-partial-05": {
-        "passes": 3,
-        "runs": 3
+        "passes": 1,
+        "runs": 1
       }
     }
   },
@@ -1699,7 +712,7 @@
     "intent_confusion": {},
     "intent_matrix": {
       "knowledge": {
-        "knowledge": 15
+        "knowledge": 5
       }
     }
   },
@@ -2906,25 +1919,6 @@
         }
       },
       {
-        "threshold": 5.782,
-        "pos_answered": 0.712,
-        "neg_refused": 0.682,
-        "balanced_acc": 0.697,
-        "meets_floor": false,
-        "pos_ci": {
-          "k": 42,
-          "n": 59,
-          "lo": 58.6,
-          "hi": 81.2
-        },
-        "neg_ci": {
-          "k": 15,
-          "n": 22,
-          "lo": 47.3,
-          "hi": 83.6
-        }
-      },
-      {
         "threshold": 5.862,
         "pos_answered": 0.712,
         "neg_refused": 0.682,
@@ -3059,25 +2053,6 @@
       },
       {
         "threshold": 6.007,
-        "pos_answered": 0.695,
-        "neg_refused": 0.682,
-        "balanced_acc": 0.688,
-        "meets_floor": false,
-        "pos_ci": {
-          "k": 41,
-          "n": 59,
-          "lo": 56.9,
-          "hi": 79.7
-        },
-        "neg_ci": {
-          "k": 15,
-          "n": 22,
-          "lo": 47.3,
-          "hi": 83.6
-        }
-      },
-      {
-        "threshold": 6.043,
         "pos_answered": 0.695,
         "neg_refused": 0.682,
         "balanced_acc": 0.688,
@@ -4141,7 +3116,7 @@
         }
       },
       {
-        "threshold": 9.488,
+        "threshold": 9.357,
         "pos_answered": 0.61,
         "neg_refused": 1.0,
         "balanced_acc": 0.805,
@@ -4199,6 +3174,25 @@
       },
       {
         "threshold": 9.746,
+        "pos_answered": 0.61,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.805,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 36,
+          "n": 59,
+          "lo": 48.3,
+          "hi": 72.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.749,
         "pos_answered": 0.61,
         "neg_refused": 1.0,
         "balanced_acc": 0.805,
@@ -4389,6 +3383,25 @@
       },
       {
         "threshold": 10.994,
+        "pos_answered": 0.576,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.788,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 34,
+          "n": 59,
+          "lo": 44.9,
+          "hi": 69.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.003,
         "pos_answered": 0.576,
         "neg_refused": 1.0,
         "balanced_acc": 0.788,
@@ -5914,14 +4927,14 @@
     "cases": 59,
     "positives": 59,
     "negatives": 22,
-    "recall@3": 0.839,
-    "mrr": 0.816,
-    "hit@3": 0.847,
-    "recall@5": 0.89,
-    "mrr@10": 0.832,
+    "recall@3": 0.822,
+    "mrr": 0.811,
+    "hit@3": 0.831,
+    "recall@5": 0.873,
+    "mrr@10": 0.826,
     "first_gold_rank": {
       "What's the difference between the Get Clássica and the Get Smart?": 1,
-      "Do I need a bank account to receive my sales via Pix?": 3,
+      "Do I need a bank account to receive my sales via Pix?": null,
       "My card machine won't connect to the internet, what should I do?": 1,
       "How does receivables advance (antecipação) work with Getnet?": 4,
       "How many installments can I split a sale into with the crediário?": 1,
@@ -5983,9 +4996,9 @@
     "by_origin": {
       "official": {
         "cases": 6,
-        "recall@3": 0.833,
-        "recall@5": 0.917,
-        "mrr@10": 0.764
+        "recall@3": 0.667,
+        "recall@5": 0.75,
+        "mrr@10": 0.708
       },
       "page": {
         "cases": 39,
@@ -6001,14 +5014,14 @@
       }
     },
     "hit@3_ci": {
-      "k": 50,
+      "k": 49,
       "n": 59,
-      "lo": 73.5,
-      "hi": 91.8
+      "lo": 71.5,
+      "hi": 90.5
     },
-    "ndcg@3": 0.821,
+    "ndcg@3": 0.813,
     "page": {
-      "recall@3": 0.96,
+      "recall@3": 0.955,
       "mrr": 0.927,
       "hit@3": 0.966,
       "hit@3_ci": {
@@ -6019,21 +5032,21 @@
       }
     },
     "latency_ms": {
-      "p50": 1038.3,
-      "p95": 2295.7,
-      "mean": 1182.4
+      "p50": 1154.8,
+      "p95": 4820.5,
+      "mean": 1750.2
     },
     "gate": {
       "min_score": 5.334,
       "min_cosine": 0.784,
-      "pos_answered": 0.847,
+      "pos_answered": 0.831,
       "neg_refused": 0.909,
       "meets_floor": true,
       "pos_ci": {
-        "k": 50,
+        "k": 49,
         "n": 59,
-        "lo": 73.5,
-        "hi": 91.8
+        "lo": 71.5,
+        "hi": 90.5
       },
       "neg_ci": {
         "k": 20,
@@ -6046,14 +5059,14 @@
       "neg_refusal_min": 0.85
     },
     "separation": {
-      "auc": 0.891,
+      "auc": 0.897,
       "gap": -0.043,
       "positives": 58,
       "negatives": 3,
       "enough": false
     },
     "separation_rerank": {
-      "auc": 0.856,
+      "auc": 0.868,
       "gap": -5.869,
       "positives": 58,
       "negatives": 3,
@@ -6061,14 +5074,14 @@
     },
     "rerank_gate": {
       "min_rerank": 0.9516,
-      "pos_answered": 0.776,
+      "pos_answered": 0.793,
       "neg_refused": 1.0,
       "meets_floor": true,
       "pos_ci": {
-        "k": 45,
+        "k": 46,
         "n": 58,
-        "lo": 65.3,
-        "hi": 86.4
+        "lo": 67.2,
+        "hi": 87.7
       },
       "neg_ci": {
         "k": 3,
@@ -6091,16 +5104,16 @@
       "retriever": "dense",
       "recall@3": 0.856,
       "mrr": 0.774,
-      "recall@5": 0.881,
-      "mrr@10": 0.782
+      "recall@5": 0.864,
+      "mrr@10": 0.778
     },
     "requested": "dense"
   },
   "cassette": {
     "file": "evals/cassettes/partial.jsonl",
-    "requests": 88,
+    "requests": 30,
     "errors": 0,
-    "repeat": 3,
+    "repeat": 1,
     "floors": {
       "intent_acc": 100.0,
       "handoff_acc": 100.0,
@@ -6115,9 +5128,9 @@
   "judge": {
     "status": "ran",
     "file": "judge.json",
-    "verdicts": 15,
-    "grounded": 15,
-    "helpful": 15,
+    "verdicts": 5,
+    "grounded": 4,
+    "helpful": 5,
     "judge_unreliable": false
   }
 }
