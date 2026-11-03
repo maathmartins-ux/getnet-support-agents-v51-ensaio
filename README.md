@@ -402,8 +402,9 @@ e como comparar pela primeira entrega.
 | 18:50:28 | 395 | readme: números e linha do tempo (fill_readme, último passo) |
 | 18:52:31 | 398 | eval: remove abortos substituídos por rodadas completas |
 | 18:53:14 | 398 | readme: números e linha do tempo (fill_readme, último passo) |
+| 18:54:48 | 400 | eval: juiz dos oficiais re-medido sobre a rodada de 1fa7c26 (fundamentadas 0,933, úteis 1,00) |
 
-Do primeiro ao último commit: **398 min**.
+Do primeiro ao último commit: **400 min**.
 <!-- timeline:end -->
 
 </details>
