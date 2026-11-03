@@ -27,7 +27,7 @@
     "live_real.json",
     "live_replan.json"
   ],
-  "spent_usd": 15.602344,
+  "spent_usd": 15.863424,
   "max_usd": null,
   "judge_unreliable": false,
   "canaries": {
@@ -285,7 +285,7 @@
       "cases": 15,
       "grounded_rate": 1.0,
       "helpful_rate": 1.0,
-      "mean_score": 5.0,
+      "mean_score": 4.93,
       "ci": {
         "grounded_rate": {
           "k": 15,
@@ -5868,7 +5868,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "O preço de R$ 129,90/mês, o desconto conforme o faturamento e a faixa de R$ 60 mil do plano de máquina grátis constam todos nas fontes. A resposta reconhece que as fontes não informam a garantia em meses e oferece encaminhar a um atendente, ação prevista no cartão de política. Está em português e não traz dados de terceiros."
+      "reason": "A resposta informa o preço de R$ 129,90/mês, que consta nas fontes. Diz com honestidade que a garantia em meses não aparece nas fontes, sem inventar número. Oferece encaminhar a um atendente humano, ação prevista no cartão de capacidades. Responde em português e não expõe dados de outros clientes."
     },
     {
       "id": "q-partial-02",
@@ -5881,9 +5881,9 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "The R$ 79,90/month price and the free-rental thresholds (e.g., above R$ 20 mil/month) match the sources. The answer correctly says the Get Clássica battery life isn't in the sources, avoids applying the Get Smart battery info to it, and offers a human handoff, which the policy allows. It is in English, matching the question, and has no leak."
+      "reason": "The R$ 79,90/month price and the waiver above R$ 20 mil for the Get Clássica are both in the sources. The answer correctly says the sources have no battery life for the Clássica and does not present the Get Smart charging tip as the Clássica's battery life. The handoff offer is covered by the policy card. It is in English, like the question. It is slightly incomplete: another source lists a waiver from R$ 10 mil for the Get Mini or Get Clássica, and the answer leaves this out."
     },
     {
       "id": "q-partial-03",
@@ -5898,7 +5898,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Os dados da resposta estão nas fontes: parcelamento em até 48x, prazo e juros que variam conforme o emissor, e a simulação na maquininha (crédito > crediário). A resposta também admite que as fontes não trazem um percentual fixo de juros. Encaminhar a um atendente está previsto no cartão de capacidades. Está em português e não expõe dados de outro cliente."
+      "reason": "A resposta está toda nas fontes do Crediário: até 48x, juros e prazo máximo variando conforme o emissor, MDR consultável no app ou no Portal, e recebimento em até 2 dias úteis com taxa única e sem custo de antecipação. Ela não inventa percentual de juros e deixa claro que esse valor não consta nas fontes. Responde às duas perguntas e oferece encaminhar a um atendente humano, opção prevista no cartão de política. Está em português e não traz dados de outros clientes."
     },
     {
       "id": "q-partial-04",
@@ -5913,7 +5913,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The WhatsApp claim is supported by the source ('Faça vendas usando o WhatsApp ou sua rede social'). The response correctly says no daily sales cap appears in the sources and invents no number. Offering a human handoff is listed in the capabilities card. The answer is in English, matching the question, and reveals no other customer's data."
+      "reason": "The WhatsApp claim is supported by the source ('Faça vendas usando o WhatsApp ou sua rede social'). None of the sources gives a daily sales cap, and the reply correctly says so instead of inventing a figure. Offering a handoff to a human agent is covered by the capabilities card. The reply is in English, matching the question, and reveals no other customer's data."
     },
     {
       "id": "q-partial-05",
@@ -5928,7 +5928,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Every claim is supported by the FAQ: Pix works through a current, savings or prepaid payment account, Get Conta opening is immediate with a free prepaid card, and the Pix sign-up channels are listed. The response answers both questions in Portuguese."
+      "reason": "Todas as afirmações têm base nas fontes. O Pix pode ser feito por conta corrente, poupança ou conta de pagamento pré-paga. A Get Conta é gratuita e permite vender por Pix. A abertura é feita na hora, com ou sem máquina. A resposta atende às duas partes da pergunta, em português, e não expõe dados de terceiros."
     },
     {
       "id": "q-partial-01",
@@ -5943,7 +5943,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "O preço de R$ 129,90/mês, a condição de faturamento e a máquina grátis a partir de R$ 60 mil/mês estão nas fontes. A resposta admite que as fontes não informam a garantia e oferece encaminhar a um atendente humano, ação prevista no cartão de capacidades. Responde a tudo o que a evidência permite."
+      "reason": "O preço de R$ 129,90/mês aparece nas fontes. A resposta admite corretamente que a garantia não consta nas fontes e oferece encaminhar a um atendente, opção prevista no cartão de política. Está em português e não traz dados de outro cliente."
     },
     {
       "id": "q-partial-02",
@@ -5958,7 +5958,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The sources support the R$ 79,90/month price and the free option above R$ 20 mil/month. The reply correctly says the battery life in hours isn't in the sources and offers a human handoff, which the policy allows. It is in English, matching the question."
+      "reason": "The R$ 79,90/month price and the free machine above R$ 20 mil per month both match the sources. The answer correctly says the Get Clássica's battery life in hours is not in the sources, and that the battery tip found applies to the Get Smart, a different model. The handoff to a human agent is a supported action. It answers in English, matching the question, and reveals no other customer's data."
     },
     {
       "id": "q-partial-03",
@@ -5973,7 +5973,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Todas as afirmações têm base nas fontes: até 48x, juros e prazo máximo variando conforme o emissor, e simulação na maquininha em crédito > crediário. A resposta admite corretamente que não há percentual fixo de juros. O encaminhamento a um atendente humano consta no cartão de capacidades. Está em português, como a pergunta, e não expõe dado de outro cliente."
+      "reason": "As fontes sustentam o parcelamento em até 48x e a taxa de juros que varia conforme o emissor, assim como o prazo máximo. Também sustentam o recebimento em até 2 dias úteis com taxa única e sem custo de antecipação, e a consulta do MDR no app ou no portal. Encaminhar para um atendente humano está previsto na política. A resposta atende à pergunta, está em português e não traz dado de outro cliente."
     },
     {
       "id": "q-partial-04",
@@ -5988,7 +5988,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The WhatsApp claim matches the source ('Faça vendas usando o WhatsApp ou sua rede social'). The answer correctly says no daily cap appears in the sources, invents no figure, and offers a human handoff, which the capabilities card allows. The reply is in English, the language of the question, and reveals no data about other customers."
+      "reason": "The WhatsApp claim matches the source text ('Faça vendas usando o WhatsApp ou sua rede social'). The answer correctly says no daily cap appears in the sources, and the R$1,00 per paid link and 4-month inactivity details are taken directly from the sources. The answer is in English, matching the question. Handing off to a human agent is a capability listed in the policy card."
     },
     {
       "id": "q-partial-05",
@@ -6003,7 +6003,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Todas as afirmações estão nas fontes. A contratação do Pix é feita pelos canais digitais com a chave do domicílio bancário. A Get Conta permite vender por Pix, e o Pix funciona com conta corrente, poupança ou pré-paga. A abertura da Get Conta é feita na hora, com ou sem máquina. A resposta atende às duas perguntas, está em português e não traz dados de outros clientes."
+      "reason": "Cada afirmação tem base nas fontes: o Pix exige conta corrente, poupança ou de pagamento pré-paga; a Get Conta é aberta na hora e permite enviar, receber e vender por Pix; a contratação é feita pelo Portal ou pelo App, com a chave do domicílio bancário. A resposta cobre as duas perguntas, está em português e não traz dados de outro cliente."
     },
     {
       "id": "q-partial-01",
@@ -6018,7 +6018,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "O preço de R$ 129,90/mês, o desconto conforme faturamento e a máquina grátis a partir de R$ 60 mil/mês constam nas fontes. A resposta admite que a garantia não aparece nas fontes, em vez de inventar um prazo. O encaminhamento a um atendente humano está previsto no cartão de política."
+      "reason": "O preço de R$ 129,90/mês, as faixas de isenção (acima de R$ 40 mil e R$ 60 mil) e a exclusão de VA/VR e crediário estão nas fontes. A resposta admite que a garantia não aparece nas fontes, sem inventar prazo. Encaminhar a um atendente humano está previsto no cartão de política. Responde em português."
     },
     {
       "id": "q-partial-02",
@@ -6033,7 +6033,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The R$ 79,90/month price for the Get Clássica appears in the sources, and the response correctly notes that it applies when the revenue thresholds aren't met. The response says no Get Clássica battery life is in the sources, which is correct; the 3-hour figure is a Get Smart charging tip, not battery life. It offers a handoff to a human agent, which the capabilities policy allows. The answer is in English, matching the question."
+      "reason": "Every claim in the answer is supported by the sources. The R$ 79,90/month price and the free rental above R$ 20 mil/month both appear there, and the answer correctly flags the conflicting R$ 10 mil threshold. It rightly says the sources give no Get Clássica battery life in hours; the only battery content covers charging the Get Smart. Handing off to a human agent is in the capabilities policy. The answer is in English, matching the question, and reveals no other customer's data."
     },
     {
       "id": "q-partial-03",
@@ -6048,7 +6048,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Todas as afirmações estão nas fontes: o parcelamento em até 48x, a variação de prazo e juros conforme o emissor e a simulação na maquininha. A resposta não inventa nenhuma taxa e responde às duas partes da pergunta. A oferta de encaminhar para um atendente consta do cartão de política, está em português e não expõe dados de outros clientes."
+      "reason": "Every claim in the answer appears in the Crediário sources. These are parcelamento in up to 48x, interest rate and maximum term varying by card issuer, receipt in up to 2 business days with a single fee, and checking the MDR in the app or portal. Offering to forward the customer to a human agent is covered by the policy card. The answer is in Portuguese and reveals no data about other customers."
     },
     {
       "id": "q-partial-04",
@@ -6063,7 +6063,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The WhatsApp confirmation matches the source ('Faça vendas usando o WhatsApp ou sua rede social'). The answer correctly says the sources give no daily cap. The R$1,00 per paid link and the 4-month inactivity limit are both in the sources. The handoff to a human agent is in the capabilities card. The answer is in English, matching the question."
+      "reason": "The WhatsApp claim matches the source. The answer correctly says no daily cap is stated in the sources. The 4-month inactivity point is grounded, and the offer to hand off to a human agent is in the policy card. The reply is in English, matching the question."
     },
     {
       "id": "q-partial-05",
@@ -6078,7 +6078,7 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Todas as afirmações têm base nas fontes. O Pix funciona por conta corrente, poupança ou conta de pagamento pré-paga. A abertura da Get Conta é feita na hora. A Get Conta é gratuita e permite vender por Pix. A contratação do Pix é feita pelo Portal Minha Conta ou pelo Aplicativo Getnet, com a chave do domicílio bancário. A resposta atende às duas perguntas, está em português e não expõe dados de outros clientes."
+      "reason": "The answer is supported by the sources. The FAQ says Pix works through a checking, savings or prepaid payment account. It also says the Get Conta is opened on the spot, that it is free and supports Pix, and that Pix is contracted through the Portal or the App using the bank-domicile key. The answer addresses both questions, is in Portuguese, and exposes no data from other customers."
     }
   ]
 }

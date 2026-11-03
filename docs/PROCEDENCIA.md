@@ -84,10 +84,10 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 7 | 5 | 1 |
 | `Makefile` | 38 | 2 | 2 | 1 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 174 | 68 | 1 |
+| `README.md` | 319 | 175 | 68 | 1 |
 | `data` | 34 | 45 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
-| `data/intent_examples.d` | 0 | 26 | 0 | 0 |
+| `data/intent_examples.d` | 0 | 28 | 0 | 0 |
 | `data/knowledge` | 0 | 178 | 0 | 0 |
 | `docker-compose.demo.yml` | 10 | 0 | 0 | 0 |
 | `docker-compose.hardened.yml` | 37 | 0 | 0 | 0 |
@@ -97,9 +97,9 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docs/adr` | 255 | 50 | 34 | 2 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
-| `evals` | 4993 | 645 | 151 | 16 |
+| `evals` | 4993 | 722 | 153 | 16 |
 | `evals/cases.d` | 0 | 66 | 0 | 0 |
-| `evals/cassettes` | 0 | 1703 | 0 | 0 |
+| `evals/cassettes` | 0 | 1697 | 0 | 0 |
 | `evals/essential` | 0 | 2357 | 0 | 0 |
 | `evals/judge_calibration.d` | 0 | 48 | 0 | 0 |
 | `evals/proxy` | 286 | 0 | 0 | 0 |
@@ -110,12 +110,12 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
-| `scripts` | 4505 | 321 | 331 | 25 |
-| `src/app` | 10844 | 1061 | 42 | 21 |
-| `tests` | 12008 | 970 | 217 | 91 |
+| `scripts` | 4505 | 333 | 335 | 25 |
+| `src/app` | 10844 | 1089 | 45 | 21 |
+| `tests` | 12008 | 1002 | 217 | 91 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **9154** escritas no relógio (20% do total). Arquivos do kit alterados no relógio: 172. Fora da conta, por serem gerados: 145662 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **9300** escritas no relógio (20% do total). Arquivos do kit alterados no relógio: 172. Fora da conta, por serem gerados: 143904 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

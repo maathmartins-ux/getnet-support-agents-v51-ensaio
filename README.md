@@ -23,9 +23,9 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 <!-- scorecard:begin -->
 | medida | valor | como se mede |
 |---|---:|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.97 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
-| Oficiais resolvidas: pass^k (todas as rodadas) | 0.90 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 0.93 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
+| Juiz: respostas oficiais fundamentadas | 0.97 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
 | Memória ao vivo: pass@1 | 0.97 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.84 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
@@ -413,8 +413,11 @@ e como comparar pela primeira entrega.
 | 19:37:38 | 443 | hitl: transcrição ao vivo com o operador respondendo no turno (router → escalation → human); README sem frases vencidas; TIMESHEET regenerado |
 | 19:37:39 | 443 | readme: números e linha do tempo (fill_readme, último passo) |
 | 19:44:13 | 449 | kit: RESULTS enxuto (uma linha por split), argumentos das tools validados no servidor; offline regenerado |
+| 19:44:14 | 449 | readme: números e linha do tempo (fill_readme, último passo) |
+| 19:52:33 | 458 | kit: portão sem fonte pela nota do cross-encoder (MIN_RERANK -5,2247 calibrado no gold do desafio); README sem contradição nos rótulos humanos; frase sem citação quebrada |
+| 20:17:17 | 482 | router: exemplos rotulados de duas perguntas sobre o MESMO produto (knowledge, não multi); rotulagem com amostra enriquecida |
 
-Do primeiro ao último commit: **449 min**.
+Do primeiro ao último commit: **482 min**.
 <!-- timeline:end -->
 
 </details>
