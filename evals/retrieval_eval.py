@@ -316,15 +316,20 @@ FAST_CROSS = "BAAI/bge-reranker-v2-m3-int8"
 KIT_CHARS = 600  # caracteres de cada trecho que o cross lê na grade (o mesmo do KIT_RETRIEVER do app)
 FAST_CONFIGS = (
     {"retriever": "bm25"},
+    # o denso sem e com janelas, sem cross (segundos cada): na ordem `base` a ordem é a do denso, então a diferença de
+    # Recall/MRR entre as duas linhas é o efeito das janelas no domínio; e a com janelas é o "sem o cross" que o
+    # README (scripts/fill_readme.py) compara com a escolha (portão e custo a mais por busca)
     {"retriever": "dense", "embed_model": FAST_EMBED},
+    {"retriever": "dense", "embed_model": FAST_EMBED, "windows": True},
     # pool 10 lendo 600 caracteres por trecho: Recall@3 0,754 / MRR 0,947 / p95 1130 ms, contra
-    # 0,734 / 0,937 / 896 ms do pool 5 com 1500 caracteres; pool 20 subiu a 0,777 com p95 de 4,7 s (fora do teto)
+    # 0,734 / 0,937 / 896 ms do pool 5 com 1500 caracteres; pool 20 subiu a 0,777 com p95 de 4,7 s (fora do teto).
+    # Com janelas (o pacote do kit, config.KIT_RETRIEVER): no gold do ensaio, o mesmo Recall/MRR/portão de sem elas
     {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
-     "rerank_chars": 600},
+     "rerank_chars": 600, "windows": True},
     # a mesma busca com a ordem do denso; a nota do cross só decide o portão sem fonte. Qual das duas ordens lê melhor
     # é medida de cada domínio (a tabela vai para data/retriever.json); o choose() desempata pela cobertura do portão.
     {"retriever": "dense", "embed_model": FAST_EMBED, "rerank": "cross", "rerank_model": FAST_CROSS, "rerank_pool": 10,
-     "rerank_chars": 600, "rerank_order": "base"},
+     "rerank_chars": 600, "rerank_order": "base", "windows": True},
 )
 
 
@@ -334,6 +339,8 @@ def config_name(cfg: dict, verbose: bool = False) -> str:
     name = cfg["retriever"]
     if verbose and cfg.get("embed_model"):
         name += f"[{cfg['embed_model'].split('/')[-1]}]"
+    if cfg.get("windows") and cfg["retriever"] in ("hybrid", "dense"):
+        name += "+windows"  # o mesmo nome do buscador (rag.HybridRetriever)
     if cfg.get("rerank"):
         name += f"+{cfg['rerank']}"
         if verbose and cfg.get("rerank_model"):
@@ -448,8 +455,10 @@ def build(cfg: dict, fx: _Factories):
 
     base = BM25Retriever(get_index())
     if cfg["retriever"] in ("hybrid", "dense"):
+        # janelas explícitas na configuração (ausente = sem): o --verify refaz a busca que a escolha gravada mediu,
+        # qualquer que seja o RAG_WINDOWS do ambiente
         base = HybridRetriever(get_index(), fx.embed(cfg["embed_model"]),
-                               "dense" if cfg["retriever"] == "dense" else "rrf")
+                               "dense" if cfg["retriever"] == "dense" else "rrf", windows=bool(cfg.get("windows")))
     if cfg.get("rerank") == "cross":
         return CrossRerankRetriever(base, fx.cross(cfg["rerank_model"]), cfg.get("rerank_pool"),
                                     cfg.get("rerank_chars"), cfg.get("rerank_order") or "cross")
@@ -711,13 +720,19 @@ def choose_cli(args, gold: Path, results_dir: Path, sha: str | None) -> int:
     ram_budget = ram_arg if ram_arg is not None else (recorded.get("ram_budget_mb") or RAM_BUDGET_MB)
     ram_budget = None if ram_budget <= 0 else ram_budget  # 0 = sem teto de RAM
     if getattr(args, "fast", False):
-        configs = [dict(c) for c in FAST_CONFIGS]  # 4 configurações: cabe no relógio (a grade leva quase 1 h)
+        configs = [dict(c) for c in FAST_CONFIGS]  # 5 configurações (2 com cross): cabe no relógio (a grade, ~1 h)
     else:
         embeds, crosses = recorded_models(recorded)  # --verify refaz as MESMAS configurações que a escolha gravada
         pools = [int(p) for p in split(getattr(args, "rerank_pools", None),
                                        ",".join(map(str, pools_of(recorded))) or "20")]
         configs = default_configs(split(args.embed_models, ",".join(embeds) or embed_model()),
                                   split(args.rerank_models, ",".join(crosses) or rerank_model()), pools)
+    if getattr(args, "windows", False):
+        # cada denso/híbrido com E sem janelas (rag.window_spans), sem repetir configuração: a escolha decide pela
+        # mesmo critério. Fora do --fast de sempre: o par a mais com cross-encoder custa minutos de CPU no relógio.
+        both = [v for c in configs for v in ([c, {**c, "windows": not c.get("windows")}]
+                                              if c["retriever"] in ("dense", "hybrid") else [c])]
+        configs = list({config_name(c, True): c for c in both}.values())
     saved = results_dir / "retrieval_compare.json"
     report = load_choice(saved) if getattr(args, "reuse", False) else {}
     if not report or {config_name(c, True) for c in configs} - {config_name(r.get("config", {}), True)

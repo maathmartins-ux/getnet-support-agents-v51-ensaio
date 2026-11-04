@@ -114,7 +114,9 @@ def build(dry: bool) -> list[str]:
             (TARGET / name).write_text(body, encoding="utf-8")
     done.append("copiar src/app/prompts/*.md → src/app/domain/challenge_prompts/")
     if not dry:
-        shutil.copytree(PROMPTS, TARGET_PROMPTS)
+        # o contrato do motor (prompts/contract/) fica no motor: domain.prompt anexa a versão do kit, e uma cópia no
+        # domínio só envelheceria sem ser lida
+        shutil.copytree(PROMPTS, TARGET_PROMPTS, ignore=shutil.ignore_patterns("contract", "__pycache__"))
     for rel in EMPTIED:
         done.append(f"esvaziar {rel} (exemplo da loja; original em tests/fixtures/kit_data)")
         if not dry:

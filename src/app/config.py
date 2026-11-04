@@ -213,13 +213,14 @@ def rate_limit_per_min() -> int:
 # hybrid+cross (com o BM25 só no idioma do corpus, rag.lexical_fits) 0,895 / 0,921 / 0,830. Empate técnico;
 # dense+cross fica porque foi o validado ao vivo (2 baterias integrais: oficiais 96,7%), e o híbrido sem o filtro de
 # idioma tirou a fonte de uma pergunta em inglês nas 3 rodadas. RETRIEVER=hybrid troca.
-# Ordem `base` (rodada 10): a nota do cross-encoder só decide o portão sem fonte e a ordem fica a do denso. No gold do
+# Ordem `base` (kit v5.5.1): a nota do cross-encoder só decide o portão sem fonte e a ordem fica a do denso. No gold do
 # ensaio Getnet (59 com fonte) a escolha automática deu dense+cross:base Recall@5 0,915 / Recall@3 0,898 / MRR 0,842
 # contra 0,907 / 0,873 / 0,859 reordenando (o portão é o mesmo nas duas), e a bateria integral ao vivo com ela teve
 # oficiais 30/30 aterradas. `--choose-retriever` mede as duas ordens no domínio; RERANK_ORDER=cross volta.
-# Janelas (rodada 12, rag.window_spans): no gold do ensaio Getnet o denso com janelas deu o mesmo Recall@3/@5, MRR e
-# portão que sem elas, e o trecho da Get Clássica (12º–18º, fora do pool do cross) subiu ao top-5 do redator no
-# official-01. Escolha gravada sem a chave = sem janelas (foi medida sem elas); RAG_WINDOWS=off desliga.
+# Janelas (kit v5.5.3, rag.window_spans): no gold do ensaio Getnet o denso com janelas deu o mesmo Recall@3/@5, MRR e
+# portão que sem elas, e o trecho que junta a tabela de um produto com o cartão de outro (12º–18º, fora do pool do
+# cross) subiu ao top-5 do redator da pergunta de comparação. Escolha gravada sem a chave = sem janelas (foi medida
+# sem elas); RAG_WINDOWS=off desliga.
 KIT_RETRIEVER = {
     "retriever": "dense",
     "embed_model": "intfloat/multilingual-e5-large",
