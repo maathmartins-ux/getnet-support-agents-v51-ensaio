@@ -26,3 +26,5 @@
 {"text": "I would rather have a staff member handle this", "intent": "human_request"}
 {"text": "O Get Tap funciona no iPhone e qual é a taxa no débito?", "intent": "knowledge"}
 {"text": "Does the Get Smart print receipts, and how much is its monthly fee?", "intent": "knowledge"}
+{"text": "Meu segundo terminal está funcionando agora?", "intent": "support"}
+{"text": "What is the current status of my other card machine?", "intent": "support"}

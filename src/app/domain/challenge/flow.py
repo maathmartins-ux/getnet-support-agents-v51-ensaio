@@ -27,7 +27,8 @@ ALLOWED = {None: {"faq", "records", "escalation"}, "faq": {"records", "escalatio
 # troubleshoot: o manual (faq) precisa do modelo/estado do terminal ou do código de recusa (records).
 DEPENDS: dict[str, set[str]] = {"faq": {"records"}}
 NO_ESCALATION: set[str] = {"general"}
-# Pergunta sobre a própria Getnet nunca fica no general (ensaio de 03/11: replan-06/11/12 iam à web sem escalar).
+# Pergunta sobre a própria Getnet nunca fica no general (medido ao vivo: 3 perguntas sobre a empresa iam à web sem
+# escalar).
 OWN_COMPANY = r"\bgetnet\b|\bvoc[eê]s\b"  # "vocês" dirigido ao atendimento = a empresa
 OWN_COMPANY_INTENT = "knowledge"
 DEFAULT_INTENT = "knowledge"  # cláusula com assunto do domínio e sem regra

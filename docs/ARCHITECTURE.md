@@ -36,7 +36,7 @@ flowchart LR
 - Cada especialista devolve `AgentResult` com status `ok` / `partial` / `insufficient` / `error`
   (`src/app/schemas.py`); o supervisor lê o status e replaneja.
 - Fluxo específico do domínio: `src/app/domain/challenge/flow.py`; tools com schema e dono verificado
-  (`_lookup` só devolve registro do próprio `user_id`): `src/app/domain/challenge/tools.py`.
+  (`_merchant` só devolve o registro do próprio `user_id`): `src/app/domain/challenge/tools.py`.
 
 ## 2. RAG: ingestão → armazenamento → busca → redação
 
