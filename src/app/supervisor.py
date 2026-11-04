@@ -685,6 +685,22 @@ def run(plan: list[str], ctx: Context, confidence: float = 1.0, prior: list[Agen
 
 CONSULTED = {"pt": "Consultei um atendente humano (protocolo {ticket}), que respondeu agora.",
              "en": "I checked with a human agent (ticket {ticket}), who replied just now."}
+# Frase que oferece o atendente ("posso encaminhar a um atendente", "would you like me to hand this to a human"): depois
+# que o atendente já respondeu no turno, a oferta contradiz a resposta e sai do texto final.
+_OFFERS_HUMAN = re.compile(
+    r"(?i)\b(?:posso|podemos|quer que eu|gostaria que eu|se quiser|se preferir|I can|we can|would you like me to|"
+    r"shall I|if you'd like|if you want)\b.{0,160}?\b(?:atendente|humano|human agent|a human|an agent)\b")
+_SENTENCES = re.compile(r"(?<=[.!?])\s+|\n+")
+
+
+def without_human_offer(text: str) -> str:
+    """O texto sem as frases que oferecem passar ao atendente (o resto fica na ordem, linha a linha)."""
+    lines = []
+    for line in (text or "").split("\n"):
+        kept = [s for s in _SENTENCES.split(line) if s.strip() and not _OFFERS_HUMAN.search(s)]
+        if kept or not line.strip():
+            lines.append(" ".join(kept))
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
 
 
 def _continue_with_operator(plan: list[str], ctx: Context, out: Outcome) -> Outcome:
@@ -708,6 +724,7 @@ def _continue_with_operator(plan: list[str], ctx: Context, out: Outcome) -> Outc
         return out
     answer, operator = answered.get("answer") or "", answered.get("answered_by") or "operador"
     lang = ctx.language if ctx.language in LABEL else "pt"
+    before = [r for r in out.results if r is not esc]  # o que o turno respondeu antes do atendente
     human = human_result(answer, operator)
     human.text = f"{LABEL[lang]}: {answer}"
     esc.text = CONSULTED[lang].format(ticket=ticket["id"])
@@ -718,13 +735,21 @@ def _continue_with_operator(plan: list[str], ctx: Context, out: Outcome) -> Outc
     steps = out.deferred or [p for p in plan if p != "escalation" and p in AGENTS and p not in out.route]
     out.deferred = []
     ctx.facts["resume_of"] = ticket["id"]  # o passo retomado não reabre o caso (no_escalation)
+    resumed, rerun = "", set()
     if steps:
         with span("resume_live", ticket=ticket["id"], steps=",".join(steps)):
             sub = _run(steps, ctx)
         out.route += sub.route
         out.results += sub.results
         out.replans += [f"human->{','.join(steps)} (no mesmo turno)", *sub.replans]
-    out.answer = None  # junta os textos na ordem: consulta, resposta do atendente, passos retomados
+        rerun = {r.agent for r in sub.results}
+        resumed = sub.answer or "\n\n".join(r.text for r in sub.results if r.text)
+    # Resposta final: o que o turno já tinha respondido (sem a oferta do atendente, que agora respondeu; sem o texto
+    # de quem rodou de novo depois dele) → a consulta e a resposta do atendente → os passos retomados. Juntar todos os
+    # textos repetia o agente que rodou duas vezes e mantinha "posso encaminhar ao atendente" depois da resposta dele.
+    earlier = [without_human_offer(r.text) for r in before if r.text and r.agent not in rerun and r.agent != "human"]
+    parts = [*earlier, esc.text, human.text, without_human_offer(resumed)]
+    out.answer = "\n\n".join(p for p in parts if p and p.strip())
     METRICS.inc("plan_resumed_total", steps=str(len(steps)))
     return out
 

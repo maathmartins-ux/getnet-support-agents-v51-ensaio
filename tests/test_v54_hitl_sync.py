@@ -126,3 +126,31 @@ def test_wait_answer_with_fake_clock_times_out_and_audits_the_deadline():
 
     assert hitl_sync.wait_answer(t["id"], seconds=1.0, sleep=sleep, clock=lambda: now[0]) is None
     assert hitl_sync.deadline_of(t["id"]) == 1001.0
+
+
+def test_final_answer_after_the_operator_drops_the_offer_and_the_repeated_step():
+    """Depois da resposta do atendente: sem "posso encaminhar ao atendente" e sem o texto do passo que rodou de novo."""
+    assert supervisor.without_human_offer(
+        "A T1988A está online. Posso encaminhar o seu caso a um atendente humano, se quiser. Mais algo?"
+    ) == "A T1988A está online. Mais algo?"
+    offer = "Status ok.\n\nI can hand this to a human agent if you'd like."
+    assert supervisor.without_human_offer(offer) == "Status ok."
+    assert supervisor.without_human_offer("Sem oferta aqui.") == "Sem oferta aqui."
+
+
+def test_operator_answer_turn_keeps_each_step_once(monkeypatch):
+    """Plano com um passo que roda antes e depois do atendente: o texto de antes sai (o de depois o substitui)."""
+    monkeypatch.setenv("HITL_SYNC_WAIT_S", "3")
+    monkeypatch.setenv("HITL_SYNC_POLL_S", "0.05")
+    release = _slow_faq_once(monkeypatch)
+    seen = {t["id"] for t in get_store().list_tickets("open")}
+    got: dict = {}
+    op = _operator("Verifiquei: seu pedido sai amanhã.", 0.1, seen, got)
+    try:
+        r = client.post("/chat", json={"message": ASK}, headers=auth()).json()
+    finally:
+        release.set()
+    op.join(5)
+    answer = r["answer"]
+    assert answer.count("Consultei um atendente humano") == 1 and "tarde demais" not in answer
+    assert not supervisor._OFFERS_HUMAN.search(answer.split("Consultei um atendente humano", 1)[1])

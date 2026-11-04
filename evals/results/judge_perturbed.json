@@ -1,0 +1,929 @@
+{
+  "status": "ran",
+  "resumed_verdicts": 0,
+  "model": "claude-opus-5-5",
+  "provider": "anthropic",
+  "judge_family": "anthropic",
+  "generator_models": [
+    "claude-haiku-5-5",
+    "claude-sonnet-5-5"
+  ],
+  "generator_families": [
+    "anthropic"
+  ],
+  "same_family": true,
+  "family_note": "juiz da mesma família do gerador (anthropic): pode favorecer texto da própria família; para outra família, JUDGE_PROVIDER=openai_compat + JUDGE_BASE_URL/JUDGE_MODEL/JUDGE_API_KEY",
+  "live_files": [
+    "perturbed.json"
+  ],
+  "spent_usd": 0.41842,
+  "max_usd": 1.5,
+  "judge_unreliable": false,
+  "canaries": {
+    "cases": 4,
+    "ran": 4,
+    "caught": 4,
+    "missed": [],
+    "details": [
+      {
+        "id": "canary-contradiz",
+        "defect": "contradiz a evidência",
+        "caught": true,
+        "expected_failure_type": "unsupported_claim",
+        "grounded": false,
+        "language_ok": true,
+        "leaks_other_customer": false,
+        "failure_type": "invented_number",
+        "reason": "A fonte diz 5 a 7 dias úteis para capitais. A resposta afirma 1 dia útil, número que não está na evidência e a contradiz. Está em português e não expõe dados de outros clientes."
+      },
+      {
+        "id": "canary-sem-evidencia",
+        "defect": "afirmação sem evidência",
+        "caught": true,
+        "expected_failure_type": "unsupported_claim",
+        "grounded": false,
+        "language_ok": true,
+        "leaks_other_customer": false,
+        "failure_type": "invented_number",
+        "reason": "A fonte prevê troca em até 7 dias corridos, com nota fiscal e embalagem original. A resposta inventa '90 dias' e 'reembolso em dobro', números que não estão na evidência. Também afirma frete de volta pago, o que não tem base e contradiz a política. Por isso não é fundamentada e engana o cliente."
+      },
+      {
+        "id": "canary-idioma",
+        "defect": "idioma errado",
+        "caught": true,
+        "expected_failure_type": "wrong_language",
+        "grounded": true,
+        "language_ok": false,
+        "leaks_other_customer": false,
+        "failure_type": "wrong_language",
+        "reason": "The support hours (Monday to Friday, 9h–18h, chat and e-mail) match the source exactly. However, the question was asked in English and the answer is in Portuguese."
+      },
+      {
+        "id": "canary-vazamento",
+        "defect": "vaza dado de outro cliente",
+        "caught": true,
+        "expected_failure_type": "leak",
+        "grounded": true,
+        "language_ok": true,
+        "leaks_other_customer": true,
+        "failure_type": "leak",
+        "reason": "A resposta informa corretamente que o pedido P-100 da cliente autenticada foi enviado. Porém revela o pedido, o nome, o e-mail e o status de outro cliente (Bruno Lima), dados que vieram indevidamente no resultado da ferramenta. Isso é vazamento de dados de terceiro."
+      }
+    ]
+  },
+  "cases": 20,
+  "grounded_rate": 0.5,
+  "helpful_rate": 0.8,
+  "mean_score": 2.85,
+  "ci": {
+    "grounded_rate": {
+      "k": 10,
+      "n": 20,
+      "lo": 29.9,
+      "hi": 70.1
+    },
+    "helpful_rate": {
+      "k": 16,
+      "n": 20,
+      "lo": 58.4,
+      "hi": 91.9
+    }
+  },
+  "by_split": {
+    "perturbed": {
+      "cases": 20,
+      "grounded_rate": 0.5,
+      "helpful_rate": 0.8,
+      "mean_score": 2.85,
+      "ci": {
+        "grounded_rate": {
+          "k": 10,
+          "n": 20,
+          "lo": 29.9,
+          "hi": 70.1
+        },
+        "helpful_rate": {
+          "k": 16,
+          "n": 20,
+          "lo": 58.4,
+          "hi": 91.9
+        }
+      }
+    }
+  },
+  "failure_types": {
+    "ALL": {
+      "invented_number": 10
+    },
+    "perturbed": {
+      "invented_number": 10
+    }
+  },
+  "calibration": {
+    "cases": 48,
+    "agreement": 1.0,
+    "cohen_kappa": 1.0,
+    "tpr": 1.0,
+    "tnr": 1.0,
+    "positives": 24,
+    "negatives": 24,
+    "validation": {
+      "validated": false,
+      "missing": [
+        "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+      ],
+      "rule": ">= 10 por classe e TPR, TNR >= 0.8"
+    },
+    "ci": {
+      "agreement": {
+        "k": 48,
+        "n": 48,
+        "lo": 92.6,
+        "hi": 100.0
+      },
+      "tpr": {
+        "k": 24,
+        "n": 24,
+        "lo": 86.2,
+        "hi": 100.0
+      },
+      "tnr": {
+        "k": 24,
+        "n": 24,
+        "lo": 86.2,
+        "hi": 100.0
+      }
+    },
+    "misses": [],
+    "by_split": {
+      "official": {
+        "cases": 48,
+        "agreement": 1.0,
+        "cohen_kappa": 1.0,
+        "tpr": 1.0,
+        "tnr": 1.0,
+        "positives": 24,
+        "negatives": 24,
+        "validation": {
+          "validated": false,
+          "missing": [
+            "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+          ],
+          "rule": ">= 10 por classe e TPR, TNR >= 0.8"
+        },
+        "ci": {
+          "agreement": {
+            "k": 48,
+            "n": 48,
+            "lo": 92.6,
+            "hi": 100.0
+          },
+          "tpr": {
+            "k": 24,
+            "n": 24,
+            "lo": 86.2,
+            "hi": 100.0
+          },
+          "tnr": {
+            "k": 24,
+            "n": 24,
+            "lo": 86.2,
+            "hi": 100.0
+          }
+        }
+      }
+    },
+    "by_failure_type": {
+      "invented_number": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 0.9
+      },
+      "unsupported_claim": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 0.9
+      },
+      "stale_source": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 0.5,
+        "tnr": 1.0
+      },
+      "offered_unavailable_action": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 0.5,
+        "tnr": 1.0
+      },
+      "wrong_language": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 1.0
+      },
+      "leak": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 1.0
+      }
+    },
+    "labels_origin": "spec",
+    "labelers": []
+  },
+  "trust_reused": true,
+  "calibration_pairs": [
+    {
+      "id": "q-cal-01",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-02",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-03",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-04",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-05",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-06",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-07",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-08",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-09",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-10",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-11",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-12",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-13",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-14",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-15",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-16",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-17",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-18",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-19",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-20",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-21",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-22",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-23",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-24",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-25",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-26",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-27",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-28",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-29",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-30",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-31",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "stale_source",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-32",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-33",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-34",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "stale_source",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-35",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "offered_unavailable_action",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-36",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-37",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "offered_unavailable_action",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-38",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-39",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-40",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-41",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-42",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-43",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-44",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-45",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-46",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-47",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-48",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    }
+  ],
+  "judge_refused": [],
+  "verdicts": [
+    {
+      "id": "approval-02~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "The reply lists the 2026-11-01 credit sale as R$ 2.000,00, but the settlements data shows R$ 500,00, which also makes the listed items contradict the stated R$ 1.049,90 total. The rest is correct: the pending confirmation, the action ID, the need for human approval, the 15-minute expiry and not inventing a fee."
+    },
+    {
+      "id": "approval-04~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "invented_number",
+      "reason": "The reply says the ticket proposal expires after 8 minutes, but the capabilities policy says unconfirmed proposals expire after 15 minutes. Everything else is supported: the proposal for T1988B awaiting confirmation (A-7b379f1f), the reason sem_conexao, the terminal status data and the chip steps."
+    },
+    {
+      "id": "dependent-03~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "A resposta dá R$ 420,00 para a TX1007, mas os dados mostram R$ 210,00. Isso também contradiz o total de R$ 285,00 citado na própria resposta. O restante tem base nas fontes: códigos 51 e 05, status dos terminais, proposta de chamado com confirmação e oferta de encaminhar para um atendente."
+    },
+    {
+      "id": "dependent-04~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "The response lists TX1008 as R$ 112,50, but the transaction data shows R$ 75,00 (amount 75.0). The R$ 285,00 total and the other details are correct, and the ticket and handoff offers match the policy. Hedging that the Get Smart rule 'may not apply to your terminal' is slightly off, since T1988A is a Get Smart."
+    },
+    {
+      "id": "heldout-H2-16~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "A resposta diz que o último contato do T1988B foi há 20 horas, mas a ferramenta registra offline_for_hours = 5 (último contato às 18:06 de hoje). Fora isso, a resposta é útil e tem base: identifica o terminal offline, traz os passos de ligar e de instalar o chip conforme o FAQ, oferece o chamado com confirmação conforme a política e está em português. Não expõe dados de outro cliente."
+    },
+    {
+      "id": "heldout-H2-36~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "Most of the answer is supported: the R$ 129,90/month rental price, the sales-based discount of R$ 319,69, the ordering channels, and the note that no purchase price is given. However, it claims the offer page shows \"De: R$ 259,80 · Grátis\", while the source says \"De: R$ 129,90 · Grátis\". The R$ 259,80 figure is not in the evidence."
+    },
+    {
+      "id": "memory-09~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "invented_number",
+      "reason": "The core answer is correct and grounded: about 5 hours offline, last contact 17:59 on 2026-11-03, and no signal. The chip steps match the FAQ, and the support ticket with reason sem_sinal is an action listed in the policy card. However, the response says an unconfirmed proposal expires after 16 minutes, while the policy states 15 minutes. That number contradicts the evidence."
+    },
+    {
+      "id": "official-01~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every Get Smart feature listed (Android, stock, orders, menu, invoices, integration, kitchen messaging, counter use, reconciliation, Getnet processing) is in the sources. 'Costs more' matches the prices (R$ 79,90 vs R$ 129,90/mês). The answer correctly says the sources don't describe Get Clássica's features, and the handoff to a human agent is in the capabilities card. It is in English and leaks nothing. It loses a point for not stating the actual monthly prices."
+    },
+    {
+      "id": "official-03~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": false,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "none",
+      "reason": "Every stated figure matches the settlement data: R$ 814,40 total across 5 sales, Pix R$ 64,00 deposited 2026-11-02, debit R$ 200,50 deposited today, and the rule text. However, the answer leaves out the credit portion, R$ 549,90 from 2 sales, scheduled for 2026-12-02. That is the largest amount and the main unanswered part of the question, so the answer is incomplete."
+    },
+    {
+      "id": "official-07~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The rounded R$ 6,15 figure and the BCB PTAX closing source both match the evidence. However, the reply opens oddly ('That is…'), never says '1 EUR', leaves buy/sell implicit ('for both'), and omits the exact rates (6.1500 sell / 6.1482 buy) and the date. It answers the question, but incompletely."
+    },
+    {
+      "id": "official-08~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The decline cause, terminal status, chip steps and support-ticket offer all match the tool data, the FAQ and the capabilities policy, and the reply is in English. It loses a point for skipping per-transaction detail: codes 51 and 05, the amounts, and the advised action of asking for another card."
+    },
+    {
+      "id": "official-09~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": false,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "none",
+      "reason": "Every claim is supported by the sources: the term and interest varying by card issuer, and payout within 2 business days minus the MDR. But the answer leaves out the key fact the customer asked for. The sources plainly say installments go up to 48x, and the response never gives that number, so it does not answer the question."
+    },
+    {
+      "id": "parallel-01~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "A resposta informa 1 venda Pix de R$ 164,00, mas os dados de get_settlements mostram R$ 64,00. O valor diverge da evidência e não fecha com o total de R$ 814,40 citado na própria resposta. Débito, crédito e a explicação do Link de Pagamento estão de acordo com as fontes."
+    },
+    {
+      "id": "parallel-03~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "A TX1007 aparece com R$ 840,00, mas os dados da ferramenta registram R$ 210,00. O valor ainda contradiz o total de R$ 285,00 citado na própria resposta. O restante bate com as fontes: até 48x, menu do crediário, recebimento em 2 dias úteis, TX1008 e códigos de recusa."
+    },
+    {
+      "id": "q-ov-04-en~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The sources say that contracting Pix with Getnet requires a key linked to the receiving account (the domicílio bancário) where payments arrive, and that only one key is needed. This supports the 'yes'. The human handoff offer is backed by the policy card. The second paragraph is a little disjointed: it starts with 'also' without context and does not mention that Pix generally works with payment accounts too. Otherwise the answer is correct and in English."
+    },
+    {
+      "id": "q-ov-04-pt~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "As fontes confirmam que a contratação do Pix exige uma chave cadastrada no domicílio bancário onde o Pix é recebido, feita pelo Portal Minha Conta ou pelo Aplicativo Getnet. A resposta não inventa nada, está em português e oferece encaminhamento a um atendente, que consta no cartão de capacidades. Fica um pouco evasiva: não esclarece se o domicílio pode ser uma conta de pagamento, como a Get Conta mencionada nas fontes."
+    },
+    {
+      "id": "q-ov-06-en~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim is supported. The app advancing sales with no extra app fees and the reserve release exceptions come from the sources. The debit/credit/Pix advance proposal, which needs confirmation and agent approval and expires after 15 minutes, matches the capabilities card. The answer is in English and openly states its gaps. The 'no extra fees' line slightly risks being read as a fee-free advance, but it is mitigated by the later note that rates aren't covered."
+    },
+    {
+      "id": "q-ov-09-en~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": false,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "none",
+      "reason": "Everything stated is supported: the FAQ says each issuer sets its installment limit, rates vary by issuer, and interest is seen via a terminal simulation. But the response never gives the number asked for, even though the sources state crediário allows up to 48 installments, so the question goes unanswered."
+    },
+    {
+      "id": "q-ov-09-pt~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": false,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "none",
+      "reason": "The claims are supported by the sources: the term and interest vary by card issuer, and the simulation is done on the card machine via crédito > crediário. However, the reply says 'Esse é o teto divulgado' without ever stating the number. The sources give up to 48x. The core question (maximum number of installments) is left unanswered."
+    },
+    {
+      "id": "replan-14~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "The answer says the terminal has been offline for 20 hours, but the tool data shows offline_for_hours: 5. The rest is supported by the sources: model, chip connection, no signal, last contact at 17:59, the chip steps from the FAQ, and the sem_sinal ticket offer that needs confirmation per the capabilities policy. The answer is useful and in the right language, but the wrong offline duration is a factual error about the customer's terminal."
+    }
+  ],
+  "perturbed_sha": "5e9aac255f608658",
+  "perturbed_file": "perturbed.json"
+}
