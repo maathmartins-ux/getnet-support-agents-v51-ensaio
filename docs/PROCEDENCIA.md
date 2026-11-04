@@ -93,7 +93,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docker-compose.hardened.yml` | 37 | 23 | 7 | 1 |
 | `docker-compose.scale.yml` | 28 | 0 | 0 | 0 |
 | `docker-compose.yml` | 91 | 3 | 0 | 1 |
-| `docs` | 429 | 1409 | 32 | 6 |
+| `docs` | 429 | 1412 | 32 | 6 |
 | `docs/adr` | 255 | 95 | 44 | 4 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
@@ -108,7 +108,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `evals/validation` | 0 | 1970 | 0 | 0 |
 | `ops` | 669 | 140 | 1 | 2 |
 | `pyproject.toml` | 51 | 5 | 0 | 1 |
-| `reports` | 0 | 28 | 0 | 0 |
+| `reports` | 0 | 29 | 0 | 0 |
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
@@ -117,7 +117,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 6653 | 294 | 97 |
 | `tests/fixtures` | 70 | 7 | 0 | 1 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **23679** escritas no relógio (39% do total). Arquivos do kit alterados no relógio: 194. Fora da conta, por serem gerados: 159924 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **23683** escritas no relógio (39% do total). Arquivos do kit alterados no relógio: 194. Fora da conta, por serem gerados: 159924 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

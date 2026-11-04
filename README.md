@@ -381,9 +381,9 @@ e como comparar pela primeira entrega.
 | 07:40:08 | 1165 | eval: ablação em commits com o mesmo código sem AVISO; gold de busca citado onde está (kit 30e19cf) |
 | 07:45:05 | 1170 | eval: respostas adulteradas da bateria da rodada 11 com o juiz delas e a página 4 de rotulagem congelada (28 itens) |
 | 07:46:25 | 1171 | eval: relatório humano pela regra do mesmo texto (rótulos de outra bateria fora e listados) e eval offline no código atual |
-| 07:47:04 | 1172 | readme: números e linha do tempo (fill_readme, último passo) |
+| 07:59:55 | 1185 | reports: check.py --docker --scale completo e verde no código final da rodada 11 |
 
-Do primeiro ao último commit: **1172 min**, 159 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **1185 min**, 161 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>

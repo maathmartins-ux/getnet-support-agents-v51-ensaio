@@ -1,6 +1,6 @@
 # Linha do tempo (gerada do `git log`)
 
-Relógio: **47 min** de 03/11/2026 13:45:50 a 14:32:54 (commit de scaffold ('chore: scaffold') ao commit d5d5252 (--clock-end); horário do commit, fuso UTC). 39 commits dentro do relógio, 111 depois e 1 antes (declarados abaixo).
+Relógio: **47 min** de 03/11/2026 13:45:50 a 14:32:54 (commit de scaffold ('chore: scaffold') ao commit d5d5252 (--clock-end); horário do commit, fuso UTC). 39 commits dentro do relógio, 113 depois e 1 antes (declarados abaixo).
 Maior rajada: 28 commits em até 10 min a partir de 13:48:57.
 
 | min | hora | autor | arquivos | commit | relógio |
@@ -156,6 +156,8 @@ Maior rajada: 28 commits em até 10 min a partir de 13:48:57.
 | 1081.0 | 07:46:49 | Claude | 1 | `0b5ffec` docs: README com a página 4 de rotulagem e a causa do official-01 parcial (recursos da Get | pós-relógio |
 | 1081.2 | 07:47:02 | Claude | 1 | `b3db638` docs: DEMO dos oficiais regenerado da bateria da rodada 11 (ff8afed) | pós-relógio |
 | 1081.2 | 07:47:04 | Claude | 6 | `6f5100a` readme: números e linha do tempo (fill_readme, último passo) | pós-relógio |
+| 1082.8 | 07:48:36 | Claude | 4 | `513bea9` readme: números e linha do tempo (fill_readme, último passo) | pós-relógio |
+| 1094.1 | 07:59:55 | Claude | 1 | `b9adf4c` reports: check.py --docker --scale completo e verde no código final da rodada 11 | pós-relógio |
 
 Commits antes do relógio: anteriores ao início (o repositório antes do scaffold); não contam no tempo declarado.
 
