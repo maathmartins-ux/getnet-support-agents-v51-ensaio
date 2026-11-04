@@ -23,11 +23,11 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 <!-- scorecard:begin -->
 | medida | valor | como se mede |
 |---|---:|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 1.00 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
-| Oficiais resolvidas: pass^k (todas as rodadas) | 1.00 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
-| Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
-| Memória ao vivo: pass@1 | 0.95 | conversas de vários turnos: o fato do turno anterior chega à resposta |
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.97 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas: pass^k (todas as rodadas) | 0.90 | o mesmo, em todas as rodadas de cada cenário |
+| Juiz: respostas oficiais fundamentadas | 0.63 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Juiz: respostas oficiais úteis (helpful) | 0.70 | juiz LLM: a resposta resolve o que o lojista perguntou |
+| Memória ao vivo: pass@1 | 0.98 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.88 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
 | Busca: MRR | 0.84 | posição média da primeira página certa (1 = sempre em primeiro) |
 <!-- scorecard:end -->
@@ -345,8 +345,10 @@ e como comparar pela primeira entrega.
 | 21:08:15 | 533 | eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,984) |
 | 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
 | 22:32:42 | 618 | eval: offline com a ordem do denso e o portão pela nota do cross (gate de intenção 90,5%) |
+| 23:21:59 | 667 | eval offline no código atual (corpus com quebra de linha, cartão com listas fechadas, buscador dense+cross:base) |
+| 01:50:32 | 816 | guardrail (kit 75c0432): famílias novas da regex como suspeita que o classificador decide; sem LLM, falha fechada |
 
-Do primeiro ao último commit: **618 min**, 109 commits (aqui os 18 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **816 min**, 125 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
