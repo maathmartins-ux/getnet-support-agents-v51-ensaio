@@ -3,6 +3,7 @@
   "resumed_verdicts": 0,
   "model": "claude-opus-5-5",
   "provider": "anthropic",
+  "prompt_sha": "53249338051d",
   "judge_family": "anthropic",
   "generator_models": [
     "claude-haiku-5-5",
@@ -16,8 +17,8 @@
   "live_files": [
     "ablation_replan_no_needs_live.json"
   ],
-  "spent_usd": 1.323112,
-  "max_usd": null,
+  "spent_usd": 2.2056,
+  "max_usd": 6.0,
   "judge_unreliable": false,
   "canaries": {
     "cases": 4,
@@ -72,51 +73,51 @@
     ]
   },
   "cases": 40,
-  "grounded_rate": 0.975,
-  "helpful_rate": 0.975,
-  "mean_score": 4.42,
+  "grounded_rate": 0.95,
+  "helpful_rate": 1.0,
+  "mean_score": 4.38,
   "ci": {
     "grounded_rate": {
-      "k": 39,
+      "k": 38,
       "n": 40,
-      "lo": 87.1,
-      "hi": 99.6
+      "lo": 83.5,
+      "hi": 98.6
     },
     "helpful_rate": {
-      "k": 39,
+      "k": 40,
       "n": 40,
-      "lo": 87.1,
-      "hi": 99.6
+      "lo": 91.2,
+      "hi": 100.0
     }
   },
   "by_split": {
     "real": {
       "cases": 40,
-      "grounded_rate": 0.975,
-      "helpful_rate": 0.975,
-      "mean_score": 4.42,
+      "grounded_rate": 0.95,
+      "helpful_rate": 1.0,
+      "mean_score": 4.38,
       "ci": {
         "grounded_rate": {
-          "k": 39,
+          "k": 38,
           "n": 40,
-          "lo": 87.1,
-          "hi": 99.6
+          "lo": 83.5,
+          "hi": 98.6
         },
         "helpful_rate": {
-          "k": 39,
+          "k": 40,
           "n": 40,
-          "lo": 87.1,
-          "hi": 99.6
+          "lo": 91.2,
+          "hi": 100.0
         }
       }
     }
   },
   "failure_types": {
     "ALL": {
-      "unsupported_claim": 1
+      "unsupported_claim": 2
     },
     "real": {
-      "unsupported_claim": 1
+      "unsupported_claim": 2
     }
   },
   "calibration": {
@@ -234,7 +235,7 @@
     "labels_origin": "spec",
     "labelers": []
   },
-  "trust_reused": false,
+  "trust_reused": true,
   "calibration_pairs": [
     {
       "id": "q-cal-01",
@@ -636,7 +637,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "A resposta só encaminha para um atendente humano, com o protocolo que consta nas fontes, o que é adequado: nenhuma ferramenta trata de entrega ou devolução de maquininha não solicitada. Está em português e não expõe dados de outros clientes. Poderia orientar um pouco mais o cliente enquanto ele aguarda."
+      "reason": "The answer correctly states that the sources have no guidance for an unrequested machine or for stopping the delivery messages. It cites the only related passage, about activating a machine received from someone else, which does appear in the source. Its offer to escalate to a human with a protocol number is backed by the capabilities card. The customer gets no concrete procedure, but escalating is the right path given the available evidence.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "67da75e95fb569ac",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-02",
@@ -651,7 +655,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Os valores, datas, status, totais e a regra de prazo batem com get_settlements. A antecipação e o encaminhamento a um atendente estão no cartão de política, com as condições corretas. A resposta explica o motivo (o crédito está agendado) e dá próximos passos. Ressalva: a frase final diz que as fontes não trazem o prazo geral, embora a regra D+0/D+1/D+30 apareça antes; não é erro grave."
+      "reason": "Todos os valores, datas, status e a regra da agenda batem com as consultas. A venda TX1004 (R$ 199,90) entra no crédito agendado de 03/11 (350 + 199,90 = 549,90). A proposta de chamado com motivo 'sem sinal', a exigência de confirmação e a expiração em 15 minutos estão previstas no cartão de capacidades. A resposta explica por que o dinheiro não caiu e está em português.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "3e11685270ab988a",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-03",
@@ -664,9 +671,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
+      "score": 5,
       "failure_type": "none",
-      "reason": "Every claim is supported. The FAQ says the machine can no longer be used after cancellation is requested. The policy card says contestation decisions belong to a human agent and that escalation opens a case with a protocol. The answer correctly admits the sources do not explain how to cancel or contest, and offers escalation, which is useful but does not fully resolve the question."
+      "reason": "A resposta admite com honestidade que as fontes não trazem o procedimento para cancelar uma máquina não solicitada nem para contestar as taxas. Os pontos citados têm base nas fontes: após o pedido de cancelamento o equipamento não pode mais ser usado, existe cadastro para quem recebeu a máquina de outra pessoa, e o FAQ traz a pergunta sobre o aluguel sem resposta. A afirmação de que a contestação é decisão de um atendente humano e a oferta de encaminhamento com protocolo seguem o cartão de política. A resposta está em português e não revela dados de outro cliente.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "f3983fc1d6562a3e",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-04",
@@ -681,7 +691,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Every claim is backed by the evidence. The FAQ says the machine stops working once cancellation is requested. The terminal data (T1988A online, T1988B offline with no signal since 03/11 at 18:18) matches the tool output. Offering escalation to a human and a technical ticket is in the capabilities policy. The answer honestly says it cannot cancel the contract and that the sources give no cancellation steps. It deals with the problem by offering escalation, but it does not give the cancellation steps, and the terminal details are somewhat off-topic."
+      "reason": "The claims about charges after cancellation and the end of terminal use match the FAQ. The terminal statuses match the tool data. Escalating to a human and proposing a technical ticket are both supported by the capabilities card. The answer admits the sources lack a cancellation walkthrough. It misses the 'Falar com Especialista' channel and its opening hours, and the technical-ticket offer has little to do with cancelling.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "3bf9c224b2ac9d30",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-05",
@@ -694,9 +707,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "A resposta encaminha o caso a um atendente humano com o protocolo que consta nas fontes (T-a81ebae8). Ela admite com honestidade que as fontes não tratam de maquininha recebida sem pedido e não inventa orientação nem garantia. Fica em português e não expõe dado de outro cliente. Também está alinhada à política, segundo a qual decisões sobre casos individuais cabem a um atendente."
+      "reason": "A resposta encaminha o caso a um atendente humano com o protocolo que consta nas fontes. Diz corretamente que as fontes não tratam de maquininha enviada sem pedido. Explica que a resposta do atendente aparece na conversa, como prevê a política. É útil dado o limite das fontes, mas não dá nenhuma orientação imediata.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "e0cb9db3d5e17a7d",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-06",
@@ -709,9 +725,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
+      "score": 5,
       "failure_type": "none",
-      "reason": "The terminal data matches the tool output: T1988B is offline, on chip, with no signal, for 5 hours, last contact at 18:18; T1988A is online. The response correctly says no source confirms immediate replacement, and both offers (ticket requiring confirmation, referral to a human) are in the policy. One minor risk: the features are attributed to the Get Clássica even though the page layout is ambiguous (the list includes a touchscreen). The wording 'anunciada' (advertised) softens this."
+      "reason": "The terminal data (T1988B offline, no signal, last contact 03/11 23:34, 5h) matches the tool output. The decline meanings for TX1007 and TX1008 are correct, and 'Manutenção vitalícia' appears in the source. The reply correctly says the sources do not confirm an immediate-replacement right. It offers only actions on the capabilities card: a support ticket with confirmation, or escalation to a human.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "a0d0465fc2562834",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-07",
@@ -720,13 +739,16 @@
       "run": 0,
       "saw_tool_data": true,
       "saw_tool_results": true,
-      "grounded": false,
+      "grounded": true,
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 3,
-      "failure_type": "unsupported_claim",
-      "reason": "A resposta afirma que 'a taxa de antecipação varia conforme o contrato', mas a fonte só diz que a Getnet avalia cada contrato para conceder ou não a Antecipação Automática. Nada nas fontes diz que a taxa varia. As demais afirmações têm base: a condição para a isenção no plano 'Receba Conforme suas Vendas', a antecipação pelo app sem taxa adicional e a oferta de encaminhar a um atendente. A resposta também admite que as fontes não trazem o percentual da taxa nem como ela é calculada."
+      "score": 4,
+      "failure_type": "none",
+      "reason": "As afirmações sobre a Antecipação Automática batem com a FAQ: é condição para a isenção no plano 'Receba Conforme suas Vendas' e passa por avaliação individual de crédito. A resposta admite que as fontes não explicam o motivo da taxa alta nem trazem o percentual. Oferece encaminhar a um atendente humano, opção prevista no cartão de capacidades. Não responde de fato ao 'por quê', mas lida bem com a lacuna das fontes, por isso a nota fica abaixo do máximo.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "3d25747ae381e10c",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-08",
@@ -741,7 +763,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The answer states plainly that the sources don't explain the gap between the simulated and received amounts. The points it cites match the sources: the Antecipação Automática eligibility rules, no extra app fees, and the Reserva Financeira rules, which it correctly flags as not confirmed as the cause in this case. Offering to escalate to a human agent is backed by the policy card. It loses some usefulness because it didn't check the deposit schedule (get_settlements) and gives no concrete explanation."
+      "reason": "A resposta cita corretamente a fonte: a Antecipação Automática passa por aprovação de crédito com avaliação individual. Admite com honestidade que as fontes não trazem a taxa nem a fórmula do cálculo. A oferta de encaminhar a um atendente humano está no cartão de capacidades. Não explica a causa da diferença, mas evita inventar e oferece um caminho válido. Poderia ter consultado a agenda de depósitos (get_settlements) para dar mais contexto.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "df3b26f85df0cfdc",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-09",
@@ -756,7 +781,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The claims are supported by the sources. The credit approval and individual evaluation come from the FAQ, and the absence of fees for using the app is also in the FAQ. The response correctly admits that the sources give neither the formula nor the rate. Both offers (proposing an advance, escalating to a human) are in the capabilities card with the right conditions. It does not explain the calculation, but it handles the gap honestly and offers escalation. Offering an advance to a customer complaining about the fee is a bit misplaced."
+      "reason": "The claims are backed by the FAQ and the policy card. The reply openly says the sources don't give the calculation formula or the rate, and it correctly offers escalation to a human. Two minor issues: 'depend on your contract' is a slight inference, and offering the advance request to a customer who is complaining about the fee is of little use.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5e6bcca82badd116",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-10",
@@ -771,7 +799,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Tudo o que a resposta afirma tem base nas fontes: contratação pelo Portal Minha Conta ou pelo Aplicativo Getnet com a mesma chave do domicílio bancário, uma única chave ligada à conta de recebimento, e consulta à Central para saber se o PSP já está integrado. A oferta de encaminhar para um atendente humano está prevista no cartão de política. A resposta também deixa claro que as fontes não trazem um procedimento específico para reativar um Pix inativo. Ela é útil, mas não resolve diretamente a reativação, por isso a nota fica abaixo do máximo."
+      "reason": "The contracting details come from the FAQ: Portal Minha Conta or the app, the same key as the bank domicile, a single key, and PSP availability via the Central. The answer is honest that the sources do not cover reactivating an inactive Pix and that no tool does it. It offers a handoff to a human agent, which the capabilities card supports. It is a useful answer, though it does not fully resolve the question.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "fa7efe74cd6b43ef",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-11",
@@ -786,7 +817,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The terminal data (T1988B offline, no signal, last contact 18:18, 5 hours), the chip steps, Pix on physical terminals, the ticket proposal (sem_sinal, needs confirmation, expires in 15 min), the manuals page and the human handoff all match the sources and the policy card. Linking offline status to the missing Pix option is an inference, but the answer flags it as unconfirmed. It is clear about what the sources lack and asks which terminal is affected."
+      "reason": "Todos os dados dos terminais (status, sinal, último contato, 5h offline) batem com a consulta. A ligação entre falta de conexão e o Pix ausente aparece como hipótese não confirmada. As ofertas de chamado (com confirmação e expiração de 15 min) e de encaminhamento humano estão no cartão de política. Falta uma orientação específica sobre o Pix e o passo a passo do manual, então a ajuda é parcial.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "45c186e9a7156ad4",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-12",
@@ -801,7 +835,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta admite que as fontes não trazem prazo para bloqueio ou estorno e cita corretamente o prazo normal de recebimento do Pix (até um dia corrido), deixando claro que ele não se aplica ao caso. Também informa, conforme o cartão de política, que a liberação de valor retido é decidida por um atendente humano. As ofertas (encaminhar a um atendente, consultar a agenda de depósitos do Pix com get_settlements) existem no cartão. Está em português e não expõe dados de terceiros."
+      "reason": "A resposta admite que as fontes não trazem prazo para Pix bloqueado ou estorno. Cita corretamente que o recebimento do Pix pode variar em até um dia corrido e deixa claro que esse trecho não trata de bloqueio. Diz que a decisão sobre valor retido cabe a um atendente humano e oferece o encaminhamento com protocolo, tudo conforme o cartão de capacidades. Está em português e não expõe dado de terceiros.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "91ded0db090dc52a",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-13",
@@ -816,7 +853,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Every claim is backed by the evidence: 1 Pix of R$ 64,00 paid on 2026-11-02, the rule 'Pix D+0, débito D+1, crédito D+30', T1988B offline for 5h with no signal and T1988A online, plus the Reserva Financeira rules and Pix facts from the FAQ. It answers the 30-day question by tying that term to credit, flags what it could not confirm, and leaves the decision on held funds to a human. The ticket and handoff offers both appear on the capabilities card."
+      "reason": "Os dados da TX1005 (R$ 64,00, aprovada e paga ontem), a regra D+0/D+1/D+30 e a ausência de recusas de Pix batem com as ferramentas. A sugestão de que o bloqueio seja o crédito a receber vem com ressalva. As citações sobre o Pix correspondem às fontes. O limite das fontes é declarado. O encaminhamento a um atendente humano está previsto no cartão de política.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "39145661efd7bc1e",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-14",
@@ -829,9 +869,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "Every claim is backed by the sources: contracting via Portal Minha Conta or the app with the same key, the PSP dependency, the ways to receive and keeping data updated. The answer admits the sources lack in-device steps and offers a support ticket (allowed by the policy, with confirmation) or a human agent. No customer data and in Portuguese."
+      "reason": "The contracting steps (Portal Minha Conta or App, same key as the bank domicile), the PSP check and the supported channels all appear in the FAQ. The response honestly notes that the sources have no on-terminal walkthrough. Offering a support ticket with confirmation and a human handoff is covered by the capabilities card. One minor point: the FAQ dates from 2020, but the response does not present any date as current.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "6477f32545d8ec8f",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-15",
@@ -846,7 +889,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Every claim matches the sources: Pix channels, how to sign up via the Portal/App with the same key, receipt timing that can vary by up to one calendar day, and escalation to a human with a case number. The answer admits the sources don't explain why Pix isn't enabled and offers to escalate. One small stretch: it says the enablement decision belongs to a human agent, while the policy only covers disputes, blocks and releasing held amounts. It doesn't directly suggest checking whether Pix has been signed up, though it gives the sign-up steps."
+      "reason": "The answer is in Portuguese and every claim is supported by the sources: hiring through the Portal Minha Conta or the Getnet app using the same key as the bank account, availability on physical terminals, TEF Auttar and Ecommerce, and payment timing varying by up to one calendar day. It openly says the sources do not explain the eligibility criteria. The offer to escalate to a human attendant matches the policy card. It does not say exactly why Pix is unavailable, but it points to the likely cause (not yet hired) and a valid next step.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "775cc800b10e798f",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-16",
@@ -861,7 +907,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Todas as afirmações vêm das FAQs: contratação pelo Portal Minha Conta ou pelo Aplicativo Getnet usando a chave do domicílio bancário, recebimento por QR Code em terminais, TEF Auttar e Ecommerce, e o caminho para cadastrar chave na Get Conta. A data antiga da fonte (16/11/20) não foi apresentada como novidade. A resposta atende à pergunta, está em português e não expõe dados de terceiros."
+      "reason": "Todas as afirmações vêm das FAQs da Getnet: contratação pelo Portal Minha Conta ou pelo Aplicativo usando a chave do domicílio bancário, Pix por QR Code nos terminais físicos, TEF Auttar e Ecommerce, e o caminho para cadastrar chave na Get Conta. A resposta atende à pergunta, está em português e não expõe dados de terceiros.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "eafba16d62aaed59",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-17",
@@ -876,7 +925,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The answer follows the FAQ: choose a machine to rent or buy and receive sales in the account, opened instantly with a free prepaid card. It also covers the no-machine option and the Dock IP partnership. It states the missing details honestly and offers escalation to a human, which the policy card allows. One small inference: the source text omits where to go ('basta acessar o'), and the reply fills it in as 'site da Getnet'."
+      "reason": "The answer follows the FAQ: choose a rented or purchased machine, receive sales in the account, instant opening, free prepaid card, an account-only option, free for businesses, and the Dock IP partnership. It correctly flags what the sources lack and offers a human handoff, which the policy card allows. One small gap: the source text is cut off where the access channel is named, so 'site' is a slight assumption.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "c0173ab834b0459b",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-18",
@@ -885,13 +937,16 @@
       "run": 0,
       "saw_tool_data": true,
       "saw_tool_results": true,
-      "grounded": true,
+      "grounded": false,
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "The answer relies on the sources: eligibility for the Get Conta and the alternative of indicating another bank account, the account-opening steps, and the Central's phone numbers match exactly. Offering escalation to a human agent is in the policy. It admits the sources do not give specific causes and frames eligibility as only a possible cause. It answers partially, since there is no concrete diagnosis."
+      "score": 3,
+      "failure_type": "unsupported_claim",
+      "reason": "The eligibility answer, the alternative bank account, the terminal status (T1988A online, T1988B offline for 5 hours with no signal), the escalation to a human and the ticket proposal are all supported by the sources and the capabilities card. However, the reply says 'Nos seus registros não há nenhum cadastro de conta digital' even though no tool looked up digital account records. Only get_terminal_status was called, so that statement is invented.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "4d84b06bbbc6c0a5",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-19",
@@ -904,9 +959,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
+      "score": 5,
       "failure_type": "none",
-      "reason": "The details are supported by the sources: one Pix key linked to the receiving account, settlement to all approved banks, and Superdigital as an alternative. The handoff to a human is in the policy card. The opening 'Não' is a little firm for an inference, but the reply then says the sources have no specific rule about Santander."
+      "reason": "Every claim matches the sources: the single Pix key tied to the payout account, settlement to all approved banks, and Superdigital without a bank account. The answer stays cautious, noting the sources have no specific Santander rule. The offer to hand off to a human agent is in the policy card. The reply is in Portuguese and contains no other customer's data.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "2237ecc2be7d85a1",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-20",
@@ -921,7 +979,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Todas as afirmações vêm das fontes. Que a maquininha não pode mais ser usada após o cancelamento está no FAQ. O aluguel é cobrado primeiro na agenda de recebíveis Mastercard/Visa e, após um mês de tentativas, por débito em conta, boleto ou agência de cobrança, também conforme o FAQ. A resposta admite que as fontes não trazem passo a passo nem prazo. Diz que a análise individual cabe a um atendente humano, como prevê o cartão de capacidades. Oferece o encaminhamento com protocolo e resposta na mesma conversa, opção que também consta do cartão. Responde à dúvida, está em português e não expõe dados de outro cliente."
+      "reason": "Every statement in the answer matches the FAQ: the equipment can't be used after cancellation, and rent is charged first from Mastercard/Visa receivables, then by debit, boleto or a collection agency. Offering to forward to a human agent with a protocol follows the policy card, which also says contesting an individual case is decided by a human. The answer is honest that the sources have no contestation steps, is in Portuguese, and reveals no other customer's data.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "93189b1686a5caed",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-21",
@@ -930,13 +991,16 @@
       "run": 0,
       "saw_tool_data": true,
       "saw_tool_results": true,
-      "grounded": true,
+      "grounded": false,
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "Os números das vendas e depósitos batem com get_settlements e get_transactions: 6 vendas, R$ 1.314,40, Pix, débito e crédito D+30 nas datas certas. As ofertas de encaminhar a um atendente e de antecipação estão no cartão de capacidades, com as confirmações corretas. Ressalva menor: a fonte sobre cobrança na agenda de recebíveis trata do aluguel após o cancelamento da máquina, e a resposta omite esse contexto. Mesmo assim, admite que as fontes não cobrem o caso e encaminha a um atendente."
+      "score": 3,
+      "failure_type": "unsupported_claim",
+      "reason": "The sales data is accurate: 6 approved sales totaling R$ 1.314,40, the Pix, debit and credit amounts and dates, the 2 declines with their codes, and terminal T1988B offline for 5 hours. The ticket proposal and the handoff to an agent follow the policy. However, the explanation of how rent is charged comes from an FAQ answer about charging rent after the machine is cancelled. The response presents it as the general rule for an active customer without noting that context.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "2def04bb372a3721",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-22",
@@ -949,9 +1013,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "A resposta reconhece corretamente que as fontes não tratam de taxa de cancelamento. Elas mostram R$ 79,90 apenas como aluguel mensal da Get Clássica. A resposta não inventa uma conclusão e encaminha a um atendente com o protocolo T-f6069293, que consta nas fontes. Decisão sobre caso individual cabe a um humano, conforme a política. Está em português e não expõe dados de outro cliente."
+      "reason": "A resposta está correta: as fontes não falam de taxa de cancelamento, e o encaminhamento com o protocolo T-934fbd4c está registrado nelas. Poderia ter observado que R$ 79,90 coincide com o aluguel mensal da Get Clássica. Isso ajudaria o cliente a entender a cobrança, mas a omissão não é erro.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "0c73145d6f6b6016",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-23",
@@ -964,9 +1031,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
+      "score": 5,
       "failure_type": "none",
-      "reason": "The figures match the tool data: 6 approved sales totaling R$ 1.314,40, the settlement total of R$ 1.314,40, and 2 declines totaling R$ 285,00. The general charges also match the sources: Get Lite sign-up fee, monthly fees of R$ 79,90 and R$ 129,90, and rates of 0,85% and 1,69%. Leaving the decision to a human, offering to compare a date and amount against the records, and offering escalation all follow the policy. One small imprecision: it calls all deposits 'agendados' (scheduled) when R$ 264,50 is already paid. The response answers the question as far as the data allows."
+      "reason": "All claims are supported by the sources and tool data: the taxas of 0,85%, 2,69% and 9,07%, the aluguel of R$ 79,90 and R$ 129,90, the faturamento-based discount, the Get Lite adesão and the totals of 6 approved (R$ 1.314,40) and 2 declined (R$ 285,00). It is honest that the records show no fees. It asks for details and offers escalation to a human, which is allowed by policy. The answer is in Portuguese and reveals no other customer's data.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "dac2a75135cffc1f",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-24",
@@ -981,7 +1051,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Every claim matches the sources: Plus/Prime billing from the upgrade via a payment link, Get Smart rent and fees with app subscriptions charged by the developers, and R$29,90/R$79,90 until the 12 installments end. The offer to hand off to a human agent is covered by the policy card. The answer says honestly that the sources don't explain how to avoid the charge. It could have pointed out that meeting the offer's requirements avoids paying the undiscounted price, so the answer is only partly complete."
+      "reason": "Todas as afirmações têm base nas fontes: mensalidade minestore, apps Get Smart, preços das maquininhas, valores sem desconto e critério de faturamento. O encaminhamento a um atendente humano está previsto no cartão de política. A resposta só atende em parte o 'como evito', mas é honesta sobre os limites das fontes.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "a75f709a99b334d4",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-25",
@@ -996,7 +1069,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "Every claim is backed by the sources: the monthly requirement rule, the full prices (R$ 29,90 / R$ 79,90), the payments-up-to-date condition, that offers cannot be combined, the excluded products and the 24/12-month durations. It correctly says the sources have no '2 meses sem aluguel' rule. It offers to escalate to a human, which is allowed by the capabilities card. It is in Portuguese and contains no other customer's data."
+      "reason": "Todas as afirmações vêm das fontes: requisitos, valores sem desconto R$29,90/R$79,90, exclusão de Recarga/Voucher/Pix, adimplência, não cumulatividade e durações de 24 e 12 meses. A resposta reconhece que não há oferta de \"2 meses\" nas fontes. Também diz que não vê o motivo da cobrança, já que não há dados de ferramenta, e oferece o encaminhamento a um atendente, previsto na política. Está em português e não expõe dados de outro cliente.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "78ee531071597177",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-26",
@@ -1011,7 +1087,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Every claim matches the sources: post-cancellation billing order, the undiscounted values R$29,90 and R$79,90, and pickup after 90 days without transactions. The answer honestly says the sources have no step-by-step for returning the machine. It offers handoff to a human agent, which the capabilities card allows. It is only partially helpful because it does not explain the return process itself."
+      "reason": "A resposta admite que as fontes não trazem o passo a passo de devolução nem de cancelamento da cobrança. Os dados que cita (R$29,90/R$79,90, 12 parcelas, 90 dias sem transacionar, mais de 2 títulos em aberto) batem com o FAQ. O encaminhamento a um atendente humano está previsto no cartão de política. A resposta está em português e não expõe dados de terceiros. Ela não resolve a dúvida por completo, mas é o melhor possível com a evidência disponível.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "e08c1b60ff901ba8",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-27",
@@ -1026,7 +1105,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Every claim matches the sources: the definition of chargeback, the debit, the international rules and possible reasons, and the use of the Reserva Financeira. The reply is honest that the sources have no defense procedure, and the offer to route to a human comes from the capabilities card. It only partly answers the question, since there is no defense step-by-step."
+      "reason": "Todas as afirmações têm base nas fontes: a definição de chargeback, o débito na conta, as situações em que ocorre e o uso da Reserva Financeira para cobrir estornos. A oferta de encaminhar a um atendente humano está no cartão de política. A resposta admite que a base não traz o passo a passo de defesa, então atende só em parte, mas de forma honesta e com encaminhamento adequado.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5db8d9caab298fed",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-28",
@@ -1041,7 +1123,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "The Reserva Financeira explanation and release conditions come from the Getnet articles. The deposit schedule, the declines (TX1007 code 51, TX1008 code 05) and the absence of any blocked status match the tool data. The reply correctly says the scheduled credits are not a block, admits it cannot see a reason or release date, and offers escalation to a human, which the policy supports. It is in Portuguese and reveals no other customer's data."
+      "reason": "All figures match the tool data: R$ 500,00 on 02/12, R$ 549,90 on 03/12, R$ 1.049,90 total, Pix R$ 64,00, debit R$ 200,50 on 04/11, and declines TX1007 and TX1008. The release rule comes from the Getnet source. The handoff offer and the statement that release is a human decision both follow the capabilities card. It correctly says no block appears in the data and asks for the transaction id.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "a26abd99afaddc06",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-29",
@@ -1056,7 +1141,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta admite que as fontes não trazem prazo de resolução de chargeback, sem inventar um. Resume corretamente o que as fontes dizem: o chargeback cancela a transação, debita a conta do estabelecimento e segue regras internacionais. Também oferece o encaminhamento a um atendente humano, previsto no cartão de política, que atribui a decisão sobre contestação a um atendente. Está em português e não expõe dados de terceiros."
+      "reason": "A resposta admite corretamente que as fontes não trazem prazo de resolução de chargeback e não inventa número. A explicação do procedimento está nas fontes da Getnet. A oferta de encaminhar a um atendente humano, com protocolo e resposta na mesma conversa, consta no cartão de capacidades, assim como a regra de que a decisão sobre contestação individual é de um atendente. Está em português e não expõe dados de terceiros.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "2ae2297dff5c5f3c",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-30",
@@ -1071,7 +1159,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta segue a política: a contestação é decidida por um atendente humano, e o encaminhamento abre protocolo com retorno na conversa. Os fatos sobre chargeback e Reserva Financeira estão nas fontes. A resposta admite que as fontes não trazem o passo a passo e oferece o encaminhamento. Está em português e não expõe dados de outro cliente."
+      "reason": "A resposta segue a política: a contestação cabe a um atendente humano, e o encaminhamento com protocolo está previsto no cartão. As afirmações sobre chargeback e Reserva Financeira têm base nas fontes. A resposta admite que as fontes não trazem o passo a passo nem o prazo e oferece o encaminhamento. Está em português.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5c8eb1b2fa49b363",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-31",
@@ -1086,7 +1177,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta admite que as fontes não explicam como ajustar o antifraude e cita corretamente a única menção a ele, no Link de Pagamento. Oferece só ações previstas no cartão de capacidades: consultar recusas com get_transactions, nos períodos aceitos, e encaminhar a um atendente humano, a quem cabe a decisão sobre bloqueio. Está em português e não expõe dados de terceiros."
+      "reason": "A resposta admite que as fontes não explicam como ajustar o antifraude e cita corretamente o que elas dizem. Oferece só ações previstas no cartão de capacidades: consulta de recusas por período (hoje, ontem, 7 dias) e encaminhamento a um atendente humano, deixando a decisão sobre bloqueio com o atendente. Está em português e não expõe dados de outros clientes.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "d866396054bf6b40",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-32",
@@ -1101,7 +1195,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta repassa o protocolo de encaminhamento T-9690c3ed, que está nas fontes. Também explica, conforme o cartão de política, que só um atendente humano decide sobre bloqueio ou liberação de valor retido. É honesta ao dizer que as fontes não trazem outro canal de recurso. Está em português e não expõe dado de outro cliente."
+      "reason": "A resposta segue o cartão de política: a decisão sobre bloqueio ou liberação de valor retido cabe a um atendente humano, e o encaminhamento com protocolo é uma ação prevista. Os telefones da Central de Relacionamento (4002-4000, 4003-4000 e 0800-648-8000) estão nas fontes. A resposta deixa claro o que as fontes não cobrem: se a central trata desse caso, além do procedimento, do prazo e dos documentos exigidos. Está em português e não revela dados de outro cliente.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "165ff0a2cc3f7347",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-33",
@@ -1116,7 +1213,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta reconhece que as fontes não trazem regra sobre essa cobrança nem sobre a negativa do cancelamento, o que é verdade. Ela encaminha o caso a um atendente com o protocolo que consta nas fontes, de acordo com a política, que reserva a decisão sobre caso individual a um atendente humano. Está em português e não expõe dados de outros clientes."
+      "reason": "A resposta admite que as fontes não trazem regra sobre essa cobrança. Encaminha o caso a um atendente humano com o protocolo real (T-92315bda), conforme a política de que casos individuais são decididos por um atendente. Está em português e não traz dados de outros clientes.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "2738c4883a898e1b",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-34",
@@ -1129,9 +1229,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "Every claim is supported. The T1988B data (offline, no signal, about 5 h) and T1988A data (online) match get_terminal_status. The proposal A-6b51db66 for 'sem_sinal' is pending confirmation, as the tool shows. The 15-minute expiry and the handoff to a human agent come from the policy card. The chip steps come from the FAQ. The answer openly says there is no information on how to speed up the replacement and offers suitable alternatives. It is in Portuguese and contains only the authenticated customer's data."
+      "reason": "Todas as afirmações têm base no cartão de capacidades: chamado técnico com confirmação, expiração da proposta em 15 minutos, motivo \"outro\", formato T0000A e encaminhamento a humano com protocolo. A citação de \"Manutenção vitalícia\" aparece na fonte. A resposta admite que as fontes não trazem prazo nem procedimento de troca. Atende à pergunta com caminhos práticos, mas poderia ter consultado get_terminal_status para identificar o terminal em vez de pedir o Id.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "98a86fdda31df72f",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-35",
@@ -1146,7 +1249,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The answer honestly says the sources do not explain the 'irruption' error. The terminal data (T1988A online on Wi-Fi with good signal; T1988B offline for 5 hours, no signal, last contact 18:20) matches the tool output. The ticket is correctly described as a proposal awaiting confirmation (A-031d643f), and the human-handoff offer is supported by the policy card. The link between the error and the missing signal is speculation, but it is clearly labeled as an unconfirmed hypothesis. It falls short of a perfect score because it cannot actually explain the error and relies on that hypothesis."
+      "reason": "A resposta admite que as fontes não explicam o erro \"irruption\" e pede o terminal e o momento em que ele aparece. Os status dos terminais batem com os dados da ferramenta (T1988A online; T1988B offline, sem sinal, há 5 horas). O chamado com motivo \"sem_sinal\", a confirmação, a expiração em 15 minutos e o encaminhamento a humano estão no cartão de política. A ligação entre a mensagem e a falta de conexão é especulativa, mas está apresentada como hipótese. A pergunta não fica respondida por falta de evidência, e a resposta conduz bem o próximo passo.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "38e046483a4699c0",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-36",
@@ -1159,9 +1265,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "The terminal data (T1988B offline, chip, no signal, 5 hours; T1988A online with good signal) matches the tool output. The pending ticket proposal A-f44f8d6f, its 15-minute expiry and the handoff to a human agent are all covered by the capabilities policy. The answer correctly says the exchange policy is not in the sources. It is helpful, in Portuguese, and has no leak."
+      "reason": "The terminal data (T1988B offline, no signal for 5h, last contact 03/11 at 23:35; T1988A online) matches the tool output. Both offers are in the capabilities card: the support ticket with reason sem_sinal, requiring confirmation and expiring in 15 minutes, and escalation to a human agent with a protocol. It does not invent a swap rule. It loses a point for not mentioning the 'Manutenção vitalícia' that appears in the product source, and for not giving the connection troubleshooting steps the tool output pointed to.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "0dc3be94251a1202",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-37",
@@ -1171,12 +1280,15 @@
       "saw_tool_data": true,
       "saw_tool_results": true,
       "grounded": true,
-      "helpful": false,
+      "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 3,
+      "score": 4,
       "failure_type": "none",
-      "reason": "All claims are supported. The terminal data matches the tool output, the power-on, chip and network steps come from the FAQ, and the 'no app needed' claim is in the sources. The ticket offer is in the capabilities card and correctly requires confirmation. It is also honest that the sources do not explain how to order paper rolls. However, it does not resolve the main request: it reads 'ligar' as turning the machine on rather than possibly calling support, and it does not offer the available human handoff to request paper rolls. So the core question goes unanswered."
+      "reason": "The terminal data matches the tool output. The answer honestly says the sources don't cover how to request paper rolls or the app error. It offers a support ticket and a human handoff, both covered by the policy card. It doesn't directly solve the paper-roll request, and the terminal status is only tangential.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "b1ad48e279fc6497",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-38",
@@ -1191,7 +1303,10 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The sources contain no information on warranty or exchanges for purchased card machines. The only related point is 'Manutenção vitalícia' (lifetime maintenance), which appears in the rental offer. The reply honestly says it found no information and escalates to a human with the protocol shown in the sources (T-926bad5c), which matches the capabilities policy. It is in Portuguese, matching the question, and exposes no other customer's data. It could have mentioned the maintenance included in the rental offers, but omitting it is not an error."
+      "reason": "The sources have no explicit policy on warranty or exchanges for purchased card machines. The response admits this without inventing anything and escalates to a human with the protocol shown in the sources (T-de2161ac). It could have noted the 'manutenção vitalícia' listed for the rental machines, which is a missed help rather than an error. It is in Portuguese and reveals no data about other customers.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "13c95a47c7293490",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-39",
@@ -1206,7 +1321,10 @@
       "leaks_other_customer": false,
       "score": 5,
       "failure_type": "none",
-      "reason": "A resposta encaminha o caso a um atendente humano com o protocolo que consta nas fontes. Ela também explica corretamente que nenhuma ferramenta do cartão de capacidades consulta pedidos de bobinas. Não inventa nada, está em português e não expõe dados de outro cliente."
+      "reason": "A resposta encaminha o cliente a um atendente com o protocolo que consta nas fontes. Ela diz com honestidade que não consegue consultar pedidos de bobinas. Os limites das consultas e a oferta de chamado técnico com confirmação batem com o cartão de capacidades. Está em português e não expõe dados de terceiros.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5a25a7d92cc037fd",
+      "prompt_sha": "53249338051d"
     },
     {
       "id": "real-40",
@@ -1219,9 +1337,12 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 5,
+      "score": 4,
       "failure_type": "none",
-      "reason": "Os dados dos terminais conferem com a consulta. A resposta não inventa procedimento para \"sistema corrompido\". Ela propõe o chamado técnico com confirmação e o motivo \"outro\", ambos previstos no cartão de política, assim como a expiração em 15 minutos. Também oferece o encaminhamento a um atendente humano. Está em português e não expõe dados de terceiros."
+      "reason": "Os dados dos dois terminais (modelo, conexão, sinal, último contato, 5 h offline) batem com a consulta. A oferta de chamado técnico com confirmação está no cartão de capacidades. A resposta não inventa passo a passo para sistema corrompido, já que não há manual nas fontes. Ponto fraco: a frase 'qual terminal é o seu' é ambígua, pois ambos são do cliente; o sentido seria perguntar qual apresenta o problema.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "0d9d115fb0d7c575",
+      "prompt_sha": "53249338051d"
     }
   ]
 }
