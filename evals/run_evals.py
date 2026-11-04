@@ -396,7 +396,7 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
 
     token = _CASE_DB.set(db) if db else None
     scope_token = CASSETTE_SCOPE.set(scope or case["id"])  # cassete: cada caso/rodada acha a SUA resposta
-    t0, prior_cost = time.perf_counter(), 0.0
+    t0, prior_cost, turn_ms = time.perf_counter(), 0.0, None
     try:
         if db:  # o gancho precisa valer AQUI, na thread do caso; senão é crash, não medida contaminada
             from app.store import get_store
@@ -408,7 +408,9 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
             conv = sent["conversation_id"]
             # turnos anteriores também gastam: sem eles o teto do split subestimava o custo dos casos de memória
             prior_cost += (sent.get("usage") or {}).get("cost_usd", 0) or 0
+        t_turn = time.perf_counter()  # só o turno avaliado: os `steps` da resposta são dele, não dos de `before`
         got, crash = client.send(case["message"], user, conv), None
+        turn_ms = round((time.perf_counter() - t_turn) * 1000, 1)
     except Exception as exc:  # crash vira métrica, não derruba o relatório
         got, crash = {}, f"{type(exc).__name__}: {exc}"
     finally:
@@ -416,8 +418,9 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
         if token is not None:
             _CASE_DB.reset(token)
     ms = (time.perf_counter() - t0) * 1000
+    # `ms` cronometra a conversa inteira (turnos de `before` inclusos); `turn_ms` só o último turno (None = crash)
     row = {"id": case["id"], "split": case["split"], "message": case["message"], "ms": round(ms, 1),
-           "expected_intent": case["expect"].get("intent"),
+           "turn_ms": turn_ms, "expected_intent": case["expect"].get("intent"),
            "checks": score(case, got) if not crash else {"intent": False}, "crash": crash,
            "got_intent": got.get("intent"), "route": got.get("route", []), "replans": got.get("replans", []),
            "engine": got.get("engine"), "answer": got.get("answer", ""),

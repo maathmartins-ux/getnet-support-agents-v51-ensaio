@@ -193,7 +193,7 @@ Latência e custo: p50 19.2 s · p95 25.1 s · US$ 0.693996 no split.
 Casos com alguma checagem falhando: `replan-07`, `replan-09`.
 <!-- eval-live:end -->
 
-## Onde vai o tempo e quem decide (ao vivo: SLO por split, fatia por agente, LLM × código)
+## Onde vai o tempo e quem decide (ao vivo: SLO por split, fatia por agente, supervisor LLM × plano do router × código)
 
 <!-- trace:begin -->
 <!-- trace:end -->

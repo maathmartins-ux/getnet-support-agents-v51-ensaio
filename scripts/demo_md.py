@@ -9,13 +9,16 @@ evals/results/live_<split>.json (1ª rodada de cada caso) e escreve, por cenári
 agentes, ferramentas, fontes, números sem base, resposta e custo. O cabeçalho carimba o commit e a data.
 
 Árvore de passos (o trace legível por caso): quando a linha traz `steps` (a resposta do /chat), cada cenário mostra
-agente → status/motivo → ms → ferramenta com args → prévia do resultado → quem decidiu o passo ("decidido por:
-supervisor LLM" ou "código (regra)", lido de `decided_by`/`why`; passo gravado sem o campo sai "não registrado").
+agente → status/motivo → ms → ferramenta com args → prévia do resultado → quem decidiu o passo, lido de
+`decided_by`/`why` ("decidido por: supervisor LLM (tool call)", "plano do router, rodado pelo atalho sem o
+supervisor" ou "... pelo motor de tabela", "código (regra)", "operadora <nome>"; passo gravado sem o campo sai "não
+registrado").
 `--transcript`: roda NO PROCESSO (o LLM que o ambiente tiver; sem chave, o modo offline) uma conversa multi-turno
 descrita em JSONL — {"user": "u1"} na 1ª linha; depois {"say": "..."}, {"confirm": true} (confirma a última ação
 proposta e mostra o antes/depois da escrita) e {"say": "...", "operator": "resposta", "wait_s": 5} (a operadora
 simulada responde o caso durante a espera síncrona, app/hitl_sync.py, com chave pessoal: o nome dela vai para o
-passo e para a auditoria) — e escreve a transcrição com a árvore.
+passo e para a auditoria) — e escreve a transcrição com a árvore. O que a transcrição diz da operadora vem do status
+do POST dela e da árvore do turno, não do roteiro.
 """
 
 from __future__ import annotations
@@ -72,43 +75,62 @@ def _short(value, limit: int = 140) -> str:
     return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
-DECIDED_LABEL = {"llm": "supervisor LLM", "code": "código"}
+# Ao vivo, o plano vem do router LLM OU de uma regra que o substitui (seguimento herdado, guarda da própria empresa,
+# queda do LLM para as palavras-chave); a linha ao vivo não grava qual dos dois, então o rótulo não diz "LLM".
+ROUTER_LLM = ""
+ROUTER_RULES = "regras, sem LLM"
+# Por onde rodou o agente que o plano do router escolheu (supervisor.ROUTER_WHY), sem consultar o supervisor LLM.
+ROUTER_LABEL = {
+    "fast_path": "rodado pelo atalho sem o supervisor",
+    "plan": "rodado pelo motor de tabela",
+}
 # A regra do código que pôs o passo no turno (supervisor.CODE_WHY), dita para quem lê o DEMO sem abrir o código.
 WHY_LABEL = {
     "needs": "achado `needs` de outro especialista",
     "escalation": "escalada garantida: ninguém resolveu",
-    "table": "motor determinístico",
-    "fast_path": "atalho de 1 passo",
-    "operator": "resposta do operador",
+    "table": "FALLBACK do domínio ou router incerto",
     "budget": "orçamento do turno esgotado",
-    "lead": "1º passo do plano, antes do supervisor LLM",
+    "lead": "1º passo do plano do router, rodado antes do supervisor LLM",
     "hold": "caso aberto: modo espera",
 }
 
 
-DECIDED_LEGEND = ("Em cada passo, **decidido por** diz quem o pôs no turno: o supervisor LLM (pediu a tool) ou o "
-                  "código, com a regra entre parênteses (`supervisor.CODE_WHY`); \"não registrado\" = passo gravado "
-                  "antes do campo `decided_by`.")
+DECIDED_LEGEND = ("Em cada passo, **decidido por** diz quem pôs o agente no turno: o supervisor LLM (tool call); o "
+                  "plano do router (o router LLM, ou a regra que o substitui: seguimento herdado, guarda da própria "
+                  "empresa, queda do LLM), quando o supervisor LLM não foi consultado (rodado pelo atalho de 1 passo "
+                  "ou pelo motor de tabela); o código, com a regra entre parênteses "
+                  "(`supervisor.CODE_WHY`); ou a operadora que respondeu o caso. \"não registrado\" = passo gravado "
+                  "sem o campo `decided_by`.")
+RULES_NOTE = ("Nesta execução não havia LLM: o plano do router veio das regras de palavras-chave "
+              "(`router.classify_offline`) e o motor de tabela fez o papel do supervisor.")
 
 
-def decided(st: dict) -> str:
-    """Quem decidiu o passo: o supervisor LLM (tool call) ou o código, com a regra entre parênteses.
+def decided(st: dict, router: str = ROUTER_LLM) -> str:
+    """Quem decidiu o passo: o supervisor LLM (tool call), o plano do router (`router` diz se foi o LLM ou as
+    regras), o código (com a regra entre parênteses) ou a operadora que respondeu.
 
-    Passo gravado antes do campo `decided_by` sai "não registrado": a decisão não é deduzida dos replanos nem do
-    motor do turno, porque um mesmo turno mistura passos dos dois.
+    Passo gravado sem o campo `decided_by` sai "não registrado": a decisão não é deduzida dos replanos nem do
+    motor do turno, porque um mesmo turno mistura passos de origens diferentes.
     """
-    who = st.get("decided_by")
+    who, why = st.get("decided_by"), st.get("why")
     if not who:
         return "decidido por: não registrado"
+    if who == "llm":
+        return "decidido por: supervisor LLM (tool call)"
+    if who == "router":
+        how = ROUTER_LABEL.get(why) or _short(why or "sem motivo", 40)
+        return f"decidido por: plano do router{f' ({router})' if router else ''}, {how}"
     if who == "code":
-        why = st.get("why")
         return f"decidido por: código ({WHY_LABEL.get(why) or _short(why or 'sem regra', 40)})"
-    return f"decidido por: {DECIDED_LABEL.get(who) or _short(who, 40)}"
+    if who == "operator":
+        name = st.get("operator")
+        return f"decidido por: operadora `{_short(name, 40)}`" if name else "decidido por: operadora (sem nome)"
+    return f"decidido por: {_short(who, 40)}"
 
 
-def step_tree(steps: list[dict]) -> list[str]:
+def step_tree(steps: list[dict], router: str = ROUTER_LLM) -> list[str]:
     """Linhas markdown da árvore de passos: um item por agente (terminando em quem decidiu o passo), sub-itens por
-    ferramenta."""
+    ferramenta. `router`: de onde veio o plano do router nestas respostas (ROUTER_LLM ou ROUTER_RULES)."""
     out = []
     for n, st in enumerate(steps, 1):
         extra = [f"motivo `{st['reason']}`"] if st.get("reason") else []
@@ -118,13 +140,13 @@ def step_tree(steps: list[dict]) -> list[str]:
             extra.append(f"caso {st['ticket_id']}")
         if st.get("answered_live"):
             extra.append("operador respondeu durante a espera")
-        if st.get("operator"):
+        if st.get("operator") and st.get("decided_by") != "operator":  # a resposta dela já sai com o nome
             extra.append(f"operador `{st['operator']}`")
         if st.get("from_memory"):
             extra.append("do livro de fatos")
         if st.get("pending_action"):
             extra.append(f"ação proposta `{st['pending_action']}`")
-        extra.append(decided(st))
+        extra.append(decided(st, router))
         out.append(f"{n}. **{st.get('agent')}** · {st.get('status')} · " + " · ".join(extra))
         for t in st.get("tools") or []:
             proposed = '"needs_confirmation": true' in (t.get("preview") or "")
@@ -148,6 +170,7 @@ def change_table(data: dict) -> list[str]:
 def render(report: dict, split: str, sha: str, when: str) -> str:
     rows = first_runs(report.get("rows", []))
     stab = report.get("stability") or {}
+    router = ROUTER_RULES if report.get("provider") == "offline" else ROUTER_LLM  # sem LLM, o router são regras
     unstable = ", ".join(stab.get("unstable", [])) or "nenhum"
     out = [
         f"# Respostas reais — split `{split}`",
@@ -166,7 +189,7 @@ def render(report: dict, split: str, sha: str, when: str) -> str:
             "",
         ]
     if any(r.get("steps") for r in rows):
-        out += [DECIDED_LEGEND, ""]
+        out += [DECIDED_LEGEND if router == ROUTER_LLM else f"{DECIDED_LEGEND} {RULES_NOTE}", ""]
     out += ["| caso | intenção | rota | ferramentas | handoff | veredito automático |", "|---|---|---|---|---|---|"]
     for r in rows:
         out.append(
@@ -193,7 +216,7 @@ def render(report: dict, split: str, sha: str, when: str) -> str:
             "",
         ]
         if r.get("steps"):
-            out += ["**Passos:**", "", *step_tree(r["steps"]), ""]
+            out += ["**Passos:**", "", *step_tree(r["steps"], router), ""]
         sources = [s.get("url") or s.get("id") for s in (r.get("sources") or [])][:5]
         if sources:
             out.append("**Fontes:** " + "; ".join(f"<{s}>" for s in sources))
@@ -233,7 +256,9 @@ def _env(name: str, value: str):
 
 def _operator_thread(answer: str, after_s: float, seen: set[str], key: str):
     """Operadora simulada: responde, pelo endpoint do console e com a chave pessoal `key`, o 1º caso de atendimento
-    novo da fila."""
+    novo da fila. Devolve (thread, stop, state): `stop` encerra a espera quando o turno acaba (senão ela responderia
+    o caso de um turno seguinte); `state` guarda o caso que ela achou (`ticket`) e o status HTTP do POST (`status`,
+    None = não postou)."""
     import threading
     import time
 
@@ -242,20 +267,42 @@ def _operator_thread(answer: str, after_s: float, seen: set[str], key: str):
     from app.api import app
     from app.store import get_store
 
+    stop, state = threading.Event(), {"ticket": None, "status": None}
+
     def run() -> None:
         client, end = TestClient(app), time.time() + 30
-        while time.time() < end:
+        while time.time() < end and not stop.is_set():
             fresh = [t for t in get_store().list_tickets("open") if t["kind"] == "handoff" and t["id"] not in seen]
             if fresh:
-                time.sleep(after_s)
-                client.post(f"/handoffs/{fresh[0]['id']}/reply", json={"answer": answer},
-                            headers={"X-Operator-Token": key})
+                state["ticket"] = fresh[0]["id"]
+                if stop.wait(after_s):  # o turno acabou antes da hora de ela responder
+                    return
+                state["status"] = client.post(f"/handoffs/{fresh[0]['id']}/reply", json={"answer": answer},
+                                              headers={"X-Operator-Token": key}).status_code
                 return
-            time.sleep(0.05)
+            stop.wait(0.05)
 
     thread = threading.Thread(target=run, daemon=True)
     thread.start()
-    return thread
+    return thread, stop, state
+
+
+def operator_note(state: dict, ticket: str | None, steps: list[dict], answer: str) -> str:
+    """O que a transcrição diz da operadora simulada no turno, lido do que aconteceu (não do roteiro): "responde"
+    só com o POST 2xx no caso que o turno abriu; a resposta só é "durante a espera" se voltou no próprio turno (passo
+    da operadora na árvore)."""
+    who, status, answered = f"a operadora simulada `{DEMO_OPERATOR}`", state.get("status"), state.get("ticket")
+    if status is None:
+        if not (answered or ticket):
+            return f"*({who} não respondeu: nenhum caso de atendimento novo na fila)*"
+        return f"*({who} não respondeu: o caso {answered or ticket} ficou na fila, sem resposta enviada)*"
+    if not 200 <= status < 300:
+        return f"*({who} não respondeu: status {status})*"
+    if not ticket or answered != ticket:
+        return f"*({who} não respondeu ao caso deste turno: respondeu o caso {answered}, status {status})*"
+    live = any(st.get("decided_by") == "operator" or st.get("answered_live") for st in steps)
+    when = "durante a espera" if live else "depois da espera do turno (a resposta segue pela retomada do caso)"
+    return f"*({who} responde pelo console, com chave pessoal, {when}: \"{answer}\")*"
 
 
 def _audit_line(ticket: str) -> list[str]:
@@ -286,18 +333,22 @@ def _transcript(path: Path, sha: str, when: str, operator_key: str) -> str:
 
     from app.api import app
     from app.auth import issue_token
+    from app.llm import get_llm
     from app.store import get_store
 
     lines = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
     user = (lines[0] if lines and "user" in lines[0] else {}).get("user", "u1")
     turns = [x for x in lines if "user" not in x or len(x) > 1]
     client, headers = TestClient(app), {"Authorization": f"Bearer {issue_token(user)}"}
-    out = ["# Transcrição multi-turno (memória, ação com antes/depois, humano)", "",
-           f"Gerada por `scripts/demo_md.py --transcript {path.as_posix()}` no commit `{sha}` em {when}, rodando o "
-           f"`POST /chat` no processo (LLM: `{os.getenv('LLM_PROVIDER', 'padrão do ambiente')}`). Nada escrito à mão. "
-           f"Quem responde o caso é a operadora simulada `{DEMO_OPERATOR}`, com chave pessoal gerada nesta execução "
-           "(o `OPERATOR_KEYS` do processo guarda só o sha256 dela), pelo mesmo endpoint do console.",
-           "", DECIDED_LEGEND, ""]
+    router = ROUTER_LLM if get_llm("router").enabled else ROUTER_RULES
+    head = (f"Gerada por `scripts/demo_md.py --transcript {path.as_posix()}` no commit `{sha}` em {when}, rodando o "
+            f"`POST /chat` no processo (LLM: `{os.getenv('LLM_PROVIDER', 'padrão do ambiente')}`). Nada escrito à "
+            "mão.")
+    if any(turn.get("operator") for turn in turns):
+        head += (f" Quem responde o caso é a operadora simulada `{DEMO_OPERATOR}`, com chave pessoal gerada nesta "
+                 "execução (o `OPERATOR_KEYS` do processo guarda só o sha256 dela), pelo mesmo endpoint do console.")
+    legend = DECIDED_LEGEND if router == ROUTER_LLM else f"{DECIDED_LEGEND} {RULES_NOTE}"
+    out = ["# Transcrição multi-turno (memória, ação com antes/depois, humano)", "", head, "", legend, ""]
     conv, pending, n = None, None, 0
     for turn in turns:
         if turn.get("confirm"):
@@ -313,12 +364,13 @@ def _transcript(path: Path, sha: str, when: str, operator_key: str) -> str:
             pending = None
             continue
         n += 1
-        thread, prev = None, os.environ.get("HITL_SYNC_WAIT_S")
+        operator, prev = None, os.environ.get("HITL_SYNC_WAIT_S")
         if turn.get("operator"):
             os.environ["HITL_SYNC_WAIT_S"] = str(turn.get("wait_s", 5))
             os.environ.setdefault("HITL_SYNC_POLL_S", "0.2")
             seen = {t["id"] for t in get_store().list_tickets("open")}
-            thread = _operator_thread(turn["operator"], float(turn.get("operator_after_s", 0.3)), seen, operator_key)
+            operator = _operator_thread(turn["operator"], float(turn.get("operator_after_s", 0.3)), seen,
+                                        operator_key)
         try:
             got = client.post("/chat", json={"message": turn["say"], "conversation_id": conv}, headers=headers).json()
         finally:
@@ -327,19 +379,23 @@ def _transcript(path: Path, sha: str, when: str, operator_key: str) -> str:
                     os.environ.pop("HITL_SYNC_WAIT_S", None)
                 else:
                     os.environ["HITL_SYNC_WAIT_S"] = prev
-        if thread:
-            thread.join(5)
+        ticket = (got.get("handoff") or {}).get("ticket_id")
+        if operator:
+            thread, stop, state = operator
+            if state["ticket"] or ticket:
+                thread.join(5)  # há caso: a resposta pode chegar logo depois da espera (vai pela retomada)
+            stop.set()  # o caso de um turno seguinte não é deste: a operadora para de esperar aqui
+            thread.join(60)  # só demora se o POST já saiu; a espera pendente acaba no stop
         conv = got.get("conversation_id", conv)
         pending = got.get("pending_action") or pending
+        steps = got.get("steps") or []
         out += [f"### Turno {n}", "", f"**Cliente:** {turn['say']}", ""]
-        if turn.get("operator"):
-            out += [f"*(a operadora simulada `{DEMO_OPERATOR}` responde pelo console, com chave pessoal, durante a "
-                    f"espera: \"{turn['operator']}\")*", ""]
+        if operator:
+            out += [operator_note(state, ticket, steps, turn["operator"]), ""]
         out += [f"**Intenção:** {got.get('intent')} · **rota:** {' → '.join(got.get('route') or [])}", "",
-                "**Passos:**", "", *step_tree(got.get("steps") or []), "", "**Resposta:**", "",
+                "**Passos:**", "", *step_tree(steps, router), "", "**Resposta:**", "",
                 *[f"> {ln}" if ln.strip() else ">" for ln in (got.get("answer") or "").splitlines()], ""]
-        ticket = (got.get("handoff") or {}).get("ticket_id")
-        if turn.get("operator") and ticket:
+        if operator and ticket:
             out += _audit_line(ticket)
     return "\n".join(out) + "\n"
 

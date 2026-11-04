@@ -41,10 +41,17 @@ contextvars (trace_id, custo do request, span OTel pai). O resultado entra SEMPR
 (ou dos blocos tool_use), nunca na ordem de término: rota, resposta e eval ficam determinísticos.
 Todo desvio do plano vai para `replans`.
 
-Quem decidiu cada passo (`decided_by` na árvore de passos, `step_view`): "llm" quando o passo veio de uma tool call
-do supervisor LLM; "code" quando uma regra do código o pôs no turno, com a regra em `why` (CODE_WHY). A marca é
-gravada onde o passo é registrado (`_record`, com o motivo de cada chamada), não deduzida depois dos replanos: o
-leitor do trace separa o que o modelo escolheu do que o código impôs.
+Quem decidiu cada passo (`decided_by` na árvore de passos, `step_view`):
+- "llm": o passo veio de uma tool call do supervisor LLM (o motivo é a própria tool call; sem `why`);
+- "router": o agente veio do PLANO do router (um LLM ao vivo; as regras de palavra-chave sem LLM) e o supervisor
+  LLM não foi consultado sobre ele; `why` diz por onde rodou (ROUTER_WHY: "fast_path" = o atalho de 1 passo,
+  "plan" = o motor de tabela);
+- "code": uma regra do código pôs o passo no turno, com a regra em `why` (CODE_WHY: achado, escalada garantida,
+  FALLBACK ou router incerto, orçamento, passo antecipado, aviso de caso aberto);
+- "operator": a resposta do humano (passo "human"), que chega pronta como evidência (sem `why`).
+A marca é gravada onde o passo é registrado (`_record`, com o motivo de cada chamada), não deduzida depois dos
+replanos nem do motor do turno, que mistura passos de origens diferentes; passo sem marca sai sem os campos ("não
+registrado"). Assim o leitor do trace separa o que cada modelo escolheu do que o código impôs.
 """
 from __future__ import annotations
 
@@ -98,18 +105,28 @@ MAX_TURN_USD = 0.25
 NODE_TIMEOUT_S = 60.0  # agente com LLM e 3 rodadas de tool leva ~10–25 s ao vivo
 BUDGET_REASON = "budget_exhausted"
 REPLAN_MODES = ("on", "no_needs", "off")
-# Quem decidiu o passo: DECIDED_LLM = tool call do supervisor LLM; senão a regra do código que o pôs no turno (why):
-#   needs       achado de um especialista aceito por accept_need (o modelo não precisou pedir o passo);
-#   escalation  escalada garantida por _enforce_escalation (faltou fonte, dado ou registro e ninguém respondeu);
-#   table       motor determinístico: plano do router, FALLBACK do domínio ou router incerto (LOW_CONFIDENCE);
-#   fast_path   o passo único do atalho (`fast_path`), rodado sem consultar o supervisor LLM;
-#   operator    a resposta do humano (passo "human"), na retomada (`prior`) ou na espera síncrona;
-#   budget      orçamento do turno esgotado (_exhaust, inclui NODE_TIMEOUT_S): o caso vai ao humano;
-#   lead        1º passo do plano rodado antes da 1ª volta do supervisor LLM (lead_step, SUPERVISOR_LEAD=on);
-#   hold        aviso de caso aberto na conversa (_hold): o turno fica em espera.
+# Quem decidiu o passo (`decided_by`) e por quê (`why`), o vocabulário fechado que `_decide` grava:
+#   DECIDED_LLM       tool call do supervisor LLM;
+#   DECIDED_OPERATOR  a resposta do humano (passo "human"), na retomada (`prior`) ou na espera síncrona;
+#   DECIDED_ROUTER    agente do plano do router rodado sem consultar o supervisor LLM, com o caminho em ROUTER_WHY:
+#     fast_path   o passo único do atalho (`fast_path`);
+#     plan        passo do plano rodado pelo motor de tabela (offline e queda do supervisor LLM); na retomada sem
+#                 LLM o plano são os passos que o caso guardou para depois do humano (cases.save_pending);
+#   DECIDED_CODE      regra do código, com a regra em CODE_WHY:
+#     needs       achado de um especialista aceito por accept_need (o modelo não precisou pedir o passo);
+#     escalation  escalada garantida por _enforce_escalation (faltou fonte, dado ou registro e ninguém respondeu);
+#     table       FALLBACK do domínio para um passo que falhou, ou router incerto (LOW_CONFIDENCE) → escalation;
+#     budget      orçamento do turno esgotado (_exhaust, inclui NODE_TIMEOUT_S): o caso vai ao humano;
+#     lead        1º passo do plano rodado antes da 1ª volta do supervisor LLM (lead_step, SUPERVISOR_LEAD=on): o
+#                 agente é do plano, mas rodá-lo antes de consultar o modelo é a regra DEPENDS do código;
+#     hold        aviso de caso aberto na conversa (_hold): não é escolha de agente, e a conta de quem decide
+#                 (evals/trace_stats.py) o deixa de fora.
 DECIDED_LLM = "llm"
+DECIDED_ROUTER = "router"
 DECIDED_CODE = "code"
-CODE_WHY = ("needs", "escalation", "table", "fast_path", "operator", "budget", "lead", "hold")
+DECIDED_OPERATOR = "operator"
+ROUTER_WHY = ("fast_path", "plan")
+CODE_WHY = ("needs", "escalation", "table", "budget", "lead", "hold")
 TOOLS = [
     {"name": "faq_agent", "strict": True,
      "description": "Responde dúvidas sobre produto e políticas com RAG e fonte citada. "
@@ -180,8 +197,9 @@ class Outcome:
     budget: str | None = None  # teto que parou o turno (model_calls | usd | node_timeout)
     deferred: list[str] = field(default_factory=list)  # passos do plano que ficaram para depois do humano
     handover: str | None = None  # atalho: agente cujo insufficient a tabela passou ao supervisor LLM
-    # fila do motor determinístico: a regra de CODE_WHY que pôs cada agente nela (plano, achado, FALLBACK). A fila
-    # guarda só nomes (next_batch); o motivo vai ao passo quando ele roda (_table_loop → _record).
+    # fila do motor determinístico: o motivo (ROUTER_WHY ou CODE_WHY) que pôs cada agente nela (plano do router,
+    # achado, FALLBACK). A fila guarda só nomes (next_batch); o motivo vai ao passo quando ele roda (_table_loop →
+    # _record) e é consumido ali: agente sem motivo na fila sai sem marca, nunca com um motivo presumido.
     queued_by: dict[str, str] = field(default_factory=dict)
 
 
@@ -233,15 +251,19 @@ PREVIEW_CHARS = 200
 
 
 def _decide(result: AgentResult, by: str | None) -> AgentResult:
-    """Grava no passo quem o decidiu: `by` = DECIDED_LLM ou uma regra de CODE_WHY; None não marca nada.
+    """Grava no passo quem o decidiu. `by`: DECIDED_LLM ou DECIDED_OPERATOR (sem `why`), um caminho de ROUTER_WHY
+    (decided_by "router") ou uma regra de CODE_WHY (decided_by "code"). None, ou valor fora do vocabulário, não
+    marca nada: o passo sai "não registrado", nunca com uma decisão presumida.
 
     A decisão é do supervisor, não do especialista: vai num atributo próprio do AgentResult (`decided`), fora de
     `facts` (que acumulam no contexto dos agentes) e de `for_supervisor` (o que o modelo lê). Marcar não muda
     contexto, rota nem resposta; só `step_view` lê a marca.
     """
-    if by == DECIDED_LLM:
-        result.decided = {"decided_by": DECIDED_LLM}
-    elif by is not None:
+    if by in (DECIDED_LLM, DECIDED_OPERATOR):
+        result.decided = {"decided_by": by}
+    elif by in ROUTER_WHY:
+        result.decided = {"decided_by": DECIDED_ROUTER, "why": by}
+    elif by in CODE_WHY:
         result.decided = {"decided_by": DECIDED_CODE, "why": by}
     return result
 
@@ -249,8 +271,8 @@ def _decide(result: AgentResult, by: str | None) -> AgentResult:
 def step_view(result: AgentResult, mask=lambda text: text) -> dict:
     """Um passo da árvore de passos (o trace legível por caso): agente → status/motivo → ms →
     ferramentas com args, ok e prévia do resultado (mascarada por `mask`) → antes/depois de escrita executada →
-    quem decidiu o passo (`decided_by`, e `why` quando foi o código). Passo sem marca sai sem os dois campos: quem
-    lê conta "não registrado", nunca uma decisão presumida."""
+    quem decidiu o passo (`decided_by`, e `why` quando foi o plano do router ou o código). Passo sem marca sai sem os
+    dois campos: quem lê conta "não registrado", nunca uma decisão presumida."""
     evidence = result.evidence if len(result.evidence) == len(result.tool_calls) else []
     tools = []
     for i, call in enumerate(result.tool_calls):
@@ -301,8 +323,8 @@ def run_batch(names: list[str], ctx: Context) -> list[AgentResult]:
 
 
 def _record(name: str, result: AgentResult, ctx: Context, out: Outcome, by: str | None = None) -> None:
-    """Registra o passo no turno. `by`: quem o decidiu (DECIDED_LLM ou a regra de CODE_WHY), vindo de quem chama:
-    cada caminho do laço sabe por que o passo entrou."""
+    """Registra o passo no turno. `by`: quem o decidiu (ver `_decide`), vindo de quem chama: cada caminho do laço
+    sabe por que o passo entrou."""
     _decide(result, by)
     out.route.append(name)
     out.results.append(result)
@@ -380,8 +402,9 @@ def run_table(plan: list[str], ctx: Context, confidence: float = 1.0, handover: 
     e fica em `out.handover` para o supervisor LLM decidir (ver `_run`)."""
     out = Outcome()
     queue = list(plan)
-    # no atalho (handover) o passo único do plano roda sem consultar o supervisor LLM; fora dele, pela tabela
-    out.queued_by.update(dict.fromkeys(queue, "fast_path" if handover else "table"))
+    # os agentes do plano são escolha do router; a tabela só os executa, sem consultar o supervisor LLM: no atalho
+    # (handover) o passo único, fora dele o plano inteiro
+    out.queued_by.update(dict.fromkeys(queue, "fast_path" if handover else "plan"))
     if confidence < LOW_CONFIDENCE and queue and "escalation" not in queue \
             and not no_escalation(ctx) and supervisor_replan():
         queue.append("escalation")
@@ -399,7 +422,7 @@ def _table_loop(queue: list[str], ctx: Context, out: Outcome, handover: bool = F
         batch = next_batch(queue, MAX_STEPS - len(out.route))
         results = run_batch(batch, ctx)
         for name, result in zip(batch, results, strict=True):
-            _record(name, result, ctx, out, out.queued_by.pop(name, "table"))
+            _record(name, result, ctx, out, out.queued_by.pop(name, None))  # sem motivo na fila: sem marca
         timed_out = [n for n, r in zip(batch, results, strict=True) if r.reason == "node_timeout"]
         if timed_out:
             _exhaust("node_timeout", timed_out + queue, ctx, out)
@@ -643,12 +666,12 @@ def run(plan: list[str], ctx: Context, confidence: float = 1.0, prior: list[Agen
 
     `prior`: resultados que já existem antes do plano (retomada: o AgentResult "human" com a resposta do operador).
     Os fatos deles entram no contexto dos agentes e eles abrem a rota e os resultados do Outcome; na árvore de
-    passos são do código com `why` "operator" (a resposta humana chega pronta, nenhum modelo a escolheu).
+    passos são do operador (DECIDED_OPERATOR): a resposta humana chega pronta, nenhum modelo nem regra a escolheu.
     """
     held = cases.open_case(ctx.conversation_id)
     seeded = Outcome()
     for result in prior or []:
-        _record(result.agent, result, ctx, seeded, "operator")
+        _record(result.agent, result, ctx, seeded, DECIDED_OPERATOR)
     out = _run(plan, ctx, confidence)
     if seeded.results:
         out.route[:0], out.results[:0] = seeded.route, seeded.results
@@ -690,7 +713,7 @@ def _continue_with_operator(plan: list[str], ctx: Context, out: Outcome) -> Outc
     esc.text = CONSULTED[lang].format(ticket=ticket["id"])
     esc.evidence = [esc.text]
     esc.facts = {**esc.facts, "answered_live": True, "operator": operator}  # o DEMO e o eval leem daqui
-    _record("human", human, ctx, out, "operator")
+    _record("human", human, ctx, out, DECIDED_OPERATOR)
     out.replans.append(f"escalation->human (resposta em {hitl_sync.wait_s():g}s de espera)")
     steps = out.deferred or [p for p in plan if p != "escalation" and p in AGENTS and p not in out.route]
     out.deferred = []
