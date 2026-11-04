@@ -1,72 +1,195 @@
 {
- "rotulos": 37,
- "humano_passa": 36,
- "automatico_passa": 36,
- "concordancia": 0.946,
- "kappa": -0.028,
- "divergencias": [
-  {
-   "id": "q-mem-02",
-   "humano": "fail",
-   "automatico": "pass",
-   "nota": "wrong_route"
-  },
-  {
-   "id": "dependent-07",
-   "humano": "pass",
-   "automatico": "fail",
-   "nota": ""
-  }
- ],
+ "rotulos": 2,
+ "humano_passa": 2,
+ "automatico_passa": 2,
+ "concordancia": 1.0,
+ "kappa": null,
+ "divergencias": [],
  "rotuladores": 1,
  "por_rotulador": {
   "matheus": {
-   "rotulos": 37,
-   "concordancia": 0.946,
-   "kappa": -0.028,
-   "heldout": {
-    "rotulos": 8,
-    "humano_passa": 8,
-    "taxa": 1.0,
-    "ci": {
-     "k": 8,
-     "n": 8,
-     "lo": 67.6,
-     "hi": 100.0
-    },
-    "diagnostico_intencao": 1.0,
-    "intencao_errada_humano_passa": []
-   }
+   "rotulos": 2,
+   "concordancia": 1.0,
+   "kappa": null,
+   "heldout": null
   }
  },
- "heldout": {
-  "rotulos": 8,
-  "humano_passa": 8,
-  "taxa": 1.0,
-  "ci": {
-   "k": 8,
-   "n": 8,
-   "lo": 67.6,
-   "hi": 100.0
-  },
-  "diagnostico_intencao": 1.0,
-  "intencao_errada_humano_passa": []
- },
+ "heldout": null,
  "entre_humanos": null,
  "juiz_x_humano": {
-  "casos": 37,
-  "concordancia": 0.946,
-  "tpr": 0.944,
-  "tnr": 1.0,
-  "positives": 36,
-  "negatives": 1,
+  "casos": 0,
+  "concordancia": null,
+  "tpr": null,
+  "tnr": null,
+  "positives": 0,
+  "negatives": 0,
+  "juiz_reprova": 0,
   "validacao": {
    "validated": false,
    "missing": [
-    ">= 10 positivos e negativos humanos (tem 36 e 1)"
+    ">= 10 positivos e negativos humanos (tem 0 e 0)",
+    "TPR e TNR >= 0.8 (tem None e None)"
    ],
-   "rule": ">= 10 por classe e TPR, TNR >= 0.8"
+   "rule": ">= 10 por classe e TPR, TNR >= 0.8",
+   "selection_rule": "só conta resposta real que entrou na amostra sem depender do juiz (sorteio ou checagem automática que falhou); a escolhida porque o juiz a reprovou e a sem o motivo da escolha gravado (seleção desconhecida) ficam fora da validação, inclusive do mínimo de negativos reais, e saem à parte como diagnóstico",
+   "left_out": {
+    "desconhecida": {
+     "positives": 1,
+     "negatives": 0,
+     "tpr": 1.0,
+     "tnr": null
+    }
+   }
+  },
+  "veredito_do_juiz": "fundamentada, útil, no idioma da pergunta e sem vazamento — as 3 perguntas da página",
+  "selecao": {
+   "desconhecida": 1
+  },
+  "fora_da_validacao": {
+   "desconhecida": {
+    "casos": 1,
+    "concordancia": 1.0,
+    "tpr": 1.0,
+    "tnr": null,
+    "positives": 1,
+    "negatives": 0,
+    "juiz_reprova": 0,
+    "humano_reprova": 0
+   }
+  },
+  "reais": null,
+  "adulteradas": null
+ },
+ "adulteradas": {
+  "arquivo": "perturbed.json",
+  "geradas": 21,
+  "por_tipo": {
+   "numero_trocado": 10,
+   "afirmacao_sem_base": 1,
+   "fato_removido": 10
+  },
+  "rotuladas": 0,
+  "rotuladas_por_tipo": {
+   "numero_trocado": 0,
+   "afirmacao_sem_base": 0,
+   "fato_removido": 0
+  },
+  "humano": {},
+  "juiz": {
+   "julgadas": 21,
+   "reprovou": 15,
+   "reprovou_antes": 11,
+   "por_tipo": {
+    "numero_trocado": {
+     "julgadas": 10,
+     "reprovou": 10,
+     "reprovou_antes": 10
+    },
+    "afirmacao_sem_base": {
+     "julgadas": 1,
+     "reprovou": 1,
+     "reprovou_antes": 1
+    },
+    "fato_removido": {
+     "julgadas": 10,
+     "reprovou": 4,
+     "reprovou_antes": 0
+    }
+   }
+  },
+  "fora_da_conta": [],
+  "aviso": null
+ },
+ "bateria": {
+  "regra": "rótulo de pessoa só se compara com veredito do juiz, checagem ou outra pessoa sobre o MESMO texto: o da página congelada (evals/validation/<amostra>.json) ou, sem ela, a resposta de hoje em evals/results; rótulo de outro texto sai de toda conta e é listado",
+  "rotulos_por_bateria": {
+   "ff8afed": 2
+  },
+  "de_pagina_congelada": 1,
+  "do_texto_de_hoje": 1,
+  "paginas": [
+   "10ac784d5e97"
+  ]
+ },
+ "rotulos_de_outra_bateria": {
+  "rotulos": 35,
+  "ids": [
+   "approval-01",
+   "approval-03",
+   "approval-04",
+   "dependent-01",
+   "dependent-07",
+   "dependent-11",
+   "heldout-H1-11",
+   "heldout-H1-27",
+   "heldout-H1-30",
+   "heldout-H1-35",
+   "heldout-H2-05",
+   "heldout-H2-09",
+   "heldout-H2-12",
+   "heldout-H2-18",
+   "memory-09",
+   "official-03",
+   "official-08",
+   "official-09",
+   "parallel-01",
+   "parallel-04",
+   "q-dep-01",
+   "q-guard-oos-3",
+   "q-hard-01",
+   "q-hard-03",
+   "q-hard-05",
+   "q-mem-02",
+   "q-ov-01-pt",
+   "q-ov-04-pt",
+   "q-ov-05-pt",
+   "q-ov-10-en",
+   "q-partial-02",
+   "q-partial-03",
+   "real-22",
+   "replan-03",
+   "replan-05"
+  ],
+  "por_rotulador": {
+   "matheus": [
+    "approval-01",
+    "approval-03",
+    "approval-04",
+    "dependent-01",
+    "dependent-07",
+    "dependent-11",
+    "heldout-H1-11",
+    "heldout-H1-27",
+    "heldout-H1-30",
+    "heldout-H1-35",
+    "heldout-H2-05",
+    "heldout-H2-09",
+    "heldout-H2-12",
+    "heldout-H2-18",
+    "memory-09",
+    "official-03",
+    "official-08",
+    "official-09",
+    "parallel-01",
+    "parallel-04",
+    "q-dep-01",
+    "q-guard-oos-3",
+    "q-hard-01",
+    "q-hard-03",
+    "q-hard-05",
+    "q-mem-02",
+    "q-ov-01-pt",
+    "q-ov-04-pt",
+    "q-ov-05-pt",
+    "q-ov-10-en",
+    "q-partial-02",
+    "q-partial-03",
+    "real-22",
+    "replan-03",
+    "replan-05"
+   ]
   }
  },
- "aviso": null
+ "aviso_juiz": "1 rótulo(s) sem veredito do juiz sobre o texto rotulado (fora do juiz × humano): rode o juiz na bateria ou, se a página foi congelada, `python -m evals.judge --validation`",
+ "aviso": "só 2 rótulos: abaixo de 20 não dá para confiar"
 }
