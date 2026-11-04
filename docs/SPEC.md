@@ -62,7 +62,7 @@ recusas, com o significado do código de recusa), `get_terminal_status` (termina
 
 | ID | Mensagem | Esperado (intent / rota / ferramenta / handoff) | Fato de referência (`expect.facts`) |
 |---|---|---|---|
-| official-01 | What's the difference between the Get Clássica and the Get Smart? | knowledge / faq / — / não | preços `79,90` e `129,90` |
+| official-01 | What's the difference between the Get Clássica and the Get Smart? | knowledge / faq / — / não | preços `79,90` e `129,90` + 1 recurso de cada (Get Smart: estoque/comanda/nota fiscal; Get Clássica: chip 3G/bobina, de `prod-taxas-02`) |
 | official-02 | What's the weather forecast in Porto Alegre tomorrow? | general / faq (Open-Meteo) / — / não | número da API com data |
 | official-03 | When will the money from yesterday's sales be deposited? | support / records / get_settlements / não | datas e total da tool |
 | official-04 | Do I need a bank account to receive my sales via Pix? | knowledge / faq / — / não | conta corrente/poupança/pagamento ou Get Conta |
@@ -71,7 +71,7 @@ recusas, com o significado do código de recusa), `get_terminal_status` (termina
 | official-07 | What's the euro exchange rate today? | general / faq (PTAX) / — / não | cotação do BCB com data |
 | official-08 | My card machine is showing a transaction decline error. | troubleshoot / records→faq / get_transactions / não | código de recusa e significado da tool |
 | official-09 | How many installments can I split a sale into with the crediário? | knowledge / faq / — / não | `48x` |
-| official-10 | Can I sell through WhatsApp using the Payment Link? | knowledge / faq / — / não | WhatsApp |
+| official-10 | Can I sell through WhatsApp using the Payment Link? | knowledge / faq / — / não | WhatsApp + redes sociais/cobranças remotas + Pix/débito/crédito (`prod-pagamentos-pelo-whatsapp-02`) |
 
 Cada AC vira um caso `official-NN` em `evals/cases.jsonl`. Respostas no idioma da pergunta (todas en).
 
