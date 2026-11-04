@@ -245,3 +245,29 @@ def test_needs_ablation_gives_the_p50_where_the_finding_fired_and_what_happened_
     assert ("2 achados no braço com `needs`: o modelo chamou o agente pedido 1, ignorou mesmo com o lembrete "
             "(`need_ignored`) 1") in line
     assert set(NEED_OUTCOME_LABEL) == set(supervisor.NEED_OUTCOMES)  # destino novo sem rótulo sairia "outro"
+
+
+def test_ablation_arms_on_commits_with_the_same_code_are_not_flagged(tmp_path):
+    """Braço sem `needs` rodado depois de commitar os resultados da bateria: commits diferentes, código igual."""
+    import subprocess as sp
+
+    import scripts.fill_readme as fr
+
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
+           "PATH": __import__("os").environ["PATH"]}
+    sp.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    (tmp_path / "src").mkdir()
+    (tmp_path / "src" / "a.py").write_text("x = 1\n")
+    sp.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    sp.run(["git", "commit", "-q", "-m", "c1"], cwd=tmp_path, check=True, env=env)
+    a = sp.run(["git", "rev-parse", "HEAD"], cwd=tmp_path, capture_output=True, text=True).stdout.strip()
+    (tmp_path / "evals").mkdir()
+    (tmp_path / "evals" / "results.json").write_text("{}")
+    sp.run(["git", "add", "-A"], cwd=tmp_path, check=True)
+    sp.run(["git", "commit", "-q", "-m", "c2"], cwd=tmp_path, check=True, env=env)
+    b = sp.run(["git", "rev-parse", "HEAD"], cwd=tmp_path, capture_output=True, text=True).stdout.strip()
+    assert fr._same_code(a, b, tmp_path)
+    (tmp_path / "src" / "a.py").write_text("x = 2\n")
+    sp.run(["git", "commit", "-q", "-am", "c3"], cwd=tmp_path, check=True, env=env)
+    c = sp.run(["git", "rev-parse", "HEAD"], cwd=tmp_path, capture_output=True, text=True).stdout.strip()
+    assert not fr._same_code(a, c, tmp_path)

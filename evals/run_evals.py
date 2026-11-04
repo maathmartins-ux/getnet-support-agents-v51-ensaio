@@ -220,6 +220,17 @@ def _check_operator(case: dict) -> None:
             raise ValueError(f"caso {case['id']}: {name} tem de ser um número de segundos >= 0, não {value!r}")
 
 
+def _gold_where() -> str:
+    """Onde está o gold de busca: o arquivo base e/ou a pasta `.d/` (no ensaio o base ficou vazio e o gold está todo em
+    `evals/retrieval.d/`; o README apontava para o arquivo vazio)."""
+    base, extra = HERE / "retrieval.jsonl", HERE / "retrieval.d"
+    has_base = base.exists() and base.stat().st_size > 0
+    has_extra = extra.is_dir() and any(extra.glob("*.jsonl"))
+    if has_base and has_extra:
+        return "`evals/retrieval.jsonl` + `evals/retrieval.d/`"
+    return "`evals/retrieval.d/`" if has_extra else "`evals/retrieval.jsonl`"
+
+
 def has_credentials() -> bool:
     """Alguma credencial resolvível pelo SDK (chave, token, perfil do `ant auth login` ou WIF)."""
     names = ("APP_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_PROFILE",
@@ -1918,7 +1929,7 @@ def to_markdown(report: dict, split_view: bool = False) -> str:
     ret = None if split_view else report.get("retrieval")
     if ret:
         via = ", caminho de busca do agente" if ret.get("path") == "agente" else ""
-        out.append(f"\nRetrieval ativo ({ret['retriever']}{via}, `evals/retrieval.jsonl`): {_retrieval_line(ret)}")
+        out.append(f"\nRetrieval ativo ({ret['retriever']}{via}, {_gold_where()}): {_retrieval_line(ret)}")
     for name, cmp in ({} if split_view else report.get("retrieval_compare") or {}).items():
         out.append(f"- {name}: {_retrieval_line(cmp)}")
     return "\n".join(out)

@@ -529,6 +529,15 @@ def _need_outcomes(rows: list[dict]) -> str:
     return f"{sum(counts.values())} achados no braço com `needs`: " + ", ".join(told)
 
 
+def _same_code(sha_a: str | None, sha_b: str | None, root: Path = ROOT) -> bool:
+    """Os dois commits têm o mesmo código do produto e do eval (src/, data/, evals/*.py)? Sem git ou sha: não."""
+    if not sha_a or not sha_b:
+        return False
+    r = subprocess.run(["git", "diff", "--quiet", sha_a, sha_b, "--", "src", "data", "evals/*.py"], cwd=root,
+                       check=False, capture_output=True)
+    return r.returncode == 0
+
+
 def _needs_ablation(results: Path) -> list[str]:
     """Ablação ao vivo SEM os achados `needs` num split sem rótulo de rota (ex.: perguntas reais), lado a lado com o
     MESMO split com `needs`: o juiz (vereditos num arquivo próprio, fora da manchete), números e frases sem base,
@@ -558,6 +567,11 @@ def _needs_ablation(results: Path) -> list[str]:
         sha_a, sha_b = base.get("git_sha"), abl.get("git_sha")
         if sha_a == sha_b:
             parts = [f"mesmos {ma['cases']} casos, mesmo commit `{sha_a}`"]
+        elif _same_code(sha_a, sha_b):
+            # o braço sem `needs` roda depois da bateria, quando os resultados dela já foram commitados: commits
+            # diferentes, código igual (rodada 11: o AVISO saía para ff8afed × f39d9ff, que só trazia resultados)
+            parts = [f"mesmos {ma['cases']} casos, mesmo código (`{sha_a}` × `{sha_b}`: entre os dois só "
+                     "resultados e docs, nada em src/, data/ nem evals/*.py)"]
         else:
             differ = _prompts_differ(base, abl)
             parts = [f"mesmos {ma['cases']} casos; **AVISO: braços em commits diferentes** (`{sha_a}` × `{sha_b}`, "
