@@ -244,6 +244,23 @@ TOOLS = {
                                                                       "outro"]}}, ["terminal_id"]),
                             "fn": _open_ticket},
 }
+# Palavras que o cliente lê no lugar dos valores internos das tools (app/capabilities.label): o cartão de capacidades e
+# a resposta final mostram estas, nunca "sem_sinal" ou o nome da tool.
+LABELS = {
+    "sem_conexao": {"pt": "sem conexão", "en": "no connection"},
+    "sem_sinal": {"pt": "sem sinal", "en": "no signal"},
+    "erro_transacao": {"pt": "erro de transação", "en": "transaction error"},
+    "outro": {"pt": "outro", "en": "other"},
+    "last_7_days": {"pt": "últimos 7 dias", "en": "last 7 days"},
+    "yesterday": {"pt": "ontem", "en": "yesterday"},
+    "today": {"pt": "hoje", "en": "today"},
+    "debito": {"pt": "débito", "en": "debit"},
+    "credito": {"pt": "crédito", "en": "credit"},
+    "reason": {"pt": "motivo", "en": "reason"},
+    "period": {"pt": "período", "en": "period"},
+    "request_receivables_advance": {"pt": "antecipação dos recebíveis", "en": "receivables advance"},
+    "open_support_ticket": {"pt": "chamado técnico", "en": "support ticket"},
+}
 # Escrita → status do item em que faz sentido: só antecipa o que ainda está agendado; chamado para terminal offline.
 ELIGIBLE_STATUS: dict[str, set[str]] = {"request_receivables_advance": {"agendado"},
                                         "open_support_ticket": {"offline"}}
