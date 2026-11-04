@@ -182,7 +182,8 @@ def _get_terminal_status(user_id: str, terminal_id: str | None = None) -> dict:
         item = {k: v for k, v in t.items() if k != "last_contact_hours_ago"}
         h = t["last_contact_hours_ago"]
         item["last_contact"] = (now - timedelta(hours=h)).isoformat(timespec="minutes")
-        item["offline_for_hours"] = h if t["status"] == "offline" else 0
+        if t["status"] == "offline":  # online não leva o campo: com 0 o LLM escrevia "offline há 0 hora"
+            item["offline_for_hours"] = h
         items.append(item)
     offline = [i["terminal_id"] for i in items if i["status"] == "offline"]
     out = {"ok": True, "data": {"items": items, "count": len(items), "online_count": len(items) - len(offline),
