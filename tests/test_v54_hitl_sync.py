@@ -26,7 +26,7 @@ def auth(user="u1"):
 
 def _slow_faq_once(monkeypatch):
     """1ª chamada do faq estoura o NODE_TIMEOUT_S (vai ao humano com o faq pendente); as seguintes respondem."""
-    monkeypatch.setenv("NODE_TIMEOUT_S", "0.2")
+    monkeypatch.setenv("NODE_TIMEOUT_S", "1")  # o 1º faq espera 5 s; 1 s deixa folga aos outros agentes
     release, calls = threading.Event(), []
 
     def faq(ctx):

@@ -216,7 +216,7 @@ def _budget_before_the_step(monkeypatch):
 
 
 def _node_timeout(monkeypatch):
-    monkeypatch.setenv("NODE_TIMEOUT_S", "0.2")
+    monkeypatch.setenv("NODE_TIMEOUT_S", "1")  # o lento espera 2 s; 1 s deixa folga ao records com a máquina carregada
     release, finished = threading.Event(), threading.Event()
 
     def slow(c):

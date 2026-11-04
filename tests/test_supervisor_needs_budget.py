@@ -149,7 +149,7 @@ def test_table_budget_checked_before_each_step(monkeypatch):
 
 
 def test_node_timeout_keeps_the_fast_part(monkeypatch):
-    monkeypatch.setenv("NODE_TIMEOUT_S", "0.2")
+    monkeypatch.setenv("NODE_TIMEOUT_S", "1")  # o lento espera 5 s; 1 s deixa folga ao records com a máquina carregada
     release, finished = threading.Event(), threading.Event()
 
     def slow(c):
@@ -160,7 +160,7 @@ def test_node_timeout_keeps_the_fast_part(monkeypatch):
     monkeypatch.setitem(supervisor.AGENTS, "faq", slow)
     t0 = time.perf_counter()
     out = supervisor.run(["faq", "records"], ctx("Qual o prazo? E o pedido 1002?", "multi"))
-    assert time.perf_counter() - t0 < 1.2
+    assert time.perf_counter() - t0 < 3  # entrega sem esperar os 5 s do lento
     assert out.budget == "node_timeout" and out.deferred == ["faq"]
     assert out.route == ["faq", "records", "escalation"] and "em separação" in out.results[1].text
     assert out.results[0].reason == "node_timeout" and out.results[-1].handoff.reason == "budget_exhausted"

@@ -325,10 +325,23 @@ def _cpu_best_of_5(fn, text: str) -> float:
 
 @pytest.mark.parametrize("word", TRIGGERS)
 def test_long_repetitive_input_stays_fast(word):
-    """10 mil caracteres de palavra-gatilho repetida, máscara de PII incluída (o texto que não barra é mascarado)."""
-    text = (word * (10_000 // len(word) + 1))[:10_000]
-    best = _cpu_best_of_5(pre_check, text)
-    assert best < 0.05, f"{word!r}: {best * 1000:.1f} ms"
+    """10 mil caracteres de palavra-gatilho repetida, máscara de PII incluída (o texto que não barra é mascarado).
+
+    O que se prova é custo linear no tamanho (o bug antigo era quadrático, ~400 ms). Até 50 ms passa direto; acima
+    (runner de CI mais lento: '@a.' mediu 51-52 ms lá e 38 ms aqui), vale a razão inteiro / metade (linear ~2,
+    quadrático ~4) com teto de 100 ms. A metade tem o MESMO final: '@a.' cortado em 10 mil termina num "@" solto, que
+    gera uma cópia desofuscada a mais; cortado em 5 mil, não (a razão media 2 × 2 cópias, não o tamanho).
+    """
+    reps, tail = divmod(10_000, len(word))
+
+    def sample(n_words: int) -> str:
+        return word * n_words + word[:tail]
+
+    best = _cpu_best_of_5(pre_check, sample(reps))
+    if best < 0.05:
+        return
+    half = _cpu_best_of_5(pre_check, sample(reps // 2))
+    assert best < 0.1 and best / half < 3, f"{word!r}: {best * 1000:.1f} ms (5 mil: {half * 1000:.1f} ms)"
 
 
 @pytest.mark.parametrize("text", [

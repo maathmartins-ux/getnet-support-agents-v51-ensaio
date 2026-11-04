@@ -29,7 +29,9 @@ def chat(message, conv=None, user="u1"):
 
 
 def test_operator_reply_runs_the_pending_knowledge_step(monkeypatch):
-    monkeypatch.setenv("NODE_TIMEOUT_S", "0.2")
+    # só o 1º faq é lento (espera 5 s): 1 s de teto estoura ele e deixa folga ao records do mesmo turno; com 0,2 s, a
+    # máquina carregada (check e outra suíte juntos) estourou também o records do 3º turno e o caso escalou
+    monkeypatch.setenv("NODE_TIMEOUT_S", "1")
     release, calls = threading.Event(), []
 
     def faq_slow_once(ctx):
@@ -44,6 +46,7 @@ def test_operator_reply_runs_the_pending_knowledge_step(monkeypatch):
         r1 = chat("Qual o prazo de entrega? E onde está meu pedido 1002?")
     finally:
         release.set()
+    monkeypatch.delenv("NODE_TIMEOUT_S")  # dali em diante, o teto padrão: o resto do teste não mede tempo
     conv, ticket = r1["conversation_id"], r1["handoff"]["ticket_id"]
     assert r1["handoff"]["reason"] == "budget_exhausted" and "budget:node_timeout->escalation" in r1["replans"]
     assert "em separação" in r1["answer"] and "dias úteis" not in r1["answer"]  # entrega a parte respondida
