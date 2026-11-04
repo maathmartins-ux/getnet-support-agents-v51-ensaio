@@ -268,6 +268,9 @@ def _guard_and_route(message: str, history: list[dict]) -> tuple[Verdict, Router
     if verdict.blocked:
         return verdict, None
     if not get_llm("guardrail").enabled:
+        verdict = llm_check(verdict)  # sem classificador: a suspeita da camada 1 bloqueia (falha fechada)
+        if verdict.blocked:
+            return verdict, None
         with span("router"):
             return verdict, route(verdict.text, history)
     with ThreadPoolExecutor(max_workers=2) as pool:
