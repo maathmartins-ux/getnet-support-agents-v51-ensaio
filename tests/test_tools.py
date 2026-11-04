@@ -6,6 +6,8 @@ from datetime import date, timedelta
 
 import pytest
 
+from app import clock
+
 
 @pytest.fixture
 def d(domain_data):
@@ -54,7 +56,7 @@ def test_settlements_totals_and_dates_computed(d):
     data = r["data"]
     assert data["total"] == 814.40 and data["count"] == 5  # 120 + 80,50 + 350 + 199,90 + 64
     by = {g["method"]: g for g in data["items"]}
-    yesterday = date.today() - timedelta(days=1)
+    yesterday = clock.today() - timedelta(days=1)  # o dia do cliente (fuso do negócio), como a tool
     assert by["pix"]["deposit_date"]["date"] == yesterday.isoformat()
     assert by["debito"]["total"] == 200.50 and date.fromisoformat(by["debito"]["deposit_date"]["date"]).weekday() < 5
     assert by["credito"]["total_brl"] == "R$ 549,90"

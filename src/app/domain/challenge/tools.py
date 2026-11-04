@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from functools import lru_cache
 
+from app import clock
 from app.config import data_dir
 
 # --- adaptador do CRM -----------------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ def _merchant(user_id: str) -> dict:
 
 
 def _today() -> date:
-    return date.today()
+    return clock.today()  # dia do cliente (fuso do negócio), o mesmo do prompt e do dado ao vivo
 
 
 def _business(d: date) -> date:
@@ -175,7 +176,7 @@ def _get_terminal_status(user_id: str, terminal_id: str | None = None) -> dict:
         terms = [t for t in terms if t["terminal_id"] == terminal_id]
         if not terms:
             return {"ok": False, "error": "not_found"}
-    now = datetime.now().replace(microsecond=0, second=0)
+    now = clock.now().replace(microsecond=0, second=0)
     items = []
     for t in terms:
         item = {k: v for k, v in t.items() if k != "last_contact_hours_ago"}

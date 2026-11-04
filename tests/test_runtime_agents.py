@@ -6,7 +6,6 @@
 6. Escolha do item para a ação: contestar a transação certa, não a ÚLTIMA (mesmo recusada).
 """
 import json
-from datetime import date
 from types import SimpleNamespace as NS
 
 from fakes import fake_llm, resp, text
@@ -60,7 +59,9 @@ def test_general_prompt_carries_today(monkeypatch):
     llm, msgs = fake_llm([_web_reply("ok")])
     monkeypatch.setattr(agents, "get_llm", lambda role="agent": llm)
     agents.faq_agent(ctx("Vai chover amanhã em São Paulo?", intent="general"))
-    assert date.today().isoformat() in msgs.sent[0]["system"]
+    from app import clock
+
+    assert clock.today().isoformat() in msgs.sent[0]["system"]  # data do negócio, não do servidor
 
 
 def test_general_offline_is_honest_and_has_no_number():

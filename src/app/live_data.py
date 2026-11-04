@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from . import clock
 from .observability import METRICS, log, span
 
 TIMEOUT_S = 3.0
@@ -276,8 +277,8 @@ def weather(city: str, offset: int) -> LiveResult | None:
     tz = place.get("timezone") or "UTC"
     try:
         today = datetime.now(ZoneInfo(tz)).date()
-    except Exception:  # noqa: BLE001 — fuso desconhecido: data do servidor
-        today = date.today()
+    except Exception:  # noqa: BLE001 — fuso desconhecido: data do negócio
+        today = clock.today()
     day = today + timedelta(days=offset)
     params = {"latitude": place["latitude"], "longitude": place["longitude"], "timezone": tz,
               "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code",
@@ -388,7 +389,7 @@ def _lookup(text: str, today: date | None = None) -> LiveResult | None:
     try:
         with span("live_data", kind=kind):
             if code:
-                result = fx(code, today or datetime.now(ZoneInfo("America/Sao_Paulo")).date())
+                result = fx(code, today or clock.today())
             else:
                 # 1ª fonte com 60% do teto; o resto fica para a segunda: a consulta inteira continua dentro do teto
                 start = time.monotonic()

@@ -23,11 +23,10 @@ import re
 import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import date
 from functools import lru_cache
 from pathlib import Path
 
-from . import capabilities, domain, grounding, live_data, memory
+from . import capabilities, clock, domain, grounding, live_data, memory
 from .actions import run_tool, tool_specs
 from .config import (
     corpus_language_setting,
@@ -160,7 +159,7 @@ def latest_eligible(items: list[dict], tool: str, status_key: str = "status") ->
 
 
 def _today() -> str:
-    d = date.today()  # data local do servidor; o prompt não pode adivinhar o dia ("tomorrow (Oct 30)" num dia 31)
+    d = clock.today()  # data do negócio (app/clock.py); o prompt não pode adivinhar o dia ("tomorrow (Oct 30)" num 31)
     return f"{d.isoformat()} ({d.strftime('%A')})"
 
 

@@ -253,7 +253,9 @@ def is_calendar_day(raw: str, answer: str, today=None) -> bool:
 
     if not raw.isdigit():
         return False
-    base = today or _dt.date.today()
+    from . import clock
+
+    base = today or clock.today()
     days = [base + _dt.timedelta(days=d) for d in (-1, 0, 1)]
     n = re.escape(raw)
     # "Nov 4, 2026" / "4 de novembro de 2026": o ano da data de ontem/hoje/amanhã escrito logo depois do dia e mês

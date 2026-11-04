@@ -59,9 +59,9 @@ def test_judge_wallet_is_one_balance_for_all_splits():
 def test_tomorrow_day_number_is_not_flagged():
     import datetime
 
-    from app import grounding
+    from app import clock, grounding
 
-    t = datetime.date.today() + datetime.timedelta(days=1)
+    t = clock.today() + datetime.timedelta(days=1)
     assert grounding.unsupported_numbers(f"No forecast found for tomorrow, {t.day} {t:%B}.", []) == []
     meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro",
              "novembro", "dezembro"]
