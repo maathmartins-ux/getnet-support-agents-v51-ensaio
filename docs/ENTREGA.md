@@ -15,6 +15,6 @@ Resultados medidos (todos gerados de evals/results/, no README):
 Onde ainda está abaixo da referência, ou não foi medido (as limitações, com o efeito e o que faltaria, estão na seção de limitações do README):
 - nenhuma métrica
 
-Procedência: o primeiro commit traz um kit próprio, que evoluiu a partir das correções das minhas entregas anteriores deste desafio. O que veio do kit, o que foi feito no relógio e como comparar pela primeira entrega estão em docs/PROCEDENCIA.md. Relógio: 790 min do commit de scaffold ao commit 11daa65.
+Procedência: o primeiro commit traz um kit próprio, que evoluiu a partir das correções das minhas entregas anteriores deste desafio. O que veio do kit, o que foi feito no relógio e como comparar pela primeira entrega estão em docs/PROCEDENCIA.md. Relógio: 807 min do commit de scaffold ao commit 607621e.
 
 Obrigado!
