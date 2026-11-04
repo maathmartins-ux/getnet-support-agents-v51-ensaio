@@ -15,8 +15,8 @@ from .tools import *  # noqa: F403
 # challenge.py (ou COVERAGE_MIN_SCORE no compose). Trocar o padrão do KIT quebrou 14 testes.
 MIN_SCORE = 0.5
 # Portão pela nota do cross-encoder (bge-reranker-v2-m3): menor limiar que recusa >= 85% dos sem fonte no gold.
-# run_evals --calibrate-rerank-gate (03/11/2026): responde 98% dos com fonte, recusa 86% dos sem fonte (n=59/22)
-MIN_RERANK = -5.5017
+# run_evals --calibrate-rerank-gate (04/11/2026): responde 100% dos com fonte, recusa 91% dos sem fonte (n=48/22)
+MIN_RERANK = -4.986
 
 # --- prompts ------------------------------------------------------------------------------------------------
 # None = prompts do kit (src/app/prompts). O pré-voo aponta o challenge para src/app/domain/challenge_prompts.

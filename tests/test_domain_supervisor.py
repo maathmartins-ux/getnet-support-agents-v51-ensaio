@@ -46,14 +46,17 @@ def test_general_without_data_never_escalates(monkeypatch):
     assert "escalation" not in out.route and not any(r.handoff for r in out.results)
 
 
-# --- dependent: troubleshoot lê o terminal e DEPOIS o manual, com o fato do records ----------------------------
+# --- dependent: troubleshoot lê o terminal; o achado dele traz o manual, com o fato do records -------------------
 def test_troubleshoot_runs_records_then_faq_with_the_terminal_facts(monkeypatch):
+    # rodada 11: o plano do troubleshoot é só o records; o manual (faq) entra pelo achado (`needs`)
     calls: list = []
     seen: dict = {}
     stub(monkeypatch, "records", "ok", calls, seen, text="T1988B offline (chip, sem sinal).",
-         facts={"terminal_id": "T1988B", "connection": "chip"})
+         facts={"terminal_id": "T1988B", "connection": "chip"},
+         needs=[{"agent": "faq", "why": "terminal offline: passos do manual", "hint": "maquininha não conecta"}])
     stub(monkeypatch, "faq", "ok", calls, seen, text="Manual: confira o chip e o sinal.")
     out = supervisor.run(plan("troubleshoot"), ctx(), confidence=0.85)
+    assert plan("troubleshoot") == ["records"]
     assert calls == ["records", "faq"] and out.route == ["records", "faq"]
     assert seen["faq"].get("terminal_id") == "T1988B"  # o faq viu o achado do records
 
@@ -68,12 +71,13 @@ def test_need_from_records_brings_the_manual_when_the_plan_lacked_it(monkeypatch
 
 
 def test_records_failure_defers_the_dependent_manual(monkeypatch):
+    # sem o dado do records não há achado: o manual (que dependia dele) não roda e o caso vai ao humano
     calls: list = []
     stub(monkeypatch, "records", "error", calls, reason="tool_error")
     stub(monkeypatch, "faq", "ok", calls, text="Manual.")
     stub(monkeypatch, "escalation", "ok", calls, text="Encaminhei.")
     out = supervisor.run(plan("troubleshoot"), ctx(), confidence=0.85)
-    assert "faq" not in calls and "escalation" in out.route and "faq" in out.deferred
+    assert "faq" not in calls and "escalation" in out.route
 
 
 # --- partial do Knowledge é resposta, não humano ----------------------------------------------------------------

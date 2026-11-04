@@ -13,7 +13,9 @@ PLANS = {
     "knowledge": ["faq"],
     "general": ["faq"],  # dado ao vivo (clima/câmbio) ou busca web; nunca escala
     "support": ["records"],
-    "troubleshoot": ["records", "faq"],  # lê terminal/transação e depois o manual (needs)
+    # lê terminal/transação; o manual (faq) entra pelo achado do records (`needs`), decidido pelo supervisor LLM
+    # (rodada 11: no plano, o faq era passo do router e o achado só o antecipava — nenhum desvio era decisão do modelo)
+    "troubleshoot": ["records"],
     "multi": ["faq", "records"],
     "human_request": ["escalation"],
 }
@@ -122,7 +124,7 @@ def combine(intents: set[str]) -> tuple[str, float]:
     """Intenções das cláusulas → (intent da mensagem, confiança)."""
     if "human_request" in intents:
         return "human_request", 0.95
-    if "troubleshoot" in intents:  # o plano já inclui o manual (faq) e o dado (records)
+    if "troubleshoot" in intents:  # o dado (records); o manual (faq) vem do achado, se o records trouxer
         return "troubleshoot", 0.85
     if "support" in intents and intents & {"knowledge", "general"}:
         return "multi", 0.8  # desempate 2: produto + dado meu

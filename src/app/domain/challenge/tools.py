@@ -262,14 +262,15 @@ def needs_for(result, ctx) -> list[dict]:
     """Deriva needs dos resultados de tool do records (caminho com LLM): só com sintoma na pergunta."""
     if result.agent != "records" or not _SYMPTOM.search(ctx.text):
         return []
+    found: list[dict] = []
     for item in result.evidence:
         try:
             data = json.loads(item)
         except ValueError:
             continue
-        if isinstance(data, dict) and data.get("needs"):
-            return [dict(n) for n in data["needs"]]
-    return []
+        if isinstance(data, dict) and data.get("needs"):  # de TODOS os resultados (terminal E transação)
+            found += [dict(n) for n in data["needs"]]
+    return found
 
 
 # --- caminho offline do agente records (sem LLM) ----------------------------------------------------------------

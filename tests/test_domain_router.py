@@ -70,4 +70,4 @@ def test_general_never_escalates_and_troubleshoot_waits_for_records(domain_data)
     from app import domain
     d = domain.active()
     assert d.NO_ESCALATION == {"general"} and d.DEPENDS["faq"] == {"records"}
-    assert d.PLANS["troubleshoot"] == ["records", "faq"] and "faq" in d.ALLOWED["records"]
+    assert d.PLANS["troubleshoot"] == ["records"] and "faq" in d.ALLOWED["records"]
