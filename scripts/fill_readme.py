@@ -285,6 +285,39 @@ def _ablation_gain(results: Path) -> list[str]:
         if a and b and a.get("handoff_outcome_acc") is not None and b.get("handoff_outcome_acc") is not None:
             out.append(f"Ablação ({name}): desfecho certo no split replan **{a['handoff_outcome_acc']:.1f}% com** × "
                        f"**{b['handoff_outcome_acc']:.1f}% sem** replanejamento (mesmos {a['cases']} casos).")
+    return out + _needs_ablation(results)
+
+
+def _needs_ablation(results: Path) -> list[str]:
+    """Ablação ao vivo SEM os achados `needs` (o supervisor LLM decide sozinho) num split sem rótulo de rota (ex.:
+    perguntas reais): o juiz (vereditos num arquivo próprio, fora da manchete), números e frases sem base, latência e
+    custo, lado a lado com o MESMO split com `needs`. Só compara rodadas completas com os mesmos casos."""
+    out = []
+    for abl_f in sorted(results.glob("ablation_replan_no_needs*live.json")):
+        abl = _load(abl_f) or {}
+        split = abl.get("split")
+        base = _load(results / f"live_{split}.json") or {}
+        if not split or not base:
+            continue
+        ma, mb = (base.get("metrics") or {}).get(split) or {}, (abl.get("metrics") or {}).get(split) or {}
+        ja, jb = base.get("judge") or {}, abl.get("judge") or {}
+        if abl.get("status") != "complete" or base.get("status") != "complete" or ma.get("cases") != mb.get("cases"):
+            out.append(f"Ablação ao vivo sem `needs` ({split}): não comparável (status {abl.get('status')}, "
+                       f"{mb.get('cases')} × {ma.get('cases')} casos).")
+            continue
+        parts = [f"mesmos {ma['cases']} casos, commits `{base.get('git_sha')}` × `{abl.get('git_sha')}`"]
+        if ja.get("verdicts") and jb.get("verdicts"):
+            parts.append(f"fundamentadas pelo juiz **{ja['grounded']}/{ja['verdicts']} com** × "
+                         f"**{jb['grounded']}/{jb['verdicts']} sem**; úteis {ja['helpful']}/{ja['verdicts']} × "
+                         f"{jb['helpful']}/{jb['verdicts']}")
+        for key, label in (("numbers_acc", "números com base"), ("claims_acc", "frases com base")):
+            if ma.get(key) is not None and mb.get(key) is not None:
+                parts.append(f"{label} {ma[key]:.1f}% × {mb[key]:.1f}%")
+        if ma.get("p50_ms") and mb.get("p50_ms"):
+            parts.append(f"p50 {ma['p50_ms'] / 1000:.1f} s × {mb['p50_ms'] / 1000:.1f} s")
+        if ma.get("cost_usd") and mb.get("cost_usd"):
+            parts.append(f"US$ por caso {ma['cost_usd'] / ma['cases']:.3f} × {mb['cost_usd'] / mb['cases']:.3f}")
+        out.append(f"Ablação ao vivo sem `needs` ({split}, com × sem): " + "; ".join(parts) + ".")
     return out
 
 

@@ -839,7 +839,7 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
         target.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
         if judge is not None and live and status == "complete":
             # parcial (teto, chave, cota) e degradada não são evidência: não vão ao juiz nem ao judge.json
-            report["judge"] = judge_after_split(judge, target, judge_max_usd)
+            report["judge"] = judge_after_split(judge, target, judge_max_usd, out=judge_file_for(target))
             target.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
         report["path"] = str(target)
         return report
@@ -890,14 +890,22 @@ class JudgeWallet:
             self.spent += max(0.0, float(usd or 0.0))
 
 
-def judge_after_split(judge, path: Path, max_usd: float | JudgeWallet | None = None) -> dict:
-    """Julga o live_<split>.json recém-gravado e funde em judge.json (evals.judge.judge_into). Falha do juiz não
-    derruba o eval: vira {"status": "error"} na linha do split. `max_usd` pode ser o saldo comum (JudgeWallet)."""
+def judge_file_for(target: Path) -> Path:
+    """Onde vão os vereditos do juiz de um arquivo ao vivo: judge.json (a manchete) para os splits; arquivo próprio
+    para a ablação (`ablation_*`), que tem os MESMOS casos de um split e, no judge.json, se misturaria a ele na taxa
+    por split e no total."""
+    name = Path(target).name
+    return RESULTS_DIR / (f"judge_{Path(name).stem}.json" if name.startswith("ablation_") else "judge.json")
+
+
+def judge_after_split(judge, path: Path, max_usd: float | JudgeWallet | None = None, out: Path | None = None) -> dict:
+    """Julga o live_<split>.json recém-gravado e funde em `out` (judge.json; evals.judge.judge_into). Falha do juiz
+    não derruba o eval: vira {"status": "error"} na linha do split. `max_usd` pode ser o saldo comum (JudgeWallet)."""
     from evals import judge as judge_mod
 
     wallet = max_usd if isinstance(max_usd, JudgeWallet) else None
     try:
-        out = RESULTS_DIR / "judge.json"
+        out = out or RESULTS_DIR / "judge.json"
         before = _spent_in(out)
         rep = judge_mod.judge_into(judge(), path, out=out, max_usd=wallet.left() if wallet else max_usd)
         if wallet:
@@ -905,7 +913,7 @@ def judge_after_split(judge, path: Path, max_usd: float | JudgeWallet | None = N
     except Exception as exc:  # noqa: BLE001 — o eval já está gravado; o juiz é evidência adicional
         return {"status": "error", "reason": f"{type(exc).__name__}: {exc}"[:300]}
     mine = [v for v in rep.get("verdicts", []) if v.get("source") == path.name]
-    return {"status": rep.get("status"), "file": "judge.json", "verdicts": len(mine),
+    return {"status": rep.get("status"), "file": out.name, "verdicts": len(mine),
             "grounded": sum(bool(v.get("grounded")) for v in mine),
             "helpful": sum(bool(v.get("helpful")) for v in mine),
             "judge_unreliable": rep.get("judge_unreliable")}

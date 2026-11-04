@@ -159,3 +159,32 @@ def test_smoke_outside_results_does_not_rerecord_the_ci_cassette(tmp_path, monke
     assert not run_evals.records_cassette(tmp_path / "smoke.json")  # fumaça fora de evals/results
     monkeypatch.setenv("EVAL_CASSETTE", "off")
     assert not run_evals.records_cassette(None)
+
+
+def test_ablation_verdicts_go_to_their_own_judge_file():
+    """A ablação tem os mesmos casos de um split: no judge.json ela se misturaria à taxa do split e do total."""
+    from evals import run_evals
+
+    assert run_evals.judge_file_for(run_evals.RESULTS_DIR / "live_real.json").name == "judge.json"
+    assert run_evals.judge_file_for(run_evals.RESULTS_DIR / "ablation_replan_no_needs_live.json").name == \
+        "judge_ablation_replan_no_needs_live.json"
+
+
+def test_needs_ablation_line_compares_only_complete_runs_with_the_same_cases(tmp_path):
+    import json as _json
+
+    from scripts.fill_readme import _needs_ablation
+
+    def write(name, status, cases, grounded):
+        (tmp_path / name).write_text(_json.dumps({
+            "split": "real", "status": status, "git_sha": "abc",
+            "metrics": {"real": {"cases": cases, "numbers_acc": 100.0, "claims_acc": 97.5, "p50_ms": 20000,
+                                 "cost_usd": 1.6}},
+            "judge": {"verdicts": cases, "grounded": grounded, "helpful": grounded - 1}}), encoding="utf-8")
+
+    write("live_real.json", "complete", 40, 38)
+    write("ablation_replan_no_needs_live.json", "complete", 40, 33)
+    line = _needs_ablation(tmp_path)[0]
+    assert "mesmos 40 casos" in line and "38/40 com" in line and "33/40 sem" in line
+    write("ablation_replan_no_needs_live.json", "aborted_max_usd", 28, 25)
+    assert "não comparável" in _needs_ablation(tmp_path)[0]
