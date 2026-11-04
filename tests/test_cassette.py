@@ -157,6 +157,7 @@ def test_smoke_outside_results_does_not_rerecord_the_ci_cassette(tmp_path, monke
     monkeypatch.delenv("EVAL_CASSETTE", raising=False)
     assert run_evals.records_cassette(None) and run_evals.records_cassette(run_evals.RESULTS_DIR / "live_x.json")
     assert not run_evals.records_cassette(tmp_path / "smoke.json")  # fumaça fora de evals/results
+    assert not run_evals.records_cassette(run_evals.RESULTS_DIR / "ablation_replan_no_needs_live.json")  # outro modo
     monkeypatch.setenv("EVAL_CASSETTE", "off")
     assert not run_evals.records_cassette(None)
 
@@ -186,5 +187,9 @@ def test_needs_ablation_line_compares_only_complete_runs_with_the_same_cases(tmp
     write("ablation_replan_no_needs_live.json", "complete", 40, 33)
     line = _needs_ablation(tmp_path)[0]
     assert "mesmos 40 casos" in line and "38/40 com" in line and "33/40 sem" in line
+    # rejulgado: o arquivo de vereditos vence o resumo gravado no relatório
+    verdicts = [{"source": "live_real.json", "grounded": i < 39, "helpful": True} for i in range(40)]
+    (tmp_path / "judge.json").write_text(_json.dumps({"verdicts": verdicts}), encoding="utf-8")
+    assert "39/40 com" in _needs_ablation(tmp_path)[0]
     write("ablation_replan_no_needs_live.json", "aborted_max_usd", 28, 25)
     assert "não comparável" in _needs_ablation(tmp_path)[0]

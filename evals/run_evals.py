@@ -1035,6 +1035,8 @@ def records_cassette(out: Path | None) -> bool:
         return False
     if out is None:
         return True
+    if Path(out).name.startswith("ablation_"):  # mesmo split, outro modo: regravaria o cassete do split aceito
+        return False
     try:
         Path(out).resolve().relative_to(RESULTS_DIR.resolve())
         return True

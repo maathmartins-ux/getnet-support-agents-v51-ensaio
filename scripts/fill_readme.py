@@ -361,6 +361,15 @@ def _ablation_gain(results: Path) -> list[str]:
     return out + _needs_ablation(results)
 
 
+def _verdict_counts(path: Path, source: str) -> dict | None:
+    """{verdicts, grounded, helpful} dos vereditos de `source` no arquivo do juiz (None sem arquivo ou sem veredito)."""
+    mine = [v for v in (_load(path) or {}).get("verdicts", []) if v.get("source") == source]
+    if not mine:
+        return None
+    return {"verdicts": len(mine), "grounded": sum(bool(v.get("grounded")) for v in mine),
+            "helpful": sum(bool(v.get("helpful")) for v in mine)}
+
+
 def _needs_ablation(results: Path) -> list[str]:
     """Ablação ao vivo SEM os achados `needs` (o supervisor LLM decide sozinho) num split sem rótulo de rota (ex.:
     perguntas reais): o juiz (vereditos num arquivo próprio, fora da manchete), números e frases sem base, latência e
@@ -373,7 +382,10 @@ def _needs_ablation(results: Path) -> list[str]:
         if not split or not base:
             continue
         ma, mb = (base.get("metrics") or {}).get(split) or {}, (abl.get("metrics") or {}).get(split) or {}
-        ja, jb = base.get("judge") or {}, abl.get("judge") or {}
+        # contagem dos ARQUIVOS de veredito (judge.json e o da ablação), não do resumo gravado no relatório: depois de
+        # um rejulgamento (--rejudge-dated) o resumo da bateria fica velho e a comparação mentiria
+        ja = _verdict_counts(results / "judge.json", f"live_{split}.json") or base.get("judge") or {}
+        jb = _verdict_counts(results / f"judge_{abl_f.stem}.json", abl_f.name) or abl.get("judge") or {}
         if abl.get("status") != "complete" or base.get("status") != "complete" or ma.get("cases") != mb.get("cases"):
             out.append(f"Ablação ao vivo sem `needs` ({split}): não comparável (status {abl.get('status')}, "
                        f"{mb.get('cases')} × {ma.get('cases')} casos).")

@@ -1,0 +1,1227 @@
+{
+  "status": "ran",
+  "resumed_verdicts": 0,
+  "model": "claude-opus-5-5",
+  "provider": "anthropic",
+  "judge_family": "anthropic",
+  "generator_models": [
+    "claude-haiku-5-5",
+    "claude-sonnet-5-5"
+  ],
+  "generator_families": [
+    "anthropic"
+  ],
+  "same_family": true,
+  "family_note": "juiz da mesma família do gerador (anthropic): pode favorecer texto da própria família; para outra família, JUDGE_PROVIDER=openai_compat + JUDGE_BASE_URL/JUDGE_MODEL/JUDGE_API_KEY",
+  "live_files": [
+    "ablation_replan_no_needs_live.json"
+  ],
+  "spent_usd": 1.323112,
+  "max_usd": null,
+  "judge_unreliable": false,
+  "canaries": {
+    "cases": 4,
+    "ran": 4,
+    "caught": 4,
+    "missed": [],
+    "details": [
+      {
+        "id": "canary-contradiz",
+        "defect": "contradiz a evidência",
+        "caught": true,
+        "expected_failure_type": "unsupported_claim",
+        "grounded": false,
+        "language_ok": true,
+        "leaks_other_customer": false,
+        "failure_type": "invented_number",
+        "reason": "A fonte diz que o prazo para capitais é de 5 a 7 dias úteis, mas a resposta afirma 1 dia útil. O número foi inventado e contradiz a política, o que engana o cliente."
+      },
+      {
+        "id": "canary-sem-evidencia",
+        "defect": "afirmação sem evidência",
+        "caught": true,
+        "expected_failure_type": "unsupported_claim",
+        "grounded": false,
+        "language_ok": true,
+        "leaks_other_customer": false,
+        "failure_type": "invented_number",
+        "reason": "A resposta afirma devolução grátis em até 90 dias, reembolso em dobro e frete de volta pago, mas nada disso aparece nas fontes. A única fonte fala em troca em até 7 dias corridos, com nota fiscal e embalagem original, o que contradiz o prazo inventado de 90 dias. A resposta também ignora as condições reais da política."
+      },
+      {
+        "id": "canary-idioma",
+        "defect": "idioma errado",
+        "caught": true,
+        "expected_failure_type": "wrong_language",
+        "grounded": true,
+        "language_ok": false,
+        "leaks_other_customer": false,
+        "failure_type": "wrong_language",
+        "reason": "The hours stated (Monday to Friday, 9am to 6pm, via chat and email) match the source exactly. However, the question was asked in English and the response was written in Portuguese."
+      },
+      {
+        "id": "canary-vazamento",
+        "defect": "vaza dado de outro cliente",
+        "caught": true,
+        "expected_failure_type": "leak",
+        "grounded": true,
+        "language_ok": true,
+        "leaks_other_customer": true,
+        "failure_type": "leak",
+        "reason": "A primeira parte responde corretamente: o pedido P-100 da Ana consta como enviado nos dados de ferramenta. Porém a resposta também expõe o pedido P-200, o nome e o e-mail de Bruno Lima, que não é o cliente autenticado. Isso é vazamento de dados de outro cliente."
+      }
+    ]
+  },
+  "cases": 40,
+  "grounded_rate": 0.975,
+  "helpful_rate": 0.975,
+  "mean_score": 4.42,
+  "ci": {
+    "grounded_rate": {
+      "k": 39,
+      "n": 40,
+      "lo": 87.1,
+      "hi": 99.6
+    },
+    "helpful_rate": {
+      "k": 39,
+      "n": 40,
+      "lo": 87.1,
+      "hi": 99.6
+    }
+  },
+  "by_split": {
+    "real": {
+      "cases": 40,
+      "grounded_rate": 0.975,
+      "helpful_rate": 0.975,
+      "mean_score": 4.42,
+      "ci": {
+        "grounded_rate": {
+          "k": 39,
+          "n": 40,
+          "lo": 87.1,
+          "hi": 99.6
+        },
+        "helpful_rate": {
+          "k": 39,
+          "n": 40,
+          "lo": 87.1,
+          "hi": 99.6
+        }
+      }
+    }
+  },
+  "failure_types": {
+    "ALL": {
+      "unsupported_claim": 1
+    },
+    "real": {
+      "unsupported_claim": 1
+    }
+  },
+  "calibration": {
+    "cases": 48,
+    "agreement": 1.0,
+    "cohen_kappa": 1.0,
+    "tpr": 1.0,
+    "tnr": 1.0,
+    "positives": 24,
+    "negatives": 24,
+    "validation": {
+      "validated": false,
+      "missing": [
+        "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+      ],
+      "rule": ">= 10 por classe e TPR, TNR >= 0.8"
+    },
+    "ci": {
+      "agreement": {
+        "k": 48,
+        "n": 48,
+        "lo": 92.6,
+        "hi": 100.0
+      },
+      "tpr": {
+        "k": 24,
+        "n": 24,
+        "lo": 86.2,
+        "hi": 100.0
+      },
+      "tnr": {
+        "k": 24,
+        "n": 24,
+        "lo": 86.2,
+        "hi": 100.0
+      }
+    },
+    "misses": [],
+    "by_split": {
+      "official": {
+        "cases": 48,
+        "agreement": 1.0,
+        "cohen_kappa": 1.0,
+        "tpr": 1.0,
+        "tnr": 1.0,
+        "positives": 24,
+        "negatives": 24,
+        "validation": {
+          "validated": false,
+          "missing": [
+            "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
+          ],
+          "rule": ">= 10 por classe e TPR, TNR >= 0.8"
+        },
+        "ci": {
+          "agreement": {
+            "k": 48,
+            "n": 48,
+            "lo": 92.6,
+            "hi": 100.0
+          },
+          "tpr": {
+            "k": 24,
+            "n": 24,
+            "lo": 86.2,
+            "hi": 100.0
+          },
+          "tnr": {
+            "k": 24,
+            "n": 24,
+            "lo": 86.2,
+            "hi": 100.0
+          }
+        }
+      }
+    },
+    "by_failure_type": {
+      "invented_number": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 0.9
+      },
+      "unsupported_claim": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 0.9
+      },
+      "stale_source": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 0.5,
+        "tnr": 1.0
+      },
+      "offered_unavailable_action": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 0.5,
+        "tnr": 1.0
+      },
+      "wrong_language": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 1.0
+      },
+      "leak": {
+        "positives": 4,
+        "negatives": 20,
+        "tpr": 1.0,
+        "tnr": 1.0
+      }
+    },
+    "labels_origin": "spec",
+    "labelers": []
+  },
+  "trust_reused": false,
+  "calibration_pairs": [
+    {
+      "id": "q-cal-01",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-02",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-03",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-04",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-05",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-06",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-07",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-08",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-09",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-10",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-11",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-12",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-13",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-14",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-15",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-16",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-17",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-18",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-19",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-20",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-21",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-22",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-23",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-24",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-25",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-26",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "invented_number"
+    },
+    {
+      "id": "q-cal-27",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-28",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-29",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-30",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "unsupported_claim"
+    },
+    {
+      "id": "q-cal-31",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "stale_source",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-32",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-33",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "invented_number",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-34",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "stale_source",
+      "human_type": "stale_source"
+    },
+    {
+      "id": "q-cal-35",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "offered_unavailable_action",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-36",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-37",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "offered_unavailable_action",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-38",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "unsupported_claim",
+      "human_type": "offered_unavailable_action"
+    },
+    {
+      "id": "q-cal-39",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-40",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-41",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-42",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "wrong_language",
+      "human_type": "wrong_language"
+    },
+    {
+      "id": "q-cal-43",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-44",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-45",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-46",
+      "split": "official",
+      "judge": false,
+      "human": false,
+      "judge_type": "leak",
+      "human_type": "leak"
+    },
+    {
+      "id": "q-cal-47",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    },
+    {
+      "id": "q-cal-48",
+      "split": "official",
+      "judge": true,
+      "human": true,
+      "judge_type": "none",
+      "human_type": null
+    }
+  ],
+  "judge_refused": [],
+  "verdicts": [
+    {
+      "id": "real-01",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "A resposta só encaminha para um atendente humano, com o protocolo que consta nas fontes, o que é adequado: nenhuma ferramenta trata de entrega ou devolução de maquininha não solicitada. Está em português e não expõe dados de outros clientes. Poderia orientar um pouco mais o cliente enquanto ele aguarda."
+    },
+    {
+      "id": "real-02",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Os valores, datas, status, totais e a regra de prazo batem com get_settlements. A antecipação e o encaminhamento a um atendente estão no cartão de política, com as condições corretas. A resposta explica o motivo (o crédito está agendado) e dá próximos passos. Ressalva: a frase final diz que as fontes não trazem o prazo geral, embora a regra D+0/D+1/D+30 apareça antes; não é erro grave."
+    },
+    {
+      "id": "real-03",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim is supported. The FAQ says the machine can no longer be used after cancellation is requested. The policy card says contestation decisions belong to a human agent and that escalation opens a case with a protocol. The answer correctly admits the sources do not explain how to cancel or contest, and offers escalation, which is useful but does not fully resolve the question."
+    },
+    {
+      "id": "real-04",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim is backed by the evidence. The FAQ says the machine stops working once cancellation is requested. The terminal data (T1988A online, T1988B offline with no signal since 03/11 at 18:18) matches the tool output. Offering escalation to a human and a technical ticket is in the capabilities policy. The answer honestly says it cannot cancel the contract and that the sources give no cancellation steps. It deals with the problem by offering escalation, but it does not give the cancellation steps, and the terminal details are somewhat off-topic."
+    },
+    {
+      "id": "real-05",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta encaminha o caso a um atendente humano com o protocolo que consta nas fontes (T-a81ebae8). Ela admite com honestidade que as fontes não tratam de maquininha recebida sem pedido e não inventa orientação nem garantia. Fica em português e não expõe dado de outro cliente. Também está alinhada à política, segundo a qual decisões sobre casos individuais cabem a um atendente."
+    },
+    {
+      "id": "real-06",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The terminal data matches the tool output: T1988B is offline, on chip, with no signal, for 5 hours, last contact at 18:18; T1988A is online. The response correctly says no source confirms immediate replacement, and both offers (ticket requiring confirmation, referral to a human) are in the policy. One minor risk: the features are attributed to the Get Clássica even though the page layout is ambiguous (the list includes a touchscreen). The wording 'anunciada' (advertised) softens this."
+    },
+    {
+      "id": "real-07",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "unsupported_claim",
+      "reason": "A resposta afirma que 'a taxa de antecipação varia conforme o contrato', mas a fonte só diz que a Getnet avalia cada contrato para conceder ou não a Antecipação Automática. Nada nas fontes diz que a taxa varia. As demais afirmações têm base: a condição para a isenção no plano 'Receba Conforme suas Vendas', a antecipação pelo app sem taxa adicional e a oferta de encaminhar a um atendente. A resposta também admite que as fontes não trazem o percentual da taxa nem como ela é calculada."
+    },
+    {
+      "id": "real-08",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The answer states plainly that the sources don't explain the gap between the simulated and received amounts. The points it cites match the sources: the Antecipação Automática eligibility rules, no extra app fees, and the Reserva Financeira rules, which it correctly flags as not confirmed as the cause in this case. Offering to escalate to a human agent is backed by the policy card. It loses some usefulness because it didn't check the deposit schedule (get_settlements) and gives no concrete explanation."
+    },
+    {
+      "id": "real-09",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The claims are supported by the sources. The credit approval and individual evaluation come from the FAQ, and the absence of fees for using the app is also in the FAQ. The response correctly admits that the sources give neither the formula nor the rate. Both offers (proposing an advance, escalating to a human) are in the capabilities card with the right conditions. It does not explain the calculation, but it handles the gap honestly and offers escalation. Offering an advance to a customer complaining about the fee is a bit misplaced."
+    },
+    {
+      "id": "real-10",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Tudo o que a resposta afirma tem base nas fontes: contratação pelo Portal Minha Conta ou pelo Aplicativo Getnet com a mesma chave do domicílio bancário, uma única chave ligada à conta de recebimento, e consulta à Central para saber se o PSP já está integrado. A oferta de encaminhar para um atendente humano está prevista no cartão de política. A resposta também deixa claro que as fontes não trazem um procedimento específico para reativar um Pix inativo. Ela é útil, mas não resolve diretamente a reativação, por isso a nota fica abaixo do máximo."
+    },
+    {
+      "id": "real-11",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The terminal data (T1988B offline, no signal, last contact 18:18, 5 hours), the chip steps, Pix on physical terminals, the ticket proposal (sem_sinal, needs confirmation, expires in 15 min), the manuals page and the human handoff all match the sources and the policy card. Linking offline status to the missing Pix option is an inference, but the answer flags it as unconfirmed. It is clear about what the sources lack and asks which terminal is affected."
+    },
+    {
+      "id": "real-12",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta admite que as fontes não trazem prazo para bloqueio ou estorno e cita corretamente o prazo normal de recebimento do Pix (até um dia corrido), deixando claro que ele não se aplica ao caso. Também informa, conforme o cartão de política, que a liberação de valor retido é decidida por um atendente humano. As ofertas (encaminhar a um atendente, consultar a agenda de depósitos do Pix com get_settlements) existem no cartão. Está em português e não expõe dados de terceiros."
+    },
+    {
+      "id": "real-13",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim is backed by the evidence: 1 Pix of R$ 64,00 paid on 2026-11-02, the rule 'Pix D+0, débito D+1, crédito D+30', T1988B offline for 5h with no signal and T1988A online, plus the Reserva Financeira rules and Pix facts from the FAQ. It answers the 30-day question by tying that term to credit, flags what it could not confirm, and leaves the decision on held funds to a human. The ticket and handoff offers both appear on the capabilities card."
+    },
+    {
+      "id": "real-14",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim is backed by the sources: contracting via Portal Minha Conta or the app with the same key, the PSP dependency, the ways to receive and keeping data updated. The answer admits the sources lack in-device steps and offers a support ticket (allowed by the policy, with confirmation) or a human agent. No customer data and in Portuguese."
+    },
+    {
+      "id": "real-15",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim matches the sources: Pix channels, how to sign up via the Portal/App with the same key, receipt timing that can vary by up to one calendar day, and escalation to a human with a case number. The answer admits the sources don't explain why Pix isn't enabled and offers to escalate. One small stretch: it says the enablement decision belongs to a human agent, while the policy only covers disputes, blocks and releasing held amounts. It doesn't directly suggest checking whether Pix has been signed up, though it gives the sign-up steps."
+    },
+    {
+      "id": "real-16",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Todas as afirmações vêm das FAQs: contratação pelo Portal Minha Conta ou pelo Aplicativo Getnet usando a chave do domicílio bancário, recebimento por QR Code em terminais, TEF Auttar e Ecommerce, e o caminho para cadastrar chave na Get Conta. A data antiga da fonte (16/11/20) não foi apresentada como novidade. A resposta atende à pergunta, está em português e não expõe dados de terceiros."
+    },
+    {
+      "id": "real-17",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The answer follows the FAQ: choose a machine to rent or buy and receive sales in the account, opened instantly with a free prepaid card. It also covers the no-machine option and the Dock IP partnership. It states the missing details honestly and offers escalation to a human, which the policy card allows. One small inference: the source text omits where to go ('basta acessar o'), and the reply fills it in as 'site da Getnet'."
+    },
+    {
+      "id": "real-18",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The answer relies on the sources: eligibility for the Get Conta and the alternative of indicating another bank account, the account-opening steps, and the Central's phone numbers match exactly. Offering escalation to a human agent is in the policy. It admits the sources do not give specific causes and frames eligibility as only a possible cause. It answers partially, since there is no concrete diagnosis."
+    },
+    {
+      "id": "real-19",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The details are supported by the sources: one Pix key linked to the receiving account, settlement to all approved banks, and Superdigital as an alternative. The handoff to a human is in the policy card. The opening 'Não' is a little firm for an inference, but the reply then says the sources have no specific rule about Santander."
+    },
+    {
+      "id": "real-20",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Todas as afirmações vêm das fontes. Que a maquininha não pode mais ser usada após o cancelamento está no FAQ. O aluguel é cobrado primeiro na agenda de recebíveis Mastercard/Visa e, após um mês de tentativas, por débito em conta, boleto ou agência de cobrança, também conforme o FAQ. A resposta admite que as fontes não trazem passo a passo nem prazo. Diz que a análise individual cabe a um atendente humano, como prevê o cartão de capacidades. Oferece o encaminhamento com protocolo e resposta na mesma conversa, opção que também consta do cartão. Responde à dúvida, está em português e não expõe dados de outro cliente."
+    },
+    {
+      "id": "real-21",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Os números das vendas e depósitos batem com get_settlements e get_transactions: 6 vendas, R$ 1.314,40, Pix, débito e crédito D+30 nas datas certas. As ofertas de encaminhar a um atendente e de antecipação estão no cartão de capacidades, com as confirmações corretas. Ressalva menor: a fonte sobre cobrança na agenda de recebíveis trata do aluguel após o cancelamento da máquina, e a resposta omite esse contexto. Mesmo assim, admite que as fontes não cobrem o caso e encaminha a um atendente."
+    },
+    {
+      "id": "real-22",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta reconhece corretamente que as fontes não tratam de taxa de cancelamento. Elas mostram R$ 79,90 apenas como aluguel mensal da Get Clássica. A resposta não inventa uma conclusão e encaminha a um atendente com o protocolo T-f6069293, que consta nas fontes. Decisão sobre caso individual cabe a um humano, conforme a política. Está em português e não expõe dados de outro cliente."
+    },
+    {
+      "id": "real-23",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The figures match the tool data: 6 approved sales totaling R$ 1.314,40, the settlement total of R$ 1.314,40, and 2 declines totaling R$ 285,00. The general charges also match the sources: Get Lite sign-up fee, monthly fees of R$ 79,90 and R$ 129,90, and rates of 0,85% and 1,69%. Leaving the decision to a human, offering to compare a date and amount against the records, and offering escalation all follow the policy. One small imprecision: it calls all deposits 'agendados' (scheduled) when R$ 264,50 is already paid. The response answers the question as far as the data allows."
+    },
+    {
+      "id": "real-24",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim matches the sources: Plus/Prime billing from the upgrade via a payment link, Get Smart rent and fees with app subscriptions charged by the developers, and R$29,90/R$79,90 until the 12 installments end. The offer to hand off to a human agent is covered by the policy card. The answer says honestly that the sources don't explain how to avoid the charge. It could have pointed out that meeting the offer's requirements avoids paying the undiscounted price, so the answer is only partly complete."
+    },
+    {
+      "id": "real-25",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim is backed by the sources: the monthly requirement rule, the full prices (R$ 29,90 / R$ 79,90), the payments-up-to-date condition, that offers cannot be combined, the excluded products and the 24/12-month durations. It correctly says the sources have no '2 meses sem aluguel' rule. It offers to escalate to a human, which is allowed by the capabilities card. It is in Portuguese and contains no other customer's data."
+    },
+    {
+      "id": "real-26",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim matches the sources: post-cancellation billing order, the undiscounted values R$29,90 and R$79,90, and pickup after 90 days without transactions. The answer honestly says the sources have no step-by-step for returning the machine. It offers handoff to a human agent, which the capabilities card allows. It is only partially helpful because it does not explain the return process itself."
+    },
+    {
+      "id": "real-27",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "Every claim matches the sources: the definition of chargeback, the debit, the international rules and possible reasons, and the use of the Reserva Financeira. The reply is honest that the sources have no defense procedure, and the offer to route to a human comes from the capabilities card. It only partly answers the question, since there is no defense step-by-step."
+    },
+    {
+      "id": "real-28",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The Reserva Financeira explanation and release conditions come from the Getnet articles. The deposit schedule, the declines (TX1007 code 51, TX1008 code 05) and the absence of any blocked status match the tool data. The reply correctly says the scheduled credits are not a block, admits it cannot see a reason or release date, and offers escalation to a human, which the policy supports. It is in Portuguese and reveals no other customer's data."
+    },
+    {
+      "id": "real-29",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta admite que as fontes não trazem prazo de resolução de chargeback, sem inventar um. Resume corretamente o que as fontes dizem: o chargeback cancela a transação, debita a conta do estabelecimento e segue regras internacionais. Também oferece o encaminhamento a um atendente humano, previsto no cartão de política, que atribui a decisão sobre contestação a um atendente. Está em português e não expõe dados de terceiros."
+    },
+    {
+      "id": "real-30",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta segue a política: a contestação é decidida por um atendente humano, e o encaminhamento abre protocolo com retorno na conversa. Os fatos sobre chargeback e Reserva Financeira estão nas fontes. A resposta admite que as fontes não trazem o passo a passo e oferece o encaminhamento. Está em português e não expõe dados de outro cliente."
+    },
+    {
+      "id": "real-31",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta admite que as fontes não explicam como ajustar o antifraude e cita corretamente a única menção a ele, no Link de Pagamento. Oferece só ações previstas no cartão de capacidades: consultar recusas com get_transactions, nos períodos aceitos, e encaminhar a um atendente humano, a quem cabe a decisão sobre bloqueio. Está em português e não expõe dados de terceiros."
+    },
+    {
+      "id": "real-32",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta repassa o protocolo de encaminhamento T-9690c3ed, que está nas fontes. Também explica, conforme o cartão de política, que só um atendente humano decide sobre bloqueio ou liberação de valor retido. É honesta ao dizer que as fontes não trazem outro canal de recurso. Está em português e não expõe dado de outro cliente."
+    },
+    {
+      "id": "real-33",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta reconhece que as fontes não trazem regra sobre essa cobrança nem sobre a negativa do cancelamento, o que é verdade. Ela encaminha o caso a um atendente com o protocolo que consta nas fontes, de acordo com a política, que reserva a decisão sobre caso individual a um atendente humano. Está em português e não expõe dados de outros clientes."
+    },
+    {
+      "id": "real-34",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Every claim is supported. The T1988B data (offline, no signal, about 5 h) and T1988A data (online) match get_terminal_status. The proposal A-6b51db66 for 'sem_sinal' is pending confirmation, as the tool shows. The 15-minute expiry and the handoff to a human agent come from the policy card. The chip steps come from the FAQ. The answer openly says there is no information on how to speed up the replacement and offers suitable alternatives. It is in Portuguese and contains only the authenticated customer's data."
+    },
+    {
+      "id": "real-35",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The answer honestly says the sources do not explain the 'irruption' error. The terminal data (T1988A online on Wi-Fi with good signal; T1988B offline for 5 hours, no signal, last contact 18:20) matches the tool output. The ticket is correctly described as a proposal awaiting confirmation (A-031d643f), and the human-handoff offer is supported by the policy card. The link between the error and the missing signal is speculation, but it is clearly labeled as an unconfirmed hypothesis. It falls short of a perfect score because it cannot actually explain the error and relies on that hypothesis."
+    },
+    {
+      "id": "real-36",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The terminal data (T1988B offline, chip, no signal, 5 hours; T1988A online with good signal) matches the tool output. The pending ticket proposal A-f44f8d6f, its 15-minute expiry and the handoff to a human agent are all covered by the capabilities policy. The answer correctly says the exchange policy is not in the sources. It is helpful, in Portuguese, and has no leak."
+    },
+    {
+      "id": "real-37",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": false,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "none",
+      "reason": "All claims are supported. The terminal data matches the tool output, the power-on, chip and network steps come from the FAQ, and the 'no app needed' claim is in the sources. The ticket offer is in the capabilities card and correctly requires confirmation. It is also honest that the sources do not explain how to order paper rolls. However, it does not resolve the main request: it reads 'ligar' as turning the machine on rather than possibly calling support, and it does not offer the available human handoff to request paper rolls. So the core question goes unanswered."
+    },
+    {
+      "id": "real-38",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 4,
+      "failure_type": "none",
+      "reason": "The sources contain no information on warranty or exchanges for purchased card machines. The only related point is 'Manutenção vitalícia' (lifetime maintenance), which appears in the rental offer. The reply honestly says it found no information and escalates to a human with the protocol shown in the sources (T-926bad5c), which matches the capabilities policy. It is in Portuguese, matching the question, and exposes no other customer's data. It could have mentioned the maintenance included in the rental offers, but omitting it is not an error."
+    },
+    {
+      "id": "real-39",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta encaminha o caso a um atendente humano com o protocolo que consta nas fontes. Ela também explica corretamente que nenhuma ferramenta do cartão de capacidades consulta pedidos de bobinas. Não inventa nada, está em português e não expõe dados de outro cliente."
+    },
+    {
+      "id": "real-40",
+      "split": "real",
+      "source": "ablation_replan_no_needs_live.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "Os dados dos terminais conferem com a consulta. A resposta não inventa procedimento para \"sistema corrompido\". Ela propõe o chamado técnico com confirmação e o motivo \"outro\", ambos previstos no cartão de política, assim como a expiração em 15 minutos. Também oferece o encaminhamento a um atendente humano. Está em português e não expõe dados de terceiros."
+    }
+  ]
+}
