@@ -211,6 +211,13 @@ def test_readme_timeline_shows_milestones_and_points_to_the_full_timesheet(tmp_p
     assert len(rows) <= _fr.TIMELINE_MAX_ROWS and "docs/TIMESHEET.md" in text and "33 commits" in text
     assert "chore: scaffold" in text and "eval: bateria" in text and "readme: fim" in text
 
+    # a conferência vale o total declarado, não as linhas da tabela (só marcos): antes reprovava todo repo com > 20
+    block = f"<!-- timeline:begin -->\n{text}\n<!-- timeline:end -->"
+    assert _fr._check_timeline(block, tmp_path) == []
+    _sp.run(["git", "commit", "-q", "--allow-empty", "-m", "fix: depois do readme"], cwd=tmp_path, check=True,
+            env={**__import__("os").environ, **env})
+    assert "o git tem 34" in " ".join(_fr._check_timeline(block, tmp_path))
+
 
 def test_rerank_order_base_keeps_the_base_order_and_attaches_the_score(monkeypatch):
     """RERANK_ORDER=base: a nota do cross vai em cada trecho (o portão usa), a ordem é a do buscador base."""

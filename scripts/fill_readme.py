@@ -699,6 +699,9 @@ def _check_timeline(text: str, root: Path) -> list[str]:
                            capture_output=True, encoding="utf-8")
         commits = [c for c in r.stdout.splitlines() if c.strip()]
         listed = sum(1 for line in rows.splitlines() if re.match(r"^\| \d\d:\d\d:\d\d \|", line))
+        # com mais de TIMELINE_MAX_ROWS commits a tabela mostra só os marcos: vale o total declarado na linha final
+        declared = re.search(r"Do primeiro ao último commit: \*\*\d+ min\*\*, (\d+) commits", rows)
+        listed = int(declared.group(1)) if declared else listed
         last_files = subprocess.run(["git", "show", "--name-only", "--format=", "HEAD"], cwd=root, check=False,
                                     text=True, capture_output=True, encoding="utf-8").stdout.split()
         readme_only = bool(last_files) and set(last_files) <= README_ONLY
