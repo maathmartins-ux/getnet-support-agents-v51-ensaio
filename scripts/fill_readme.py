@@ -115,6 +115,11 @@ def judge_block(results: Path) -> str:
     lines = [f"Modelo `{j['model']}` · status `{j['status']}` · arquivos {', '.join(j.get('live_files', [])) or '—'}"
              f" · gasto US$ {j.get('spent_usd')}", "",
              "| split | casos | grounded | helpful | nota média |", "|---|---:|---:|---:|---:|"]
+    if j.get("rejudged_dated"):  # rejulgamento declarado: quem compara os commits vê por que o veredito mudou
+        lines[1:1] = ["", f"Rejulgados {j['rejudged_dated']} vereditos (os reprovados e os de resposta com data) com a "
+                          "data em que cada resposta foi gerada, no fuso do negócio (`evals.judge --rejudge-dated`): o "
+                          "juiz usava a data do relógio dele (UTC) e, numa bateria perto da meia-noite, julgava "
+                          "\"hoje/amanhã/ontem\" contra o dia seguinte."]
     for split, s in {**j.get("by_split", {}), "ALL": j}.items():
         lines.append(f"| {split} | {s['cases']} | {s['grounded_rate']}{ci(s, 'grounded_rate')} | "
                      f"{s['helpful_rate']}{ci(s, 'helpful_rate')} | {s['mean_score']} |")

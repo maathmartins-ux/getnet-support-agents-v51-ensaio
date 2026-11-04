@@ -32,3 +32,16 @@ def test_live_rows_record_the_business_date(monkeypatch):
 
     monkeypatch.setattr("app.clock.today", lambda: __import__("datetime").date(2026, 11, 3))
     assert run_evals._business_date() == "2026-11-03"
+
+
+def test_results_block_declares_the_rejudge(tmp_path):
+    import json
+
+    from scripts.fill_readme import judge_block
+
+    base = {"model": "m", "status": "ran", "live_files": ["live_a.json"], "spent_usd": 1, "cases": 1,
+            "grounded_rate": 1.0, "helpful_rate": 1.0, "mean_score": 5, "by_split": {}, "calibration": {}}
+    (tmp_path / "judge.json").write_text(json.dumps({**base, "rejudged_dated": 131}), encoding="utf-8")
+    assert "Rejulgados 131 vereditos" in judge_block(tmp_path)
+    (tmp_path / "judge.json").write_text(json.dumps(base), encoding="utf-8")
+    assert "Rejulgados" not in judge_block(tmp_path)

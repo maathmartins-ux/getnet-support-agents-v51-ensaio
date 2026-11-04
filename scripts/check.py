@@ -55,8 +55,13 @@ def free_port() -> int:
         return s.getsockname()[1]
 
 
-def wait_health(url: str, timeout_s: float = 60) -> dict | None:
-    deadline = time.time() + timeout_s
+# Espera do /health do container. A 1ª subida logo depois de um build de vários GB lê o disco frio: na rodada 10 passou
+# de 60 s (e a mesma imagem subiu em 8 s em seguida), reprovando uma imagem sã. O tempo medido vai no detalhe.
+HEALTH_TIMEOUT_S = float(os.getenv("CHECK_HEALTH_TIMEOUT_S", "180"))
+
+
+def wait_health(url: str, timeout_s: float | None = None) -> dict | None:
+    deadline = time.time() + (HEALTH_TIMEOUT_S if timeout_s is None else timeout_s)
     while time.time() < deadline:
         try:
             with urllib.request.urlopen(url, timeout=2) as resp:
@@ -158,7 +163,8 @@ def docker_steps(extras: str = "", forced: bool = False) -> list[tuple[str, bool
         # o buscador do container é o pedido (sem fallback para BM25): a imagem que sobe é a que foi medida
         ok = bool(health) and health.get("data_files", 0) > 0 and not health.get("retriever_fallback")
         logs = "" if health else sh(["docker", "logs", IMAGE]).stdout[-2000:]
-        detail = json.dumps(health) if health else f"sem resposta em 60 s: {logs}"
+        detail = (json.dumps({**health, "subiu_em_s": round(time.perf_counter() - t0, 1)}) if health
+                  else f"sem resposta em {HEALTH_TIMEOUT_S:.0f} s: {logs}")
         results.append(("container /health com dados", ok, time.perf_counter() - t0, detail))
         if ok:
             # o token do eval é assinado com o mesmo segredo do container (senão 401)

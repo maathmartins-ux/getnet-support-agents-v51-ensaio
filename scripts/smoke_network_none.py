@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -30,7 +31,10 @@ def docker(*args: str) -> subprocess.CompletedProcess:
                           check=False)
 
 
-def smoke(image: str, timeout_s: float = 60) -> tuple[bool, str]:
+def smoke(image: str, timeout_s: float | None = None) -> tuple[bool, str]:
+    # mesma espera do check (CHECK_HEALTH_TIMEOUT_S): a 1ª subida depois do build lê o disco frio
+    timeout_s = float(os.getenv("CHECK_HEALTH_TIMEOUT_S", "180")) if timeout_s is None else timeout_s
+    t0 = time.time()
     name = f"{image.replace(':', '-').replace('/', '-')}-netnone"
     docker("rm", "-f", name)
     run = docker("run", "-d", "--network", "none", "--name", name, "-e", "LLM_PROVIDER=offline", image)
@@ -46,7 +50,8 @@ def smoke(image: str, timeout_s: float = 60) -> tuple[bool, str]:
                 ok = health[0] == 200 and health[1].get("data_files", 0) > 0 and ready[0] == 200
                 net = docker("inspect", "-f", "{{.HostConfig.NetworkMode}}", name).stdout.strip()
                 return ok and net == "none", json.dumps({"network": net, "health": health[0],
-                                                         "ready": ready, "data_files": health[1].get("data_files")})
+                                                         "ready": ready, "data_files": health[1].get("data_files"),
+                                                         "subiu_em_s": round(time.time() - t0, 1)})
             last = (r.stderr or r.stdout).strip()[-300:]
             time.sleep(1)
         return False, f"sem resposta em {timeout_s:.0f} s: {last}\n{docker('logs', name).stderr[-1500:]}"

@@ -20,9 +20,9 @@ fraude, abuso verbal, autoagressão, ação sem confirmação, envenenamento de 
 
 ## Número medido
 
-- Camada regex offline (`app.guardrails.check_input`, sem LLM): bloqueia 23 de 32 ataques do split guardrail.
-  Os 9 que passam (personificação de admin, `cliente2024` em pt sem verbo "mostre ... de", lavagem com outro
-  vocabulário, clonagem de cartão, memória persistente) ficam para a camada LLM; são o alvo de melhoria.
+- Camada regex offline (`app.guardrails.check_input`, sem LLM): não fecha todos os ataques do split guardrail sozinha (taxa por família ASI no bloco do red team de `docs/RESULTS.md`, gerado).
+  Os que passam (ids em `evals/results/latest.json`, `gate_red_team.unsafe`) ficam para a camada LLM; são o alvo
+  de melhoria.
 - `tests/test_domain_http.py` + `tests/test_domain_guardrails.py`: 23 passed.
 
 ## Juiz
