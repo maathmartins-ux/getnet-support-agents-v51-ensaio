@@ -193,3 +193,55 @@ def test_needs_ablation_line_compares_only_complete_runs_with_the_same_cases(tmp
     assert "39/40 com" in _needs_ablation(tmp_path)[0]
     write("ablation_replan_no_needs_live.json", "aborted_max_usd", 28, 25)
     assert "não comparável" in _needs_ablation(tmp_path)[0]
+
+
+def _ablation_arm(path, sha, rows, prompt="h1"):
+    """Um braço da ablação `needs` (split real) com as linhas que a conta de p50 e de destino do achado lê."""
+    rows = [{"prompt_versions": {"supervisor.md": prompt}, **r} for r in rows]
+    path.write_text(json.dumps({
+        "split": "real", "status": "complete", "git_sha": sha, "rows": rows,
+        "metrics": {"real": {"cases": len(rows), "p50_ms": 2000, "cost_usd": 0.4}},
+        "judge": {"verdicts": len(rows), "grounded": len(rows), "helpful": len(rows)}}), encoding="utf-8")
+
+
+def test_needs_ablation_warns_when_the_arms_come_from_different_commits(tmp_path):
+    """Medido na rodada 10: os braços eram de 35020c4 × 318f3af e o README dizia "no mesmo commit da bateria"."""
+    from scripts.fill_readme import _needs_ablation
+
+    rows = [{"id": "real-01", "ms": 1000.0}]
+    _ablation_arm(tmp_path / "live_real.json", "abc", rows)
+    _ablation_arm(tmp_path / "ablation_replan_no_needs_live.json", "abc", rows)
+    same = _needs_ablation(tmp_path)[0]
+    assert "mesmo commit `abc`" in same and "AVISO" not in same
+    _ablation_arm(tmp_path / "ablation_replan_no_needs_live.json", "def", rows)
+    other = _needs_ablation(tmp_path)[0]
+    assert "**AVISO: braços em commits diferentes** (`abc` × `def`, mesmos prompts)" in other
+    _ablation_arm(tmp_path / "ablation_replan_no_needs_live.json", "def", rows, prompt="h2")
+    assert "prompts diferentes: supervisor.md" in _needs_ablation(tmp_path)[0]
+
+
+def test_needs_ablation_gives_the_p50_where_the_finding_fired_and_what_happened_to_it(tmp_path):
+    """Só 10 dos 40 casos reais dispararam o achado na rodada 10: o p50 do split inteiro misturava 30 casos de mesmo
+    caminho nos dois braços. O achado conta pela árvore de passos (`needs`) ou, em gravação antiga, pelo replanejamento
+    "records:need->faq"; o destino (supervisor.NEED_OUTCOMES) sai contado do braço com `needs`."""
+    from app import supervisor
+    from scripts.fill_readme import NEED_OUTCOME_LABEL, _needs_ablation
+
+    def finding(outcome):
+        return [{"agent": "records", "needs": [{"agent": "faq", "why": "terminal offline", "outcome": outcome}]},
+                {"agent": "faq"}]
+
+    base = [{"id": "real-01", "ms": 30000.0, "steps": finding("called")},
+            {"id": "real-02", "ms": 20000.0, "steps": finding("ignored")},
+            {"id": "real-03", "ms": 25000.0, "replans": ["records:need->faq (terminal offline)"]},  # gravação antiga
+            {"id": "real-04", "ms": 1000.0, "steps": [{"agent": "faq"}]},
+            {"id": "real-05", "ms": 2000.0, "steps": [{"agent": "faq"}]}]
+    slower = {"real-01", "real-02", "real-03"}
+    ablation = [{**r, "ms": r["ms"] + 10000.0 if r["id"] in slower else r["ms"]} for r in base]
+    _ablation_arm(tmp_path / "live_real.json", "abc", base)
+    _ablation_arm(tmp_path / "ablation_replan_no_needs_live.json", "abc", ablation)
+    line = _needs_ablation(tmp_path)[0]
+    assert "p50 só nos 3 casos em que o achado disparou 25.0 s × 35.0 s" in line
+    assert ("2 achados no braço com `needs`: o modelo chamou o agente pedido 1, ignorou mesmo com o lembrete "
+            "(`need_ignored`) 1") in line
+    assert set(NEED_OUTCOME_LABEL) == set(supervisor.NEED_OUTCOMES)  # destino novo sem rótulo sairia "outro"

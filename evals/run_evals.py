@@ -20,11 +20,21 @@ Campos de `expect`: intent, handoff, blocked, language (conferido no TEXTO da re
 chamado), pending_action, replanned, not_contains, doc_ids (relevantes → Recall@3 e MRR), agents /
 forbidden_agents (handoff por desfecho), must_include_agents / must_mention (conclusão da tarefa → completed_acc:
 a resposta tem as partes esperadas), facts (regex sem caixa que a resposta TEM de conter → facts_acc e a
-manchete `resolved`: sem humano E todo fato na resposta E ao menos uma fonte citada ou dado de ferramenta).
+manchete `resolved`: sem humano E todo fato na resposta E ao menos uma fonte citada ou dado de ferramenta),
+human_in_turn (a resposta do operador saiu NO MESMO turno: algum passo com `answered_live`).
 `before`: mensagens anteriores na mesma conversa (casos de memória).
+Humano no laço (split `hitl`): o caso traz `"operator": {"answer": ..., "after_s": ...}` (a operadora simulada,
+evals/operator_sim.py, responde o caso que o turno abrir `after_s` s depois de o turno começar a esperar) e `"wait_s"`
+(espera síncrona só deste caso, hitl_sync.override; sem ele vale o env). Depois do turno, o eval espera a resposta
+dela e lê o que a retomada assíncrona entregou na conversa: `facts` vale para a resposta do turno + a mensagem
+retomada, `human_once` confere que a resposta dela chegou uma vez só (no turno, sem retomada; ou só pela retomada) e
+`resolved` (sem humano) não se aplica. Só em processo: com --url a fila e a espera são do servidor.
 Gate de resolvidas (opcional): `--min-resolved 0.9` reprova o offline com oficiais resolvidas abaixo do alvo.
-Ablação: `--ablate-replan` (plano fixo, split replan) · `--ablate-replan --mode no_needs` (só reage a falha, split
-dependent): mede o ganho do replanejamento por achado em completed_acc.
+Ablação: `--ablate-replan` (plano fixo, split replan) · `--ablate-replan --mode no_needs` (split dependent por padrão;
+ao vivo, `--split real`): o achado `needs` some do turno — o supervisor LLM não o recebe no tool_result, não há a
+volta de lembrete e o motor de tabela não insere o passo; a reação à falha continua. Mede o ganho do achado como
+informação (completed_acc offline; juiz, latência e custo ao vivo, em scripts/fill_readme.py::_needs_ablation). Rode
+o braço no mesmo commit da bateria com `needs`: em commits diferentes a linha do README sai com AVISO.
 
 Isolamento: em processo, cada caso (e cada repetição) roda num banco SQLite próprio — memória de longo
 prazo, tickets e ações não vazam entre casos, e o user_id (dono no CRM) continua o do caso. Toda taxa sai com
@@ -52,6 +62,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from evals import operator_sim
 from evals.context import build as build_context
 
 HERE = Path(__file__).resolve().parent
@@ -65,6 +76,11 @@ RESULTS_DIR = HERE / "results"
 RESULTS = RESULTS_DIR / "latest.json"
 # Splits medidos mas fora do gate: gatear o cego ou os difíceis convidaria a ajustar o sistema a eles.
 UNGATED = {"heldout", "hard", "real"}  # real: perguntas de lojistas sem gabarito de rota
+
+
+def ungated(split: str) -> bool:
+    """Fora do gate de intenção: os de UNGATED e todo lote cego do held-out (heldout_h3...), pelo prefixo."""
+    return split in UNGATED or split.startswith("heldout")
 # 0.9 é o piso usual de take-home; ajuste por desafio, nunca para "fazer passar".
 GATE = float(os.getenv("EVAL_GATE", "0.9"))
 # Red team como GATE (casos rotulados por ASI que reprovam o CI): nos splits de ataque, a
@@ -169,7 +185,39 @@ def load_cases(paths: tuple[Path, ...] | None = None) -> list[dict]:
                 re.compile(pattern, re.IGNORECASE)
             except re.error as exc:
                 raise ValueError(f"caso {c['id']}: expect.facts com regex inválida {pattern!r}: {exc}") from exc
+        if field := echo_facts(c):
+            raise ValueError(f"caso {c['id']}: todo fato já está na pergunta ({field}); eco não mede a resposta: "
+                             "acrescente um fato que só a resposta certa traz (valor, prazo, condição da fonte)")
+        _check_operator(c)
     return cases
+
+
+def echo_facts(case: dict) -> str | None:
+    """A lista de fatos que casa INTEIRA com a própria pergunta (`expect.facts` ou `expect.expects_fact`), ou None.
+
+    Com ela, repetir a pergunta passa na checagem: rodada 10, o official-10 ("Can I sell through WhatsApp using the
+    Payment Link?", fatos "whats ?app" e "payment link") contava como resolvido sem nenhum dado da fonte, e mais 3
+    casos tinham só "whats ?app". Cada lista é olhada sozinha porque cada uma alimenta uma checagem (`facts`/
+    `resolved` e `memory`), com o mesmo casamento delas (regex sem caixa; fact_present na memória)."""
+    exp, message = case.get("expect") or {}, case.get("message") or ""
+    if exp.get("facts") and not facts_missing(exp, message):
+        return "expect.facts"
+    if exp.get("expects_fact"):
+        from .memory_metrics import facts_ok
+
+        if facts_ok(exp["expects_fact"], message):
+            return "expect.expects_fact"
+    return None
+
+
+def _check_operator(case: dict) -> None:
+    """Caso do split hitl mal escrito quebra na carga (não vira "a operadora não respondeu" depois de gastar)."""
+    op = case.get("operator")
+    if op is not None and not (isinstance(op, dict) and str(op.get("answer") or "").strip()):
+        raise ValueError(f"caso {case['id']}: `operator` precisa de {{\"answer\": \"...\", \"after_s\": N}}")
+    for name, value in (("operator.after_s", (op or {}).get("after_s")), ("wait_s", case.get("wait_s"))):
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int | float) or value < 0):
+            raise ValueError(f"caso {case['id']}: {name} tem de ser um número de segundos >= 0, não {value!r}")
 
 
 def has_credentials() -> bool:
@@ -258,9 +306,16 @@ def score(case: dict, got: dict) -> dict[str, bool]:
         checks["completed"] = set(exp.get("must_include_agents", [])) <= called \
             and all(m.casefold() in answer for m in exp.get("must_mention", []))
     if "facts" in exp:  # contrato do caso oficial: cada regex (sem caixa) TEM de estar na resposta
-        missing = facts_missing(exp, got.get("answer", ""))
+        missing = facts_missing(exp, delivered_text(got))
         checks["facts"] = not missing
-        checks["resolved"] = resolved(got, missing)
+        if not case.get("operator"):  # "resolvido SEM humano" não se aplica ao caso que existe para o humano
+            checks["resolved"] = resolved(got, missing)
+    if "human_in_turn" in exp:  # a resposta do operador saiu no MESMO turno (supervisor._continue_with_operator)
+        checks["human_in_turn"] = answered_live(got) == bool(exp["human_in_turn"])
+    if (got.get("operator") or {}).get("posted"):
+        # a resposta da operadora chega ao cliente UMA vez: no turno (e a retomada não manda de novo) ou só pela
+        # retomada assíncrona, quando chegou depois da espera
+        checks["human_once"] = len(got.get("resumed") or []) == (0 if answered_live(got) else 1)
     if exp.get("expects_fact"):  # valores de turnos anteriores que a resposta deve conter (evals/memory_metrics.py)
         from .memory_metrics import facts_ok
 
@@ -274,6 +329,18 @@ def score(case: dict, got: dict) -> dict[str, bool]:
 def facts_missing(exp: dict, answer: str) -> list[str]:
     """Regex de `expect.facts` que a resposta NÃO contém (busca sem caixa)."""
     return [p for p in exp.get("facts", []) if not re.search(p, answer or "", re.IGNORECASE)]
+
+
+def answered_live(got: dict) -> bool:
+    """O operador respondeu durante a espera e a resposta saiu no próprio turno (passo com `answered_live`)."""
+    return any(st.get("answered_live") for st in got.get("steps") or [])
+
+
+def delivered_text(got: dict) -> str:
+    """O que o cliente leu: a resposta do turno + as mensagens que a retomada assíncrona pôs na conversa depois dele
+    (caso com operadora; nos outros, só a resposta do turno, como sempre)."""
+    resumed = got.get("resumed") or []
+    return "\n\n".join([got.get("answer") or "", *resumed]) if resumed else got.get("answer") or ""
 
 
 def handed_off(got: dict) -> bool:
@@ -390,13 +457,39 @@ def _case_store(db: str):
     return store
 
 
+def _start_operator(case: dict, client):
+    """Operadora simulada do caso (split `hitl`), já de olho na fila antes do turno; None sem `operator` ou com --url
+    (a fila e a espera são do servidor remoto)."""
+    spec = case.get("operator")
+    if not spec or getattr(client, "url", None):
+        return None
+    return operator_sim.Operator(str(spec["answer"]), float(spec.get("after_s", 0.0)), operator_sim.reply_direct(),
+                                 seen=operator_sim.open_handoffs()).start()
+
+
+def _operator_outcome(sim, case: dict, got: dict) -> dict:
+    """Depois do turno: espera a resposta da operadora e lê o que a retomada assíncrona pôs na conversa (no banco do
+    caso). Vai para `got` (as checagens leem daqui) e para a linha."""
+    from app.store import get_store
+
+    state = sim.finish((got.get("handoff") or {}).get("ticket_id"))
+    conv = got.get("conversation_id")
+    resumed = [m["content"] for m in get_store().history(conv, limit=500) if m.get("intent") == "resumed"] \
+        if conv else []
+    report = {"ticket": state["ticket"], "status": state["status"], "posted": sim.posted, "clock": state["clock"],
+              "after_s": sim.after_s, "wait_s": case.get("wait_s"),
+              "resume_engine": (state["resumed"] or {}).get("engine"), "error": state["error"]}
+    return {"operator": report, "resumed": resumed}
+
+
 def run_case(client, case: dict, db: str | None = None, scope: str | None = None) -> dict:
+    from app import hitl_sync
     from app.llm import CASSETTE_SCOPE
     from app.rag import recall_at_k, reciprocal_rank
 
     token = _CASE_DB.set(db) if db else None
     scope_token = CASSETTE_SCOPE.set(scope or case["id"])  # cassete: cada caso/rodada acha a SUA resposta
-    t0, prior_cost, turn_ms = time.perf_counter(), 0.0, None
+    t0, prior_cost, turn_ms, sim, t_done = time.perf_counter(), 0.0, None, None, None
     try:
         if db:  # o gancho precisa valer AQUI, na thread do caso; senão é crash, não medida contaminada
             from app.store import get_store
@@ -408,16 +501,26 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
             conv = sent["conversation_id"]
             # turnos anteriores também gastam: sem eles o teto do split subestimava o custo dos casos de memória
             prior_cost += (sent.get("usage") or {}).get("cost_usd", 0) or 0
+        sim = _start_operator(case, client)  # depois do `before`: ela só responde o caso aberto no turno avaliado
         t_turn = time.perf_counter()  # só o turno avaliado: os `steps` da resposta são dele, não dos de `before`
-        got, crash = client.send(case["message"], user, conv), None
-        turn_ms = round((time.perf_counter() - t_turn) * 1000, 1)
+        # espera síncrona só deste caso (contexto, não env: os casos ao lado, em outras threads, seguem sem esperar)
+        with hitl_sync.override(case.get("wait_s"), operator_sim.TURN_POLL_S):
+            got, crash = client.send(case["message"], user, conv), None
+        t_done = time.perf_counter()  # a espera pela resposta atrasada da operadora (depois do turno) não é latência
+        turn_ms = round((t_done - t_turn) * 1000, 1)
+        if sim is not None:
+            got = {**got, **_operator_outcome(sim, case, got)}
+        elif case.get("operator"):
+            got = {**got, "operator": {"skipped": "--url: a operadora simulada só roda em processo"}}
     except Exception as exc:  # crash vira métrica, não derruba o relatório
         got, crash = {}, f"{type(exc).__name__}: {exc}"
+        if sim is not None:
+            sim.finish()
     finally:
         CASSETTE_SCOPE.reset(scope_token)
         if token is not None:
             _CASE_DB.reset(token)
-    ms = (time.perf_counter() - t0) * 1000
+    ms = ((t_done or time.perf_counter()) - t0) * 1000
     # `ms` cronometra a conversa inteira (turnos de `before` inclusos); `turn_ms` só o último turno (None = crash)
     row = {"id": case["id"], "split": case["split"], "message": case["message"], "ms": round(ms, 1),
            "turn_ms": turn_ms, "business_date": _business_date(), "expected_intent": case["expect"].get("intent"),
@@ -447,9 +550,15 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
            **({"status": got["status"]} if got.get("status") else {}),
            # com qual versão das instruções a resposta saiu (hash por arquivo de prompt)
            "prompt_versions": got.get("prompt_versions") or {},
+           # humano no laço (split hitl): o que a operadora fez, o que a retomada entregou depois do turno e o que o
+           # caso esperava (scripts/scorecard.py conta o "no turno" só entre os casos que o esperam). O custo da
+           # retomada assíncrona (redação do LLM depois do turno) é outro request e não entra em `cost_usd`.
+           **({"operator": got["operator"], "resumed": list(got.get("resumed") or [])} if "operator" in got else {}),
+           **({"expected_human_in_turn": bool(case["expect"]["human_in_turn"])}
+              if "human_in_turn" in case["expect"] else {}),
            "cost_usd": round(prior_cost + ((got.get("usage") or {}).get("cost_usd", 0) or 0), 6)}
     if "facts" in case["expect"]:  # quais fatos de referência faltaram (diagnóstico do `resolved`)
-        row["facts_missing"] = facts_missing(case["expect"], row["answer"])
+        row["facts_missing"] = facts_missing(case["expect"], delivered_text(got))
     relevant = case["expect"].get("doc_ids")
     if relevant:
         row["recall_at_k"] = recall_at_k(row["source_ids"], relevant, K)
@@ -474,7 +583,8 @@ def summarize(rows: list[dict]) -> dict:
         by_split["ALL"].append(r)
 
     checks = ("resolved", "facts", "intent", "handoff", "handoff_outcome", "blocked", "language", "tools",
-              "pending_action", "replanned", "completed", "no_leak", "numbers", "memory", "claims")
+              "pending_action", "replanned", "completed", "no_leak", "numbers", "memory", "claims", "human_in_turn",
+              "human_once")
 
     def vals(items: list[dict], key: str) -> list[bool]:
         return [r["checks"][key] for r in items if key in r["checks"]]
@@ -594,7 +704,19 @@ def _max_concurrent() -> int:
 # Sem o teto, na bateria integral, 11 splits × 4 workers = 44 conversas ao mesmo tempo numa CPU; a busca densa com
 # rerank ficou lenta, o faq passou de NODE_TIMEOUT_S (60 s) e 5 casos foram ao humano por `budget_exhausted` — carga
 # do eval, não do produto. O teto vale para o eval; o produto segue com o seu próprio timeout.
-_CONCURRENCY = threading.BoundedSemaphore(_max_concurrent())
+_MAX_CONCURRENT = _max_concurrent()  # lido uma vez, no import: o semáforo não muda depois, e é este que a rodada grava
+_CONCURRENCY = threading.BoundedSemaphore(_MAX_CONCURRENT)
+
+
+def concurrency(workers: int, splits: int = 1) -> dict:
+    """A carga em que a rodada mediu a latência (vai no live_<split>.json; evals/trace_stats.py a escreve ao lado do
+    SLO): casos ao mesmo tempo no processo = min(teto, workers × splits), com o teto (LIVE_MAX_CONCURRENT), os workers
+    por split, os splits no mesmo processo e as CPUs. Um p50 medido com 8 conversas dividindo 4 CPUs não é o de uma
+    conversa sozinha, e sem isto o número não dizia de qual carga veio."""
+    workers, splits = max(1, int(workers)), max(1, int(splits))
+    cpus = (getattr(os, "process_cpu_count", None) or os.cpu_count)()  # 3.13+: respeita a afinidade do processo
+    return {"cases_at_once": min(_MAX_CONCURRENT, workers * splits), "max_concurrent": _MAX_CONCURRENT,
+            "workers": workers, "splits_in_process": splits, "cpus": cpus}
 
 
 def _gated(fn, *args):
@@ -640,8 +762,9 @@ class _Session:
     filtradas pelo escopo (`<id do caso>#<rodada>`): os ids de caso são únicos entre splits.
     """
 
-    def __init__(self, case_dir: Path, recorder, extras: dict, budget: _Budget | None = None) -> None:
+    def __init__(self, case_dir: Path, recorder, extras: dict, budget: _Budget | None = None, splits: int = 1) -> None:
         self.case_dir, self.recorder, self.extras, self.budget = case_dir, recorder, extras, budget
+        self.splits = splits  # splits rodando juntos no processo: entram na carga gravada (concurrency)
 
     def entries_of(self, case_ids: set[str]) -> list[dict]:
         if self.recorder is None:
@@ -764,11 +887,11 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
         gate_resolved = resolved_gate(resolved_rep, min_resolved)
         gate_red_team = red_team_gate(rows)
         if gate_red_team is not None:
-            # Offline o guardrail é só a regex do motor (barra 77,5% dos ataques escritos à mão) e o gate
+            # Offline o guardrail é só a regex do motor (não barra todos os ataques escritos à mão) e o gate
             # deixaria a CI vermelha medindo o modo que não vai a produção. O gate vale ao vivo e no replay da gravação
             # (o guardrail com LLM); offline fica no relatório, sem reprovar.
             gate_red_team["enforced"] = bool(live) or (not url and os.getenv("LLM_PROVIDER", "offline") != "offline")
-        gated = [r for r in rows if r["split"] not in UNGATED]
+        gated = [r for r in rows if not ungated(r["split"])]
         vals = [r["checks"]["intent"] for r in gated]
         overall = sum(vals) / len(vals) if vals else 0.0
         threshold = None
@@ -785,12 +908,14 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
                   "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "git_sha": git_sha(),
                   "live": live, "split": split or "all", "status": status, "spent_usd": spent,
                   "max_usd": max_usd, **({"budget": budget.state(key)} if budget is not None else {}),
+                  "concurrency": concurrency(workers, session.splits if shared else 1),
                   "llm_errors": llm_errors, "gate": GATE, "intent_acc": round(overall, 4),
                   "intent_ci": rate_ci(sum(vals), len(vals)),
                   # db_per_case: cada caso no seu banco; http: o servidor decide (memória por user_id compartilhada)
                   "isolation": "db_per_case" if not url else "shared_http",
                   "coverage_min_score": threshold, "coverage_min_rerank": _rerank_gate_in_use(),
-                  "gated_splits": sorted({r["split"] for r in gated}), "ungated_splits": sorted(UNGATED),
+                  "gated_splits": sorted({r["split"] for r in gated}),
+                  "ungated_splits": sorted(UNGATED | {r["split"] for r in rows if ungated(r["split"])}),
                   "passed": bool(rows) and overall >= GATE and metrics["ALL"]["crashes"] == 0
                   and (gate_resolved is None or gate_resolved["passed"])
                   and (gate_red_team is None or gate_red_team["passed"] or not gate_red_team["enforced"]),
@@ -959,7 +1084,7 @@ def run_splits(splits: list[str], max_usd: float | None = None, workers: int = 1
         budget = None if max_usd is None else _Budget(max_usd, weights)
         wallet = None if judge_max_usd is None else JudgeWallet(judge_max_usd)
         session = _Session(case_dir, recorder, {"gate_calibration": calibrate_gate(),
-                                                "retrieval": retrieval_metrics()}, budget)
+                                                "retrieval": retrieval_metrics()}, budget, splits=len(splits))
         reports: dict[str, dict] = {}
         with ThreadPoolExecutor(max_workers=max(1, len(splits))) as pool:
             futures = {s: pool.submit(contextvars.copy_context().run, run, None, None, s, True,
@@ -1630,7 +1755,8 @@ def _lang_cell(lang: str, v: dict) -> str:
 
 
 SUMMARY_KEYS = (("resolved_acc", "resolvidas"), ("intent_acc", "intenção"),
-                ("handoff_acc", "humano certo"), ("replanned_acc", "replanejou"),
+                ("handoff_acc", "humano certo"), ("human_in_turn_acc", "humano no turno certo"),
+                ("human_once_acc", "resposta do humano uma vez só"), ("replanned_acc", "replanejou"),
                 ("memory_acc", "fato da conversa"), ("numbers_acc", "números com base"),
                 ("blocked_acc", "bloqueio certo"), ("language_acc", "idioma"))
 
@@ -1674,16 +1800,38 @@ def _rerank_gate_in_use() -> float | None:
     return thr if thr is not None and "cross" in str(getattr(retriever, "name", "")) else None
 
 
+def how_to_read(report: dict) -> str:
+    """1ª linha do relatório: o que mede, de onde vem e como ler o IC. Texto gerado e sem número (os números são os da
+    tabela logo abaixo); a régua da rodada 10 leu no RESULTS "tabelas densas de IC95 por split no lugar de explicação".
+    """
+    if report.get("live"):
+        origin = f"LLM real, de `evals/results/live_{report.get('split') or 'all'}.json`"
+    else:
+        origin = ("o piso do motor sem LLM (provedor `offline`: regras e tabelas no lugar do modelo), gravado em "
+                  "`evals/results/latest.json` e conferido pelo CI; o que depende do LLM (o supervisor que replaneja, "
+                  "a redação, o idioma) se lê no bloco ao vivo")
+    # o que reprova sai do próprio relatório (mesma conta de `passed` em run): o resto da tabela só informa
+    fails = ["a intenção fica abaixo do mínimo nos splits da linha Gate", "algum caso quebra"]
+    if report.get("gate_resolved"):
+        fails.append("as oficiais resolvidas ficam abaixo do alvo")
+    if (rt := report.get("gate_red_team")) and rt.get("enforced", True):
+        fails.append("o red team fica abaixo do piso")
+    return (f"**Como ler:** {origin}. O gate reprova se {', se '.join(fails[:-1])} ou se {fails[-1]}; o resto da "
+            "tabela informa e não reprova. Cada célula é a taxa em % com o n de casos que a checagem cobre (— = a "
+            "checagem não vale para o split); o IC95 de Wilson vem entre colchetes nas linhas de resolvidas e de gate: "
+            "com n pequeno o intervalo é largo, e duas taxas com intervalos que se sobrepõem não se distinguem.")
+
+
 def to_markdown(report: dict, split_view: bool = False) -> str:
     """Relatório em markdown. `split_view`: bloco de UM split numa página com vários (o retrieval sai uma vez, na
-    seção de busca, e o gate só aparece no split que o gate cobre)."""
+    seção de busca, e o gate só aparece no split que o gate cobre; o "como ler" sai uma vez, no topo do bloco)."""
     if split_view:
         return split_summary(report)
     splits = [s for s in report["metrics"] if s != "ALL"] + ["ALL"]
     # métrica sem valor em nenhum split não vira linha de traços (ex.: idioma no modo offline, que cita a fonte)
     keys = [k for k in report["metrics"]["ALL"] if k != "ci"
             and any(report["metrics"][s].get(k) is not None for s in splits)]
-    out = [line] if (line := resolved_line(report)) else []
+    out = [how_to_read(report), ""] + ([line] if (line := resolved_line(report)) else [])
     out += ["| Métrica | " + " | ".join(splits) + " |", "|---|" + "---:|" * len(splits)]
     for k in keys:
         out.append(f"| {k} | " + " | ".join(fmt_cell(report["metrics"][s], k) for s in splits) + " |")
@@ -1704,6 +1852,20 @@ def to_markdown(report: dict, split_view: bool = False) -> str:
         out.append(f"Red team (splits {', '.join(RED_TEAM_SPLITS)}): seguras {rt['safe_rate']:.1%} de {rt['cases']} "
                    f"{verdict}; por OWASP Agentic: {asi}"
                    + (f"; inseguras: {', '.join(rt['unsafe'])}" if rt["unsafe"] else ""))
+        # Separar o furo REAL da regex (ataques que ela não barrou) do ruído de roteamento: controle benigno fora do
+        # escopo não é bloqueado pela regex; ele só vai ao humano no offline (faq sem fonte escala), o que entra na
+        # taxa "segura" por falar no handoff, não por ser guardrail.
+        rows = [r for r in report.get("rows", []) if r.get("split") in RED_TEAM_SPLITS]
+        if rows:
+            attacks = [r for r in rows if r.get("expected_intent") == "blocked"]
+            benign = [r for r in rows if r.get("expected_intent") != "blocked"]
+            barred = sum(1 for r in attacks if r.get("blocked"))
+            line = (f"Ataques barrados pela regex: {barred} de {len(attacks)}. "
+                    f"Controles benignos: bloqueados {sum(1 for r in benign if r.get('blocked'))}")
+            if not report.get("live"):  # offline: o handoff do benigno é roteamento sem LLM, não guardrail
+                handed = sum(1 for r in benign if r.get("handoff_required"))
+                line += f"; fora do escopo levados ao humano no offline: {handed} (roteamento sem LLM, não guardrail)"
+            out.append(line + ".")
     if mr := report.get("memory_routing"):  # onde a conversa perde: na memória ou no roteamento
         from .memory_metrics import lines as memory_lines
 
@@ -1828,7 +1990,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--ablate-replan", action="store_true",
                     help="mede o split replan SEM replanejamento (plano fixo do router); grava ablation_replan*.json")
     ap.add_argument("--mode", choices=("off", "no_needs"), default="off",
-                    help="com --ablate-replan: off = plano fixo; no_needs = só reage a falha (split dependent)")
+                    help="com --ablate-replan: off = plano fixo; no_needs = sem o achado `needs` (o modelo não o "
+                         "recebe, sem lembrete, a tabela não insere; a falha ainda replaneja; split dependent)")
     ap.add_argument("--repeat", type=int, default=None,
                     help=f"roda cada caso N vezes: pass^k e casos instáveis (padrão {LIVE_REPEAT} no ao vivo, "
                          "1 offline)")
@@ -1916,7 +2079,9 @@ def main(argv: list[str] | None = None) -> int:
             if rep.get("metrics"):
                 print(to_markdown(rep))
         return 0 if all(r.get("status") == "complete" for r in reports.values()) else 3
-    if args.ablate_replan:  # mesma rodada, supervisor sem desvio: o README mostra com × sem lado a lado
+    if args.ablate_replan:  # mesmos casos com × sem: o README mostra lado a lado (fill_readme, bloco replan)
+        # off = plano fixo do router; no_needs = sem o achado (supervisor._for_model esconde o `needs` do modelo,
+        # _note_needs não lembra, accept_need não insere). A falha continua replanejando nos dois modos.
         os.environ["SUPERVISOR_REPLAN"] = args.mode
         args.split = args.split or ("replan" if args.mode == "off" else "dependent")
         stem = "ablation_replan" if args.mode == "off" else f"ablation_replan_{args.mode}"

@@ -147,7 +147,9 @@ ELIGIBLE_STATUS: dict[str, set[str]] = {"refund_record": {"enviado", "entregue"}
 # --- achados que pedem outro especialista (replanejamento por ACHADO, não só por falha) ---------------------
 # Contrato: um agente devolve AgentResult.needs = [{"agent", "why", "hint"}]; uma tool pode devolver "needs" no
 # próprio resultado; e `needs_for(result, ctx)` (opcional) deriva o achado do resultado de tool, o que cobre o
-# caminho com LLM do records. O supervisor insere o passo se ALLOWED[de] tiver o agente e houver orçamento.
+# caminho com LLM do records. Com `needs_for` definido ele é o filtro: o "needs" cru das tools só entra pelo que ele
+# devolver (se ele lê esse "needs", leia o de todos os resultados, não só o do 1º). O supervisor LLM recebe o achado e
+# decide; o motor de tabela insere o passo se ALLOWED[de] tiver o agente e houver orçamento.
 # Exemplo (caso "dependent"): "Quando chega meu pedido 1002?" → o records vê "em separação" (ainda não saiu) →
 # a resposta só fica completa com o prazo da política de entrega → precisa do faq. Pedido "entregue": sem need.
 # Getnet: terminal offline → manual de conexão (knowledge); regra por modelo → modelo do terminal (support).

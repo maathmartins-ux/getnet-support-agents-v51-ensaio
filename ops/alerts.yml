@@ -13,6 +13,16 @@ groups:
           summary: "Agente leva mais de 8 s em média por chamada há 10 min"
           action: "Ver llm_errors_total e o provedor; considerar effort menor ou modelo menor no papel agent"
           runbook_url: "docs/RUNBOOK.md#latenciaaltadoturno"
+      # p95 do turno respondido (histograma; o bloqueio do guardrail fica fora) acima do SLO por turno do kit:
+      # 45 s = SLO_P95_S de evals/trace_stats.py (tests/test_r11_latency_histogram.py confere que andam juntos)
+      - alert: LatenciaP95DoTurno
+        expr: histogram_quantile(0.95, sum by (le) (rate(span_latency_ms_bucket{span="turn"}[30m]))) > 45000
+        for: 30m
+        labels: {severity: warning}
+        annotations:
+          summary: "p95 do turno respondido acima do SLO (45 s) há 30 min"
+          action: "Ver o p95 por etapa no painel (agent, llm, router, guardrails) e seguir o runbook: provedor, busca ou carga"
+          runbook_url: "docs/RUNBOOK.md#latenciap95doturno"
       - alert: ErrosDoProvedorLLM
         expr: sum(rate(llm_errors_total[5m])) > 0.1
         for: 5m
@@ -21,6 +31,14 @@ groups:
           summary: "Mais de 1 erro de LLM a cada 10 s; o atendimento está caindo no caminho determinístico"
           action: "Checar status do provedor, cota (rate_limited) e chave (auth)"
           runbook_url: "docs/RUNBOOK.md#errosdoprovedorllm"
+      - alert: ClassificadorDeSegurancaIndisponivel
+        expr: sum(increase(guardrail_llm_unavailable_total[5m])) > 0
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "Classificador de segurança (camada 2) indisponível: turnos lendo sem a 2ª camada do guardrail"
+          action: "Ver llm_errors_total por kind do papel guardrail; a escrita já fica retida e a leitura corre sem agente LLM, mas a defesa está degradada — restabeleça o provedor do papel guardrail"
+          runbook_url: "docs/RUNBOOK.md#classificadordesegurancaindisponivel"
       - alert: NumeroSemBase
         expr: sum(increase(numeric_ungrounded_total[1h])) > 5
         for: 15m

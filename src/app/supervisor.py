@@ -16,8 +16,9 @@ Mapa do laço de um turno (`run` → `_run`):
      (PLANS, FALLBACK, ALLOWED, DEPENDS) e MAX_STEPS. Passos independentes do plano rodam em paralelo.
 3. `_enforce_escalation`: "o LLM propõe, o código dispõe". Turno em que um especialista não achou fonte, dado ou
    registro (NOT_RESOLVED) e ninguém respondeu nada termina no escalation, mesmo que o LLM só tenha oferecido.
-4. `_continue_with_operator` (app/hitl_sync.py): caso aberto NESTE turno e `HITL_SYNC_WAIT_S` > 0 → o turno espera
-   o operador (teto 20 s); a resposta no prazo vira evidência e os passos pendentes rodam no mesmo turno.
+4. `_continue_with_operator` (app/hitl_sync.py): caso aberto NESTE turno e espera ligada (`HITL_SYNC_WAIT_S` > 0, ou
+   `hitl_sync.override` no contexto) → o turno espera o operador (teto 20 s); a resposta no prazo vira evidência e os
+   passos pendentes rodam no mesmo turno; a resposta final não oferece nem nega o atendente (`without_handoff_talk`).
 5. `_save_pending`: o que faltou fica no caso e roda quando o operador responder (app/resume.py).
 
 Status de agente: ok | partial (respondeu o que a fonte cobre e diz o que falta: é RESPOSTA, nunca escala por si) |
@@ -27,10 +28,17 @@ Replanejamento em dois gatilhos (nos dois motores):
 - FALHA: status insufficient/error → FALLBACK do domínio (ex.: escalation); no atalho com LLM ligado, o supervisor
   LLM decide (passo 2); offline vale a tabela;
 - ACHADO: o agente devolve `needs` (ex.: records viu "pedido ainda não saiu" → precisa da política de prazo do
-  faq). O código insere o passo pedido se a transição estiver em ALLOWED e houver orçamento, e grava em `replans`
-  como "<de>:need-><para>". No motor llm o passo pedido roda mesmo que o modelo não o chame, e o resultado vai
-  junto dos tool_result.
-Ablação (SUPERVISOR_REPLAN): on (padrão) · no_needs (só reage a falha; mede o ganho do achado) · off (plano fixo).
+  faq). No motor llm o achado é INFORMAÇÃO, não passo imposto: chega ao modelo no tool_result e o modelo decide se
+  chama o agente pedido. Se encerrar sem chamá-lo, UMA volta de lembrete diz qual achado ficou sem resposta; ignorado
+  de novo, o passo que trouxe o achado sai com `outcome: ignored` na árvore de passos (`need_ignored` no log e em
+  /metrics) e o turno segue. No motor de tabela (offline, queda do LLM e o atalho de 1 passo, que rodam sem
+  consultar o modelo) o código insere o passo pedido se a transição estiver em ALLOWED e houver orçamento.
+  Medido no ensaio (rodada 10): 75 de 396 passos ao vivo (19%) eram inseridos pelo código, 51 deles o faq que já
+  estava no plano do router; no braço sem inserção o modelo chamou o faq sozinho em todos os casos com achado.
+  Replanejamento é desvio do plano do router: o agente pedido que já estava no plano roda sem entrar em `replans`; o
+  que não estava entra como "<de>:need-><para>", decidido pelo modelo (llm) ou pela tabela (code).
+Ablação (SUPERVISOR_REPLAN): on (padrão) · no_needs (o achado não chega ao modelo, não há lembrete e a tabela não
+insere: mede o ganho do achado como informação) · off (plano fixo).
 
 Orçamento por turno (condição de parada): MAX_STEPS (chamadas de agente), MAX_MODEL_CALLS, MAX_TURN_USD (o turno
 inteiro, router incluso) e NODE_TIMEOUT_S (cada agente). Estourou → entrega a parte já respondida, não roda o resto
@@ -46,8 +54,8 @@ Quem decidiu cada passo (`decided_by` na árvore de passos, `step_view`):
 - "router": o agente veio do PLANO do router (um LLM ao vivo; as regras de palavra-chave sem LLM) e o supervisor
   LLM não foi consultado sobre ele; `why` diz por onde rodou (ROUTER_WHY: "fast_path" = o atalho de 1 passo,
   "plan" = o motor de tabela);
-- "code": uma regra do código pôs o passo no turno, com a regra em `why` (CODE_WHY: achado, escalada garantida,
-  FALLBACK ou router incerto, orçamento, passo antecipado, aviso de caso aberto);
+- "code": uma regra do código pôs o passo no turno, com a regra em `why` (CODE_WHY: achado no motor de tabela,
+  escalada garantida, FALLBACK ou router incerto, orçamento, passo antecipado, aviso de caso aberto);
 - "operator": a resposta do humano (passo "human"), que chega pronta como evidência (sem `why`).
 A marca é gravada onde o passo é registrado (`_record`, com o motivo de cada chamada), não deduzida depois dos
 replanos nem do motor do turno, que mistura passos de origens diferentes; passo sem marca sai sem os campos ("não
@@ -63,7 +71,7 @@ import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from . import capabilities, cases, claims, domain
 from .agents import AGENTS, AgentResult, Context
@@ -113,7 +121,8 @@ REPLAN_MODES = ("on", "no_needs", "off")
 #     plan        passo do plano rodado pelo motor de tabela (offline e queda do supervisor LLM); na retomada sem
 #                 LLM o plano são os passos que o caso guardou para depois do humano (cases.save_pending);
 #   DECIDED_CODE      regra do código, com a regra em CODE_WHY:
-#     needs       achado de um especialista aceito por accept_need (o modelo não precisou pedir o passo);
+#     needs       achado de um especialista aceito por accept_need no motor de tabela (no motor LLM quem chama o
+#                 agente pedido é o modelo: o passo sai DECIDED_LLM);
 #     escalation  escalada garantida por _enforce_escalation (faltou fonte, dado ou registro e ninguém respondeu);
 #     table       FALLBACK do domínio para um passo que falhou, ou router incerto (LOW_CONFIDENCE) → escalation;
 #     budget      orçamento do turno esgotado (_exhaust, inclui NODE_TIMEOUT_S): o caso vai ao humano;
@@ -127,6 +136,18 @@ DECIDED_CODE = "code"
 DECIDED_OPERATOR = "operator"
 ROUTER_WHY = ("fast_path", "plan")
 CODE_WHY = ("needs", "escalation", "table", "budget", "lead", "hold")
+# O que aconteceu com cada achado (`needs` na árvore de passos, no passo que o trouxe; `step_view`):
+#   inserted  motor de tabela: o código pôs o passo pedido no turno (o passo sai decided_by code, why needs);
+#   called    motor LLM: o modelo chamou o agente pedido depois do achado, sem lembrete;
+#   reminded  motor LLM: o modelo chamou o agente pedido depois da volta de lembrete;
+#   ignored   motor LLM: o modelo encerrou sem chamar o agente pedido depois da volta de lembrete (`need_ignored`);
+#   planned   motor de tabela: o agente pedido já estava na fila do turno (o plano do router): roda sem passo novo;
+#   ran       o agente pedido já tinha rodado no turno (antes ou no mesmo lote);
+#   hidden    ablação no_needs: o achado não chegou ao modelo nem à tabela;
+#   blocked   regra do turno: transição fora de ALLOWED, MAX_STEPS, orçamento, NO_ESCALATION ou plano fixo (off).
+NEED_OUTCOMES = ("inserted", "called", "reminded", "ignored", "planned", "ran", "hidden", "blocked")
+NEED_WHY_CHARS, NEED_HINT_CHARS = 200, 300  # teto de cada parte do achado (dois achados juntos somam as partes)
+MAX_ROUNDS = MAX_STEPS + 2  # voltas do supervisor LLM por turno (a de lembrete inclusa)
 TOOLS = [
     {"name": "faq_agent", "strict": True,
      "description": "Responde dúvidas sobre produto e políticas com RAG e fonte citada. "
@@ -154,6 +175,8 @@ HOLD_TEXT = {
 
 # --- configuração (env lido a cada chamada: testes e eval trocam sem reimportar) ------------------------------
 def replan_mode() -> str:
+    """SUPERVISOR_REPLAN: "on" (padrão: falha e achado replanejam) · "no_needs" (ablação do achado: o `needs` não vai
+    ao modelo, sem lembrete, a tabela não insere; a falha segue) · "off" (plano fixo do router)."""
     mode = os.getenv("SUPERVISOR_REPLAN", "on").lower()
     return mode if mode in REPLAN_MODES else "on"
 
@@ -204,13 +227,9 @@ class Outcome:
 
 
 # --- execução de um agente --------------------------------------------------------------------------------
-def collect_needs(result: AgentResult, ctx: Context) -> list[dict]:
-    """Needs do agente + `needs` nos resultados de tool (evidência JSON) + `domain.needs_for` (opcional).
-
-    Três fontes porque o caminho com LLM do records não monta AgentResult.needs: o domínio deriva o achado do
-    resultado da tool. Normaliza e deduplica por agente pedido.
-    """
-    found = list(result.needs or [])
+def _tool_needs(result: AgentResult) -> list:
+    """`needs` que as tools devolveram no próprio resultado (evidência JSON do passo), crus."""
+    found: list = []
     for item in result.evidence:
         if item.startswith("{"):
             try:
@@ -219,15 +238,43 @@ def collect_needs(result: AgentResult, ctx: Context) -> list[dict]:
                 continue
             if isinstance(data, dict) and isinstance(data.get("needs"), list):
                 found += data["needs"]
+    return found
+
+
+def collect_needs(result: AgentResult, ctx: Context) -> list[dict]:
+    """Achados do passo: `AgentResult.needs` do próprio agente + `domain.needs_for(result, ctx)` (opcional) OU, sem
+    ele, o `needs` que as tools devolveram no resultado (evidência JSON).
+
+    O caminho com LLM do records não monta AgentResult.needs: o achado sai do resultado das tools. Quando o domínio
+    define `needs_for`, ele é o filtro (ex.: só com sintoma na pergunta) e o `needs` cru das tools não entra por fora
+    dele. Medido no ensaio (rodada 10): lido cru, 32 das 75 inserções por achado foram em mensagens sem nenhuma
+    palavra de sintoma ("Show me my last 5 transactions"; pergunta de taxa que levou a dica de recusa).
+    Um achado por agente pedido; dois achados para o mesmo agente JUNTAM why e hint (partes iguais uma vez só). Antes
+    o 2º era descartado: no official-08 a dica de recusa caiu e o faq trouxe o manual do chip.
+    """
+    found = list(result.needs or [])
     hook = getattr(_d(), "needs_for", None)
-    if hook is not None:
-        found += hook(result, ctx) or []
-    out: list[dict] = []
+    found += (hook(result, ctx) or []) if hook is not None else _tool_needs(result)
+    merged: dict[str, dict[str, list[str]]] = {}
     for need in found:
-        if isinstance(need, dict) and need.get("agent") and need["agent"] not in {n["agent"] for n in out}:
-            out.append({"agent": str(need["agent"]), "why": str(need.get("why", ""))[:200],
-                        "hint": str(need.get("hint", ""))[:300]})
-    return out
+        if not isinstance(need, dict) or not need.get("agent"):
+            continue
+        parts = merged.setdefault(str(need["agent"]), {"why": [], "hint": []})
+        for key, limit in (("why", NEED_WHY_CHARS), ("hint", NEED_HINT_CHARS)):
+            piece = str(need.get(key) or "").strip()[:limit]
+            if piece and piece not in parts[key]:
+                parts[key].append(piece)
+    return [{"agent": agent, "why": "; ".join(p["why"]), "hint": "; ".join(p["hint"])} for agent, p in merged.items()]
+
+
+def _mark_need(result: AgentResult, agent: str, outcome: str) -> None:
+    """Grava no passo o que aconteceu com o achado que pede `agent` (NEED_OUTCOMES). Como `decided`, é atributo
+    próprio do AgentResult, fora de `facts` e de `for_supervisor`: só `step_view` lê."""
+    if outcome in NEED_OUTCOMES:
+        marks = getattr(result, "need_outcomes", None)
+        if marks is None:
+            marks = result.need_outcomes = {}
+        marks[agent] = outcome
 
 
 def _invoke(name: str, ctx: Context) -> AgentResult:
@@ -272,7 +319,9 @@ def step_view(result: AgentResult, mask=lambda text: text) -> dict:
     """Um passo da árvore de passos (o trace legível por caso): agente → status/motivo → ms →
     ferramentas com args, ok e prévia do resultado (mascarada por `mask`) → antes/depois de escrita executada →
     quem decidiu o passo (`decided_by`, e `why` quando foi o plano do router ou o código). Passo sem marca sai sem os
-    dois campos: quem lê conta "não registrado", nunca uma decisão presumida."""
+    dois campos: quem lê conta "não registrado", nunca uma decisão presumida.
+    Passo que trouxe achado sai com `needs`: o agente pedido, o motivo (curto, mascarado) e `outcome` (NEED_OUTCOMES;
+    sem marca, sem o campo). É daqui que se conta onde o achado disparou e quantas vezes o modelo o ignorou."""
     evidence = result.evidence if len(result.evidence) == len(result.tool_calls) else []
     tools = []
     for i, call in enumerate(result.tool_calls):
@@ -282,6 +331,10 @@ def step_view(result: AgentResult, mask=lambda text: text) -> dict:
         tools.append(tool)
     view = {"agent": result.agent, "status": result.status, "reason": result.reason, "ms": result.ms,
             "tools": tools, **(getattr(result, "decided", None) or {})}
+    if result.needs:
+        marks = getattr(result, "need_outcomes", None) or {}
+        view["needs"] = [{"agent": n["agent"], "why": mask(str(n.get("why") or ""))[:PREVIEW_CHARS],
+                          **({"outcome": marks[n["agent"]]} if n["agent"] in marks else {})} for n in result.needs]
     for key in ("operator", "answered_live", "from_memory"):
         if result.facts.get(key):
             view[key] = result.facts[key]
@@ -359,7 +412,8 @@ def next_step(result: AgentResult, done: list[str], intent: str | None = None) -
 
 
 def accept_need(frm: str, need: dict, ctx: Context, out: Outcome, scheduled: list[str]) -> str | None:
-    """O passo pedido por um achado entra no plano? Regras do código, não do modelo.
+    """Motor de tabela (offline, queda do LLM e o atalho de 1 passo): o passo pedido por um achado entra no plano?
+    Regras do código; no motor LLM quem decide é o modelo (`_note_needs`).
 
     Entra se: modo "on"; agente existe e a transição frm→agente está em ALLOWED; ainda não rodou nem está na fila;
     cabe em MAX_STEPS; há orçamento; escalation respeita NO_ESCALATION. A dica vira sub-pergunta do agente.
@@ -370,15 +424,38 @@ def accept_need(frm: str, need: dict, ctx: Context, out: Outcome, scheduled: lis
             or agent in out.route or agent in scheduled or len(out.route) + len(scheduled) >= MAX_STEPS \
             or (agent == "escalation" and no_escalation(ctx)) or budget_exceeded():
         return None
-    ask = need.get("hint") or need.get("why")
-    if ask:
-        ctx.facts.setdefault("ask", {})[agent] = ask
-        if agent in ("faq", "knowledge"):
-            ctx.facts.setdefault("query_hints", []).append(ask)
+    _hint_to(agent, need, ctx)
     ctx.facts.setdefault("needs", []).append({"from": frm, **need})
-    out.replans.append(f"{frm}:need->{agent}" + (f" ({need['why'][:80]})" if need.get("why") else ""))
-    METRICS.inc("replans_total", agent=frm, reason="need", engine=out.engine)
+    _need_replan(frm, agent, need.get("why"), out, out.engine)
     return agent
+
+
+def _hint_to(agent: str, need: dict, ctx: Context, replace_ask: bool = True) -> None:
+    """A dica do achado vira a sub-pergunta do agente pedido (e consulta a mais do faq). `replace_ask=False`: o
+    agente já estava na fila e mantém a sub-pergunta que tinha."""
+    ask = need.get("hint") or need.get("why")
+    if not ask:
+        return
+    asks = ctx.facts.setdefault("ask", {})
+    if replace_ask or agent not in asks:
+        asks[agent] = ask
+    if agent in ("faq", "knowledge"):
+        ctx.facts.setdefault("query_hints", []).append(ask)
+
+
+def _need_replan(frm: str, agent: str, why: str | None, out: Outcome, engine: str) -> None:
+    """O achado de `frm` desviou o plano do router para `agent` ("<de>:need-><para>", nos dois motores)."""
+    out.replans.append(f"{frm}:need->{agent}" + (f" ({why[:80]})" if why else ""))
+    METRICS.inc("replans_total", agent=frm, reason="need", engine=engine)
+
+
+def _unaccepted(agent: str, out: Outcome, queue: list[str]) -> str:
+    """Por que a tabela não inseriu o passo pedido (NEED_OUTCOMES): ablação, já na fila, já rodou ou regra do turno."""
+    if replan_mode() == "no_needs":
+        return "hidden"
+    if agent in queue:
+        return "planned"
+    return "ran" if agent in out.route else "blocked"
 
 
 def _exhaust(what: str, pending: list[str], ctx: Context, out: Outcome) -> None:
@@ -428,7 +505,17 @@ def _table_loop(queue: list[str], ctx: Context, out: Outcome, handover: bool = F
             _exhaust("node_timeout", timed_out + queue, ctx, out)
             return out
         for name, result in zip(batch, results, strict=True):
-            accepted = [a for need in result.needs if (a := accept_need(name, need, ctx, out, queue))]
+            accepted = []
+            for need in result.needs:
+                agent = accept_need(name, need, ctx, out, queue)
+                outcome = "inserted" if agent else _unaccepted(need["agent"], out, queue)
+                if outcome == "planned" and replan_mode() == "on":
+                    # o passo já estava na fila (plano do router): não há passo novo nem replanejamento, mas a
+                    # informação do achado chega a ele. Medido no exemplo: sem a dica, o faq planejado depois do
+                    # records não achou fonte para "Quando chega meu pedido 1002?" e o turno escalou.
+                    _hint_to(need["agent"], need, ctx, replace_ask=False)
+                _mark_need(result, need["agent"], outcome)
+                accepted += [agent] if agent else []
             for agent in reversed(accepted):  # o passo pedido roda logo a seguir
                 queue.insert(0, agent)
                 out.queued_by[agent] = "needs"
@@ -447,9 +534,26 @@ def _fallback_of(name: str, result: AgentResult, ctx: Context, out: Outcome) -> 
     return None if nxt == "escalation" and no_escalation(ctx) else nxt
 
 
+def _answered_by_another(name: str, out: Outcome) -> AgentResult | None:
+    """O último resultado de OUTRO especialista que já respondeu parte da pergunta neste turno (humano não conta)."""
+    return next((r for r in reversed(out.results)
+                 if r.status in ANSWERED and r.agent not in (name, "escalation", "human")), None)
+
+
 def _apply_fallback(name: str, result: AgentResult, ctx: Context, out: Outcome, queue: list[str]) -> None:
     nxt = _fallback_of(name, result, ctx, out)
     if not nxt or nxt in queue:  # já agendado por outro agente do mesmo lote
+        return
+    if nxt == "escalation" and result.status == "insufficient" and (answered := _answered_by_another(name, out)):
+        # A regra do supervisor LLM (prompt: "se OUTRO já respondeu parte da pergunta, responda com ela e ofereça o
+        # humano"), que a tabela não seguia: escalava o turno inteiro. Medido na rodada 11 (offline): o faq pedido pelo
+        # achado de recusa não achou orientação no corpus e o official-08 ia ao humano com os códigos já respondidos
+        # pelo records. Erro (status error) continua indo ao FALLBACK.
+        target = result if result.text else answered
+        if not _MENTIONS_HUMAN.search(target.text or ""):
+            offer = OFFER_HUMAN.get(ctx.language, OFFER_HUMAN["pt"])
+            target.text = f"{(target.text or '').rstrip()}\n\n{offer}".strip()
+            target.evidence = [*target.evidence, offer]  # template nosso, como o texto do escalation
         return
     ctx.handoff_reason = f"{name}_{result.reason or result.status}"
     if nxt == "escalation":
@@ -511,8 +615,71 @@ def lead_step(plan: list[str], ctx: Context) -> str | None:
     return first if first in _d().ALLOWED.get(None, set()) else None
 
 
+def _for_model(result: AgentResult) -> str:
+    """O tool_result que o supervisor LLM lê do passo. Ablação no_needs: sem o achado (o modelo decide só com status,
+    texto e fatos, como se o especialista não tivesse apontado nada)."""
+    if result.needs and replan_mode() == "no_needs":
+        return replace(result, needs=[]).for_supervisor()
+    return result.for_supervisor()
+
+
+def _note_needs(frm: str, result: AgentResult, ctx: Context, out: Outcome, pending: dict[str, dict]) -> None:
+    """Motor LLM: o achado de `frm` é informação. Já foi ao modelo no tool_result e fica pendente até o modelo chamar
+    o agente pedido; nenhum passo é inserido pelo código. Fora do modo "on", ou se o agente pedido não pode vir depois
+    de `frm` (ALLOWED, NO_ESCALATION) ou já rodou, o achado só fica marcado no passo."""
+    mode = replan_mode()
+    for need in result.needs:
+        agent = need["agent"]
+        if mode != "on":
+            _mark_need(result, agent, "hidden" if mode == "no_needs" else "blocked")
+        elif agent in out.route:
+            _mark_need(result, agent, "ran")
+        elif agent not in AGENTS or agent not in _d().ALLOWED.get(frm, set()) \
+                or (agent == "escalation" and no_escalation(ctx)):
+            _mark_need(result, agent, "blocked")
+        else:
+            entry = pending.setdefault(agent, {"from": frm, "why": [], "hint": [], "results": []})
+            for key in ("why", "hint"):
+                if need.get(key) and need[key] not in entry[key]:
+                    entry[key].append(need[key])
+            entry["results"].append(result)
+            _mark_need(result, agent, "blocked")  # até o modelo decidir: o turno pode parar antes (orçamento, teto)
+
+
+def _open_needs(pending: dict[str, dict], last: str | None, ctx: Context, out: Outcome) -> dict[str, dict]:
+    """Achados pendentes que o modelo ainda pode atender agora: o agente pedido não rodou, vem depois do último
+    passo em ALLOWED, cabe em MAX_STEPS e há orçamento."""
+    if len(out.route) >= MAX_STEPS or budget_exceeded() is not None:
+        return {}
+    allowed = _d().ALLOWED.get(last, set())
+    return {agent: need for agent, need in pending.items() if agent not in out.route and agent in allowed}
+
+
+def _need_reminder(open_needs: dict[str, dict]) -> str:
+    """A volta de lembrete (o mesmo padrão do `nudged` do records): quais achados ficaram sem o agente pedido."""
+    lines = []
+    for agent, need in open_needs.items():
+        detail = "; ".join(need["why"] + [f"dica: {h}" for h in need["hint"]])
+        lines.append(f"- {need['from']}_agent pediu {agent}_agent" + (f" ({detail})" if detail else ""))
+    return ("[supervisor] Achado sem resposta: um especialista devolveu `needs` pedindo outro especialista, que não "
+            "foi chamado:\n" + "\n".join(lines) + "\nChame agora o especialista pedido, com a dica na consulta. Se o "
+            "achado não muda a resposta ao cliente, responda de novo sem citar este lembrete.")
+
+
+def _need_ignored(agent: str, need: dict) -> None:
+    """O modelo encerrou sem chamar o agente pedido, mesmo com o lembrete: conta no passo, no log e em /metrics."""
+    for result in need["results"]:
+        _mark_need(result, agent, "ignored")
+    METRICS.inc("needs_ignored_total", agent=need["from"], need=agent)
+    log.info("need_ignored", extra={"extra_fields": {"from": need["from"], "need": agent,
+                                                     "why": "; ".join(need["why"])[:200]}})
+
+
 def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> Outcome:
-    """Motor LLM. `done`: passos que o atalho já rodou (o último devolveu insufficient); o modelo começa daí."""
+    """Motor LLM. `done`: passos que o atalho já rodou (o último devolveu insufficient); o modelo começa daí.
+
+    Achado (`needs`) de um passo é informação para o modelo, que decide se chama o agente pedido (`_note_needs`); se
+    ele encerrar com achado pendente, uma volta de lembrete (`_need_reminder`) e, ignorado de novo, `need_ignored`."""
     out = Outcome(engine="llm")
     standalone = str(ctx.facts.get("standalone") or "")
     asked = f"\nPergunta completa (router): {standalone}" if standalone and standalone != ctx.text else ""
@@ -523,6 +690,7 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                  f"{ctx.facts['operator_answer']}\nRode só os passos que faltam do plano; não escale de novo.")
     last: str | None = None
     lead = None if done else lead_step(plan, ctx)
+    pending: dict[str, dict] = {}  # achados que o modelo ainda não atendeu: agente pedido → achado (_note_needs)
     if done:
         out.route, out.results, out.replans = list(done.route), list(done.results), list(done.replans)
         last = done.handover or (done.route[-1] if done.route else None)
@@ -531,7 +699,7 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
         out.replans.append(f"{last}:{result.reason or result.status}->supervisor_llm")
         METRICS.inc("supervisor_handover_total", agent=str(last))
         user += (f"\n\nJá executado pelo código (atalho do plano de 1 passo): {last}_agent → "
-                 f"{result.for_supervisor()}\nO resultado não cobriu a pergunta. Decida com ele: chamar outro "
+                 f"{_for_model(result)}\nO resultado não cobriu a pergunta. Decida com ele: chamar outro "
                  "especialista que possa responder; se ninguém responder nada, escalation_agent com o motivo. "
                  f"Não chame {last}_agent de novo.")
     if lead:
@@ -544,17 +712,14 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
         if result.status not in ANSWERED:
             ctx.handoff_reason = f"{lead}_{result.reason or result.status}"
         user += (f"\n\nJá executado pelo código (passo do plano de que os outros dependem): {lead}_agent → "
-                 f"{result.for_supervisor()}\nNão chame {lead}_agent de novo; decida o próximo passo com esse "
+                 f"{_for_model(result)}\nNão chame {lead}_agent de novo; decida o próximo passo com esse "
                  "resultado.")
-        for agent in [a for need in result.needs if (a := accept_need(lead, need, ctx, out, []))]:
-            inserted = run_batch([agent], ctx)[0]
-            _record(agent, inserted, ctx, out, "needs")
-            last = agent
-            user += f"\n[supervisor] passo inserido por achado: {agent}_agent → {inserted.for_supervisor()}"
+        _note_needs(lead, result, ctx, out, pending)  # o achado do passo antecipado também é do modelo decidir
     messages: list = [{"role": "user", "content": user}]
+    reminded = False  # a volta de lembrete do turno (uma só) já foi usada
     # Teto de voltas do modelo separado do teto de agentes: transição recusada não faz a rota crescer,
     # e um modelo insistente prenderia o worker.
-    for _ in range(MAX_STEPS + 2):
+    for round_ in range(MAX_ROUNDS):
         if len(out.route) >= MAX_STEPS:
             break
         if (what := budget_exceeded()) is not None:
@@ -564,7 +729,20 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                           max_tokens=8192)
         if resp.stop_reason != "tool_use":
             out.answer = "".join(b.text for b in resp.content if b.type == "text").strip() or None
+            open_needs = _open_needs(pending, last, ctx, out)
+            if open_needs and not reminded and round_ < MAX_ROUNDS - 1 and resp.content:
+                # Achado pendente: uma volta a mais diz qual ficou sem resposta; quem decide ainda é o modelo.
+                reminded = True
+                for need in open_needs.values():
+                    need["reminded"] = True
+                messages.append({"role": "assistant", "content": resp.content})
+                messages.append({"role": "user", "content": _need_reminder(open_needs)})
+                METRICS.inc("needs_reminded_total", need=",".join(open_needs))
+                continue
+            for agent, need in (open_needs if reminded else {}).items():
+                _need_ignored(agent, need)
             break
+        out.answer = None  # tool call depois do lembrete: a resposta da volta anterior não vale mais
         messages.append({"role": "assistant", "content": resp.content})  # conteúdo inteiro (append-only)
         blocks = [b for b in resp.content if b.type == "tool_use"]
         verdicts: dict[str, dict] = {}
@@ -581,7 +759,6 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
         # escalation (terminal) roda depois dos outros do mesmo turno, sozinha
         batches = [[a for a in approved if a[1] not in SEQUENTIAL], [a for a in approved if a[1] in SEQUENTIAL]]
         remaining = [p for p in plan if p not in out.route]
-        notes: list[dict] = []  # passos inseridos pelo código (achado): vão como texto após os tool_result
         for batch in (b for b in batches if b):
             for block, name in batch:
                 if name == "escalation":
@@ -595,14 +772,20 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
                 ask = block.input.get("query") or block.input.get("request")
                 if ask:
                     ctx.facts.setdefault("ask", {})[name] = str(ask)[:300]
-                if name not in remaining:
+                need = pending.pop(name, None)  # o modelo atendeu o achado que pedia este agente
+                for asked_by in (need or {}).get("results", []):
+                    _mark_need(asked_by, name, "reminded" if need.get("reminded") else "called")
+                if name in remaining:
+                    continue  # passo do plano do router: não é replanejamento, mesmo vindo de um achado
+                if need is not None:
+                    _need_replan(need["from"], name, "; ".join(need["why"]), out, "llm")
+                else:
                     out.replans.append(f"{last or 'start'}->{name} (plano: {remaining or '[]'})")
                     METRICS.inc("replans_total", agent=last or "start", reason="llm_decision", engine="llm")
             results = run_batch([name for _, name in batch], ctx)
             for (block, name), result in zip(batch, results, strict=True):
                 _record(name, result, ctx, out, DECIDED_LLM)  # o modelo pediu a tool; o código só aprovou
-                verdicts[block.id] = {"type": "tool_result", "tool_use_id": block.id,
-                                      "content": result.for_supervisor()}
+                verdicts[block.id] = {"type": "tool_result", "tool_use_id": block.id, "content": _for_model(result)}
                 last = name
                 if result.status not in ANSWERED and name != "escalation":
                     ctx.handoff_reason = f"{name}_{result.reason or result.status}"
@@ -610,20 +793,10 @@ def run_llm(plan: list[str], ctx: Context, llm, done: Outcome | None = None) -> 
             if timed_out:
                 _exhaust("node_timeout", timed_out + [p for p in plan if p not in out.route], ctx, out)
                 return out
-            # achado → passo inserido pelo código (o modelo não precisa lembrar de pedir)
-            called = {n for _, n in approved}
-            inserted: list[str] = []
             for (_, name), result in zip(batch, results, strict=True):
-                inserted += [a for need in result.needs
-                             if need["agent"] not in called and (a := accept_need(name, need, ctx, out, inserted))]
-            if inserted:
-                for agent, result in zip(inserted, run_batch(inserted, ctx), strict=True):
-                    _record(agent, result, ctx, out, "needs")
-                    last = agent
-                    notes.append({"type": "text", "text": f"[supervisor] passo inserido por achado: {agent}_agent "
-                                                          f"→ {result.for_supervisor()}"})
-        # todos os tool_result numa mensagem só, na ordem dos blocos (texto só depois deles)
-        messages.append({"role": "user", "content": [verdicts[b.id] for b in blocks] + notes})
+                _note_needs(name, result, ctx, out, pending)  # achado → informação; o modelo decide na próxima volta
+        # todos os tool_result numa mensagem só, na ordem dos blocos
+        messages.append({"role": "user", "content": [verdicts[b.id] for b in blocks]})
     return out
 
 
@@ -685,19 +858,49 @@ def run(plan: list[str], ctx: Context, confidence: float = 1.0, prior: list[Agen
 
 CONSULTED = {"pt": "Consultei um atendente humano (protocolo {ticket}), que respondeu agora.",
              "en": "I checked with a human agent (ticket {ticket}), who replied just now."}
-# Frase que oferece o atendente ("posso encaminhar a um atendente", "would you like me to hand this to a human"): depois
-# que o atendente já respondeu no turno, a oferta contradiz a resposta e sai do texto final.
+# Com o atendente já respondido no turno, só CONSULTED diz se houve encaminhamento. Saem do texto dos outros agentes:
+# - a OFERTA de passar ao atendente ou de abrir o caso ("posso encaminhar a um atendente", "quer que eu encaminhe?",
+#   "would you like me to hand this to a human");
+# - a NEGAÇÃO do encaminhamento ou da abertura do caso, escrita por um especialista que não sabia do escalation do
+#   mesmo turno (régua da rodada 10: a vitrine dizia "ele não foi encaminhado por mim" e, logo abaixo, "Consultei um
+#   atendente humano"). Negação a até 4 palavras do verbo, sem vírgula no meio ("Não houve atraso, o pedido foi
+#   encaminhado" fica); o imperativo "encaminhe" é instrução ao cliente e fica.
+# Ficam: "a decisão é de um atendente humano", a ação pendente ("o chamado ainda não foi aberto": sem "caso"), o
+# "Encaminhei" e as outras negações ("não tenho ferramenta para cancelar o contrato").
+_HUMAN_WORDS = r"(?:atendente|humano|human agent|a human|an agent)"
+_HANDOFF_OTHER = (r"|escalat\w*|forward(?:ed|ing)?\b|hand(?:ed|ing)?(?:\s+\S+){0,3}?\s+(?:off|over)\b"
+                  r"|pass(?:ed|ing)?(?:\s+\S+){0,3}?\s+(?:on|along)\s+to\b"
+                  r"|transfer\w*(?=(?:\s+\S+){0,3}?\s+(?:a|para|ao|à|pra|to)\s+(?:um\s+|uma\s+|o\s+|a\s+|an?\s+"
+                  r"|the\s+)?(?:atendente|humano|human|agent|operador|operator|pessoa|person|representative)))")
+# na negação, o imperativo/subjuntivo ("encaminhe", "escale") é instrução ao cliente e não conta; na oferta conta
+# ("quer que eu encaminhe?")
+_HANDOFF_VERB = rf"(?:encaminh(?!em?\b)\w*|escal(?:on)?(?:ad[oa]s?|ar|ei|ou|amos|aram|amento)\b{_HANDOFF_OTHER}"
+_OFFER_VERB = rf"(?:encaminh\w*|escal(?:on)?(?:ad[oa]s?|ar|ei|ou|amos|aram|amento|em?)\b{_HANDOFF_OTHER}"
+# "caso" com determinante: o substantivo ("esse caso", "a new case"), não a conjunção ("Caso o chamado não seja
+# aberto", "in case")
+_CASE = (r"(?:(?:um|uma|o|esse|este|seu|novo|outro|nenhum|the|an?|this|your|new|another|no)\s+){1,2}"
+         r"(?:caso|case)\b")
+_OPENS_CASE = rf"(?:abrir|abri|abro|abertura|open|opened|opening|create|created|raise|raised)(?:\s+d[eo])?\s+{_CASE}"
+_OPENED = r"(?:abert[oa]|opened|created|raised)\b"
 _OFFERS_HUMAN = re.compile(
     r"(?i)\b(?:posso|podemos|quer que eu|gostaria que eu|se quiser|se preferir|I can|we can|would you like me to|"
-    r"shall I|if you'd like|if you want)\b.{0,160}?\b(?:atendente|humano|human agent|a human|an agent)\b")
+    rf"shall I|if you'd like|if you want)\b.{{0,160}}?(?:\b{_HUMAN_WORDS}\b|\b{_OFFER_VERB}|\b{_OPENS_CASE})")
+_NEGATION = r"\b(?:n[ãa]o|nunca|jamais|nem|nenhum|nenhuma|not|never|no|cannot|unable|\w+n[’']t)\b"
+_GAP = r"(?:\s+[^\s.,;:!?]+){0,4}?\s+"  # até 4 palavras, sem pontuação no meio
+_DENIES_HANDOFF = re.compile(
+    rf"(?i){_NEGATION}{_GAP}(?:{_HANDOFF_VERB}|{_OPENS_CASE})"  # "não foi encaminhado", "não tenho como abrir um caso"
+    # "No case was opened", "nenhum caso foi aberto", "não há caso aberto"
+    rf"|{_NEGATION}(?:\s+[^\s.,;:!?]+)?\s+(?:caso|case)\b[^.!?\n]{{0,30}}?\b{_OPENED}"
+    rf"|\b{_CASE}[^.!?\n]{{0,30}}?{_NEGATION}(?:\s+\S+){{0,2}}?\s+{_OPENED}")  # "o caso não foi aberto"
 _SENTENCES = re.compile(r"(?<=[.!?])\s+|\n+")
 
 
-def without_human_offer(text: str) -> str:
-    """O texto sem as frases que oferecem passar ao atendente (o resto fica na ordem, linha a linha)."""
+def without_handoff_talk(text: str) -> str:
+    """O texto sem as frases que oferecem ou negam a passagem ao atendente (o resto fica na ordem, linha a linha)."""
     lines = []
     for line in (text or "").split("\n"):
-        kept = [s for s in _SENTENCES.split(line) if s.strip() and not _OFFERS_HUMAN.search(s)]
+        kept = [s for s in _SENTENCES.split(line)
+                if s.strip() and not _OFFERS_HUMAN.search(s) and not _DENIES_HANDOFF.search(s)]
         if kept or not line.strip():
             lines.append(" ".join(kept))
     return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
@@ -744,11 +947,12 @@ def _continue_with_operator(plan: list[str], ctx: Context, out: Outcome) -> Outc
         out.replans += [f"human->{','.join(steps)} (no mesmo turno)", *sub.replans]
         rerun = {r.agent for r in sub.results}
         resumed = sub.answer or "\n\n".join(r.text for r in sub.results if r.text)
-    # Resposta final: o que o turno já tinha respondido (sem a oferta do atendente, que agora respondeu; sem o texto
-    # de quem rodou de novo depois dele) → a consulta e a resposta do atendente → os passos retomados. Juntar todos os
-    # textos repetia o agente que rodou duas vezes e mantinha "posso encaminhar ao atendente" depois da resposta dele.
-    earlier = [without_human_offer(r.text) for r in before if r.text and r.agent not in rerun and r.agent != "human"]
-    parts = [*earlier, esc.text, human.text, without_human_offer(resumed)]
+    # Resposta final: o que o turno já tinha respondido (sem oferecer nem negar o atendente, que agora respondeu; sem
+    # o texto de quem rodou de novo depois dele) → a consulta e a resposta do atendente → os passos retomados. Juntar
+    # todos os textos repetia o agente que rodou duas vezes e mantinha "posso encaminhar ao atendente" (ou "não foi
+    # encaminhado por mim") ao lado de "Consultei um atendente humano".
+    earlier = [without_handoff_talk(r.text) for r in before if r.text and r.agent not in rerun and r.agent != "human"]
+    parts = [*earlier, esc.text, human.text, without_handoff_talk(resumed)]
     out.answer = "\n\n".join(p for p in parts if p and p.strip())
     METRICS.inc("plan_resumed_total", steps=str(len(steps)))
     return out
@@ -761,9 +965,10 @@ def fast_path(plan: list[str], ctx: Context, confidence: float) -> bool:
 
     No motor LLM esse turno custa 2 chamadas sequenciais do supervisor (escolher a tool e redigir a resposta final),
     ~4 s por turno (medido), e a redação final só reescrevia o texto do agente (às vezes com frase a mais que o
-    verificador de claims cortava depois). Com um passo só não há o que coordenar: falha segue FALLBACK, achado segue
-    ALLOWED, igual ao LLM. Ficam no LLM: plano de 2+ passos (compor partes), router incerto e a retomada de caso
-    (a resposta do humano muda o que falta fazer).
+    verificador de claims cortava depois). Com um passo só não há o que coordenar: falha segue FALLBACK e o achado
+    segue a tabela (ALLOWED: o código insere o passo pedido, `decided_by: code`; no motor LLM quem decide é o modelo).
+    Ficam no LLM: plano de 2+ passos (compor partes), router incerto e a retomada de caso (a resposta do humano muda o
+    que falta fazer).
     """
     return supervisor_fast() and len(plan) == 1 and confidence >= supervisor_fast_min_confidence() \
         and not ctx.facts.get("operator_answer")

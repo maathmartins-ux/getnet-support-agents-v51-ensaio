@@ -49,6 +49,10 @@ TARGETS = (
     Target("official_pass_k", "Oficiais: pass^k (todas as rodadas passam)", 0.90, "frac", "live_official.json"),
     Target("memory_pass_1", "Memória ao vivo: pass@1", 0.85, "frac", "live_memory.json stability"),
     Target("memory_numbers", "Memória ao vivo: números com base", 95.0, "%", "live_memory.json numbers_acc"),
+    # humano no laço medido, não só testado: a operadora simulada (evals/operator_sim.py) responde dentro da espera
+    # e a resposta dela tem de sair no mesmo turno; os casos atrasados (retomada, uma vez só) ficam no bloco do split
+    Target("hitl_in_turn", "Humano no laço: resposta do operador no mesmo turno (split hitl)", 0.90, "frac",
+           "live_hitl.json human_in_turn"),
     Target("recall3", "Busca: Recall@3", 0.85, "frac", "latest.json retrieval"),
     Target("mrr", "Busca: MRR", 0.80, "frac", "latest.json retrieval"),
     # o redator lê os 5 primeiros (faq_top_k): cobertura que importa para a resposta
@@ -103,6 +107,17 @@ def official_resolved(report: dict) -> tuple[float | None, float | None]:
     return round(sum(runs) / len(runs), 4), round(sum(all(vs) for vs in by_case.values()) / len(by_case), 4)
 
 
+def hitl_in_turn(report: dict) -> float | None:
+    """Fração dos casos do split `hitl` que esperam a resposta no turno (`expect.human_in_turn` verdadeiro: a
+    operadora responde dentro da espera) em que ela saiu no MESMO turno (checagem `human_in_turn`; caso que quebrou
+    conta como não). None = split não medido."""
+    rows = [r for r in report.get("rows") or [] if r.get("split") == "hitl" and r.get("expected_human_in_turn")]
+    if not rows:
+        return None
+    return round(sum(1 for r in rows if not r.get("crash") and (r.get("checks") or {}).get("human_in_turn"))
+                 / len(rows), 4)
+
+
 def cost_per_resolved(results: Path = RESULTS) -> tuple[float | None, float | None]:
     """(US$ por turno resolvido sem humano, fração resolvida) sobre todos os live_*.json completos.
 
@@ -126,6 +141,7 @@ def measure(results: Path = RESULTS) -> dict[str, float | None]:
     latest = _load(results / "latest.json") or {}
     official = _complete(_load(results / "live_official.json")) or {}
     memory = _complete(_load(results / "live_memory.json")) or {}
+    hitl = _complete(_load(results / "live_hitl.json")) or {}
     judge = _load(results / "judge.json") or {}
     human = _load(results / "human_review.json") or {}
     ret = latest.get("retrieval") or {}
@@ -145,6 +161,7 @@ def measure(results: Path = RESULTS) -> dict[str, float | None]:
         "official_pass_k": (official.get("stability") or {}).get("pass_hat_k"),
         "memory_pass_1": (memory.get("stability") or {}).get("pass_at_1"),
         "memory_numbers": mm.get("numbers_acc"),
+        "hitl_in_turn": hitl_in_turn(hitl),
         "recall3": ret.get("recall@3"),
         "mrr": ret.get("mrr"),
         "recall5": ret.get("recall@5"),
@@ -204,19 +221,28 @@ def to_markdown(results: Path = RESULTS) -> str:
     return "\n".join(lines)
 
 
-# O README mostra só as medidas que o enunciado pede (resposta certa nos cenários, busca, memória), com valor e de
-# onde vem — sem meta própria, sem status "abaixo" e sem repetir tabelas com intervalo de confiança. As tabelas
-# completas seguem em docs/RESULTS.md e as limitações, em prosa no README (efeito + o que faltaria).
+# O README mostra só as medidas que o enunciado pede (resposta certa nos cenários, busca, memória) e o KPI do negócio
+# (fração resolvida sem humano e o custo de cada uma), com valor e de onde vem — sem meta própria, sem status "abaixo"
+# e sem repetir tabelas com intervalo de confiança. As tabelas completas seguem em docs/RESULTS.md e as limitações, em
+# prosa no README (efeito + o que faltaria). Rodada 10: o README prometia "custo por turno resolvido (§0)" e o §0 não
+# o trazia; as duas são diagnósticas (sem meta), então a mensagem de entrega não as lista como abaixo.
 HEADLINE = ("official_resolved", "official_resolved_k", "official_grounded", "official_helpful", "memory_pass_1",
-            "recall3", "mrr")
+            "hitl_in_turn", "recall3", "mrr", "resolved_fraction", "cost_per_resolved")
 HOW = {
     "official_resolved": "resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado)",
     "official_resolved_k": "o mesmo, em todas as rodadas de cada cenário",
     "official_grounded": "juiz LLM com o texto das fontes: cada afirmação apoiada nelas",
     "official_helpful": "juiz LLM: a resposta resolve o que o lojista perguntou",
     "memory_pass_1": "conversas de vários turnos: o fato do turno anterior chega à resposta",
+    "hitl_in_turn": "operadora simulada responde o caso aberto no turno dentro da espera: a resposta dela e os passos "
+                    "pendentes saem no mesmo turno (a que chega depois vai pela retomada, uma vez só)",
     "recall3": "perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras",
     "mrr": "posição média da primeira página certa (1 = sempre em primeiro)",
+    "resolved_fraction": "todas as execuções ao vivo, de todos os splits: resposta sem pedir humano e sem erro "
+                         "(recusa do guardrail conta; o fato se confere só nas oficiais resolvidas)",
+    # logo depois da fração em HEADLINE: o denominador do custo é a contagem da linha de cima
+    "cost_per_resolved": "gasto ao vivo de todos os splits (inclusive turnos que foram ao humano e turnos anteriores "
+                         "das conversas) ÷ as execuções resolvidas da linha acima",
 }
 
 

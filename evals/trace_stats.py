@@ -6,13 +6,18 @@ Um p50 sem orçamento declarado não diz se a latência está boa, e sozinho nã
 junta, por split e no total:
 
 - **p50 e p95 do turno**, pelo mesmo critério de run_evals.summarize (o valor na posição int(q·n) da lista
-  ordenada, sem interpolação): num split de turno único e sem crash os números batem com os do bloco ao vivo. Linha
-  com crash fica fora dos percentis (o tempo dela é o de uma falha, não o de um turno) e sai contada à parte. A
-  linha de um caso com turnos anteriores (`before`, casos de memória) cronometra a conversa inteira; o turno dela
-  vale ms ÷ turnos (a média dos turnos daquela conversa) e a conversa sai à parte, para não esconder a cauda. Caso
-  que não está nos arquivos de casos conta como 1 turno: o erro possível superestima a latência, nunca a esconde;
+  ordenada, sem interpolação): num split de turno único, sem crash e sem bloqueio os números batem com os do bloco
+  ao vivo. Linha com crash fica fora dos percentis (o tempo dela é o de uma falha, não o de um turno) e sai contada
+  à parte. Linha bloqueada pelo guardrail (`blocked`) também: a recusa leva ms, e 39 delas baixavam o p50 do total
+  de 17,6 s para 16,3 s no ensaio (o número que a régua citou misturava turno e recusa); sai contada à parte, e
+  fica fora da fatia. A linha de um caso com turnos anteriores (`before`, casos de memória) cronometra a conversa
+  inteira; o turno dela vale ms ÷ turnos (a média dos turnos daquela conversa) e a conversa sai à parte, para não
+  esconder a cauda. Caso que não está nos arquivos de casos conta como 1 turno: o erro possível superestima a
+  latência, nunca a esconde;
 - **SLO declarado** por env, com padrão fixo aqui (SLO_P50_S=20, SLO_P95_S=45, em segundos, por turno): cada split
-  cumpre ou não (p50 ≤ alvo e p95 ≤ alvo), e os que não cumprem saem nomeados com o valor medido;
+  cumpre ou não (p50 ≤ alvo e p95 ≤ alvo), e os que não cumprem saem nomeados com o valor medido. Ao lado, a
+  **carga** em que foi medido (`concurrency` do live_<split>.json: conversas ao mesmo tempo no processo, splits ×
+  workers, teto e CPUs): o p50 de 8 conversas dividindo a CPU não é o de uma conversa sozinha;
 - **fatia de cada agente** = soma dos `ms` dos passos dele ÷ soma do tempo dos turnos a que esses passos pertencem.
   Os `steps` de uma linha são só do último turno da conversa: o denominador é o `turn_ms` da linha (o run_evals
   cronometra esse turno à parte) ou, sem ele, o `ms` da linha de turno único. Ficam fora da fatia, contadas no texto:
@@ -84,15 +89,17 @@ def percentile(values: list[float], q: float) -> float | None:
 
 
 def load_rows(results: Path = RESULTS) -> list[dict]:
-    """Só o que a conta usa de cada linha ao vivo: id, split, ms (a conversa), turn_ms (o último turno), crash e
-    steps (None = linha sem árvore de passos)."""
+    """Só o que a conta usa de cada linha ao vivo: id, split, ms (a conversa), turn_ms (o último turno), crash, steps
+    (None = linha sem árvore de passos), blocked (recusa do guardrail) e load (o `concurrency` do arquivo da linha;
+    None = gravação anterior ao campo)."""
     rows = []
     for path in sorted(Path(results).glob("live_*.json")):
         report = json.loads(path.read_text(encoding="utf-8"))
+        load = report.get("concurrency") if isinstance(report.get("concurrency"), dict) else None
         for row in report.get("rows") or []:
             rows.append({"id": row.get("id"), "split": row.get("split") or report.get("split") or path.stem[5:],
                          "ms": row.get("ms"), "turn_ms": row.get("turn_ms"), "crash": row.get("crash"),
-                         "steps": row.get("steps")})
+                         "steps": row.get("steps"), "blocked": bool(row.get("blocked")), "load": load})
     return rows
 
 
@@ -147,7 +154,9 @@ def turn_time(row: dict, n_turns: int) -> float | None:
 def _group(rows: list[dict], turns: dict[str, int], target: dict) -> dict:
     """Medidas de um conjunto de linhas (um split ou todas): latência por turno, SLO, fatias e decisões."""
     crashed = sum(1 for r in rows if r.get("crash"))
-    timed = [r for r in rows if not r.get("crash") and _number(r.get("ms"))]
+    blocked = sum(1 for r in rows if r.get("blocked") and not r.get("crash"))
+    # bloqueio do guardrail: o tempo é o de uma recusa (ms), não o de um turno atendido; sai contado à parte
+    timed = [r for r in rows if not r.get("crash") and not r.get("blocked") and _number(r.get("ms"))]
     n_turns = [max(1, int(turns.get(r.get("id"), 1))) for r in timed]
     per_turn = [r["ms"] / t for r, t in zip(timed, n_turns, strict=True)]
     p50, p95 = percentile(per_turn, 0.5), percentile(per_turn, 0.95)
@@ -194,6 +203,7 @@ def _group(rows: list[dict], turns: dict[str, int], target: dict) -> dict:
     return {
         "rows": len(timed),
         "crashes": crashed,
+        "blocked": blocked,
         "turns_per_row": round(sum(n_turns) / len(timed), 2) if timed else None,
         "multi_turn_rows": multi,
         "p50_ms": round(p50, 1) if p50 is not None else None,
@@ -212,8 +222,24 @@ def _group(rows: list[dict], turns: dict[str, int], target: dict) -> dict:
     }
 
 
+def loads(rows: list[dict]) -> dict:
+    """Carga de cada split, do `load` das linhas: {"by_load": [{"load", "splits"}], a carga da maioria primeiro,
+    "unrecorded": splits lidos de gravação sem o campo}. Split lido de arquivos com cargas diferentes entra em cada."""
+    by: dict[str, set[str]] = defaultdict(set)
+    unrecorded: set[str] = set()
+    for r in rows:
+        split, load = str(r.get("split") or "?"), r.get("load")
+        if isinstance(load, dict):
+            by[json.dumps(load, sort_keys=True)].add(split)
+        else:
+            unrecorded.add(split)
+    ordered = sorted(by.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    return {"by_load": [{"load": json.loads(key), "splits": sorted(names)} for key, names in ordered],
+            "unrecorded": sorted(unrecorded)}
+
+
 def summarize(rows: list[dict], turns: dict[str, int] | None = None, target: dict | None = None) -> dict:
-    """{"slo", "by_split": {split: medidas}, "ALL": medidas, "agents": agentes do mais ao menos demorado}.
+    """{"slo", "load", "by_split": {split: medidas}, "ALL": medidas, "agents": agentes do mais ao menos demorado}.
 
     `turns`: id → turnos da linha (case_turns()); sem ele, cada linha vale 1 turno. `target`: slo() por padrão."""
     turns, target = turns or {}, target or slo()
@@ -221,7 +247,8 @@ def summarize(rows: list[dict], turns: dict[str, int] | None = None, target: dic
     for r in rows:
         by_split[str(r.get("split") or "?")].append(r)
     total = _group(rows, turns, target)
-    return {"slo": target, "by_split": {s: _group(items, turns, target) for s, items in sorted(by_split.items())},
+    return {"slo": target, "load": loads(rows),
+            "by_split": {s: _group(items, turns, target) for s, items in sorted(by_split.items())},
             "ALL": total, "agents": list(total["agent_share"])}
 
 
@@ -247,7 +274,10 @@ def _decision_cell(d: dict) -> str:
 
 
 def _rows_cell(g: dict) -> str:
-    return str(g["rows"]) + (f" (+{g['crashes']} crash)" if g["crashes"] else "")
+    apart = [f"+{g['crashes']} crash"] if g["crashes"] else []
+    if g.get("blocked"):
+        apart.append(f"+{g['blocked']} {'bloqueada' if g['blocked'] == 1 else 'bloqueadas'}")
+    return str(g["rows"]) + (f" ({', '.join(apart)})" if apart else "")
 
 
 def _lines(n: int) -> str:
@@ -278,6 +308,36 @@ def _origin(target: dict) -> str:
                      for k, v in origin.items())
 
 
+def _names(splits: list[str]) -> str:
+    return ", ".join(f"`{s}`" for s in splits)
+
+
+def _load_text(load: dict) -> str:
+    n, splits, workers = load.get("cases_at_once"), load.get("splits_in_process"), load.get("workers")
+    cpus = f", em {load['cpus']} CPUs" if load.get("cpus") else ""
+    return (f"até **{n}** {'conversa' if n == 1 else 'conversas'} ao mesmo tempo no processo ({splits} "
+            f"{'split' if splits == 1 else 'splits'} × {workers} {'worker' if workers == 1 else 'workers'}; teto "
+            f"`LIVE_MAX_CONCURRENT` {load.get('max_concurrent')}){cpus}")
+
+
+def _load_line(summary: dict) -> str:
+    """A carga em que o SLO foi medido, do `concurrency` dos live_*.json; gravação sem o campo sai declarada."""
+    groups, unrecorded = summary["load"]["by_load"], summary["load"]["unrecorded"]
+    missing = "gravação anterior ao campo `concurrency`"
+    if not groups:
+        return f"Carga da medida: não registrada nos live_*.json ({missing})."
+    if len(groups) == 1 and not unrecorded:
+        parts = [_load_text(groups[0]["load"])]
+    else:
+        parts = [f"{_load_text(g['load'])} em {_names(g['splits'])}" for g in groups]
+    if unrecorded:
+        parts.append(f"não registrada em {_names(unrecorded)} ({missing})")
+    shared = any(isinstance(g["load"].get("cases_at_once"), int) and g["load"]["cases_at_once"] > 1 for g in groups)
+    tail = (": o tempo do turno inclui a CPU dividida com as outras conversas (carga do eval, não a de uma conversa "
+            "sozinha)") if shared else ""
+    return "Carga da medida: " + "; ".join(parts) + tail + "."
+
+
 def _slo_line(summary: dict) -> str:
     target, splits, total = summary["slo"], summary["by_split"], summary["ALL"]
     judged = {s: g for s, g in splits.items() if g["slo_ok"] is not None}
@@ -285,10 +345,16 @@ def _slo_line(summary: dict) -> str:
               for s, g in judged.items() if not g["slo_ok"]]
     verdict = f"Cumprem **{len(judged) - len(misses)} de {len(judged)}** splits"
     verdict += f"; não cumprem: {', '.join(misses)}." if misses else "."
-    crash = f" ({total['crashes']} crash fora do p50/p95)" if total["crashes"] else ""
+    apart = []
+    if total.get("blocked"):
+        n = total["blocked"]
+        apart.append(f"{n} {'bloqueio' if n == 1 else 'bloqueios'} do guardrail fora do p50/p95: a recusa leva ms")
+    if total["crashes"]:
+        apart.append(f"{total['crashes']} crash fora do p50/p95")
+    note = f" ({'; '.join(apart)})" if apart else ""
     return (f"SLO declarado, por turno: p50 ≤ **{target['p50_s']:g} s** e p95 ≤ **{target['p95_s']:g} s** "
-            f"({_origin(target)}). {verdict} Total: p50 {_s(total['p50_ms'])}, p95 {_s(total['p95_ms'])} em "
-            f"{total['rows']} linhas{crash}.")
+            f"({_origin(target)}). {_load_line(summary)} {verdict} Total: p50 {_s(total['p50_ms'])}, p95 "
+            f"{_s(total['p95_ms'])} em {_lines(total['rows'])}{note}.")
 
 
 def _left_out_text(left_out: dict) -> str:

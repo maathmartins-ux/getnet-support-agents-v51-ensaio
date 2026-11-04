@@ -91,6 +91,7 @@ def isolated_env(tmp_path, monkeypatch, pg_schema):
     # da escolha das páginas (evals/human_selection.json, que vai para o git) recebe página de teste
     monkeypatch.setattr(label, "SALT_FILE", tmp_path / "var" / "rotulagem_salt.json")
     monkeypatch.setattr(label, "SELECTION_FILE", tmp_path / "human_selection.json")
+    monkeypatch.setattr(label, "VALIDATION_DIR", tmp_path / "validation")  # conjuntos congelados das páginas (git)
     monkeypatch.setenv("DB_PATH", str(tmp_path / "test.db"))
     if pg_schema:
         monkeypatch.setenv("DATABASE_URL", pg_schema)
@@ -98,7 +99,7 @@ def isolated_env(tmp_path, monkeypatch, pg_schema):
         monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.setenv("LLM_PROVIDER", "offline")
     monkeypatch.setenv("AUTH_MODE", "required")
-    monkeypatch.setenv("AUTH_SECRET", "test-secret")
+    monkeypatch.setenv("AUTH_SECRET", "test-secret-hs256-com-32-bytes-ou-mais")  # RFC 7518 §3.2; menos = aviso do PyJWT
     monkeypatch.setenv("OPERATOR_TOKEN", "test-operator")
     monkeypatch.setenv("RATE_LIMIT_PER_MIN", "1000")
     monkeypatch.setenv("RETRIEVER", "bm25")

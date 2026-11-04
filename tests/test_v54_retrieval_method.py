@@ -45,8 +45,10 @@ def test_offline_plan_also_searches_the_customer_words_first():
             seen.append(query)
             return []
 
-    agents.retrieve("Do I need a bank account to receive my sales via Pix?", retriever=Fake(), k=5)
-    assert seen[0] == "Do I need a bank account to receive my sales via Pix?"
+    found = agents.retrieve("Do I need a bank account to receive my sales via Pix?", retriever=Fake(), k=5)
+    # 1ª no plano (e na fusão); as buscas do plano rodam juntas, então a ordem de chegada não conta
+    assert found.plan.queries[0] == "Do I need a bank account to receive my sales via Pix?"
+    assert "Do I need a bank account to receive my sales via Pix?" in seen
 
 
 def test_separation_reports_auc_and_gap():
@@ -55,6 +57,34 @@ def test_separation_reports_auc_and_gap():
     sep = retrieval_eval.separation(pos, neg)
     assert sep["auc"] == 1.0 and sep["gap"] == 0.3 and sep["enough"]
     assert retrieval_eval.separation(pos, [[(0.0, 0.85, False)]])["auc"] == 0.5
+
+
+def test_question_refused_by_the_agent_gate_counts_as_minus_infinity():
+    """Rodada 10: o portão do caminho do agente recusava 18 das 22 sem fonte e a separação saía de 57 × 4
+    ("indicativa"); a recusa é o sinal mais baixo e entra na conta. O gap fica entre as não recusadas."""
+    pos = [[(0.0, 0.9, True)]] * 57 + [[]] * 2  # 2 com fonte recusadas pelo portão
+    neg = [[(0.0, 0.95, False)]] * 4 + [[]] * 18  # 4 sem fonte passam (com nota alta), 18 recusadas
+    sep = retrieval_eval.separation(pos, neg)
+    assert (sep["positives"], sep["negatives"], sep["enough"]) == (59, 22, True)
+    assert sep["refused"] == {"positives": 2, "negatives": 18}
+    # 57×18 vitórias + 2×18 empates (-inf × -inf) + 0 contra as 4 que passam, sobre 59 × 22
+    assert sep["auc"] == round((57 * 18 + 0.5 * 2 * 18) / (59 * 22), 3)
+    assert sep["gap"] == round(0.9 - 0.95, 3)  # só entre as não recusadas
+    old = retrieval_eval.separation([p for p in pos if p], [n for n in neg if n])  # o que saía antes: 57 × 4
+    assert (old["positives"], old["negatives"], old["enough"]) == (57, 4, False)
+    assert retrieval_eval.separation([[]], [[]]) is None  # nenhuma nota: o buscador não tem o sinal
+
+
+def test_agent_path_rerank_note_is_minus_infinity_only_when_refused():
+    from app import rag
+
+    hit = rag.Hit(rag.Doc("d", "t", "u", "x"), 1.0, rerank=-2.0)
+    assert retrieval_eval._note([]) == float("-inf")  # recusada pelo portão
+    assert retrieval_eval._note([hit]) == -2.0
+    assert retrieval_eval._note([rag.Hit(rag.Doc("d", "t", "u", "x"), 1.0)]) is None  # buscador sem rerank
+    # sem rerank no caminho do agente: as recusadas (-inf) sozinhas não viram separação pela nota
+    assert retrieval_eval.separation([[(0.0, float("-inf"), True)]], [[(0.0, float("-inf"), False)]]) is None
+    assert retrieval_eval.calibrate_rerank_gate([1.0], [-1.0])["min_rerank"] == 1.0
 
 
 def test_judge_validation_rule_is_fixed_before_measuring():
@@ -82,7 +112,7 @@ def test_rerank_hits_carry_the_cross_score():
         def score(self, q, texts):
             return [0.1, 2.5, -1.0]
 
-    hits = rag.CrossRerankRetriever(Base(), Scorer(), pool=3, chars=100).search("q", k=3)
+    hits = rag.CrossRerankRetriever(Base(), Scorer(), pool=3, chars=100, order="cross").search("q", k=3)
     assert [h.doc.id for h in hits] == ["d1", "d0", "d2"] and hits[0].rerank == 2.5
 
 

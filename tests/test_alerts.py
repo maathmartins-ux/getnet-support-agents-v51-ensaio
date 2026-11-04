@@ -7,10 +7,19 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def latency_series() -> set[str]:
+    """Séries de latência que o /metrics de fato emite (Metrics.render() com uma observação): _bucket, _sum e _count."""
+    from app.observability import Metrics
+
+    m = Metrics()
+    m.observe("agent", 1.0)
+    return {line.split("{")[0] for line in m.render().splitlines() if line and not line.startswith("#")}
+
+
 def emitted_metrics() -> set[str]:
     code = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "src" / "app").glob("*.py"))
     names = set(re.findall(r'METRICS\.(?:inc|add)\("([a-z_]+)"', code))
-    return names | {"span_latency_ms_sum", "span_latency_ms_count"}  # render() de observability.py
+    return names | latency_series()
 
 
 def test_alert_rules_are_valid_and_actionable():
@@ -20,8 +29,16 @@ def test_alert_rules_are_valid_and_actionable():
     for rule in rules:
         assert rule["alert"] and rule["expr"] and rule["for"], rule
         assert rule["annotations"]["action"], f"{rule['alert']} sem ação: alerta sem ação vira ruído"
-        used = set(re.findall(r"\b([a-z_]+_(?:total|sum|count))\b", rule["expr"]))
+        used = set(re.findall(r"\b([a-z_]+_(?:total|sum|count|bucket))\b", rule["expr"]))
         assert used and used <= known, f"{rule['alert']} usa métrica que o app não emite: {used - known}"
+
+
+def test_latency_series_include_the_histogram_buckets():
+    # o filtro de sufixo pega _bucket: um alerta com histogram_quantile sobre série inexistente reprovaria acima
+    assert latency_series() == {"span_latency_ms_bucket", "span_latency_ms_sum", "span_latency_ms_count"}
+    assert re.findall(r"\b([a-z_]+_(?:total|sum|count|bucket))\b",
+                      'histogram_quantile(0.95, sum by (le) (rate(span_latency_ms_bucket{span="turn"}[30m])))') == [
+        "span_latency_ms_bucket"]
 
 
 def test_every_alert_has_a_runbook_section():

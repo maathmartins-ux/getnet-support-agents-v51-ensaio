@@ -19,7 +19,7 @@ from . import capabilities, cases, casestate, claims, domain, grounding, memory,
 from .agents import Context, escalation_agent
 from .grounding import risk_flags, unsupported_numbers
 from .guardrails import UNAVAILABLE, Verdict, llm_check, mask_output, pre_check
-from .llm import get_llm
+from .llm import force_offline, get_llm
 from .observability import METRICS, log, new_trace_id, prompt_versions, request_usage, span
 from .rag import get_index
 from .router import detect_language, route
@@ -91,6 +91,71 @@ def _scrub_internal(answer: str, language: str) -> str:
     # o que sobrou da citação tirada: "atendente, ." → "atendente."; ", ," → ","; espaço antes de pontuação
     answer = re.sub(r"\s*,\s*(?=[.;:!?])", "", answer)
     return re.sub(r"[ \t]+([,.;:!?])", r"\1", answer)
+
+
+# --- resposta primeiro --------------------------------------------------------------------------------------------
+# Medido no ensaio (rodada 10, official-04, rodada 0 de 3): a resposta abriu com "The sources don't say a bank account
+# is mandatory." e a frase seguinte, com citação, trazia a regra que responde; o fim repetia a ausência. O cliente lê a
+# ressalva antes da resposta (o eval marca não resolvido). O prompt já pede "a 1ª frase responde" (prompts/faq.md),
+# mas nada no código impunha. A guarda tira essa 1ª frase só quando nada se perde e a resposta segue legível:
+# - a 1ª frase ABRE dizendo que as fontes não trazem algo e não cita fonte;
+# - a 2ª cita fonte do turno, não é outra ausência nem ressalva de "só achei..." (que continua a 1ª);
+# - outra frase diz, sem citação, o que AS FONTES não trazem (ou "não encontrei") e fecha a resposta: o cliente
+#   continua lendo o que falta. Ressalva de um trecho só ("o trecho não diz a que plano vale") não conta;
+# - a 2ª não depende da 1ª: "They do say X [n]" vira "X [n]"; "They describe it..." deixa tudo como está.
+# Levar a 1ª frase para o fim (quando ela é a única ausência) ficou de fora de propósito: nas respostas gravadas do
+# ensaio isso valeria em 3 (memory-15 ×2, real-29) e pioraria as 3, porque ali a ressalva era a resposta direta
+# ("the sources don't say whether X connects over Wi-Fi") e a frase seguinte dependia dela.
+_NOT_EN = r"(?:don[’']?t|do\s+not|doesn[’']?t|does\s+not)"
+_SOURCES = r"(?:(?:the|these)\s+(?:sources?|passages)|(?:as|essas)\s+(?:fontes|passagens)|os\s+trechos)\b"
+_NOT_FOUND = (r"(?:n[ãa]o\s+(?:encontrei|achei|localizei)"
+              r"|i\s+(?:couldn[’']?t|could\s+not|didn[’']?t|did\s+not)\s+find)\b")
+_OPENS_ABSENT = re.compile(rf"^\W*(?:{_SOURCES}(?:\s+\w+){{0,3}}?\s+(?:{_NOT_EN}|only|n[ãa]o|s[óo])\b"
+                           rf"|{_NOT_FOUND}[^.!?]*\b(?:nas\s+fontes|in\s+the\s+sources?)\b)", re.IGNORECASE)
+_SOURCES_ABSENT = re.compile(rf"\b{_SOURCES}(?:\s+\w+){{0,3}}?\s+(?:{_NOT_EN}|n[ãa]o)\b|\b{_NOT_FOUND}",
+                             re.IGNORECASE)
+_HEDGE = re.compile(r"^\W*(?:\w+\s+){0,3}?(?:s[óo]|apenas|somente|[úu]nic[ao]s?|only|just)\b", re.IGNORECASE)
+_CONTRAST = re.compile(r"\b(?:but|however|although|mas|por[ée]m|embora|contudo)\b", re.IGNORECASE)  # 1ª com conteúdo
+_LEAD = re.compile(r"^(?:(?:but|however|still|mas|por[ée]m|no entanto|contudo),?\s+)?"
+                   r"(?:they|elas|eles)\s+(?:do\s+)?(?:say|state|show|mention|explain|dizem|informam|mostram|trazem)"
+                   r"\s+(?:that\s+|que\s+)?", re.IGNORECASE)
+_DANGLING = re.compile(r"^\W*(?:they|it|this|that|these|those|elas?|eles?|isso|isto|esse|essa|este|esta)\b"
+                       r"|^\W*(?:\S+\s+){0,5}?(?:ele|ela|eles|elas|dele|dela|deles|delas|it|its|they|them|their)\b",
+                       re.IGNORECASE)
+_CITE = re.compile(r"\[([^\]\[]+)\]")
+
+
+def _cites(sentence: str, ids: set[str]) -> bool:
+    return any(part.strip() in ids for m in _CITE.finditer(sentence) for part in m.group(1).split(","))
+
+
+def answer_first(answer: str, source_ids: set[str]) -> str:
+    """Tira a ressalva de abertura ("as fontes não dizem...") quando a frase seguinte, citada, já responde e outra
+    ausência fecha a resposta (regras acima). Sem fonte do turno citada, a resposta não muda."""
+    if not source_ids:
+        return answer
+    sents = claims.split_sentences(answer)
+    if len(sents) < 3:
+        return answer
+    first, second = sents[0].text, sents[1].text
+
+    def absent(text: str) -> bool:
+        return claims.states_absence(text) or bool(_SOURCES_ABSENT.search(text))
+
+    if not _OPENS_ABSENT.search(first) or _cites(first, source_ids) or _CONTRAST.search(first):
+        return answer
+    if not _cites(second, source_ids) or absent(second) or _HEDGE.search(second):
+        return answer
+    if not any(_SOURCES_ABSENT.search(s.text) and not _cites(s.text, source_ids) for s in sents[2:]):
+        return answer
+    lead = _LEAD.sub("", second, count=1)
+    if _DANGLING.search(lead) or not lead.strip():
+        return answer
+    out = claims.remove_sentences(answer, {first})
+    if lead != second:
+        out = out.replace(second, lead[0].upper() + lead[1:], 1)
+    METRICS.inc("answer_first_total", action="dropped_opening_absence")
+    return out
 
 
 def _digest(store, conversation_id: str, ledger: memory.Ledger | None = None) -> str:
@@ -285,12 +350,19 @@ def _guard_and_route(message: str, history: list[dict]) -> tuple[Verdict, Router
 def handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> ChatResponse:
     t0 = time.perf_counter()
     resp = _handle(req, user_id, identity_verified)
+    ms = round((time.perf_counter() - t0) * 1000, 1)
+    if not resp.blocked:
+        # O turno inteiro no histograma (span "turn"): o p95 do SLO e da escalada do runbook sai do Prometheus. O
+        # bloqueio do guardrail leva ms e fica fora (conta em guardrail_blocks_total e no span guardrails): uma rajada
+        # de ataques baixaria o p95 e esconderia o turno lento. Medido no ensaio: 39 bloqueios baixavam o p50 do
+        # total de 17,6 s para 16,3 s (evals/trace_stats.py tira os mesmos do SLO).
+        METRICS.observe("turn", ms)
     try:  # analytics é melhor esforço: falha ao registrar nunca derruba o atendimento
         get_store().log_request({
             "trace_id": resp.trace_id, "conversation_id": resp.conversation_id, "user_id": user_id,
             "intent": resp.intent, "route": resp.route, "handoff": resp.handoff.required, "blocked": resp.blocked,
             "ungrounded": bool(resp.unsupported_numbers), "cost_usd": resp.usage.cost_usd,
-            "ms": round((time.perf_counter() - t0) * 1000, 1)})  # sem o texto: analytics não guarda conteúdo
+            "ms": ms})  # sem o texto: analytics não guarda conteúdo
         # evidência (mascarada) e versão das instruções: o 👎 desta resposta vira candidato a caso com elas
         get_store().save_snapshot(resp.trace_id, resp.conversation_id, list(resp.evidence), resp.prompt_versions)
     except Exception as exc:  # noqa: BLE001
@@ -336,9 +408,14 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
     # contrato router → faq: a pergunta completa do turno ("" = reescrita recusada); o faq busca por ela quando houver
     ctx.facts["standalone"] = getattr(decision, "standalone", "") or ""
     ctx.facts["search_queries"] = list(getattr(decision, "search_queries", []) or [])  # consultas do RAG (LLM)
-    outcome = supervisor.run(list(decision.plan), ctx, decision.confidence)
     if UNAVAILABLE in verdict.flags:
+        # classificador de segurança indisponível: a leitura segue, mas sem NENHUM agente LLM sobre o texto não
+        # conferido (força o caminho offline durante a orquestração), e a escrita do turno fica retida
+        with force_offline():
+            outcome = supervisor.run(list(decision.plan), ctx, decision.confidence)
         _hold_writes(store, outcome, language)
+    else:
+        outcome = supervisor.run(list(decision.plan), ctx, decision.confidence)
 
     answer = outcome.answer or "\n\n".join(r.text for r in outcome.results if r.text)
     if outcome.answer and _drops_live_values(outcome, language):
@@ -385,6 +462,8 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
         answer, claim_report = claims.enforce(_scrub_internal(mask_output(specialist, public=public), language),
                                               evidence=evidence[:-1], question=verdict.text, card=card,
                                               writes_blocked=blocked)
+    # depois da última chamada ao LLM (as gravações seguem valendo): a resposta citada vem antes da ressalva
+    answer = answer_first(answer, {s.id for r in outcome.results for s in r.sources})
     if case_action == "escalate":  # 2º ciclo sem sucesso: humano, com as tentativas, qualquer que seja o motivo
         if not handoff.required:
             ctx.handoff_reason = "unresolved_after_cycles"

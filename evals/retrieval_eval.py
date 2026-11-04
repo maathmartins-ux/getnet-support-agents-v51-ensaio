@@ -159,17 +159,34 @@ def separation(pos: list[list[GateHit]], neg: list[list[GateHit]]) -> dict | Non
     """Quanto o sinal do portão separa perguntas COM fonte das SEM fonte ("gap" e AUC por embedder): melhor
     cosseno de cada pergunta; AUC = chance de uma pergunta com fonte superar uma sem fonte; gap = pior com fonte −
     melhor sem fonte (> 0 separa por completo).
-    Sem cosseno (BM25 puro) usa o BM25. Pede >= 15 sem fonte para valer (`enough`)."""
+    Sem cosseno (BM25 puro) usa o BM25. Pede >= 15 sem fonte para valer (`enough`).
+
+    Pergunta que o portão do caminho do agente recusou (lista vazia; nota -inf do `_evaluate`) entra com a nota mais
+    baixa possível, -inf, em vez de sair da conta: medido no ensaio (rodada 10), o portão recusava 18 das 22 sem fonte
+    e a AUC publicada saía de 57 × 4, "indicativa". O gap fica entre as não recusadas (`refused` conta as outras).
+    Sem nenhuma nota finita (buscador sem o sinal): None."""
     def best(hits: list[GateHit]) -> float:
+        if not hits:
+            return -math.inf
         cos = [c for _, c, _ in hits if c is not None]
         return max(cos) if cos else max((b for b, _, _ in hits), default=0.0)
 
-    p, n = [best(h) for h in pos if h], [best(h) for h in neg if h]
-    if not p or not n:
+    p, n = [best(h) for h in pos], [best(h) for h in neg]
+    pf, nf = [x for x in p if math.isfinite(x)], [x for x in n if math.isfinite(x)]
+    if not p or not n or not (pf or nf):
         return None
     wins = sum((a > b) + 0.5 * (a == b) for a in p for b in n)
-    return {"auc": round(wins / (len(p) * len(n)), 3), "gap": round(min(p) - max(n), 3),
-            "positives": len(p), "negatives": len(n), "enough": len(n) >= 15}
+    return {"auc": round(wins / (len(p) * len(n)), 3), "gap": round(min(pf) - max(nf), 3) if pf and nf else None,
+            "positives": len(p), "negatives": len(n), "enough": len(n) >= 15,
+            "refused": {"positives": len(p) - len(pf), "negatives": len(n) - len(nf)}}
+
+
+def _note(hits: list) -> float | None:
+    """Maior nota do cross-encoder entre os trechos; -inf se o portão (caminho do agente) recusou a pergunta (lista
+    vazia: a recusa é o sinal mais baixo, entra na separação); None se o buscador não dá nota (sem rerank)."""
+    if not hits:
+        return -math.inf
+    return max((h.rerank for h in hits if h.rerank is not None), default=None)
 
 
 def _by_origin(per_q: list[dict]) -> dict:
@@ -221,7 +238,7 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
         ms = (time.perf_counter() - t0) * 1000
         got = [h.doc.id for h in hits]
         gate_pos.append([(h.bm25, h.cosine, h.doc.id in rel) for h in hits[:K]])
-        rerank_pos.append(max((h.rerank for h in hits[:K_GEN] if h.rerank is not None), default=None))
+        rerank_pos.append(_note(hits[:K_GEN]))
         m = score_question(got, [h.doc.url for h in hits], units, rel_urls)
         per_q.append({"question": r["question"], "passages": len(units), "top3": got[:K], "latency_ms": round(ms, 1),
                       "origin": r.get("origin") or "sem_origem",
@@ -236,7 +253,7 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
     negatives = [r["question"] for r in all_rows if not Gold.from_row(r).positive]
     neg_hits = [retriever.search(_query(q), k=K_GEN) for q in negatives if _reaches_knowledge(q)]
     gate_neg = [[(h.bm25, h.cosine, False) for h in hits[:K]] for hits in neg_hits]
-    rerank_neg = [max((h.rerank for h in hits if h.rerank is not None), default=None) for hits in neg_hits]
+    rerank_neg = [_note(hits) for hits in neg_hits]
     n = len(per_q) or 1
 
     def mean(key: str) -> float:
@@ -259,8 +276,9 @@ def _evaluate(path: Path, retriever, warmup: bool) -> dict:
             # com rerank, a nota do cross-encoder separa melhor que o cosseno (medido num gold real: AUC 0,84 × 0,78)
             "separation_rerank": separation([[(0.0, x, True)] for x in rerank_pos if x is not None],
                                             [[(0.0, x, False)] for x in rerank_neg if x is not None]),
-            "rerank_gate": calibrate_rerank_gate([x for x in rerank_pos if x is not None],
-                                                 [x for x in rerank_neg if x is not None]),
+            # o limiar só se calibra sobre nota de verdade: a recusa do portão (-inf) não é nota do cross
+            "rerank_gate": calibrate_rerank_gate([x for x in rerank_pos if x is not None and math.isfinite(x)],
+                                                 [x for x in rerank_neg if x is not None and math.isfinite(x)]),
             "essential": sum(1 for _, g in rows if g.passages),
             **({"related": {"cases": len(related_q),
                             f"recall@{K}": round(sum(q["recall"] for q in related_q) / len(related_q), 3),

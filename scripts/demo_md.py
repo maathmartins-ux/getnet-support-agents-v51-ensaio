@@ -15,10 +15,11 @@ supervisor" ou "... pelo motor de tabela", "código (regra)", "operadora <nome>"
 registrado").
 `--transcript`: roda NO PROCESSO (o LLM que o ambiente tiver; sem chave, o modo offline) uma conversa multi-turno
 descrita em JSONL — {"user": "u1"} na 1ª linha; depois {"say": "..."}, {"confirm": true} (confirma a última ação
-proposta e mostra o antes/depois da escrita) e {"say": "...", "operator": "resposta", "wait_s": 5} (a operadora
-simulada responde o caso durante a espera síncrona, app/hitl_sync.py, com chave pessoal: o nome dela vai para o
-passo e para a auditoria) — e escreve a transcrição com a árvore. O que a transcrição diz da operadora vem do status
-do POST dela e da árvore do turno, não do roteiro.
+proposta e mostra o antes/depois da escrita) e {"say": "...", "operator": "resposta", "wait_s": 5,
+"operator_after_s": 0.3} (a operadora simulada, evals/operator_sim.py — a mesma do split `hitl` do eval —, responde
+o caso `operator_after_s` s depois de o turno começar a esperar, app/hitl_sync.py, com chave pessoal: o nome dela vai
+para o passo e para a auditoria) — e escreve a transcrição com a árvore. O que a transcrição diz da operadora vem do
+status do POST dela e da árvore do turno, não do roteiro.
 """
 
 from __future__ import annotations
@@ -254,39 +255,6 @@ def _env(name: str, value: str):
             os.environ[name] = prev
 
 
-def _operator_thread(answer: str, after_s: float, seen: set[str], key: str):
-    """Operadora simulada: responde, pelo endpoint do console e com a chave pessoal `key`, o 1º caso de atendimento
-    novo da fila. Devolve (thread, stop, state): `stop` encerra a espera quando o turno acaba (senão ela responderia
-    o caso de um turno seguinte); `state` guarda o caso que ela achou (`ticket`) e o status HTTP do POST (`status`,
-    None = não postou)."""
-    import threading
-    import time
-
-    from fastapi.testclient import TestClient
-
-    from app.api import app
-    from app.store import get_store
-
-    stop, state = threading.Event(), {"ticket": None, "status": None}
-
-    def run() -> None:
-        client, end = TestClient(app), time.time() + 30
-        while time.time() < end and not stop.is_set():
-            fresh = [t for t in get_store().list_tickets("open") if t["kind"] == "handoff" and t["id"] not in seen]
-            if fresh:
-                state["ticket"] = fresh[0]["id"]
-                if stop.wait(after_s):  # o turno acabou antes da hora de ela responder
-                    return
-                state["status"] = client.post(f"/handoffs/{fresh[0]['id']}/reply", json={"answer": answer},
-                                              headers={"X-Operator-Token": key}).status_code
-                return
-            stop.wait(0.05)
-
-    thread = threading.Thread(target=run, daemon=True)
-    thread.start()
-    return thread, stop, state
-
-
 def operator_note(state: dict, ticket: str | None, steps: list[dict], answer: str) -> str:
     """O que a transcrição diz da operadora simulada no turno, lido do que aconteceu (não do roteiro): "responde"
     só com o POST 2xx no caso que o turno abriu; a resposta só é "durante a espera" se voltou no próprio turno (passo
@@ -331,10 +299,11 @@ def _transcript(path: Path, sha: str, when: str, operator_key: str) -> str:
     sys.path[:0] = [str(ROOT), str(ROOT / "src")]
     from fastapi.testclient import TestClient
 
+    from app import hitl_sync
     from app.api import app
     from app.auth import issue_token
     from app.llm import get_llm
-    from app.store import get_store
+    from evals import operator_sim
 
     lines = [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
     user = (lines[0] if lines and "user" in lines[0] else {}).get("user", "u1")
@@ -364,28 +333,18 @@ def _transcript(path: Path, sha: str, when: str, operator_key: str) -> str:
             pending = None
             continue
         n += 1
-        operator, prev = None, os.environ.get("HITL_SYNC_WAIT_S")
-        if turn.get("operator"):
-            os.environ["HITL_SYNC_WAIT_S"] = str(turn.get("wait_s", 5))
-            os.environ.setdefault("HITL_SYNC_POLL_S", "0.2")
-            seen = {t["id"] for t in get_store().list_tickets("open")}
-            operator = _operator_thread(turn["operator"], float(turn.get("operator_after_s", 0.3)), seen,
-                                        operator_key)
-        try:
+        operator = None
+        if turn.get("operator"):  # a mesma operadora simulada do split hitl do eval, pelo console e com chave pessoal
+            operator = operator_sim.Operator(turn["operator"], float(turn.get("operator_after_s", 0.3)),
+                                             operator_sim.reply_console(operator_key),
+                                             seen=operator_sim.open_handoffs()).start()
+        # espera síncrona só neste turno (contexto, não env do processo); o TestClient leva o contexto ao /chat
+        with hitl_sync.override(turn.get("wait_s", 5) if operator else None, operator_sim.TURN_POLL_S):
             got = client.post("/chat", json={"message": turn["say"], "conversation_id": conv}, headers=headers).json()
-        finally:
-            if turn.get("operator"):
-                if prev is None:
-                    os.environ.pop("HITL_SYNC_WAIT_S", None)
-                else:
-                    os.environ["HITL_SYNC_WAIT_S"] = prev
         ticket = (got.get("handoff") or {}).get("ticket_id")
-        if operator:
-            thread, stop, state = operator
-            if state["ticket"] or ticket:
-                thread.join(5)  # há caso: a resposta pode chegar logo depois da espera (vai pela retomada)
-            stop.set()  # o caso de um turno seguinte não é deste: a operadora para de esperar aqui
-            thread.join(60)  # só demora se o POST já saiu; a espera pendente acaba no stop
+        # o turno acabou: sem caso, ela desiste (o caso de um turno seguinte não é deste); com caso, a resposta dela
+        # sai na hora dela, no turno ou depois dele (aí vai pela retomada do caso)
+        state = operator.finish(ticket) if operator else {}
         conv = got.get("conversation_id", conv)
         pending = got.get("pending_action") or pending
         steps = got.get("steps") or []

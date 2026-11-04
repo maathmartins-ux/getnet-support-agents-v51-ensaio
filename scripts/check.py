@@ -424,6 +424,10 @@ def main() -> int:
         # o gate grava num arquivo à parte: evals/results/ só muda quando alguém decide commitar a medida
         step("eval gate", [PY, "-m", "evals.run_evals", "--out", str(ROOT / "var" / "check-eval.json")]),
         step("README ⇔ evidência commitada", [PY, "scripts/fill_readme.py", "--check"]),
+        # a evidência do juiz não se contradiz: resumo de cada live_*.json = judge.json (rejulgado guarda a 1ª
+        # passada), veredito do texto de hoje, held-out sem `reason`, human_review.json = o --report de hoje. Rodada
+        # 10: live_official.json dizia 19/30 ao lado do 30/30 publicado, e o juiz × humano era de outra bateria
+        step("evidência do juiz coerente", [PY, "-m", "evals.judge", "--check"]),
     ]
     results.append(committed_eval_is_current(ROOT / "var" / "check-eval.json"))
     results.append(commit_titles_clean())

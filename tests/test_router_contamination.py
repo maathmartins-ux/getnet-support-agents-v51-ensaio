@@ -71,6 +71,38 @@ def contaminated_examples(examples: list[str], heldout: list[dict]) -> list[tupl
     return [(ex, cid) for ex in examples for cid, sh in blind if shingles(ex) & sh]
 
 
+# Prompt do domínio × perguntas de avaliação. Rodada 10: o faq.md do domínio trazia a regra 'Conta para receber
+# ("preciso de conta bancária?", "do I need a bank account?")', com a frase do official-04 e o fato que ele confere;
+# a régua leu como regra sob medida para a prova. Splits que medem o sistema: os oficiais e todo held-out.
+EVAL_SPLITS = ("official", "official-var")
+
+
+def eval_questions(cases: list[dict]) -> list[dict]:
+    """Mensagens (e turnos anteriores) dos splits de avaliação: official, official-var e todo split "heldout*"."""
+    out = []
+    for c in cases:
+        split = str(c.get("split") or "")
+        if split in EVAL_SPLITS or split.startswith("heldout"):
+            out += [{"id": c.get("id", "?"), "message": m} for m in [*(c.get("before") or []), c.get("message")]
+                    if isinstance(m, str) and m.strip()]
+    return out
+
+
+def contaminated_prompts(prompts: dict[str, str], questions: list[dict]) -> list[tuple[str, str, str]]:
+    """(prompt, caso, 5 palavras seguidas em comum) — pergunta de avaliação copiada para dentro do prompt."""
+    asked = [(q["id"], shingles(q["message"])) for q in questions]
+    return [(name, cid, s) for name, text in sorted(prompts.items()) for cid, sh in asked
+            for s in sorted(shingles(text) & sh)]
+
+
+def active_prompts() -> dict[str, str]:
+    """Os prompts que o LLM lê no domínio ativo: cada .md da pasta do domínio (com o contrato do motor anexado)."""
+    from app import domain
+
+    folder = Path(getattr(domain.active(), "PROMPTS_DIR", None) or domain.KIT_PROMPTS)
+    return {p.name: domain.prompt(p.name) for p in sorted(folder.glob("*.md"))}
+
+
 # --- o detector (roda sempre, inclusive no kit) --------------------------------------------------------
 
 def test_detector_catches_v3_leak(tmp_path):
@@ -95,6 +127,24 @@ def test_detector_catches_copied_example():
     assert contaminated_examples(["show my approved transactions"], heldout) == []
 
 
+def test_detector_catches_an_eval_question_copied_into_a_prompt():
+    asked = eval_questions([
+        {"id": "official-04", "split": "official", "message": "Do I need a bank account to receive my sales via Pix?"},
+        {"id": "memory-01", "split": "memory", "message": "Do I need a bank account to receive?"},  # não é avaliação
+        {"id": "h1", "split": "heldout-v2", "before": ["Oi, tudo bem?"], "message": "Quero cancelar a minha conta"}])
+    assert [(q["id"], q["message"]) for q in asked] == [
+        ("official-04", "Do I need a bank account to receive my sales via Pix?"), ("h1", "Oi, tudo bem?"),
+        ("h1", "Quero cancelar a minha conta")]
+    # a regra do faq.md do ensaio (rodada 10) e a genérica que a troca (sem frase do caso, sem produto, sem fato)
+    copied = ('Conta para receber ("preciso de conta bancária?", "do I need a bank account?"): se vier o trecho da '
+              'conta digital, a resposta direta é que a empresa oferece a conta')
+    assert contaminated_prompts({"faq.md": copied}, asked) == [
+        ("faq.md", "official-04", "do i need a bank"), ("faq.md", "official-04", "i need a bank account")]
+    generic = ('Pergunta "preciso de X?" em que um trecho diz quais opções servem e outro descreve uma opção da '
+               'própria empresa: a 1ª frase diz o que a regra aceita, com citação; a seguinte apresenta a opção.')
+    assert contaminated_prompts({"faq.md": generic}, asked) == []
+
+
 # --- o teste de domínio (arquivos reais do projeto) -----------------------------------------------------
 
 def test_router_rules_do_not_copy_heldout():
@@ -102,6 +152,24 @@ def test_router_rules_do_not_copy_heldout():
         pytest.skip(f"sem held-out em {HELDOUT.relative_to(ROOT)}: o domínio cria o cego no relógio")
     hits = contaminated_rules(router_patterns(), load_heldout(HELDOUT))
     assert not hits, f"regra do roteador copia o held-out (o número cego vira falso): {hits}"
+
+
+def _assert_prompts_do_not_copy_eval_questions() -> None:
+    from app.jsonl import read_family
+    from evals import run_evals
+
+    cases = read_family(run_evals.CASES) + read_family(run_evals.HELDOUT)  # casos (+ .d/) e o held-out cego
+    hits = contaminated_prompts(active_prompts(), eval_questions(cases))
+    assert not hits, ("prompt do domínio copia pergunta de avaliação (regra sob medida para a prova; troque por uma "
+                      f"regra genérica): {hits[:5]}")
+
+
+def test_kit_prompts_do_not_copy_eval_questions():
+    _assert_prompts_do_not_copy_eval_questions()  # domínio de exemplo: prompts do kit × casos do kit
+
+
+def test_domain_prompts_do_not_copy_eval_questions(domain_data):
+    _assert_prompts_do_not_copy_eval_questions()  # domínio do desafio: os prompts que o LLM lê × official/var/held-out
 
 
 def test_knn_examples_do_not_copy_heldout(domain_data):

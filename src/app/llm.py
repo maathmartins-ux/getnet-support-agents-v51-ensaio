@@ -191,7 +191,24 @@ def _anthropic(model: str, effort: str) -> AnthropicLLM:
     return AnthropicLLM(model, effort)  # um cliente (pool HTTP) por modelo/effort, não um por chamada
 
 
+# Classificador de segurança indisponível (guardrails.UNAVAILABLE): o pipeline liga esta ContextVar em volta de
+# supervisor.run para que NENHUM agente use LLM sobre o texto que o classificador não conferiu. As pools dos agentes
+# propagam a ContextVar (copy_context no supervisor), então vale também nas threads dos especialistas.
+_FORCE_OFFLINE: contextvars.ContextVar[bool] = contextvars.ContextVar("llm_force_offline", default=False)
+
+
+@contextlib.contextmanager
+def force_offline():
+    token = _FORCE_OFFLINE.set(True)
+    try:
+        yield
+    finally:
+        _FORCE_OFFLINE.reset(token)
+
+
 def get_llm(role: str = "agent") -> OfflineLLM | AnthropicLLM:
+    if _FORCE_OFFLINE.get():
+        return OfflineLLM()  # leitura sem LLM: o classificador de segurança não conferiu este texto (ver pipeline)
     provider = llm_provider()
     if provider == "anthropic":
         llm = copy.copy(_anthropic(model_for(role), effort_for(role)))  # mesmo cliente HTTP, papel próprio

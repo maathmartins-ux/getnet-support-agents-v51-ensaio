@@ -52,6 +52,18 @@ def test_refusal_and_truncated_json_are_errors():
     assert (refusal.value.kind, truncated.value.kind) == ("refusal", "max_tokens")
 
 
+def test_force_offline_contextvar_wins_over_the_provider(monkeypatch):
+    """Classificador de segurança indisponível: dentro de force_offline, get_llm devolve o offline mesmo com o
+    provedor ligado, para o texto não conferido nunca chegar a um agente LLM."""
+    from app import llm as llm_mod
+
+    monkeypatch.setattr(llm_mod, "llm_provider", lambda: "anthropic")  # provedor ligado: sem o force seria AnthropicLLM
+    with llm_mod.force_offline():
+        assert isinstance(llm_mod.get_llm("agent"), OfflineLLM)
+        assert isinstance(llm_mod.get_llm("guardrail"), OfflineLLM)
+    assert not llm_mod._FORCE_OFFLINE.get()  # o contexto volta ao normal ao sair
+
+
 def test_warmup_builds_one_client_per_role_only_when_live(monkeypatch):
     # `import anthropic` leva ~7 s: sem o aquecimento, esse tempo cai dentro do 1º request de cada processo
     from app import llm as llm_mod

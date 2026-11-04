@@ -1,8 +1,9 @@
 """Quem decidiu cada passo: `decided_by` ("llm" | "router" | "code" | "operator") e `why` na árvore de passos.
 
 Quem lê o trace separa o que o supervisor LLM escolheu (tool call), o que veio do plano do router e rodou sem consultar
-o supervisor LLM (atalho ou motor de tabela), o que uma regra do código impôs (achado `needs`, escalada garantida,
-FALLBACK, orçamento, passo antecipado, aviso de caso aberto) e a resposta da operadora. Cada caminho do laço marca o
+o supervisor LLM (atalho ou motor de tabela), o que uma regra do código impôs (achado `needs` no motor de tabela —
+no motor LLM o passo pedido pelo achado é tool call do modelo —, escalada garantida, FALLBACK, orçamento, passo
+antecipado, aviso de caso aberto) e a resposta da operadora. Cada caminho do laço marca o
 passo onde o registra; a marca não muda rota, contexto nem o que o modelo lê, e passo sem marca sai "não registrado".
 O DEMO e a transcrição dizem "decidido por: ..." em cada passo, e a operadora simulada da transcrição responde com
 chave pessoal (o nome dela vai para o passo e para a auditoria); o que a transcrição diz dela vem do POST, não do
@@ -76,16 +77,40 @@ def test_step_from_a_supervisor_tool_call_is_decided_by_the_llm(monkeypatch):
 
 
 # --- achado (needs) ------------------------------------------------------------------------------------------
-def test_step_inserted_by_a_finding_is_the_code_in_both_engines(monkeypatch):
-    ask = "Quando chega meu pedido 1002?"  # records vê "em separação" → o prazo vem da política (faq)
-    offline = supervisor.run(["records"], ctx(ask, "records"))
+FINDING = "Quando chega meu pedido 1002?"  # records vê "em separação" → o prazo vem da política (faq)
+
+
+def _finding_live(monkeypatch):
+    """Turno do motor LLM com achado: o modelo lê o `needs` do records e chama o faq (tool call dele)."""
+    msgs = use_llm(monkeypatch, [resp("tool_use", tool_use("records_agent", {"request": "pedido 1002"})),
+                                 resp("tool_use", tool_use("faq_agent", {"query": "prazo de entrega"}, "tu2")),
+                                 resp("end_turn", text("Ok."))])
+    return supervisor.run(["records"], ctx(FINDING, "records")), msgs
+
+
+def test_step_a_finding_asks_for_is_the_code_in_the_table_and_the_llm_in_the_llm_engine(monkeypatch):
+    offline = supervisor.run(["records"], ctx(FINDING, "records"))
     assert offline.route == ["records", "faq"] and offline.replans[0].startswith("records:need->faq")
     assert decisions(offline) == [("records", "router", "plan"), ("faq", "code", "needs")]
-    use_llm(monkeypatch, [resp("tool_use", tool_use("records_agent", {"request": "pedido 1002"})),
-                          resp("end_turn", text("Ok."))])
-    live = supervisor.run(["records"], ctx(ask, "records"))
+    live, _ = _finding_live(monkeypatch)
     assert live.engine == "llm" and live.route == ["records", "faq"]
-    assert decisions(live) == [("records", "llm", None), ("faq", "code", "needs")]  # o modelo não pediu o faq
+    assert decisions(live) == [("records", "llm", None), ("faq", "llm", None)]  # o código não inseriu nada
+    assert live.replans[0].startswith("records:need->faq")  # o desvio do plano foi do modelo, por causa do achado
+
+
+def test_who_decides_count_follows_the_engine_on_a_finding(monkeypatch):
+    """O contador de "quem decide" (evals/trace_stats.py, bloco trace do RESULTS) lê o que o supervisor grava: o mesmo
+    achado conta "código" no motor de tabela e "supervisor LLM" no motor LLM, sem passo "não registrado"."""
+    from evals import trace_stats
+
+    offline = supervisor.run(["records"], ctx(FINDING, "records"))
+    live, _ = _finding_live(monkeypatch)
+    rows = [{"id": f"r{i}", "split": "dependent", "ms": 1000.0, "turn_ms": 1000.0, "crash": None,
+             "steps": [supervisor.step_view(r) for r in out.results]} for i, out in enumerate((offline, live))]
+    by = {row["id"]: trace_stats.summarize([row], target=trace_stats.slo())["ALL"]["decisions"] for row in rows}
+    assert by["r0"]["by"] == {"router": 1, "code": 1} and by["r0"]["why"]["code"] == {"needs": 1}
+    assert by["r1"]["by"] == {"llm": 2} and by["r1"]["why"] == {"llm": {"tool call": 2}}
+    assert [st["needs"][0]["outcome"] for st in (rows[0]["steps"][0], rows[1]["steps"][0])] == ["inserted", "called"]
 
 
 # --- escalada garantida --------------------------------------------------------------------------------------
@@ -263,13 +288,17 @@ def test_the_table_presumes_no_reason_for_an_unmarked_queue_entry():
 # --- a marca não muda comportamento --------------------------------------------------------------------------
 def test_the_mark_reaches_neither_the_model_nor_the_agents_context(monkeypatch):
     msgs = use_llm(monkeypatch, [resp("tool_use", tool_use("records_agent", {"request": "pedido 1002"})),
+                                 resp("end_turn", text("Ok.")),  # ignora o achado: a volta de lembrete roda
                                  resp("end_turn", text("Ok."))])
-    c = ctx("Quando chega meu pedido 1002?", "records")
+    c = ctx(FINDING, "records")
     out = supervisor.run(["records"], c)
-    assert [d[1] for d in decisions(out)] == ["llm", "code"]
+    assert [d[1] for d in decisions(out)] == ["llm"]
+    assert supervisor.step_view(out.results[0])["needs"][0]["outcome"] == "ignored"
     sent = json.dumps([m["messages"] for m in msgs.sent], ensure_ascii=False, default=str)
-    assert "decided" not in sent and "decided" not in json.dumps(c.facts, ensure_ascii=False, default=str)
-    assert all("decided" not in r.for_supervisor() for r in out.results)
+    context = json.dumps(c.facts, ensure_ascii=False, default=str)
+    for mark in ("decided", "need_outcomes", "ignored"):  # quem decidiu e o destino do achado ficam só no trace
+        assert mark not in sent and mark not in context
+        assert all(mark not in r.for_supervisor() for r in out.results)
 
 
 def test_unmarked_step_carries_no_presumed_decision():

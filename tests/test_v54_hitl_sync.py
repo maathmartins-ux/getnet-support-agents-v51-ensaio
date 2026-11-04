@@ -130,12 +130,12 @@ def test_wait_answer_with_fake_clock_times_out_and_audits_the_deadline():
 
 def test_final_answer_after_the_operator_drops_the_offer_and_the_repeated_step():
     """Depois da resposta do atendente: sem "posso encaminhar ao atendente" e sem o texto do passo que rodou de novo."""
-    assert supervisor.without_human_offer(
+    assert supervisor.without_handoff_talk(
         "A T1988A está online. Posso encaminhar o seu caso a um atendente humano, se quiser. Mais algo?"
     ) == "A T1988A está online. Mais algo?"
     offer = "Status ok.\n\nI can hand this to a human agent if you'd like."
-    assert supervisor.without_human_offer(offer) == "Status ok."
-    assert supervisor.without_human_offer("Sem oferta aqui.") == "Sem oferta aqui."
+    assert supervisor.without_handoff_talk(offer) == "Status ok."
+    assert supervisor.without_handoff_talk("Sem oferta aqui.") == "Sem oferta aqui."
 
 
 def test_operator_answer_turn_keeps_each_step_once(monkeypatch):

@@ -95,8 +95,21 @@ def _rows(path: Path) -> list[dict]:
 # Intenção do caso cuja resposta não vem da base (dado do cliente, web, humano, recusa): fora do gold de busca, para
 # não gastar o tempo dos rotuladores com pergunta que não tem trecho a marcar. Nomes do domínio de exemplo e do desafio.
 NOT_KNOWLEDGE = {"general", "support", "records", "human_request", "blocked"}
+# Cabeçalho, tela ou chamada do site que termina em "?" não é pergunta de cliente. Medido no ensaio (rodada 10): 9 das
+# 39 perguntas de origem `page` eram isso ("Qual a sua máquina?", "Como você prefere continuar?", "Já é nosso
+# cliente?", "Dúvidas sobre Get Tap?") e os "essenciais" delas apontavam para a tela do simulador ou um depoimento.
 GENERIC = re.compile(r"^(?:est[áa] com d[úu]vidas?|ficou com (?:alguma )?d[úu]vida|precisa de ajuda|"
-                     r"quer saber mais|vamos conversar)\b", re.IGNORECASE)
+                     r"quer saber mais|vamos conversar|como (?:voc[êe] )?prefere continuar|qual (?:[ée] )?a sua "
+                     r"m[áa]quina|j[áa] [ée] (?:nosso |nossa )?cliente|d[úu]vidas sobre)\b", re.IGNORECASE)
+# Chamada colada no meio de outro texto da página: "Gestão na palma da sua mão Já tem a sua Get Conta?", "R$ 129,90/mês
+# Venda mais Já é cliente?", "... Plataforma Digital Dúvidas sobre as maquininhas?". A maiúscula no meio da frase é o
+# título seguinte grudado; "Quem já tem conta pode...?" (minúscula) é pergunta e fica.
+BANNER = re.compile(r"\S\s+(?:J[áa]\s+(?:tem|[ée])|D[úu]vidas\s+sobre)\b")
+
+
+def generic(question: str) -> bool:
+    """Cabeçalho, tela ou chamada do site (GENERIC no começo, BANNER no meio): fora do gold de busca."""
+    return bool(GENERIC.match(question) or BANNER.search(question))
 
 
 def official_questions(cases: Path) -> list[str]:
@@ -126,7 +139,7 @@ def faq_questions(knowledge: Path, limit: int = PAGE_MAX) -> list[str]:
             # FAQ do site repete a pergunta (título do acordeão + corpo): a repetida vem primeiro
             found.sort(key=lambda q: -found.count(q))
             for q in found:
-                if 4 <= len(q.split()) <= 20 and not GENERIC.match(q):
+                if 4 <= len(q.split()) <= 20 and not generic(q):
                     by_url.setdefault(str(doc.get("url") or f.name), []).append(q)
     seen, out = set(), []
     queues = [list(dict.fromkeys(qs)) for _, qs in sorted(by_url.items())]

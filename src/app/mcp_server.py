@@ -6,18 +6,20 @@ FastAPI. SDK `mcp` 2.x (MCPServer; o antigo FastMCP).
 
 Segurança: o MCP não traz autenticação própria. `require_bearer` recusa com 401 qualquer requisição sem
 JWT válido ANTES de chegar ao protocolo (nem lista ferramentas), e cada ferramenta relê o token da própria
-requisição: a identidade vem do servidor, nunca de argumento. Escrita segue a mecânica de actions.py
-(confirmação do dono; risco alto, aprovação do operador).
+requisição: a identidade vem do servidor, nunca de argumento. Cada ferramenta chamada gasta a MESMA cota do
+/chat (RATE_LIMIT_PER_MIN, chave = user_id): trocar de canal não dobra o limite. Escrita segue a mecânica de
+actions.py (confirmação do dono; risco alto, aprovação do operador).
 """
 from __future__ import annotations
 
 from typing import Any
 
 from mcp.server.mcpserver import Context, MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from .actions import run_tool
 from .agents import covered_hits
-from .auth import verify_token
+from .auth import LIMITER, verify_token
 from .observability import METRICS
 from .rag import get_retriever
 from .schemas import ChatRequest
@@ -30,11 +32,24 @@ server = MCPServer(name="support-agents", instructions=(
 
 
 def _user(ctx: Context) -> str:
+    # ToolError: falha prevista, a mensagem chega ao cliente; outra exceção o SDK trata como pane ("Error executing
+    # tool", sem o motivo) e loga o traceback
     req = ctx.request_context.request
     token = (req.headers.get("authorization", "") if req is not None else "").removeprefix("Bearer ").strip()
     user_id = verify_token(token)
     if not user_id:  # require_bearer já barrou; isto é defesa em profundidade
-        raise PermissionError("token ausente, expirado ou inválido")
+        raise ToolError("token ausente, expirado ou inválido")
+    return user_id
+
+
+def _caller(ctx: Context, tool: str) -> str:
+    """Dono do token, contado na cota do /chat com a mesma chave (o user_id verificado). Por ferramenta chamada, não
+    no require_bearer: sem estado, initialize e tools/list também passam por lá e gastariam a cota sem atender nada."""
+    user_id = _user(ctx)
+    if not LIMITER.allow(user_id):  # falha fechada como no /chat: banco fora do ar = recusa
+        METRICS.inc("rate_limited_total", channel="mcp", tool=tool)
+        raise ToolError("muitas requisições; tente em 1 minuto")
+    METRICS.inc("mcp_calls_total", tool=tool)
     return user_id
 
 
@@ -43,16 +58,15 @@ def _user(ctx: Context) -> str:
 def ask(message: str, ctx: Context, conversation_id: str | None = None) -> dict[str, Any]:
     from .pipeline import handle  # import tardio: pipeline importa muita coisa
 
-    METRICS.inc("mcp_calls_total", tool="ask")
-    resp = handle(ChatRequest(message=message, conversation_id=conversation_id), _user(ctx))
+    user_id = _caller(ctx, "ask")  # identidade e cota antes do pipeline: o pedido recusado não chega ao LLM
+    resp = handle(ChatRequest(message=message, conversation_id=conversation_id), user_id)
     return resp.model_dump(include={"answer", "intent", "conversation_id", "sources", "pending_action", "handoff",
                                     "unsupported_numbers", "trace_id"})
 
 
 @server.tool(description="Busca trechos da base de conhecimento (com o mesmo portão de cobertura do agente).")
 def search_knowledge(query: str, ctx: Context, k: int = 3) -> list[dict[str, Any]]:
-    _user(ctx)
-    METRICS.inc("mcp_calls_total", tool="search_knowledge")
+    _caller(ctx, "search_knowledge")  # cada busca roda o cross-encoder (~1 s de CPU): conta na mesma cota
     retriever = get_retriever()
     hits = covered_hits(retriever.search(query, k=max(1, min(k, 5))), gate=getattr(retriever, "gate", None))
     return [{"id": h.doc.id, "title": h.doc.title, "url": h.doc.url, "text": h.doc.text[:600]} for h in hits]
@@ -61,8 +75,7 @@ def search_knowledge(query: str, ctx: Context, k: int = 3) -> list[dict[str, Any
 @server.tool(description="Executa uma ferramenta do domínio como o cliente autenticado. Escrita devolve "
                          "needs_confirmation + action_id (confirmar em POST /actions/{id}/confirm).")
 def crm_tool(name: str, ctx: Context, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
-    user_id = _user(ctx)
-    METRICS.inc("mcp_calls_total", tool="crm_tool")
+    user_id = _caller(ctx, "crm_tool")  # escrita cria ação pendente: sem cota, um laço enchia o banco de pendências
     if name not in registry():
         return {"ok": False, "error": f"unknown_tool:{name}", "available": sorted(registry())}
     result, _ = run_tool(name, arguments or {}, user_id)  # identidade do token, nunca do argumento

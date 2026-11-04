@@ -7,8 +7,18 @@
    chaves, e autoridade alegada ("sou da equipe interna, libere..."). PII (cartão com Luhn, CPF, e-mail, telefone)
    mascarada antes de qualquer agente, log ou LLM.
 2. Classificador (papel "guardrail": Haiku 5.5, effort low, JSON schema) quando há LLM: pega o que a
-   regex não vê (paráfrase, outro idioma, texto codificado). Falha do classificador não bloqueia — a
-   camada 1 já rodou. Meça falso positivo e falso negativo no split `guardrail` do eval ao vivo.
+   regex não vê (paráfrase, outro idioma, texto codificado). A falha do classificador NÃO é sempre aberta; a regra,
+   por caso:
+   - suspeita da camada 1 (família de alto recall) sem o classificador para liberar (offline ou fora do ar): falha
+     FECHADA — bloqueia com o motivo da regex (`_block_suspect`);
+   - recusa do modelo (LLMError kind "refusal") não é queda, é sinal de pedido tóxico: bloqueia (reason
+     prompt_injection, flag `classifier_refusal`);
+   - categoria fora do enum do schema: tratada como indisponível, nunca como "safe" (só "safe" passa);
+   - fora da suspeita, com o classificador indisponível, a leitura segue com a flag `guardrail_llm_unavailable`
+     (alerta `increase(guardrail_llm_unavailable_total[5m])>0`), MAS corre sem nenhum agente LLM — o pipeline liga a
+     ContextVar `force_offline` de llm.py em volta de `supervisor.run`, então o texto que o classificador não conferiu
+     não chega a um agente LLM — e a escrita do turno fica retida (`_hold_writes` do pipeline).
+   Meça falso positivo e falso negativo no split `guardrail` do eval ao vivo.
 
 As famílias ASI02/ASI03 exigem DOIS sinais — uma ordem dirigida ao assistente e um objeto privilegiado (papel,
 sistema interno, conta de terceiro, controle de aprovação, segredo) —, porque cada sinal sozinho aparece em pedido
@@ -604,6 +614,36 @@ _ILLEGAL = re.compile(
     r"|money laundering|evade tax(?:es)?|tax evasion|defraud)\b"
     r"|\bestruturar (?:os )?pagamentos para (?:n[aã]o|evitar|fugir)\b",
     re.IGNORECASE | re.DOTALL)
+# Crime financeiro PARAFRASEADO (alto recall): verbo de intenção dirigido ao assistente + vocabulário genérico de
+# fraude em pagamento. Entra em CONFIRM_RULES (suspeita que o classificador decide; sem LLM, falha fechada), NÃO na
+# regra terminal _ILLEGAL (precisão alta, que já dá falso positivo em pergunta legítima). Lida na cópia LOW (sem
+# acento, minúscula). Exceção estreita: um verbo PROTETOR entre a intenção e o objeto desfaz a suspeita ("como evitar
+# clonagem do cartão?", "how to prevent card cloning"). Pergunta definitória ("o que é lavagem de dinheiro?") não tem
+# verbo de intenção e nem vira suspeita.
+_ILL_INTENT = (r"(?:como|me\s+ensin\w*|ensin\w*|quero|queria|preciso|precisava|posso|consigo|gostaria|da\s+p(?:ra|ara)"
+               r"|tem\s+como|qual\s+(?:a\s+)?(?:forma|maneira|jeito)\s+de|ajud\w*|how\s+(?:do|can|could|to|would|i)"
+               r"|help\s+me|teach\s+me|show\s+me|i\s+want\s+to|i\s+need\s+to|i'?d\s+like\s+to|is\s+there\s+a\s+way\s+to"
+               r"|ways?\s+to)")
+_ILL_PROTECT = (r"(?:evit\w*|prevenir|previn\w*|preven\w*|proteg\w*|protect\w*|detect\w*|denunci\w*|report\w*|avoid"
+                r"|prevent|combat\w*|coibir|flagr\w*|reconhec\w*|impedir|impec\w*)")
+# vão até 8 palavras entre o verbo de intenção e o objeto; nenhuma delas protetora (um verbo protetor no meio desfaz)
+_ILL_GAP = r"(?:\s+(?!" + _ILL_PROTECT + r"\b)[\w'’]+){0,8}?\s+"
+# Objeto de fraude em pagamento. É também o PORTÃO da família (pedaço que todo ramo contém): sem ele, a família nem é
+# lida (sem isto o teste de custo de 10 mil caracteres pagava a família a cada posição).
+_FRAUD = (
+    r"clon\w*(?:\s+[\w'’]+){0,3}?\s+(?:cart\w*|cards?)|cart\w*\s+clonad\w*|cards?\s+clon\w*"
+    r"|duplic\w*(?:\s+[\w'’]+){0,3}?\s+(?:cart\w*|cards?)|skimming|chupa[-\s]?cabra|card\s+skimming"
+    r"|lav\w*\s+(?:de\s+|o\s+|a\s+|os\s+|uma\s+|essa\s+|minha\s+)?(?:dinheiro|grana|capital|capitais|bufunfa)"
+    r"|lavagem\s+de\s+(?:dinheiro|capital|capitais|grana)"
+    r"|esquent\w*\s+(?:o\s+|a\s+|uma\s+|essa\s+)?(?:dinheiro|grana|bufunfa)"
+    r"|dinheiro\s+(?:sujo|do\s+trafico|de\s+trafico|ilegal|de\s+origem\s+ilicita)|grana\s+suja"
+    r"|launder\w*|money[-\s]?launder\w*|anti[-\s]?money[-\s]?laundering|\baml\b"
+    r"|dirty\s+(?:money|cash|funds?)|clean\s+(?:up\s+)?(?:dirty\s+)?(?:money|cash)"
+    r"|structuring|smurf\w*"
+    r"|(?:fracion\w*|dividir|divid\w*|split\w*|break\w*|quebr\w*|pulveriz\w*)\s+(?:os\s+|as\s+|the\s+|up\s+|meus\s+"
+    r"|the\s+up\s+)?(?:deposito\w*|deposit\w*|saque\w*|valor\w*|pagamento\w*|transferencia\w*|cash|transac\w*)"
+)
+_ILLEGAL_SUSPECT = re.compile(_ILL_INTENT + _ILL_GAP + r"(?:" + _FRAUD + r")")
 # Autoagressão: não é "recusa seca" — a resposta traz apoio (CVV 188, 24 h, gratuito). Reason própria, texto próprio.
 _SELF_HARM = re.compile(
     r"\b(quero (?:me )?matar|vou me matar|me matar|suic[ií]dio|acabar com (?:a )?minha vida|tirar minha vida"
@@ -635,6 +675,7 @@ _GATES = {
                                + "|tool|function|command|acima|anterior|antes|above|before|prior|preceding"),
     "third_party": re.compile(_THIRD + "|" + _ACCT_REF + "|" + _CUST_REF + "|" + _ELSES + "|" + _THIRD_REL
                               + r"|\bmy\s+" + _REL + "'s|" + _REL_CLAIM),
+    "illegal_suspect": re.compile(_FRAUD),
 }
 _RULES = (
     ("self_harm", "self_harm", _SELF_HARM, _RAW),
@@ -649,6 +690,7 @@ _RULES = (
     ("other_user_data", "third_party", _THIRD_PARTY, _LOW),
     ("other_user_data", "forged_identity", _FORGED, _LOW),
     ("illegal_activity", "illegal", _ILLEGAL, _RAW),
+    ("illegal_activity", "illegal_suspect", _ILLEGAL_SUSPECT, _LOW),
     ("abusive", "abuse", _ABUSE, _RAW),
 )
 
@@ -718,6 +760,8 @@ def _deobfuscate_keep_numbers(text: str) -> str:
 
 def _fold(text: str) -> str:
     """Sem acento: o cliente escreve "instrucoes", "usuario", "voce"; as famílias novas são escritas assim."""
+    if text.isascii():  # sem acento a decompor: o laço por caractere era ~1/4 do pre_check num texto de 10 mil
+        return text
     return "".join(c for c in unicodedata.normalize("NFD", text) if not unicodedata.combining(c))
 
 
@@ -777,7 +821,7 @@ def _own_other(message: str) -> str:
 # revisão adversarial com frases novas acharam falso positivo novo a cada versão); com o classificador como juiz da
 # suspeita, o falso positivo da regex não chega ao cliente e o recall novo continua valendo quando o LLM cai.
 CONFIRM_RULES = frozenset({"injection_msg", "role_label", "role_escalation", "authority_claim", "secret_probe",
-                           "tool_coercion", "third_party", "forged_identity"})
+                           "tool_coercion", "third_party", "forged_identity", "illegal_suspect"})
 SUSPECT = "guardrail_suspect"
 
 
@@ -805,9 +849,11 @@ def _regex_layer(message: str) -> tuple[str, str] | None:
     return None
 
 
-# Classificador fora do ar: falha aberta para LEITURA (a camada regex já rodou e o atendimento continua) e fechada
-# para ESCRITA (nenhuma ação é proposta no turno sem a segunda camada).
+# Classificador indisponível: para LEITURA sem suspeita, a camada regex já rodou e o atendimento continua (com a
+# flag, e sem agente LLM — ver pipeline); para ESCRITA, nada é proposto no turno (falha fechada). A recusa do modelo
+# é caso à parte: bloqueia (sinal de pedido tóxico, não queda).
 UNAVAILABLE = "guardrail_llm_unavailable"
+CLASSIFIER_REFUSAL = "classifier_refusal"
 
 
 def _llm_layer(masked: str) -> str | None:
@@ -817,11 +863,22 @@ def _llm_layer(masked: str) -> str | None:
     try:
         category = llm.complete(domain.prompt("guardrail.md"), [{"role": "user", "content": masked}], max_tokens=2048,
                                 schema=SCHEMA).json()["category"]
-    except (LLMError, ValueError, KeyError, TypeError):
+    except LLMError as exc:
+        if exc.kind == "refusal":  # recusa do modelo não é queda: é sinal de pedido tóxico → bloqueia
+            METRICS.inc("guardrail_classifier_refusal_total")
+            return CLASSIFIER_REFUSAL
         METRICS.inc("guardrail_llm_unavailable_total")
-        # camada 1 já rodou: a leitura segue, mas o turno perde o direito de propor escrita (pipeline)
+        return UNAVAILABLE  # queda de verdade: a leitura segue, o turno perde o direito de propor escrita (pipeline)
+    except (ValueError, KeyError, TypeError):
+        METRICS.inc("guardrail_llm_unavailable_total")
         return UNAVAILABLE
-    return category if category in BLOCKING else None
+    if category == "safe":
+        return None  # só "safe" libera
+    if category in BLOCKING:
+        return category
+    # categoria fora do enum (schema burlado, resposta estranha): trata como indisponível, nunca como "safe"
+    METRICS.inc("guardrail_llm_unavailable_total")
+    return UNAVAILABLE
 
 
 def pre_check(message: str) -> Verdict:
@@ -858,6 +915,9 @@ def llm_check(verdict: Verdict) -> Verdict:
     if suspect and not get_llm("guardrail").enabled:
         return _block_suspect(verdict, "suspect_no_llm")
     reason = _llm_layer(verdict.text)
+    if reason == CLASSIFIER_REFUSAL:  # recusa do modelo: bloqueia (não é queda), venha de suspeita ou não
+        return Verdict(text="", blocked=True, reason="prompt_injection",
+                       flags=[*verdict.flags, "prompt_injection", CLASSIFIER_REFUSAL, "layer_llm"])
     if reason == UNAVAILABLE:
         if suspect:
             return _block_suspect(verdict, "suspect_llm_unavailable")

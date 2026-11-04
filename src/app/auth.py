@@ -1,11 +1,12 @@
 """Identidade, operadores e limite de uso.
 
-Cliente: JWT padrão (sub, iat, exp, jti, iss, aud) com `kid` no cabeçalho, assinado pela chave ATIVA do conjunto
-(app/keys.py: HS256, EdDSA ou RS256; rotação sem queda; públicas em GET /.well-known/jwks.json). Qualquer biblioteca
-JWT valida o mesmo token, e trocar por OIDC/JWKS do provedor de identidade mantém a interface
-(verify_token -> user_id). Recusa: `kid` fora do conjunto, `alg` diferente do da chave daquele `kid` (inclui "none" e
-HS256 assinado com a chave pública), assinatura errada, expirado (folga de LEEWAY_S), `iss`/`aud` diferentes e `jti`
-revogado (POST /auth/revoke).
+Cliente: JWT padrão (sub, iat, exp, jti, iss, aud) com `kid` no cabeçalho, emitido e validado pelo PyJWT (biblioteca
+auditada; nada de montar ou conferir o token à mão) com a chave ATIVA do conjunto (app/keys.py: HS256, EdDSA ou RS256;
+rotação sem queda; públicas em GET /.well-known/jwks.json). Qualquer biblioteca JWT valida o mesmo token, e trocar por
+OIDC/JWKS do provedor de identidade mantém a interface (verify_token -> user_id). Recusa (401, nunca 500): `kid` fora
+do conjunto, `alg` diferente do da chave daquele `kid` (inclui "none" e HS256 assinado com a chave pública), assinatura
+errada, `crit` desconhecido, expirado ou `nbf`/`iat` no futuro (folga de LEEWAY_S), `iss` diferente, `aud` sem o
+nosso (string ou lista, RFC 7519 §4.1.3), claim obrigatório ausente ou malformado e `jti` revogado (POST /auth/revoke).
 
 Operador: chave pessoal; a configuração guarda só o sha256 (OPERATOR_KEYS="ana:<hash>,bruno:<hash>").
 O nome entra em cada resposta e aprovação (auditoria). OPERATOR_TOKEN compartilhado continua aceito
@@ -38,8 +39,10 @@ import json
 import os
 import secrets
 import sys
-import time
+from datetime import UTC, datetime
 from pathlib import Path
+
+import jwt
 
 from . import keys
 from .config import (
@@ -54,6 +57,8 @@ from .config import (
 from .observability import METRICS, log
 
 LEEWAY_S = 30  # relógios de cliente e servidor raramente batem; 30 s é a folga usual de JWT
+# sem jti o token não pode ser revogado; iss e aud são exigidos pelos parâmetros issuer/audience do decode
+REQUIRED_CLAIMS = ["exp", "iat", "sub", "jti"]
 
 
 def _b64e(raw: bytes) -> str:
@@ -64,38 +69,47 @@ def _b64d(text: str) -> bytes:
     return base64.urlsafe_b64decode(text + "=" * (-len(text) % 4))
 
 
+def _now() -> int:
+    # O relógio com que o PyJWT valida (datetime.now em UTC). Emitir com time.time() divergia dele quando alguém adianta
+    # time.time() para vencer outra coisa (o TTL da ação pendente no teste do HITL): iat no futuro → 401.
+    return int(datetime.now(tz=UTC).timestamp())
+
+
 def issue_token(user_id: str, ttl_min: int | None = None) -> str:
-    now = int(time.time())
+    now = _now()
     key = keys.signer()
-    header = _b64e(json.dumps({"alg": key.alg, "typ": "JWT", "kid": key.kid}, separators=(",", ":")).encode())
     claims = {"sub": user_id, "iat": now, "exp": now + 60 * (ttl_min or token_ttl_min()),
               "jti": secrets.token_hex(8), "iss": auth_issuer(), "aud": auth_audience()}
-    body = _b64e(json.dumps(claims, separators=(",", ":")).encode())
-    return f"{header}.{body}.{_b64e(keys.sign(key, f'{header}.{body}'.encode()))}"
+    return jwt.encode(claims, key.signing_key, algorithm=key.alg, headers={"kid": key.kid})
+
+
+def _numeric_date(value: object) -> bool:
+    # RFC 7519 §2: NumericDate é número JSON. O PyJWT aceita texto ("123" vira int) e a denylist grava exp como REAL.
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
 def decode_token(token: str | None) -> dict | None:
-    """Claims se o token é válido agora; None em qualquer falha (sem dizer qual: não ajuda quem forja)."""
+    """Claims se o token é válido agora; None em qualquer falha (sem dizer qual: não ajuda quem forja).
+
+    O PyJWT confere assinatura, `crit`, exp/nbf/iat com a folga, `iss`, `aud` (string ou lista) e a presença e o tipo
+    dos claims obrigatórios. Aqui ficam só a escolha da chave pelo `kid`, o que o PyJWT deixa passar (sub/jti vazios,
+    data em texto) e a revogação.
+    """
     try:
-        head, body, sig = (token or "").split(".")
-        header = json.loads(_b64d(head))
-        key = keys.lookup(header.get("kid"))  # kid removido do conjunto → None → 401
-        # o alg é o da CHAVE, nunca o que o token declara: "none" ou HS256 com a pública como segredo não passam
-        if key is None or header.get("alg") != key.alg:
+        key = keys.lookup(jwt.get_unverified_header(token or "").get("kid"))  # kid fora do conjunto → None → 401
+        if key is None:
             return None
-        if not keys.verify(key, f"{head}.{body}".encode(), _b64d(sig)):
-            return None
-        claims = json.loads(_b64d(body))
-    except (ValueError, TypeError, AttributeError):  # inclui keys.KeyConfigError: configuração ruim falha fechado
+        # o alg aceito é o da CHAVE, nunca o que o token declara: "none" ou HS256 com a pública como segredo não passam
+        claims = jwt.decode(token, key.verifying_key, algorithms=[key.alg], audience=auth_audience(),
+                            issuer=auth_issuer(), leeway=LEEWAY_S, options={"require": REQUIRED_CLAIMS})
+    except (jwt.PyJWTError, ValueError, TypeError):  # ValueError inclui keys.KeyConfigError: falha fechado
         return None
-    now = time.time()
-    if not claims.get("sub") or claims.get("exp", 0) + LEEWAY_S < now or claims.get("iat", 0) - LEEWAY_S > now:
-        return None
-    if claims.get("iss") != auth_issuer() or claims.get("aud") != auth_audience():
+    dates_ok = all(_numeric_date(claims[name]) for name in ("exp", "iat", "nbf") if name in claims)
+    if not (claims["sub"] and claims["jti"] and dates_ok):
         return None
     from .store import get_store  # import tardio: store não depende de auth
 
-    if get_store().is_revoked(claims.get("jti", "")):
+    if get_store().is_revoked(claims["jti"]):
         return None
     return claims
 

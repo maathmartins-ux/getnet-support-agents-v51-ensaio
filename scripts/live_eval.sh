@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Eval ao vivo por split + juiz + README (Linux/macOS/Git Bash). Mesmo comportamento de live_eval.ps1.
+# Eval ao vivo por split + juiz + FAILURE_MODES + README (Linux/macOS/Git Bash). Mesmo comportamento de live_eval.ps1.
 #
 # Uso:
 #   scripts/live_eval.sh --max-usd 24        # medido com 11 splits (official/memory repeat 3): conversa ~11 + juiz ~6,5
@@ -116,4 +116,7 @@ fi
 
 # o juiz já rodou por split no mesmo processo (--judge); judge.json traz um bloco por split
 LLM_PROVIDER=offline "$PY" -m evals.run_evals > /dev/null  # relatório offline (bloco principal do README e gate)
+# análise de erros da bateria que acabou de rodar (gerada, nunca à mão: o fill_readme --check compara); commite
+# docs/FAILURE_MODES.md junto com evals/results/
+"$PY" -m evals.failure_modes || echo "   docs/FAILURE_MODES.md não gerado (motivo acima)"
 "$PY" scripts/fill_readme.py

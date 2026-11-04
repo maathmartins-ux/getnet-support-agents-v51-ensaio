@@ -8,7 +8,10 @@
       junta os rótulos ({"qid", "essential": ["c3", ...]}) por consenso (interseção; vazia → união), mede a
       concordância entre rotuladores (Jaccard médio, perguntas idênticas) e escreve `passage_text` em cada linha do
       gold: uma regex por passagem essencial, feita da frase-resposta do trecho (sobrevive a re-ingest; a mesma FAQ
-      copiada em outra página casa a mesma regra). Grava report.json ao lado do pool.
+      copiada em outra página casa a mesma regra). `essential_by` = quem marcou (na união, só quem marcou; a
+      pergunta vai a `no_agreement` no relatório). Consenso vazio tira da linha o rótulo de um import anterior; a
+      linha que fica sem gold nenhum (leria como "sem fonte") sai do gold e volta a rascunho. Grava report.json ao
+      lado do pool, com os arquivos escritos em `gold` (nenhum arquivo vazio é criado).
 
 Por quê (medido num corpus real de FAQ): um gold "todo trecho relacionado" mede quantos relacionados cabem em 3 vagas
 (teto 0,971; o melhor buscador parou em 0,78). Com 2 rotuladores cegos (Jaccard 0,81, 31/50 idênticos) o mesmo
@@ -121,16 +124,21 @@ def _labels(path: Path, key: dict) -> dict[str, set[str]]:
     return {q: set().union(*gs) if gs else set() for q, gs in _groups(path, key).items()}
 
 
-def consensus(per_rater: list[list[frozenset[str]]]) -> list[frozenset[str]]:
-    """Fatos em que os rotuladores concordam: fato de um casa com fato do outro quando têm trecho em comum; o fato
-    de consenso aceita qualquer trecho de qualquer um deles. Sem nenhum fato em comum: todos os fatos de todos."""
+def agreed_facts(per_rater: list[list[frozenset[str]]]) -> list[frozenset[str]]:
+    """Fatos em que TODOS os rotuladores concordam: fato de um casa com fato do outro quando têm trecho em comum; o
+    fato de consenso aceita qualquer trecho de qualquer um deles. [] = nenhum fato em comum."""
     first, *rest = per_rater
     agreed = []
     for g in first:
         matches = [next((h for h in other if h & g), None) for other in rest]
         if all(matches):
             agreed.append(frozenset(g.union(*matches)))
-    return agreed or [g for gs in per_rater for g in gs]
+    return agreed
+
+
+def consensus(per_rater: list[list[frozenset[str]]]) -> list[frozenset[str]]:
+    """Fatos de consenso (agreed_facts). Sem nenhum fato em comum: todos os fatos de todos (união)."""
+    return agreed_facts(per_rater) or [g for gs in per_rater for g in gs]
 
 
 def agreement(a: dict[str, set[str]], b: dict[str, set[str]]) -> dict:
@@ -149,19 +157,32 @@ def _rules(fact_groups: list[frozenset[str]], texts: dict[str, str]) -> list[str
     return sorted(set(rules))
 
 
-def _merge_into(path: Path, new_rows: list[dict]) -> None:
-    """Grava `new_rows` em `path` trocando a linha da mesma pergunta (re-import não duplica)."""
+def _merge_into(path: Path, new_rows: list[dict], drop: set[str] | frozenset[str] = frozenset()) -> bool:
+    """Grava `new_rows` em `path` trocando a linha da mesma pergunta (re-import não duplica) e tirando as perguntas de
+    `drop`. Arquivo que ficaria vazio não é criado (e o que já existia sai). True = o arquivo ficou com linhas."""
     old = [json.loads(x) for x in path.read_text("utf-8").splitlines() if x.strip()] if path.exists() else []
     fresh = {r["question"] for r in new_rows}
-    rows = [r for r in old if r.get("question") not in fresh] + new_rows
+    rows = [r for r in old if r.get("question") not in fresh | set(drop)] + new_rows
+    if not rows:
+        path.unlink(missing_ok=True)
+        return False
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+    return True
+
+
+def _rel(path: Path) -> str:
+    """Caminho do relatório relativo à raiz do repositório (o report.json vai para o git: sem /home/... de máquina)."""
+    try:
+        return str(path.resolve().relative_to(HERE.parent))
+    except ValueError:
+        return str(path)
 
 
 def import_labels(paths: list[Path], out: Path | None = None, out_dir: Path | None = None,
                   gold: Path | None = None, drafts: Path | None = DRAFTS) -> dict:
     from app.jsonl import family
-    from app.rag import get_index
+    from app.rag import Gold, get_index
 
     if len(paths) < 2:
         raise ValueError("gold essencial pede 2+ rotuladores (a concordância entre eles é parte da evidência)")
@@ -181,32 +202,80 @@ def import_labels(paths: list[Path], out: Path | None = None, out_dir: Path | No
     generated = {gold.parent / f"{gold.stem}.d" / f"{o}.jsonl" for o in GENERATED}
     in_generated = {json.loads(x).get("question") for p in family(gold) if p in generated
                     for x in p.read_text("utf-8").splitlines() if x.strip()}
-    unmatched, empty, written = [], [], 0
+    unmatched, empty, split, written = [], [], [], 0
     by_origin: dict[str, list[dict]] = {}
+    cleaned: dict[str, list[dict]] = {}  # perderam o rótulo velho e seguem no gold pelo resto (ids, regras, negativa)
+    back: dict[str, list[dict]] = {}  # perderam o rótulo e não têm outro gold: voltam a rascunho da origem
     for n, (row, draft) in enumerate(cands):
         qid = f"q{n:03d}"  # a mesma numeração do export (mesma ordem: gold inteiro, depois os rascunhos)
         if qid not in key or key[qid]["question"] != row["question"]:
             continue
-        facts = consensus([groups[r].get(qid, []) for r in names])
+        per = {r: groups[r].get(qid, []) for r in names}
+        agreed = agreed_facts(list(per.values()))
+        facts = agreed or [g for gs in per.values() for g in gs]  # sem fato em comum: a união (consensus)
+        origin = row.get("origin") or "page"
         if not facts:
             empty.append(row["question"])
+            if draft or not row.get("essential_by"):
+                continue  # rascunho sem essencial fica rascunho; linha que o import nunca rotulou não muda
+            # Rótulo de um import anterior que os rotuladores de agora não sustentam sai da linha. Medido no ensaio
+            # (rodada 10): 2 linhas de real.jsonl seguiam com a regra velha e contavam acerto no rank 1.
+            row.pop("passage_text", None)
+            row.pop("essential_by", None)
+            if not Gold.from_row(row).positive and "relevant" not in row:
+                # sem rótulo nenhum, a linha leria como "sem fonte" no eval: sai do gold e volta a rascunho
+                back.setdefault(origin, []).append({"question": row["question"], "origin": origin})
+            elif row["question"] in in_generated:
+                cleaned.setdefault(origin, []).append(row)
             continue
         rules = _rules(facts, texts)
         unmatched += [r for r in rules if not any(re.search(r, t, re.IGNORECASE) for t in texts.values())]
         row["passage_text"] = rules
-        row["essential_by"] = names
+        # na união, só quem marcou: "os dois rotuladores" num fato que só um viu inflava o acordo do gold
+        row["essential_by"] = names if agreed else [r for r in names if per[r]]
+        if not agreed and len(names) > 1:
+            split.append(row["question"])
         written += 1
         if draft or row["question"] in in_generated:  # rascunho rotulado vira gold no arquivo da sua origem
-            by_origin.setdefault(row.get("origin") or "page", []).append(
-                {**{k: v for k, v in row.items() if k != "relevant" or v}, "origin": row.get("origin") or "page"})
+            by_origin.setdefault(origin, []).append(
+                {**{k: v for k, v in row.items() if k != "relevant" or v}, "origin": origin})
     out = out or gold
-    rows = [r for r, draft in cands if not draft and r.get("question") not in in_generated]
-    out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
-    for origin, new_rows in by_origin.items():
-        _merge_into(gold.parent / f"{gold.stem}.d" / f"{origin}.jsonl", new_rows)
+    dropped = {r["question"] for rs in back.values() for r in rs}
+    rows = [r for r, draft in cands if not draft and r.get("question") not in in_generated | dropped]
+    members = {p.resolve() for p in family(gold)}
+    files, removed = [], []
+    if rows:
+        out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+        files.append(_rel(out))
+    elif out.exists() and out.resolve() == gold.resolve():
+        if out.read_text("utf-8").strip():  # a raiz da família fica (vazia): o que ela tinha mora nos arquivos
+            out.write_text("", encoding="utf-8")  # por origem, e o eval leria 2 vezes
+    elif out.exists() and out.resolve() in members:
+        # --out à parte sem linha própria sai em vez de ficar vazio. Medido no ensaio (rodada 10): o --out
+        # retrieval.d/k.jsonl ficava com 0 bytes e o report.json (e o RESULTS) apontavam para ele
+        out.unlink()
+        removed.append(_rel(out))
+    targets: dict[Path, list[dict]] = {}
+    for o, new in [*by_origin.items(), *cleaned.items()]:
+        targets.setdefault(gold.parent / f"{gold.stem}.d" / f"{o}.jsonl", []).extend(new)
+    def questions_in(path: Path) -> set[str]:
+        return {json.loads(x).get("question") for x in path.read_text("utf-8").splitlines() if x.strip()}
+
+    holding = {p for p in generated if p.exists() and dropped & questions_in(p)}  # só o arquivo que perde linha
+    for path in sorted(set(targets) | holding):
+        existed = path.exists()
+        if _merge_into(path, targets.get(path, []), dropped):
+            files.append(_rel(path))
+        elif existed:
+            removed.append(_rel(path))  # só tinha linhas que voltaram a rascunho
+    drafts_dir = drafts if drafts is not None else gold.parent / f"{gold.stem}.drafts"
+    drafts_written = [_rel(drafts_dir / f"{o}.jsonl") for o, rs in back.items()
+                      if _merge_into(drafts_dir / f"{o}.jsonl", rs)]  # a mesma pergunta não duplica no rascunho
     report = {"raters": names, "agreement": pairs, "questions_labelled": written,
               "drafts_labelled": {o: len(v) for o, v in by_origin.items()},
-              "no_essential": empty, "unmatched_rules": unmatched, "gold": str(out)}
+              "no_essential": empty, "no_agreement": split,
+              "back_to_drafts": sorted(dropped), "unmatched_rules": unmatched,
+              "gold": files, "removed": removed, "drafts": drafts_written}
     (out_dir / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), "utf-8")
     return report
 

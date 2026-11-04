@@ -87,7 +87,7 @@ def schema() -> dict:
 _ACK = re.compile(r"^\W*(ok(ay)?|t[aá] bom|certo|beleza|blz|valeu|obrigad[oa]|entendi|show|perfeito|combinado"
                   r"|thanks|thank you|got it|sure|alright|fine|cool)\b", re.IGNORECASE)
 # Palavras funcionais frequentes de cada idioma; nenhuma de uma letra só ("a" existe nos dois).
-_EN = re.compile(r"\b(the|what|how|why|when|my|is|are|can|you|please|want|to|talk|with|it|do|does"
+_EN = re.compile(r"\b(the|what|how|why|when|my|your|is|are|can|you|please|want|to|talk|with|it|do|does"
                  r"|of|and|for|this|that|me|need|help|where|order)\b", re.IGNORECASE)
 _PT = re.compile(r"\b(os|as|um|uma|de|do|da|que|como|com|para|por|não|meu|minha|quero|está"
                  r"|falar|ajuda|preciso|sem|no|na|qual|onde|posso|pedido)\b", re.IGNORECASE)

@@ -82,6 +82,7 @@ def test_get_retriever_builds_the_default_bundle(monkeypatch):
     monkeypatch.setattr(rag, "_hybrid_for", hybrid)
     monkeypatch.setattr(rag, "_cross_for", cross)
     r = rag.get_retriever()
-    assert r.name == "dense+cross" and r.pool == 10 and r.chars == 600 and r.fallback == ""
+    # padrão do kit desde a rodada 10: a nota do cross só decide o portão, a ordem fica a do denso (":base")
+    assert r.name == "dense+cross:base" and r.pool == 10 and r.chars == 600 and r.fallback == ""
     assert built == {"embed": "intfloat/multilingual-e5-large", "fusion": "dense",
                      "cross": "BAAI/bge-reranker-v2-m3-int8"}

@@ -7,8 +7,9 @@ supervisor junta depois, na ordem do plano. Nada de escrever em ctx dentro do ag
 
 - faq: RAG (retriever de rag.get_retriever) com fonte citada; "sem fonte, sem afirmação". Busca agentic: as
   consultas saem da pergunta autônoma do router (ctx.facts["standalone"]) no idioma do CORPUS, uma por item numa
-  comparação, até FAQ_MAX_SEARCHES por turno, fundidas por rodada (top FAQ_TOP_K ao redator); com LLM, o redator
-  ainda pode chamar a tool `search` dentro do mesmo teto. Glossário pt<->en (data/glossary.json) nas duas vias.
+  comparação, até FAQ_MAX_SEARCHES por turno, em paralelo e fundidas por rodada na ordem do plano (top FAQ_TOP_K ao
+  redator); com LLM, o redator ainda pode chamar a tool `search` dentro do mesmo teto, e leva 1 busca corretiva
+  quando o plano já gastou o teto (comparação). Glossário pt<->en (data/glossary.json) nas duas vias.
   Intent "general": câmbio (PTAX) e clima (Open-Meteo) consultados no código (app/live_data.py, texto bruto da
   API como evidência); o resto, e qualquer falha da API, pela busca web, com os resultados da busca como evidência
   e fonte (nunca a própria resposta).
@@ -17,11 +18,14 @@ supervisor junta depois, na ordem do plano. Nada de escrever em ctx dentro do ag
 """
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import re
+import threading
 import unicodedata
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -86,8 +90,9 @@ class AgentResult:
     pending_action: str | None = None
     handoff: Handoff | None = None
     evidence: list[str] = field(default_factory=list)  # base dos números: fonte, resultado de tool, template
-    # Achados que pedem outro especialista: [{"agent": "faq", "why": "...", "hint": "..."}]. O supervisor insere o
-    # passo se a transição estiver em ALLOWED e houver orçamento (replanejamento por achado, não só por falha).
+    # Achados que pedem outro especialista: [{"agent": "faq", "why": "...", "hint": "..."}]. Vão ao supervisor LLM no
+    # tool_result e ele decide (com um lembrete se ignorar); o motor de tabela insere o passo se a transição estiver
+    # em ALLOWED e houver orçamento (replanejamento por achado, não só por falha).
     needs: list[dict] = field(default_factory=list)
     ms: float | None = None  # duração do passo (supervisor._invoke); entra na árvore de passos da resposta
 
@@ -583,6 +588,48 @@ def covered_search(retriever, query: str, k: int, gate: dict | None = None) -> l
     return hits
 
 
+# Buscas do plano (2 ou 3 por turno) em paralelo. Medido no ensaio (rodada 10): com o denso + cross-encoder cada busca
+# leva ~0,95 s de p50 em CPU e o faq as fazia em série. A fusão depende da ordem do plano (as palavras do cliente
+# primeiro), então o resultado volta na ordem das consultas. Teto do PROCESSO para as buscas a mais
+# (FAQ_SEARCH_PARALLEL, padrão 2; 0 = tudo em série): sem vaga (bateria com várias conversas ao mesmo tempo), a busca
+# roda em série na thread do agente, sem fila e sem pico de RAM a mais (frente R2: 20 inferências ONNX simultâneas
+# chegaram a 5,8 GB). O BM25 puro (~1 ms por busca) fica em série: a thread custaria mais que a busca.
+def search_parallel() -> int:
+    try:
+        return max(0, int(os.getenv("FAQ_SEARCH_PARALLEL", "2")))
+    except ValueError:
+        return 2
+
+
+@lru_cache(maxsize=4)
+def _search_slots(n: int) -> threading.BoundedSemaphore:
+    return threading.BoundedSemaphore(n)
+
+
+def plan_rankings(retriever, queries: list[str], k: int, gate: dict | None = None) -> list[list]:
+    """`covered_search` de cada consulta, na ordem de `queries`: a 1ª na thread de quem chama e as outras, ao mesmo
+    tempo, em threads (com o contexto de quem chama: cassete, trace e o memo desligado da medida de latência)."""
+    n = search_parallel()
+    if n == 0 or len(queries) < 2 or str(getattr(retriever, "name", "")) == "bm25":
+        return [covered_search(retriever, q, k, gate) for q in queries]
+    slots = _search_slots(n)
+
+    def one(q: str) -> list:
+        try:
+            return covered_search(retriever, q, k, gate)
+        finally:
+            slots.release()
+
+    with ThreadPoolExecutor(max_workers=len(queries) - 1) as pool:
+        futures = {}
+        for i in range(1, len(queries)):
+            if not slots.acquire(blocking=False):
+                break  # sem vaga: esta e as seguintes rodam em série, aqui
+            futures[i] = pool.submit(contextvars.copy_context().run, one, queries[i])
+        return [futures[i].result() if i in futures else covered_search(retriever, q, k, gate)
+                for i, q in enumerate(queries)]
+
+
 def retrieve(text: str, standalone: str | None = None, hints: list[str] | tuple = (), retriever=None,
              k: int | None = None, gate: dict | None = None, queries: list[str] | None = None) -> Retrieval:
     """As buscas do plano, cada uma com o portão, fundidas por rodada (rag.merge_round_robin). Mesma função no agente
@@ -611,8 +658,8 @@ def retrieve(text: str, standalone: str | None = None, hints: list[str] | tuple 
         # frase em inglês e o trecho do fato, 1º na pergunta crua, saía do top-5. Comparação fica com uma busca
         # por item (o orçamento de buscas é delas).
         plan = QueryPlan([own, *plan.queries], plan.entities, plan.language, [True, *plan.translated])
-    rankings = [covered_search(retriever, q if done else expand_query(q), k, gate)
-                for q, done in zip(plan.queries, plan.translated, strict=True)]
+    rankings = plan_rankings(retriever, [q if done else expand_query(q)
+                                         for q, done in zip(plan.queries, plan.translated, strict=True)], k, gate)
     return Retrieval(plan, rankings, merge_round_robin(rankings, k))
 
 
@@ -678,11 +725,12 @@ def _listing(hits: list, start: int = 1) -> str:
 
 
 def _faq_write(ctx: Context, llm, system: str, framed: str, hits: list, left: int, retriever,
-               k: int) -> tuple[str | None, list, list[str]]:
+               k: int, cap: int | None = None) -> tuple[str | None, list, list[str]]:
     """Redação com a tool `search` enquanto houver busca no teto do turno: (texto, passagens, consultas do LLM).
 
     Busca além do teto volta como erro de tool ("responda com o que tem"); o loop termina em `left + 2` voltas. Trecho
     novo só entra se passa no portão; texto None = o modelo não fechou a resposta (o chamador cai no extrativo).
+    `cap` = buscas do turno (plano + `left`) que a mensagem de limite cita; padrão FAQ_MAX_SEARCHES.
     """
     messages: list = llm_history(ctx, framed)
     if left <= 0 or not hasattr(llm, "create"):  # sem teto sobrando (ou provedor sem tool use): só redige
@@ -704,8 +752,8 @@ def _faq_write(ctx: Context, llm, system: str, framed: str, hits: list, left: in
             if block.name != "search" or not query:
                 content = "consulta inválida: passe {\"query\": \"...\"}"
             elif used >= left:
-                content = (f"limite de {faq_max_searches()} buscas por turno atingido: responda com as passagens que "
-                           "já tem (o que elas não cobrem, diga que falta)")
+                content = (f"limite de {cap or faq_max_searches()} buscas por turno atingido: responda com as "
+                           "passagens que já tem (o que elas não cobrem, diga que falta)")
             else:
                 used, error = used + 1, False
                 asked.append(query)
@@ -818,18 +866,20 @@ def faq_agent(ctx: Context) -> AgentResult:
             part = ctx.facts.get("ask", {}).get("faq")
             question = (f"Mensagem do cliente: {ctx.text}\nParte que cabe a você: {part}"
                         if part and part != ctx.text else f"Pergunta: {ctx.text}")
-            left = faq_max_searches() - len(plan.queries)
-            note = ""
-            if left > 0:
-                note = (f"Buscas já feitas no corpus ({LANG_NAMES.get(plan.language, plan.language)}): "
-                        f"{' | '.join(plan.queries)}. Se um item da pergunta não está nas passagens, chame `search` "
-                        f"(até {left}x), com a consulta em {LANG_NAMES.get(plan.language, plan.language)}, uma por "
-                        "item.\n\n")
+            # Plano que gastou o teto (comparação: pergunta do cliente + uma busca por item) ainda deixa 1 busca
+            # corretiva ao redator. Medido no ensaio (rodada 10): sem a tool, a comparação de 2 produtos marcou
+            # "MISSING: recursos" de um deles nas 3 rodadas, com o trecho dos recursos a uma busca de distância.
+            left = max(1, faq_max_searches() - len(plan.queries))
+            note = (f"Buscas já feitas no corpus ({LANG_NAMES.get(plan.language, plan.language)}): "
+                    f"{' | '.join(plan.queries)}. Se um item da pergunta não está nas passagens, chame `search` "
+                    f"(até {left}x), com a consulta em {LANG_NAMES.get(plan.language, plan.language)}, uma por "
+                    "item.\n\n")
             # passagens são dado, nunca instrução (injeção indireta): o prompt diz isso e as marca
             framed = (f"<untrusted_content>\n{_listing(hits)}\n</untrusted_content>\n\n{note}{question}"
                       f"{_lang_tail(ctx)}")
             system = domain.prompt("faq.md").format(language=ctx.language)
-            text, hits, asked = _faq_write(ctx, llm, system, framed, hits, left, retriever, k)
+            text, hits, asked = _faq_write(ctx, llm, system, framed, hits, left, retriever, k,
+                                           cap=len(plan.queries) + left)
             facts["faq_queries"] += asked
             sources = [Source(id=h.doc.id, title=h.doc.title, url=h.doc.url) for h in hits]
             evidence = [f"{h.doc.title}: {h.doc.text}" for h in hits]

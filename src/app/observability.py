@@ -12,6 +12,7 @@ import logging
 import threading
 import time
 import uuid
+from bisect import bisect_left
 from collections import defaultdict
 from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
@@ -81,10 +82,31 @@ def _esc(value: object) -> str:
     return str(value).replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
 
+# Limites (ms) dos baldes do histograma de latência, fixos: o p95 sai do Prometheus (histogram_quantile) e a memória
+# não cresce com o tráfego. Um limite em cada valor que o kit compara: 8 s (alerta da média do agente), 15 s (escalada
+# do runbook), 20 s e 45 s (SLO por turno, evals/trace_stats.py), 60 s e 90 s (NODE_TIMEOUT_S do produto e do eval) e
+# 120 s (UPSTREAM_TIMEOUT_S do balanceador). No limite, "p95 > X" é exato (a interpolação só age dentro do balde).
+LATENCY_BUCKETS_MS = (10, 50, 100, 250, 500, 1000, 2500, 5000, 8000, 10000, 15000, 20000, 30000, 45000, 60000,
+                      90000, 120000)
+
+
+class _Histogram:
+    """Contagem por balde (o último é o +Inf), soma e total de uma etapa: tamanho fixo, qualquer que seja o tráfego."""
+
+    __slots__ = ("counts", "sum", "count")
+
+    def __init__(self) -> None:
+        self.counts = [0] * (len(LATENCY_BUCKETS_MS) + 1)
+        self.sum = 0.0
+        self.count = 0
+
+
 class Metrics:
     def __init__(self) -> None:
         self.counters: dict[tuple, float] = defaultdict(float)
-        self.latency: dict[str, list[float]] = defaultdict(list)
+        # Antes era uma lista por etapa que só crescia, e cada scrape somava a lista inteira segurando a trava (o
+        # observe() das threads de request esperava). Agora: contadores fixos por etapa, render() O(etapas × baldes).
+        self.latency: dict[str, _Histogram] = defaultdict(_Histogram)
         self._lock = threading.Lock()
 
     def inc(self, name: str, **labels: str) -> None:
@@ -98,8 +120,12 @@ class Metrics:
         return self.counters.get((name, tuple(sorted(labels.items()))), 0.0)
 
     def observe(self, span: str, ms: float) -> None:
+        slot = bisect_left(LATENCY_BUCKETS_MS, ms)  # 1º limite ≥ ms (`le` é "até"); acima do último, o +Inf
         with self._lock:
-            self.latency[span].append(ms)
+            hist = self.latency[span]
+            hist.counts[slot] += 1
+            hist.sum += ms
+            hist.count += 1
 
     def render(self) -> str:
         lines = []
@@ -107,9 +133,16 @@ class Metrics:
             for (name, labels), value in sorted(self.counters.items()):
                 lab = ",".join(f'{k}="{_esc(v)}"' for k, v in labels)
                 lines.append(f"{name}{{{lab}}} {value:g}")
-            for span, values in sorted(self.latency.items()):
-                lines.append(f'span_latency_ms_sum{{span="{span}"}} {sum(values):.3f}')
-                lines.append(f'span_latency_ms_count{{span="{span}"}} {len(values)}')
+            if self.latency:
+                lines += ["# HELP span_latency_ms Latência por etapa (span) e do turno inteiro (span turn), em ms.",
+                          "# TYPE span_latency_ms histogram"]
+            for span, hist in sorted(self.latency.items()):
+                lab, total = _esc(span), 0
+                for le, n in zip((*LATENCY_BUCKETS_MS, "+Inf"), hist.counts, strict=True):
+                    total += n  # cumulativo: o balde `le` conta tudo até o limite, e o +Inf é o _count
+                    lines.append(f'span_latency_ms_bucket{{span="{lab}",le="{le}"}} {total}')
+                lines.append(f'span_latency_ms_sum{{span="{lab}"}} {hist.sum:.3f}')
+                lines.append(f'span_latency_ms_count{{span="{lab}"}} {hist.count}')
         return "\n".join(lines) + "\n"
 
 

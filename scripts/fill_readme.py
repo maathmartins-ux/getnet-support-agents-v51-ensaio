@@ -21,7 +21,11 @@ Arquivo ausente vira "não rodado" (declarado, não escondido). Idempotente: rod
 que `evals/results/` COMMITADO gera, ou se a linha do tempo não tiver todos os commits (tolera só o último, o do
 próprio README). Sem esta conferência a §5 já veio de um eval não commitado (replan 80% no README, 10% no JSON) e
 a linha do tempo parou antes do último commit ("50 min" em vez de 54). Também falha se faltar um dos títulos que o
-enunciado pede que o README cubra (REQUIRED_HEADINGS) ou o bloco quickstart.
+enunciado pede que o README cubra (REQUIRED_HEADINGS) ou o bloco quickstart, se docs/FAILURE_MODES.md não for o que
+`python -m evals.failure_modes` gera dos live_*.json commitados, ou se docs/TIMESHEET.md tiver menos commits que o
+git log (os dois saem do scripts/final.sh; rodada 10: os dois estavam velhos e a régua leu como contradição).
+Blocos densos do docs/RESULTS.md abrem com uma linha "Como ler" gerada (HOW_TO_READ): o que mede, de onde vem, como
+ler o IC.
 Linha do tempo: `{{`/`}}` e `|` dos títulos de commit são neutralizados (sem isso, um título com `{{N}}` vira
 marcador de modelo no README e o check fica vermelho).
 """
@@ -36,6 +40,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from evals import failure_modes  # noqa: E402
 from evals.run_evals import fmt_cell, fmt_ci, to_markdown  # noqa: E402
 from scripts import scorecard  # noqa: E402
 
@@ -87,6 +92,53 @@ def offline_block(results: Path) -> str:
     return f"Modo: `{report['mode']}` · provedor `{report.get('provider', 'offline')}`\n\n" + to_markdown(report)
 
 
+# "Como ler" no topo de cada bloco denso do docs/RESULTS.md: o que mede, de onde vem e como ler o IC, em texto gerado
+# e sem número (os números são os do bloco). A régua da rodada 10 leu "tabelas densas de IC95 por split no lugar de
+# explicação". O do bloco offline sai de evals.run_evals.how_to_read (vale também para o console do run_evals).
+HOW_TO_READ = {
+    "eval-live": (
+        "uma seção por split, de `evals/results/live_<split>.json` (LLM real; status `complete` = todos os casos "
+        "rodaram, sem aborto por teto nem degradação). Cada taxa vem com o IC95 de Wilson entre colchetes e o n de "
+        "execuções (casos × rodadas): com n pequeno o intervalo é largo, e taxas com intervalos que se sobrepõem não "
+        "se distinguem. A causa de cada falha está em `docs/FAILURE_MODES.md`, agrupada pela primeira checagem que "
+        "falhou; o held-out fica fora dela, por ser o conjunto cego."),
+    "trace": (
+        "as mesmas linhas ao vivo (`evals/results/live_<split>.json`, contadas por `evals/trace_stats.py`): a "
+        "latência do turno por split contra o SLO declarado, a fatia do tempo de cada agente e quem decidiu cada "
+        "passo. Percentis não têm IC: num split com poucas linhas, o p95 fica perto do pior caso e muda de uma "
+        "bateria para outra."),
+    "judge": (
+        "um juiz LLM lê cada resposta ao vivo com a evidência que ela usou, fontes e dados de ferramenta "
+        "(`evals/results/judge.json`): grounded = toda afirmação tem apoio nela; helpful = resolve o que foi pedido. "
+        "Entre colchetes, o IC95 de Wilson com o n de respostas julgadas. A calibração abaixo é {calibration}; a "
+        "validação contra pessoas é o bloco de validação humana e, enquanto ele não disser \"validado\", o juiz serve "
+        "para comparar commits (regressão), não como medida absoluta."),
+    "human": (
+        "pessoas rotulam respostas ao vivo sem ver o veredito automático (`evals/label.py`, "
+        "`evals/results/human_review.json`): a concordância e o kappa comparam a pessoa com a checagem automática e "
+        "com o juiz. Com quase toda resposta aprovada, o kappa despenca mesmo com concordância alta (por isso o AC1 de "
+        "Gwet ao lado, quando há dois rotuladores), e \"validado\" só sai pela regra fixada antes de medir."),
+    "retrieval": (
+        "a busca medida sem LLM no gold de perguntas rotuladas olhando a fonte, uma linha por configuração "
+        "(`data/retriever.json`, o arquivo que o app usa como padrão): Recall@k = fração das passagens certas que "
+        "aparecem entre as k primeiras; MRR = média do inverso da posição da primeira certa. As taxas da tabela não "
+        "têm IC; a linha de busca do bloco offline traz o hit@3 com IC95 e o número de perguntas."),
+    "replan": (
+        "o split `replan` (pergunta em que o primeiro plano não basta e o supervisor troca de passo: outro agente ou "
+        "o humano), no offline e ao vivo, ao lado das ablações SEM replanejamento nos mesmos casos, quando rodadas: a "
+        "diferença com × sem é o que o replanejamento vale. Cada célula é a taxa em % com o n de casos; o IC95 de "
+        "cada taxa fica no JSON (`ci`)."),
+}
+
+
+def with_how_to_read(tag: str, body: str, **facts: str) -> str:
+    """O bloco com o "como ler" na 1ª linha (`facts` preenche o que vem do próprio resultado, ex.: a origem do
+    gabarito do juiz); bloco vazio ou "não rodado" (texto em itálico) sai como está."""
+    if tag not in HOW_TO_READ or not body.strip() or body.lstrip().startswith("_"):
+        return body
+    return f"**Como ler:** {HOW_TO_READ[tag].format(**facts)}\n\n{body}"
+
+
 def live_block(results: Path) -> str:
     files = sorted(results.glob("live_*.json"))
     if not files:
@@ -97,7 +149,7 @@ def live_block(results: Path) -> str:
         parts.append(f"### Split `{r.get('split', f.stem)}` — `{f.name}`\n\n"
                      f"Provedor `{r.get('provider')}` · status `{r.get('status')}` · "
                      f"gasto US$ {r.get('spent_usd')} (teto {r.get('max_usd')})\n\n" + to_markdown(r, split_view=True))
-    return "\n\n".join(parts)
+    return with_how_to_read("eval-live", "\n\n".join(parts))
 
 
 def judge_block(results: Path) -> str:
@@ -115,7 +167,7 @@ def judge_block(results: Path) -> str:
     lines = [f"Modelo `{j['model']}` · status `{j['status']}` · arquivos {', '.join(j.get('live_files', [])) or '—'}"
              f" · gasto US$ {j.get('spent_usd')}", "",
              "| split | casos | grounded | helpful | nota média |", "|---|---:|---:|---:|---:|"]
-    if j.get("rejudged_dated"):  # rejulgamento declarado: quem compara os commits vê por que o veredito mudou
+    if j.get("rejudged_dated") and not j.get("rejudge"):  # judge.json de antes do bloco `rejudge`: dito como foi
         lines[1:1] = ["", f"Rejulgados {j['rejudged_dated']} vereditos (os reprovados e os de resposta com data) com a "
                           "data em que cada resposta foi gerada, no fuso do negócio (`evals.judge --rejudge-dated`): o "
                           "juiz usava a data do relógio dele (UTC) e, numa bateria perto da meia-noite, julgava "
@@ -123,6 +175,8 @@ def judge_block(results: Path) -> str:
     for split, s in {**j.get("by_split", {}), "ALL": j}.items():
         lines.append(f"| {split} | {s['cases']} | {s['grounded_rate']}{ci(s, 'grounded_rate')} | "
                      f"{s['helpful_rate']}{ci(s, 'helpful_rate')} | {s['mean_score']} |")
+    if j.get("rejudge"):
+        lines += ["", *_rejudge_lines(j["rejudge"])]
     lines += ["", f"Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): {cal.get('cases')} rótulos"
               f" · concordância **{cal.get('agreement')}**"
               f"{ci(cal, 'agreement')} · kappa de Cohen **{cal.get('cohen_kappa')}** · TPR {cal.get('tpr')}"
@@ -131,7 +185,37 @@ def judge_block(results: Path) -> str:
     for split, s in cal.get("by_split", {}).items():
         lines.append(f"- {split}: concordância {s['agreement']}{ci(s, 'agreement')} · kappa {s['cohen_kappa']} "
                      f"({s['cases']} rótulos)")
-    return "\n".join(lines + _judge_trust(j))
+    # a origem do gabarito sai do relatório: rótulo de pessoa só quando a calibração diz isso (sem campo = SPEC)
+    calibration = ("contra rótulos de pessoas" if cal.get("labels_origin") == "human"
+                   else "contra o gabarito da SPEC, não contra pessoas")
+    return with_how_to_read("judge", "\n".join(lines + _judge_trust(j)), calibration=calibration)
+
+
+def _rejudge_lines(rj: dict) -> list[str]:
+    """O rejulgamento pela data (`evals.judge --rejudge-dated`, bloco `rejudge` do judge.json) com a regra e, por
+    split, fundamentadas e úteis da 1ª passada (o juiz que rodou junto da bateria, cujo resumo fica em
+    `judge_first_pass` de cada live_*.json) → rejulgado. Sem isto, o 19/30 do resumo commitado e o 30/30 publicado
+    pareciam uma contradição (rodada 10, as 3 réguas)."""
+    from evals.judge import REJUDGE_REASONS
+
+    first, flips = rj.get("primeira_passada") or {}, rj.get("viraram") or {}
+    why = ", ".join(f"{REJUDGE_REASONS.get(k, k)} {n}" for k, n in (rj.get("por_motivo") or {}).items()) or "—"
+    day = ", ".join(rj.get("data_da_1a_passada") or []) or "não gravada no veredito"
+    out = [f"Rejulgamento pela data (`python -m evals.judge --rejudge-dated`). Regra: {rj['regra']}. Rejulgados "
+           f"**{rj['rejulgados']}** vereditos, {first.get('aprovados', 0)} aprovados e {first.get('reprovados', 0)} "
+           f"reprovados na 1ª passada (por motivo: {why}); mudaram {flips.get('reprovado_para_aprovado', 0)} de "
+           f"reprovado para aprovado e {flips.get('aprovado_para_reprovado', 0)} de aprovado para reprovado. Julgados "
+           f"uma vez só (sem data, ou já com o dia em que a resposta foi gerada): {rj['mantidos']}, "
+           f"{rj.get('mantidos_reprovados', 0)} deles reprovados. 1ª passada = o juiz que rodou junto da bateria "
+           f"(data que ele usou: {day}); o resumo dela fica em `judge_first_pass` de cada live_*.json.", "",
+           "| split | casos | rejulgados | fundamentadas: 1ª passada → rejulgado | úteis: 1ª passada → rejulgado |",
+           "|---|---:|---:|---:|---:|"]
+    for split, b in {**(rj.get("por_split") or {}), "ALL": rj.get("ALL") or {}}.items():
+        a, d = b.get("antes") or {}, b.get("depois") or {}
+        out.append(f"| {split} | {d.get('casos')} | {b.get('rejulgados')} | {a.get('grounded')}/{a.get('casos')} → "
+                   f"{d.get('grounded')}/{d.get('casos')} | {a.get('helpful')}/{a.get('casos')} → "
+                   f"{d.get('helpful')}/{d.get('casos')} |")
+    return out
 
 
 def _judge_trust(j: dict) -> list[str]:
@@ -164,6 +248,7 @@ def human_block(results: Path) -> str:
     lines = [f"{h['rotulos']} respostas ao vivo rotuladas às cegas pelo dono: humano aprova {h['humano_passa']}/"
              f"{h['rotulos']}, checagem automática aprova {h['automatico_passa']}/{h['rotulos']}; concordância "
              f"**{h['concordancia']}**, kappa **{h['kappa']}**."]
+    lines += _battery_lines(h)
     for name, r in (h.get("por_rotulador") or {}).items():
         lines.append(f"- rotulador `{name}`: {r['rotulos']} rótulos · humano × automático: concordância "
                      f"{r['concordancia']}, kappa {r['kappa']}")
@@ -195,7 +280,26 @@ def human_block(results: Path) -> str:
         lines.append(f"Aviso: {h['aviso']}.")
     lines += [f"- `{d['id']}`: humano {d['humano']} × automático {d['automatico']} {d['nota']}".rstrip()
               for d in h.get("divergencias", [])[:8]]
-    return "\n".join(lines)
+    return with_how_to_read("human", "\n".join(lines))
+
+
+def _battery_lines(h: dict) -> list[str]:
+    """De que bateria (git_sha) são os rótulos que contam, quantos de página congelada e quantos do texto de hoje; os
+    de outra bateria, fora de toda conta e listados; o aviso de juiz diferente ou sem veredito do texto rotulado
+    (evals.label.FROZEN_RULE). Relatório antigo, sem esses campos: nada."""
+    out = []
+    if b := h.get("bateria"):
+        shas = "; ".join(f"`{sha}` {n}" for sha, n in (b.get("rotulos_por_bateria") or {}).items()) or "—"
+        pages = f" (páginas {', '.join(f'`{p}`' for p in b['paginas'])})" if b.get("paginas") else ""
+        out.append(f"Bateria das respostas rotuladas que contam, em rótulos: {shas}; {b.get('de_pagina_congelada', 0)} "
+                   f"de página congelada{pages} e {b.get('do_texto_de_hoje', 0)} do texto de hoje. Regra: "
+                   f"{b.get('regra', '')}.")
+    if o := h.get("rotulos_de_outra_bateria"):
+        out.append(f"Rótulos de outra bateria: **{o['rotulos']}** (a resposta rotulada não é a de hoje nem a de uma "
+                   f"página congelada), fora de toda conta: {', '.join(o.get('ids') or []) or '—'}.")
+    if h.get("aviso_juiz"):
+        out.append(f"Aviso do juiz × humano: {h['aviso_juiz']}.")
+    return out
 
 
 def _kinds(counts: dict | None) -> str:
@@ -346,7 +450,8 @@ def replan_block(results: Path) -> str:
     if len(lines) == 2:
         return "_Sem split `replan` nos resultados._"
     gain = _ablation_gain(results)
-    return "\n".join(lines + ([""] + examples if examples else []) + ([""] + gain if gain else []))
+    body = lines + ([""] + examples if examples else []) + ([""] + gain if gain else [])
+    return with_how_to_read("replan", "\n".join(body))
 
 
 def _ablation_gain(results: Path) -> list[str]:
@@ -375,10 +480,65 @@ def _verdict_counts(path: Path, source: str) -> dict | None:
             "helpful": sum(bool(v.get("helpful")) for v in mine)}
 
 
+def _need_fired(row: dict) -> bool:
+    """O achado `needs` disparou neste caso: algum passo traz `needs` (árvore de passos, supervisor.step_view) ou, em
+    gravação anterior à marca na árvore, um replanejamento por achado ("<de>:need-><para>")."""
+    return any(st.get("needs") for st in row.get("steps") or []) \
+        or any(":need->" in str(r) for r in row.get("replans") or [])
+
+
+def _p50_s(rows: list[dict]) -> float | None:
+    """p50 em segundos pelo critério de run_evals.summarize (lat[n // 2] da lista ordenada)."""
+    lat = sorted(r["ms"] for r in rows if isinstance(r.get("ms"), int | float))
+    return lat[len(lat) // 2] / 1000 if lat else None
+
+
+def _prompts_differ(a: dict, b: dict) -> list[str]:
+    """Arquivos de prompt com hash diferente entre os dois braços ([] = iguais ou sem `prompt_versions` gravado)."""
+    def hashes(report: dict) -> dict[str, set]:
+        seen: dict[str, set] = {}
+        for row in report.get("rows") or []:
+            for name, digest in (row.get("prompt_versions") or {}).items():
+                seen.setdefault(name, set()).add(digest)
+        return seen
+
+    ha, hb = hashes(a), hashes(b)
+    return sorted(n for n in set(ha) & set(hb) if ha[n] != hb[n])
+
+
+# Destino de cada achado no braço com `needs` (supervisor.NEED_OUTCOMES), na ordem em que sai na linha.
+NEED_OUTCOME_LABEL = {"called": "o modelo chamou o agente pedido", "reminded": "chamou depois do lembrete",
+                      "ignored": "ignorou mesmo com o lembrete (`need_ignored`)", "inserted": "a tabela inseriu",
+                      "planned": "já estava no plano", "ran": "o agente já tinha rodado",
+                      "blocked": "regra do turno barrou", "hidden": "não chegou ao modelo"}
+
+
+def _need_outcomes(rows: list[dict]) -> str:
+    """"N achados: o modelo chamou X, ..." do braço com `needs` ("" em gravação sem o destino na árvore)."""
+    counts: dict[str, int] = {}
+    for row in rows:
+        for step in row.get("steps") or []:
+            for need in step.get("needs") or []:
+                if need.get("outcome"):
+                    counts[need["outcome"]] = counts.get(need["outcome"], 0) + 1
+    if not counts:
+        return ""
+    told = [f"{NEED_OUTCOME_LABEL[k]} {counts[k]}" for k in NEED_OUTCOME_LABEL if counts.get(k)]
+    if other := sum(v for k, v in counts.items() if k not in NEED_OUTCOME_LABEL):
+        told.append(f"outro {other}")
+    return f"{sum(counts.values())} achados no braço com `needs`: " + ", ".join(told)
+
+
 def _needs_ablation(results: Path) -> list[str]:
-    """Ablação ao vivo SEM os achados `needs` (o supervisor LLM decide sozinho) num split sem rótulo de rota (ex.:
-    perguntas reais): o juiz (vereditos num arquivo próprio, fora da manchete), números e frases sem base, latência e
-    custo, lado a lado com o MESMO split com `needs`. Só compara rodadas completas com os mesmos casos."""
+    """Ablação ao vivo SEM os achados `needs` num split sem rótulo de rota (ex.: perguntas reais), lado a lado com o
+    MESMO split com `needs`: o juiz (vereditos num arquivo próprio, fora da manchete), números e frases sem base,
+    latência e custo. Só compara rodadas completas com os mesmos casos.
+
+    Braço sem `needs` (SUPERVISOR_REPLAN=no_needs): o modelo não recebe o achado, não há lembrete e a tabela não
+    insere. Com `needs`, o achado é informação para o supervisor LLM, que decide (um lembrete se ignorar). Os dois
+    braços em commits diferentes saem AVISADOS (a diferença mistura o código que mudou com o achado; os prompts dizem
+    se ao menos as instruções eram as mesmas). O p50 sai também só nos casos em que o achado disparou no braço com
+    `needs`: nos outros os dois braços fazem o mesmo caminho e a diferença de p50 é variação entre as rodadas."""
     out = []
     for abl_f in sorted(results.glob("ablation_replan_no_needs*live.json")):
         abl = _load(abl_f) or {}
@@ -395,7 +555,14 @@ def _needs_ablation(results: Path) -> list[str]:
             out.append(f"Ablação ao vivo sem `needs` ({split}): não comparável (status {abl.get('status')}, "
                        f"{mb.get('cases')} × {ma.get('cases')} casos).")
             continue
-        parts = [f"mesmos {ma['cases']} casos, commits `{base.get('git_sha')}` × `{abl.get('git_sha')}`"]
+        sha_a, sha_b = base.get("git_sha"), abl.get("git_sha")
+        if sha_a == sha_b:
+            parts = [f"mesmos {ma['cases']} casos, mesmo commit `{sha_a}`"]
+        else:
+            differ = _prompts_differ(base, abl)
+            parts = [f"mesmos {ma['cases']} casos; **AVISO: braços em commits diferentes** (`{sha_a}` × `{sha_b}`, "
+                     + (f"prompts diferentes: {', '.join(differ)}" if differ else "mesmos prompts")
+                     + "): a diferença mistura o código que mudou entre as rodadas com o achado"]
         if ja.get("verdicts") and jb.get("verdicts"):
             parts.append(f"fundamentadas pelo juiz **{ja['grounded']}/{ja['verdicts']} com** × "
                          f"**{jb['grounded']}/{jb['verdicts']} sem**; úteis {ja['helpful']}/{ja['verdicts']} × "
@@ -405,8 +572,15 @@ def _needs_ablation(results: Path) -> list[str]:
                 parts.append(f"{label} {ma[key]:.1f}% × {mb[key]:.1f}%")
         if ma.get("p50_ms") and mb.get("p50_ms"):
             parts.append(f"p50 {ma['p50_ms'] / 1000:.1f} s × {mb['p50_ms'] / 1000:.1f} s")
+        fired = {r.get("id") for r in base.get("rows") or [] if _need_fired(r)}
+        pa = _p50_s([r for r in base.get("rows") or [] if r.get("id") in fired])
+        pb = _p50_s([r for r in abl.get("rows") or [] if r.get("id") in fired])
+        if pa is not None and pb is not None:
+            parts.append(f"p50 só nos {len(fired)} casos em que o achado disparou {pa:.1f} s × {pb:.1f} s")
         if ma.get("cost_usd") and mb.get("cost_usd"):
             parts.append(f"US$ por caso {ma['cost_usd'] / ma['cases']:.3f} × {mb['cost_usd'] / mb['cases']:.3f}")
+        if told := _need_outcomes(base.get("rows") or []):
+            parts.append(told)
         out.append(f"Ablação ao vivo sem `needs` ({split}, com × sem): " + "; ".join(parts) + ".")
     return out
 
@@ -490,7 +664,9 @@ def quickstart_block(results: Path | None = None) -> str:
     return "\n".join([
         "```bash",
         f"# 1º caso oficial ({case['id']}, evals/cases.jsonl), como o cliente {user}, com o $TOKEN do passo Entrar",
-        f"# (atalho de teste, sem senha: TOKEN=$(python -m app.auth {user}))",
+        # o token sai de DENTRO do container: no host, o segredo da CLI não é o da API (AUTH_SECRET vazio no
+        # .env.example = segredo aleatório em cada lado, e o token do host dava 401); -T evita o \r do TTY no $TOKEN
+        f"# (atalho de teste, sem senha: TOKEN=$(docker compose exec -T api python -m app.auth {user}))",
         'curl -s -X POST localhost:8000/chat -H "Authorization: Bearer $TOKEN" \\',
         f'     -H "Content-Type: application/json" -d {_shell_quote(body)}',
         "```"])
@@ -539,7 +715,7 @@ SINCE = (
     ("A resposta do humano era só a próxima mensagem; operação (especialidade, Postgres, JWKS)",
      "a resposta do operador vira evidência e os passos pendentes do plano rodam (no turno, com espera curta, ou na "
      "retomada); fila por especialidade; Postgres atrás da mesma interface; JWKS",
-     ("resolved_fraction",), "tests/test_v54_hitl_sync.py"),
+     ("hitl_in_turn",), "tests/test_v54_hitl_sync.py"),
     ("Avaliação independente: um rotulador, held-out de 24",
      "2 rotuladores; held-out cego ≥ 80 ponta a ponta; juiz validado contra humanos com regra fixada antes",
      ("raters", "heldout_cases", "heldout_e2e", "judge_validated", "judge_kappa"),
@@ -556,6 +732,83 @@ def since_block(results: Path) -> str:
         proof = " · ".join(f"{targets[k].label} **{scorecard._fmt(got.get(k), targets[k].unit)}**" for k in keys)
         lines.append(f"| {gap} | {change} | {proof}; `{test}` |")
     return "\n".join(lines)
+
+
+def _short(model: str | None) -> str:
+    return (model or "?").split("/")[-1]
+
+
+def retriever_block(results: Path, data: Path | None = None) -> str:
+    """Frase do buscador em uso (o item "Retrieval" do README), gerada de data/retriever.json ou, sem ele, do
+    KIT_RETRIEVER: modelo, ordem, papel do cross-encoder e, quando medidos, cobertura do portão e custo a mais por
+    busca. Com o bloco no README, o --check reprova o texto que diverge da escolha gravada. Medido na rodada 10: o
+    README dizia "denso + cross-encoder sobre o top-10" e "ninguém roda --choose-retriever", mas a escolha gravada era
+    dense+cross:base (ordem do denso; a nota do cross só no portão), saída do --choose-retriever."""
+    from app.config import KIT_RETRIEVER
+    from evals.retrieval_eval import config_name
+
+    rec = _load((data or ROOT / "data") / "retriever.json") or {}
+    recorded = bool((rec.get("choice") or {}).get("retriever"))  # o app só usa a escolha que nomeia o buscador
+    cfg = rec["choice"] if recorded else dict(KIT_RETRIEVER)
+    name = (rec.get("chosen") if recorded else None) or config_name(cfg)
+    measured = (rec.get("measured") or {}) if recorded else {}
+    kind = cfg.get("retriever") or "bm25"
+    base = {"bm25": "BM25", "dense": "denso", "hybrid": "híbrido"}.get(kind, kind)
+    what = {"dense": f"denso `{_short(cfg.get('embed_model'))}`",
+            "hybrid": f"híbrido BM25 + denso `{_short(cfg.get('embed_model'))}` (RRF)"}.get(kind, "BM25 (léxico)")
+    min_rerank = (cfg.get("gate") or {}).get("min_rerank")
+    threshold = f" (nota >= {min_rerank:g})" if min_rerank is not None else ""
+    if cfg.get("rerank") == "cross":
+        text = (f"`{name}`: {what} + cross-encoder `{_short(cfg.get('rerank_model'))}` (top-{cfg.get('rerank_pool')}, "
+                f"{cfg.get('rerank_chars')} caracteres por trecho) — ")
+        if (cfg.get("rerank_order") or "cross") == "base":  # sem rerank_order a escolha reordena (config.rerank_order)
+            text += (f"ordem do {base}; nota do cross só no portão sem fonte{threshold}: o redator lê os trechos na "
+                     f"ordem do {base}.")
+        else:
+            text += f"o cross reordena o top do {base}, e a nota decide o portão sem fonte{threshold}."
+    elif cfg.get("rerank") == "llm":
+        text = f"`{name}`: {what}; o LLM reordena o top do {base}, e o portão sem fonte é o BM25/cosseno."
+    else:
+        text = f"`{name}`: {what}, sem rerank; o portão sem fonte é o BM25/cosseno."
+    me = measured.get(name) or {}
+    plain = measured.get(config_name({k: v for k, v in cfg.items() if not k.startswith("rerank")})) or {}
+    plain = {} if plain is me else plain  # a escolha já é o buscador sem rerank: nada a comparar
+    gate, pgate = me.get("rerank_gate") or me.get("gate") or {}, plain.get("gate") or {}
+    if gate.get("pos_answered") is not None and gate.get("neg_refused") is not None:
+        text += (f" Portão medido: responde {gate['pos_answered']:.0%} das perguntas com fonte e recusa "
+                 f"{gate['neg_refused']:.0%} das sem fonte ({gate.get('positives')} × {gate.get('negatives')})")
+        if pgate.get("pos_answered") is not None and pgate.get("neg_refused") is not None:
+            text += (f"; sem o cross, o do {base} responde {pgate['pos_answered']:.0%} e recusa "
+                     f"{pgate['neg_refused']:.0%}")
+        text += "."
+    lat, plat = me.get("latency_ms") or {}, plain.get("latency_ms") or {}
+    if lat.get("p50") is not None and plat.get("p50") is not None:
+        text += (f" Custo a mais por busca: {lat['p50'] - plat['p50']:+.0f} ms no p50 ({lat['p50']:.0f} × "
+                 f"{plat['p50']:.0f} ms)")
+        if me.get("memory_mb") is not None and plain.get("memory_mb") is not None:
+            text += f" e {me['memory_mb'] - plain['memory_mb']:+.0f} MB de RAM"
+        text += "."
+    if cfg.get("rerank") == "cross":  # as duas ordens medidas: o que reordenar pela nota fez com a leitura do redator
+        if name.endswith(":base"):
+            in_order, reorder = me, (measured.get(name.removesuffix(":base")) or {})
+        else:
+            in_order, reorder = (measured.get(f"{name}:base") or {}), me
+        a, b = reorder.get("recall@5"), in_order.get("recall@5")
+        if a is not None and b is not None:
+            verdict = "ganhou" if a > b else ("empatou" if a == b else "não ganhou")
+            text += f" Reordenar pela nota foi medido e {verdict}: Recall@5 {a} reordenando × {b} na ordem do {base}."
+    if rec.get("criterion") and recorded:
+        text += (f" Escolha gravada por `run_evals --choose-retriever --apply` em {rec.get('chosen_at')} (commit "
+                 f"`{rec.get('git_sha')}`); vale sobre o `KIT_RETRIEVER` de `src/app/config.py`.")
+        source = "`data/retriever.json`"
+    elif recorded:
+        text += f" Escolha do domínio em `data/retriever.json`: {rec.get('_doc') or 'sem motivo gravado'}."
+        source = "`data/retriever.json`"
+    else:
+        text += (" Padrão do kit (`KIT_RETRIEVER` em `src/app/config.py`), sem medida no domínio: "
+                 "`run_evals --choose-retriever --apply` mede e grava `data/retriever.json`.")
+        source = "`KIT_RETRIEVER`"
+    return f"- **Retrieval** (`src/app/rag.py`; frase gerada de {source} por `scripts/fill_readme.py`): {text}"
 
 
 def retrieval_block(results: Path, data: Path | None = None) -> str:
@@ -578,7 +831,8 @@ def retrieval_block(results: Path, data: Path | None = None) -> str:
     if gate.get("min_rerank") is not None:
         head += (f" Portão sem fonte da escolha: nota do cross-encoder >= {gate['min_rerank']:g} (vale este enquanto "
                  "a busca for a mesma; sem ele, o MIN_RERANK do domínio).")
-    return head + "\n\n" + markdown(chosen.get("measured") or {}, chosen.get("chosen"))
+    table = markdown(chosen.get("measured") or {}, chosen.get("chosen"))
+    return with_how_to_read("retrieval", head + "\n\n" + table)
 
 
 def red_team_block(results: Path) -> str:
@@ -613,6 +867,16 @@ def red_team_block(results: Path) -> str:
     else:  # offline o guardrail é só a regex do motor: informa, não reprova (o gate vale ao vivo e no replay)
         head = (f"Offline (só a regex do motor, sem LLM; não reprova): {offline['safe_rate']:.1%} seguras de "
                 f"{offline['cases']}. O gate de {offline['floor']:.0%} vale ao vivo e no replay da gravação.")
+    # linha do red team AO VIVO (guardrail + hard), logo abaixo: é o guardrail com o classificador LLM de verdade
+    live_gates = [g for g in (load("live_guardrail.json"), load("live_hard.json")) if g]
+    if live_gates:
+        cases = sum(g.get("cases", 0) for g in live_gates)
+        safe = sum(round(g.get("safe_rate", 0) * g.get("cases", 0)) for g in live_gates)
+        asi02 = [g["by_asi"]["ASI02"] for g in live_gates if (g.get("by_asi") or {}).get("ASI02")]
+        asi02_txt = (f", ASI02 {sum(a['safe_rate'] * a['cases'] for a in asi02) / sum(a['cases'] for a in asi02):.0%}"
+                     if asi02 else "")
+        head += (f"\n\nAo vivo (guardrail + hard): {(safe / cases if cases else 0):.1%} seguras de {cases}{asi02_txt} "
+                 f"→ {'PASS' if all(g.get('passed') for g in live_gates) else 'FAIL'}.")
     return head + "\n\n" + "\n".join(rows)
 
 
@@ -622,12 +886,14 @@ def trace_block(results: Path) -> str:
     cada caso saem dos arquivos de casos, para a linha de memória (conversa inteira) não passar por um turno só."""
     from evals import trace_stats
 
-    return trace_stats.markdown(trace_stats.summarize(trace_stats.load_rows(results), trace_stats.case_turns()))
+    summary = trace_stats.summarize(trace_stats.load_rows(results), trace_stats.case_turns())
+    return with_how_to_read("trace", trace_stats.markdown(summary))
 
 
 BLOCKS = {"eval": offline_block, "eval-live": live_block, "judge": judge_block, "human": human_block,
           "replan": replan_block, "scorecard": scorecard_block, "retrieval": retrieval_block,
-          "quickstart": quickstart_block, "red-team": red_team_block, "since": since_block, "trace": trace_block}
+          "retriever": retriever_block, "quickstart": quickstart_block, "red-team": red_team_block,
+          "since": since_block, "trace": trace_block}
 # Os detalhes (tabelas por split com IC95) vão para docs/RESULTS.md; o README fica com o placar e o mapa.
 EXTRA_FILES = ("docs/RESULTS.md", "docs/PROCEDENCIA.md", "docs/SECURITY_ASI.md")
 
@@ -654,9 +920,11 @@ def _block(text: str, tag: str) -> str | None:
     return m.group(1).strip() if m else None
 
 
-# o commit do próprio README pode não estar na linha do tempo
+# Os arquivos gerados que o scripts/final.sh aceita sujos e commita por último (GENERATED lá): o commit do próprio
+# README pode não estar na linha do tempo nem no TIMESHEET. FAILURE_MODES e TIMESHEET entraram na rodada 11: gerados à
+# mão, ficavam velhos (rodada 10: "42 falhas em 281 execuções" e "446 min, 0 depois", com 5 em 315 e 910 min no git).
 README_ONLY = {"README.md", "ESTADO.md", "docs/RESULTS.md", "docs/PROCEDENCIA.md", "docs/SECURITY_ASI.md",
-               "docs/ENTREGA.md"}
+               "docs/ENTREGA.md", "docs/FAILURE_MODES.md", "docs/TIMESHEET.md"}
 
 
 def check(readme: Path, results: Path, root: Path = ROOT) -> list[str]:
@@ -671,7 +939,52 @@ def check(readme: Path, results: Path, root: Path = ROOT) -> list[str]:
     problems += [f"README sem o título que o enunciado pede: {name!r}" for name in missing_headings(text)]
     if "<!-- quickstart:begin -->" not in text:
         problems.append("README sem o bloco <!-- quickstart:begin --> (exemplo do 1º caso oficial)")
+    problems += _check_failure_modes(readme.parent / "docs" / "FAILURE_MODES.md", results)
+    problems += _check_timesheet(readme.parent / "docs" / "TIMESHEET.md", root)
     return problems + _check_timeline(text, root)
+
+
+def _check_failure_modes(path: Path, results: Path) -> list[str]:
+    """docs/FAILURE_MODES.md é o que evals/failure_modes.py gera dos live_*.json commitados: nem velho, nem à mão."""
+    want = failure_modes.generate(results)
+    have = path.read_text(encoding="utf-8") if path.exists() else None
+    if want is None:
+        return [] if have is None else ["docs/FAILURE_MODES.md sem evals/results/live_*.json que o gere: commite a "
+                                        "bateria ao vivo ou apague o arquivo"]
+    if have is None:
+        return ["docs/FAILURE_MODES.md ausente com eval ao vivo commitado: rode `python -m evals.failure_modes` (o "
+                "scripts/final.sh já roda) e commite"]
+    if have != want:
+        return ["docs/FAILURE_MODES.md diferente do que evals/results/live_*.json gera: rode `python -m "
+                "evals.failure_modes` e commite junto com os resultados"]
+    return []
+
+
+# linha de commit do docs/TIMESHEET.md: "| min | hh:mm:ss |" (min negativo = antes do relógio)
+_TIMESHEET_ROW = re.compile(r"^\| -?\d+(?:\.\d+)? \| \d\d:\d\d:\d\d \|")
+
+
+def _check_timesheet(path: Path, root: Path) -> list[str]:
+    """Uma linha do docs/TIMESHEET.md por commit do git log (sem merges, como o scripts/timesheet.py), tolerando só o
+    último commit quando ele leva só arquivos gerados: o do scripts/final.sh, que gera o TIMESHEET antes de commitar.
+    Sem o arquivo (kit, ou antes do final.sh), nada a conferir; o README que aponta para ele cai no check de links."""
+    if not path.exists():
+        return []
+    listed = sum(1 for line in path.read_text(encoding="utf-8").splitlines() if _TIMESHEET_ROW.match(line))
+    r = subprocess.run(["git", "rev-list", "--no-merges", "--count", "HEAD"], cwd=root, check=False, text=True,
+                       capture_output=True, encoding="utf-8")
+    total = int(r.stdout.strip()) if r.returncode == 0 and r.stdout.strip().isdigit() else 0
+    last = _last_commit_files(root)
+    if listed < total - (1 if last and set(last) <= README_ONLY else 0):
+        return [f"docs/TIMESHEET.md com {listed} commits, o git tem {total} (o último mexeu em "
+                f"{', '.join(last[:4]) or 'nada'}): rode scripts/final.sh, que gera o TIMESHEET e commita só os "
+                "gerados por cima"]
+    return []
+
+
+def _last_commit_files(root: Path) -> list[str]:
+    return subprocess.run(["git", "show", "--name-only", "--format=", "HEAD"], cwd=root, check=False, text=True,
+                          capture_output=True, encoding="utf-8").stdout.split()
 
 
 def _check_blocks(text: str, results: Path) -> list[str]:
@@ -702,8 +1015,7 @@ def _check_timeline(text: str, root: Path) -> list[str]:
         # com mais de TIMELINE_MAX_ROWS commits a tabela mostra só os marcos: vale o total declarado na linha final
         declared = re.search(r"Do primeiro ao último commit: \*\*\d+ min\*\*, (\d+) commits", rows)
         listed = int(declared.group(1)) if declared else listed
-        last_files = subprocess.run(["git", "show", "--name-only", "--format=", "HEAD"], cwd=root, check=False,
-                                    text=True, capture_output=True, encoding="utf-8").stdout.split()
+        last_files = _last_commit_files(root)
         readme_only = bool(last_files) and set(last_files) <= README_ONLY
         if listed < len(commits) - (1 if readme_only else 0):
             problems.append(f"linha do tempo com {listed} commits, o git tem {len(commits)} (o último mexeu em "

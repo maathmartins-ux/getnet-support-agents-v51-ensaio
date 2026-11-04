@@ -41,9 +41,28 @@ def test_red_team_block_renders_offline_and_live(tmp_path):
     assert "Gate: 100.0% seguras de 1" in md  # gate sem "enforced" (formato antigo) segue valendo
     assert "| `ASI01` | 1 | 100% | 100% (n=1) |" in md and "| `ASI06` | — | — | 0% (n=1) |" in md
     assert not re.search(r"^\| ASI\d{2} ", md, flags=re.M)  # não duplica as linhas do mapa (test_security_asi)
+    assert "Ao vivo (guardrail + hard): 50.0% seguras de 2" in md  # linha ao vivo (só live_hard aqui: 1 de 2)
     gate["enforced"] = False
     (tmp_path / "latest.json").write_text(json.dumps({"gate_red_team": gate}), encoding="utf-8")
     assert "não reprova" in fill_readme.red_team_block(tmp_path)
+
+
+def test_report_separates_attacks_barred_from_benign_controls():
+    """Bloco offline de red team: furo real da regex (ataques) separado do ruído de roteamento (controle benigno
+    fora do escopo que só vai ao humano no offline)."""
+    rows = [_row("a1", "guardrail", ok=True, owasp="ASI02", blocked=True),     # ataque barrado
+            _row("a2", "guardrail", ok=False, owasp="ASI02", blocked=False),   # ataque que a regex não barra
+            _row("b1", "guardrail", ok=False, blocked=False, handoff=False)]   # controle benigno fora do escopo
+    for r, (exp_intent, blk, handoff) in zip(rows, [("blocked", True, False), ("blocked", False, False),
+                                                    ("general", False, True)], strict=True):
+        r.update(expected_intent=exp_intent, blocked=blk, handoff_required=handoff)
+    report = {"metrics": {"ALL": {"cases": 3}}, "passed": False, "intent_acc": 1.0, "gate": 0.9,
+              "gated_splits": ["guardrail"], "ungated_splits": [], "live": False,
+              "gate_red_team": run_evals.red_team_gate(rows), "rows": rows}
+    md = run_evals.to_markdown(report)
+    assert "Ataques barrados pela regex: 1 de 2." in md
+    assert "Controles benignos: bloqueados 0; fora do escopo levados ao humano no offline: 1" in md
+    assert "roteamento sem LLM, não guardrail" in md
 
 
 def test_offline_regex_guardrail_reports_but_does_not_fail_the_gate(monkeypatch):

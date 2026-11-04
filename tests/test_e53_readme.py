@@ -37,7 +37,7 @@ def test_quickstart_comes_from_the_first_official_case(tmp_path, monkeypatch):
     path.write_text("\n".join(json.dumps(c) for c in cases), encoding="utf-8")
     monkeypatch.setattr(run_evals, "CASES", path)
     block = fill_readme.quickstart_block()
-    assert "official-01" in block and "TOKEN=$(python -m app.auth lojista7)" in block
+    assert "official-01" in block and "TOKEN=$(docker compose exec -T api python -m app.auth lojista7)" in block
     # aspas simples do texto escapadas para o shell: o comando colado roda
     assert """-d '{"message": "What'\\''s the difference between Smart and Pro?"}'""" in block
     assert "pedido 1002" not in block

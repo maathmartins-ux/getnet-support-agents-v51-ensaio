@@ -11,8 +11,10 @@ Fluxo:
         # (gravação, replay offline do cassete): taxa de cada modo, sem LLM e sem rede
 
 Separado da rotulagem cega (evals/label.py, scripts/label_page.py): estes traces são de AJUSTE (o rascunho do modelo
-fica no CSV daqui e nunca entra em live_*.json, então a página cega não tem como mostrá-lo) e o split `heldout` fica
-de fora (o held-out continua intocado). Cada modo tem nome de comportamento e UMA checagem binária em MODE_CHECKS,
+fica no CSV daqui e nunca entra em live_*.json, então a página cega não tem como mostrá-lo) e todo split `heldout*`
+fica de fora (heldout, heldout_h3...: o held-out continua intocado; a régua da rodada 10 leu "o held-out deixou de ser
+cego em 4 classes de erro", e um lote cego novo só serve se nenhuma ferramenta o ler). Cada modo tem nome de
+comportamento e UMA checagem binária em MODE_CHECKS,
 que roda sobre a linha gravada; modo que o dono criar sem checagem aparece no relatório como "sem checagem".
 """
 from __future__ import annotations
@@ -30,7 +32,9 @@ sys.path.insert(0, str(HERE.parent / "src"))
 RESULTS = HERE / "results"
 CSV_PATH = HERE / "error_analysis.csv"
 OUT = RESULTS / "error_analysis.json"
-EXCLUDED_SPLITS = {"heldout"}  # o held-out é a medida final: ajuste nele contamina
+# o held-out é a medida final: ajuste nele contamina. Por prefixo (evals.failure_modes.is_blind): um lote cego novo
+# (heldout_h3) ficava dentro com a lista {"heldout"}
+EXCLUDED_SPLITS = {"heldout*"}
 FIELDS = ["chave", "id", "run", "split", "pergunta", "resposta", "humano_na_resposta", "fontes", "ferramentas",
           "contexto", "rascunho", "modo_rascunho", "motivo_rascunho", "origem_rascunho", "revisao", "final", "modo",
           "motivo"]
@@ -130,12 +134,14 @@ def key_of(row: dict) -> str:
 
 def load_rows(results: Path = RESULTS, pattern: str = "live_*.json") -> list[dict]:
     """Todas as execuções (todas as rodadas) dos arquivos, menos o held-out. `.degraded`/`.aborted_*` ficam fora."""
+    from evals.failure_modes import is_blind
+
     rows, seen = [], set()
     for path in sorted(results.glob(pattern)):
         if path.name.count(".") > 1:
             continue
         for row in json.loads(path.read_text(encoding="utf-8")).get("rows", []):
-            if row.get("split") in EXCLUDED_SPLITS or key_of(row) in seen:
+            if is_blind(row.get("split")) or key_of(row) in seen:
                 continue
             seen.add(key_of(row))
             rows.append(row)

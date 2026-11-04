@@ -17,21 +17,24 @@ Material: `secret` (HS256), `private_key`/`private_key_file` (PEM PKCS8; a públ
 `public_key`/`public_key_file` (só valida). Sem AUTH_KEYS: uma chave HS256 `default` com AUTH_SECRET (compatível com
 o kit anterior). Token sem `kid` é validado só pela chave `default`, se ela estiver no conjunto.
 Chave nova: `python -m app.auth keygen --alg EdDSA --kid 2026-11`.
+
+Assinar, validar e serializar a JWK é do PyJWT (biblioteca auditada); este módulo só carrega o material, confere e
+escolhe a chave pelo `kid`. A chave só entra no conjunto se o próprio PyJWT a aceita para o `alg` dela.
 """
 from __future__ import annotations
 
 import base64
-import hashlib
-import hmac
 import json
 import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, padding, rsa
+import jwt
+from cryptography.exceptions import UnsupportedAlgorithm
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
+from jwt.algorithms import OKPAlgorithm, RSAAlgorithm
 
 from .config import auth_secret
 
@@ -57,17 +60,39 @@ class Key:
     def can_sign(self) -> bool:
         return self.secret is not None or self.private is not None
 
+    @property
+    def signing_key(self) -> object | None:
+        """O que o PyJWT recebe para assinar: o segredo (HS256) ou a privada (EdDSA/RS256)."""
+        return self.secret if self.alg == "HS256" else self.private
 
-def _b64e(raw: bytes) -> str:
-    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+    @property
+    def verifying_key(self) -> object | None:
+        """O que o PyJWT recebe para validar: o segredo (HS256) ou a pública; a privada nunca."""
+        return self.secret if self.alg == "HS256" else self.public
 
 
 def _pem(entry: dict, name: str) -> bytes | None:
     if entry.get(name):
         return str(entry[name]).encode()
     if entry.get(f"{name}_file"):
-        return Path(entry[f"{name}_file"]).read_bytes()
+        try:
+            return Path(entry[f"{name}_file"]).read_bytes()
+        except OSError as exc:  # arquivo ausente ou sem permissão: erro de configuração (401 e /health), não 500
+            raise KeyConfigError(f"{entry.get('kid') or '?'}: não li {name}_file ({type(exc).__name__})") from exc
     return None
+
+
+def _accepted(key: Key) -> Key:
+    """A chave só entra se o PyJWT a aceita para o alg dela. Ele recusa, por exemplo, segredo HS256 vazio, em PEM ou em
+    JWK (o formato da confusão de algoritmo): o erro aparece na carga (/health), não no primeiro login (500)."""
+    algorithm = jwt.get_algorithm_by_name(key.alg)
+    try:
+        for material in (key.signing_key, key.verifying_key):
+            if material is not None:
+                algorithm.prepare_key(material)
+    except jwt.InvalidKeyError as exc:
+        raise KeyConfigError(f"{key.kid}: o PyJWT recusa esta chave para {key.alg} ({exc})") from exc
+    return key
 
 
 def _parse(entry: dict) -> Key:
@@ -78,11 +103,14 @@ def _parse(entry: dict) -> Key:
         secret = str(entry.get("secret") or "").encode()
         if not secret:
             raise KeyConfigError(f"{kid}: HS256 precisa de secret")
-        return Key(kid, alg, secret=secret)
+        return _accepted(Key(kid, alg, secret=secret))
     private_pem, public_pem = _pem(entry, "private_key"), _pem(entry, "public_key")
-    private = serialization.load_pem_private_key(private_pem, password=None) if private_pem else None
-    public = private.public_key() if private else (serialization.load_pem_public_key(public_pem) if public_pem
-                                                    else None)
+    try:
+        private = serialization.load_pem_private_key(private_pem, password=None) if private_pem else None
+        public = private.public_key() if private else (serialization.load_pem_public_key(public_pem) if public_pem
+                                                        else None)
+    except (ValueError, TypeError, UnsupportedAlgorithm) as exc:  # PEM inválido, cifrado ou de tipo desconhecido
+        raise KeyConfigError(f"{kid}: PEM ilegível ({type(exc).__name__})") from exc
     if public is None:
         raise KeyConfigError(f"{kid}: {alg} precisa de private_key ou public_key")
     want = ed25519.Ed25519PublicKey if alg == "EdDSA" else rsa.RSAPublicKey
@@ -90,13 +118,13 @@ def _parse(entry: dict) -> Key:
         raise KeyConfigError(f"{kid}: a chave não é do tipo de {alg}")  # impede confusão de algoritmo
     if alg == "RS256" and public.key_size < MIN_RSA_BITS:
         raise KeyConfigError(f"{kid}: RSA com {public.key_size} bits (mínimo {MIN_RSA_BITS})")
-    return Key(kid, alg, private=private, public=public)
+    return _accepted(Key(kid, alg, private=private, public=public))
 
 
 @lru_cache(maxsize=8)
 def _load(raw: str, active: str, secret: str) -> tuple[dict[str, Key], str]:
     if not raw.strip():
-        keys = {DEFAULT_KID: Key(DEFAULT_KID, "HS256", secret=secret.encode())}
+        keys = {DEFAULT_KID: _accepted(Key(DEFAULT_KID, "HS256", secret=secret.encode()))}
     else:
         try:
             entries = json.loads(raw)
@@ -131,35 +159,10 @@ def lookup(kid: str | None) -> Key | None:
     return keys.get(kid or DEFAULT_KID)
 
 
-def sign(key: Key, data: bytes) -> bytes:
-    if key.alg == "HS256":
-        return hmac.new(key.secret, data, hashlib.sha256).digest()
-    if key.alg == "EdDSA":
-        return key.private.sign(data)
-    return key.private.sign(data, padding.PKCS1v15(), hashes.SHA256())
-
-
-def verify(key: Key, data: bytes, signature: bytes) -> bool:
-    if key.alg == "HS256":
-        return key.secret is not None and hmac.compare_digest(sign(key, data), signature)
-    try:
-        if key.alg == "EdDSA":
-            key.public.verify(signature, data)
-        else:
-            key.public.verify(signature, data, padding.PKCS1v15(), hashes.SHA256())
-    except InvalidSignature:
-        return False
-    return True
-
-
 def _jwk(key: Key) -> dict:
-    base = {"kid": key.kid, "alg": key.alg, "use": "sig"}
-    if key.alg == "EdDSA":
-        raw = key.public.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-        return {**base, "kty": "OKP", "crv": "Ed25519", "x": _b64e(raw)}
-    numbers = key.public.public_numbers()
-    size = lambda n: n.to_bytes((n.bit_length() + 7) // 8, "big")  # noqa: E731
-    return {**base, "kty": "RSA", "n": _b64e(size(numbers.n)), "e": _b64e(size(numbers.e))}
+    jwk = (OKPAlgorithm if key.alg == "EdDSA" else RSAAlgorithm).to_jwk(key.public, as_dict=True)
+    jwk.pop("key_ops", None)  # a RFC 7517 §4.3 pede "use" OU "key_ops"; "use": "sig" é o que os validadores leem
+    return {**jwk, "kid": key.kid, "alg": key.alg, "use": "sig"}
 
 
 def jwks() -> dict:

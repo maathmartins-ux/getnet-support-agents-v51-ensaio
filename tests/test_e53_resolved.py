@@ -48,6 +48,38 @@ def test_invalid_fact_regex_fails_at_load(tmp_path, monkeypatch):
         run_evals.load_cases()
 
 
+def test_case_whose_every_fact_echoes_the_question_fails_at_load(tmp_path, monkeypatch):
+    """Rodada 10: o official-10 passava só repetindo a pergunta (fatos "whats ?app" e "payment link", os dois na
+    própria mensagem). Fato que só ecoa a pergunta não mede a resposta: a carga recusa, com o casamento de cada
+    checagem (regex sem caixa em expect.facts; valor/regex de memória em expects_fact)."""
+    path = tmp_path / "cases.jsonl"
+    monkeypatch.setattr(run_evals, "CASES", path)
+    q = "Can I sell through WhatsApp using the Payment Link?"
+    echo = {"id": "official-10", "split": "official", "message": q,
+            "expect": {"intent": "knowledge", "facts": ["whats ?app", "link de pagamento|payment link"]}}
+    memory = {"id": "q-mem-06", "split": "memory", "message": "E pelo WhatsApp funciona?", "before": ["O que é?"],
+              "expect": {"intent": "knowledge", "expects_fact": ["whats ?app"]}}
+    number = {"id": "m-07", "split": "memory", "message": "E a de R$ 129,90 parcela em quantas vezes?",
+              "expect": {"intent": "knowledge", "expects_fact": ["129,90"]}}  # valor por número: 129,90 = 129.9
+    for case, field in ((echo, "expect.facts"), (memory, "expect.expects_fact"), (number, "expect.expects_fact")):
+        path.write_text(json.dumps(case, ensure_ascii=False) + "\n", encoding="utf-8")
+        with pytest.raises(ValueError, match=f"caso {case['id']}: todo fato já está na pergunta \\({field}\\); eco não "
+                                             "mede a resposta"):
+            run_evals.load_cases()
+    # basta um fato que só a resposta certa traz (o trecho da fonte), e o caso carrega; memória com o valor do turno
+    # anterior, não o da pergunta, também
+    echo["expect"]["facts"].append("redes? sociais|social (media|networks?)|remote (charges?|billing)")
+    memory["expect"]["expects_fact"] = ["link de pagamento|payment link"]
+    path.write_text("\n".join(json.dumps(c, ensure_ascii=False) for c in (echo, memory)) + "\n", encoding="utf-8")
+    assert [c["id"] for c in run_evals.load_cases()] == ["official-10", "q-mem-06"]
+
+
+def test_kit_fixture_cases_load_under_the_echo_guard():
+    """A fixture do kit carrega com a guarda (os casos do domínio são conferidos pela própria carga no eval do CI)."""
+    for path in (run_evals.CASES, run_evals.HERE.parent / "tests" / "fixtures" / "dependent_cases.jsonl"):
+        assert all(run_evals.echo_facts(c) is None for c in run_evals.load_cases((path,)))
+
+
 def _cases_with_facts(tmp_path, monkeypatch, facts_01):
     cases = [json.loads(line) for line in run_evals.CASES.read_text(encoding="utf-8").splitlines() if line.strip()]
     for c in cases:
@@ -70,7 +102,9 @@ def test_report_has_resolved_per_split_and_case_and_markdown_leads_with_it(tmp_p
     row = next(r for r in rep["rows"] if r["id"] == "official-01")
     assert row["facts_missing"] == []
     md = run_evals.to_markdown(rep)
-    assert md.startswith("**Resolvidas**") and "official **100.0%**" in md
+    # 1ª linha: como ler (gerada, sem número); a 1ª linha de dado é a manchete das resolvidas
+    head, data = md.split("\n\n", 1)
+    assert head.startswith("**Como ler:**") and data.startswith("**Resolvidas**") and "official **100.0%**" in md
 
 
 def test_offline_gate_blocks_when_resolved_below_target(tmp_path, monkeypatch):
@@ -125,3 +159,11 @@ def test_scorecard_recounts_resolved_from_rows_of_an_old_report(tmp_path):
     assert got["official_resolved"] == pytest.approx(0.6667, abs=1e-4) and got["official_resolved_k"] == 0.5
     _write(tmp_path / "live_official.json", {"status": "complete", "rows": rows[3:]})
     assert scorecard.measure(tmp_path)["official_resolved"] is None  # sem medida: aparece como buraco
+
+
+def test_every_blind_heldout_lot_stays_out_of_the_intent_gate():
+    """Lote cego novo (heldout_h3) não entra no gate de intenção, como o heldout: o nome é por prefixo."""
+    from evals.run_evals import ungated
+
+    assert ungated("heldout") and ungated("heldout_h3") and ungated("real") and ungated("hard")
+    assert not ungated("official") and not ungated("hitl")

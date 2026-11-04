@@ -629,23 +629,29 @@ class CrossScorer(Protocol):
 class FastEmbedCrossEncoder:
     """Cross-encoder local (fastembed TextCrossEncoder, ONNX/CPU): lê pergunta e trecho JUNTOS, sem LLM nem custo.
 
-    Score por par (pergunta, trecho) memorizado (`Memo`): só os pares novos vão ao modelo, num lote só."""
+    Score por par (pergunta, trecho) memorizado (`Memo`): só os pares novos vão ao modelo, um par por chamada (a nota
+    de um par não depende dos outros trechos da busca)."""
 
     def __init__(self, model: str | None = None) -> None:
         from fastembed.rerank.cross_encoder import TextCrossEncoder
 
         self.name = model or rerank_model()
         self._model = TextCrossEncoder(self.name, **onnx_options())
-        self.memo = Memo("x", self.name)
+        # "xp": nota do par sozinho. O memo "x" (em disco com RAG_QUERY_CACHE=disk) guardava notas de lote, que mudam
+        # com os vizinhos; misturar as duas deixaria o portão do eval dependendo do que cada máquina já tinha em cache.
+        self.memo = Memo("xp", self.name)
 
     def score(self, query: str, texts: list[str]) -> list[float]:
         keys = [Memo.key(query, t) for t in texts]
         got = [self.memo.get(k) for k in keys]
-        missing = [i for i, v in enumerate(got) if v is None]
-        if missing:
-            fresh = [float(x) for x in self._model.rerank(query, [texts[i] for i in missing])]
-            for i, v in zip(missing, fresh, strict=True):
-                got[i] = v
+        for i, v in enumerate(got):
+            if v is None:
+                # Um par por chamada ao modelo. O int8 quantiza a ativação na hora, com a escala do lote inteiro
+                # (DynamicQuantizeLinear): em lote, a nota de um par mudava com os outros trechos (medido no corpus do
+                # ensaio: até 0,51 entre o lote de 10 e o de 5; a ordem no lote não muda nada) e o Memo guardava a de
+                # quem chegou primeiro. Sozinho, o par tem sempre a mesma nota e sai mais barato, sem preenchimento
+                # até o trecho mais longo do lote (medido: 10 trechos em 912 ms par a par × 1258 ms em lote).
+                got[i] = v = float(next(iter(self._model.rerank(query, [texts[i]]))))
                 self.memo.put(keys[i], v)
         return [float(v) for v in got]
 
@@ -656,6 +662,7 @@ CROSS_CHARS = 1500  # padrão: o cross-encoder trunca em ~512 tokens; o corte s�
 class CrossRerankRetriever:
     """Reordena o top-`pool` do base pelo score do cross-encoder. Mantém bm25/cosseno do base (portão de cobertura).
 
+    Na ordem "base" não reordena: pontua só os k trechos que devolve (a nota vai para o portão sem fonte).
     `last_latency_s`: tempo do rerank da última busca (o eval reporta p50/p95 por pergunta em CPU).
     """
 
@@ -673,19 +680,25 @@ class CrossRerankRetriever:
         cands = self.base.search(query, k=max(k, self.pool))
         if len(cands) <= 1:
             return cands[:k]
+        keep_base = (self.order or rerank_order()) == "base"  # a nota vai no trecho (portão), a ordem é a do base
+        # Na ordem do base, a saída são os k que o base escolheu (diversify só lê a URL, não a nota) e o portão só lê
+        # a nota deles (agents.covered_hits): pontuar o pool inteiro custava o dobro de pares (pool 10, top 5 do faq)
+        # para notas que ninguém lia. Medido no corpus do ensaio (int8, CPU, 8 consultas): o cross-encoder levava
+        # 1258 ms por consulta com o pool de 10 num lote; com os 5 devolvidos, um par por chamada, 418 ms.
+        scored = diversify(cands, k) if keep_base else cands
         t0 = time.perf_counter()
         try:
-            scores = self.scorer.score(query, [f"{h.doc.head}. {h.doc.text}"[:self.chars] for h in cands])
-            if len(scores) != len(cands):
-                raise ValueError(f"{len(scores)} scores para {len(cands)} trechos")
+            scores = self.scorer.score(query, [f"{h.doc.head}. {h.doc.text}"[:self.chars] for h in scored])
+            if len(scores) != len(scored):
+                raise ValueError(f"{len(scores)} scores para {len(scored)} trechos")
         except Exception as exc:  # modelo quebrado em produção: a ordem do base ainda responde
             METRICS.inc("rerank_fallback_total")
             log.warning("rerank_fallback", extra={"extra_fields": {"reason": _reason(exc)}})
             return cands[:k]
         finally:
             self.last_latency_s = time.perf_counter() - t0
-        if (self.order or rerank_order()) == "base":  # a nota vai no trecho (portão), a ordem é a do base
-            return diversify([replace(h, rerank=float(sc)) for h, sc in zip(cands, scores, strict=True)], k)
+        if keep_base:
+            return [replace(h, rerank=float(sc)) for h, sc in zip(scored, scores, strict=True)]
         order = sorted(range(len(cands)), key=lambda i: (-scores[i], i))  # empate: ordem do base
         return diversify([replace(cands[i], rerank=float(scores[i])) for i in order], k)
 

@@ -496,6 +496,103 @@
      }
     }
    ]
+  },
+  {
+   "id": 14,
+   "type": "timeseries",
+   "title": "Latência p95 por etapa (ms)",
+   "description": "Do histograma (span_latency_ms_bucket): os baldes `le` somam entre as réplicas antes do quantil (média de p95 por réplica não é p95). O span `turn` é o turno respondido inteiro.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 35,
+    "w": 12,
+    "h": 7
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "histogram_quantile(0.95, sum by (span, le) (rate(span_latency_ms_bucket[5m])))",
+     "legendFormat": "{{span}}",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     }
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "type": "timeseries",
+   "title": "Turno respondido: p50 e p95 (ms) × SLO",
+   "description": "Sem os bloqueios do guardrail (levam ms e esconderiam o turno lento). Linhas: SLO por turno do kit (SLO_P50_S e SLO_P95_S de evals/trace_stats.py); o alerta LatenciaP95DoTurno usa o do p95.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 35,
+    "w": 12,
+    "h": 7
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms",
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line"
+      }
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "orange",
+        "value": 20000
+       },
+       {
+        "color": "red",
+        "value": 45000
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "histogram_quantile(0.5, sum by (le) (rate(span_latency_ms_bucket{span=\"turn\"}[5m])))",
+     "legendFormat": "p50",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     }
+    },
+    {
+     "refId": "B",
+     "expr": "histogram_quantile(0.95, sum by (le) (rate(span_latency_ms_bucket{span=\"turn\"}[5m])))",
+     "legendFormat": "p95",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     }
+    }
+   ]
   }
  ]
 }

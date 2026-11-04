@@ -108,9 +108,9 @@ def test_e5_gets_role_prefixes(monkeypatch):
 def test_cross_rerank_reorders_the_pool_and_keeps_base_scores():
     base = rag.BM25Retriever(get_index())
     q = "Que horas o atendimento funciona?"
-    hits = CrossRerankRetriever(base, KeywordScorer(), pool=20).search(q, k=3)
+    hits = CrossRerankRetriever(base, KeywordScorer(), pool=20, order="cross").search(q, k=3)
     assert hits[0].doc.id == "faq-horario" and hits[0].bm25 > 0
-    assert CrossRerankRetriever(base, KeywordScorer()).name == "bm25+cross"
+    assert CrossRerankRetriever(base, KeywordScorer(), order="cross").name == "bm25+cross"
 
 
 def test_cross_rerank_falls_back_to_base_order_on_error():

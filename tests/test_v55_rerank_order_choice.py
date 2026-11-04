@@ -43,6 +43,10 @@ def test_cross_reranker_order_is_fixed_per_instance_and_ignores_the_environment(
     assert [h.doc.id for h in out] == ["d-0", "d-1", "d-2"] and [h.rerank for h in out] == scores
     monkeypatch.delenv("RERANK_ORDER")
     runtime = rag.CrossRerankRetriever(_Base(_hits()), _Scorer(scores), pool=3)  # app: vale a escolha/ambiente
+    # sem escolha nem ambiente: o padrão do kit (KIT_RETRIEVER, ordem do base desde a rodada 10)
+    assert runtime.search("q", k=3)[0].doc.id == "d-0" and runtime.name == "dense+cross:base"
+    monkeypatch.setenv("RERANK_ORDER", "cross")
+    runtime = rag.CrossRerankRetriever(_Base(_hits()), _Scorer(scores), pool=3)
     assert runtime.search("q", k=3)[0].doc.id == "d-1" and runtime.name == "dense+cross"
     assert base.name == "dense+cross:base" and cross.name == "dense+cross"  # o nome diz a ordem em uso
 
@@ -145,6 +149,70 @@ def test_readme_block_tolerates_a_choice_without_budget_and_shows_the_gate(tmp_p
     assert "dense+cross:base **← escolhida** | 0.915 | 0.898 | 0.842" in block and "98% / 86% (nota do cross)" in block
     assert "Recall@5 (o redator lê)" in block
     assert "`:base` = a ordem fica a do buscador base" in block
+
+
+# --- frase do buscador gerada (bloco `retriever` do README) ----------------------------------------------------------
+# Rodada 10: o README dizia "denso + cross-encoder sobre o top-10" à mão e a escolha gravada era dense+cross:base
+# (ordem do denso; a nota só no portão). Números abaixo: os do data/retriever.json do ensaio.
+_RECORDED = {
+    "_doc": "gerado por `python -m evals.run_evals --choose-retriever --apply`; não edite à mão",
+    "chosen_at": "2026-11-03T22:49:55+00:00", "git_sha": "c3aaa79", "gold": "retrieval.jsonl",
+    "criterion": "maior Recall@5", "chosen": "dense+cross:base",
+    "choice": {"retriever": "dense", "embed_model": "intfloat/multilingual-e5-large", "rerank": "cross",
+               "rerank_model": "BAAI/bge-reranker-v2-m3-int8", "rerank_pool": 10, "rerank_chars": 600,
+               "rerank_order": "base", "gate": {"min_score": 5.976, "min_cosine": 0.838, "min_rerank": -5.5017}},
+    "measured": {
+        "dense": {"recall@5": 0.915, "latency_ms": {"p50": 265.5}, "memory_mb": 1540.6,
+                  "gate": {"pos_answered": 0.898, "neg_refused": 0.864, "positives": 59, "negatives": 22}},
+        "dense+cross": {"recall@5": 0.907, "latency_ms": {"p50": 1016.2}, "memory_mb": 2381.8,
+                        "rerank_gate": {**NOTE, "pos_answered": 0.983, "neg_refused": 0.864}},
+        "dense+cross:base": {"recall@5": 0.915, "latency_ms": {"p50": 953.5}, "memory_mb": 2381.8,
+                             "rerank_gate": {**NOTE, "pos_answered": 0.983, "neg_refused": 0.864, "positives": 59,
+                                             "negatives": 22}}}}
+
+
+def test_retriever_sentence_says_what_the_recorded_choice_does(tmp_path):
+    from scripts.fill_readme import retriever_block
+
+    (tmp_path / "retriever.json").write_text(json.dumps(_RECORDED), encoding="utf-8")
+    text = retriever_block(tmp_path, data=tmp_path)
+    assert text.startswith("- **Retrieval** (`src/app/rag.py`; frase gerada de `data/retriever.json`")
+    assert "`dense+cross:base`: denso `multilingual-e5-large` + cross-encoder `bge-reranker-v2-m3-int8` (top-10" in text
+    assert "ordem do denso; nota do cross só no portão sem fonte (nota >= -5.5017)" in text
+    assert "responde 98% das perguntas com fonte e recusa 86% das sem fonte (59 × 22)" in text
+    assert "sem o cross, o do denso responde 90% e recusa 86%" in text  # o ganho do portão, ao lado
+    assert "Custo a mais por busca: +688 ms no p50 (954 × 266 ms) e +841 MB de RAM." in text
+    assert "Reordenar pela nota foi medido e não ganhou: Recall@5 0.907 reordenando × 0.915 na ordem do denso" in text
+    assert "commit `c3aaa79`" in text and "vale sobre o `KIT_RETRIEVER`" in text
+
+
+def test_retriever_sentence_without_a_recorded_choice_is_the_kit_default_and_a_reordering_choice_says_so(tmp_path):
+    from app.config import KIT_RETRIEVER
+    from scripts.fill_readme import retriever_block
+
+    text = retriever_block(tmp_path, data=tmp_path)  # sem data/retriever.json: o KIT_RETRIEVER
+    assert "frase gerada de `KIT_RETRIEVER`" in text and "Portão medido" not in text and "Custo a mais" not in text
+    assert ("ordem do denso; nota do cross só no portão sem fonte" in text) == (KIT_RETRIEVER["rerank_order"] == "base")
+    reorders = {**_RECORDED, "chosen": "dense+cross", "choice": {**_RECORDED["choice"], "rerank_order": None}}
+    (tmp_path / "retriever.json").write_text(json.dumps(reorders), encoding="utf-8")
+    text = retriever_block(tmp_path, data=tmp_path)  # escolha sem rerank_order: o app reordena (config.rerank_order)
+    assert "o cross reordena o top do denso, e a nota decide o portão sem fonte (nota >= -5.5017)" in text
+    assert "Reordenar pela nota foi medido e não ganhou: Recall@5 0.907 reordenando × 0.915" in text
+    plain = {**_RECORDED, "chosen": "dense", "choice": {"retriever": "dense", "embed_model": "m/e5"}}
+    (tmp_path / "retriever.json").write_text(json.dumps(plain), encoding="utf-8")
+    text = retriever_block(tmp_path, data=tmp_path)
+    assert "`dense`: denso `e5`, sem rerank; o portão sem fonte é o BM25/cosseno." in text
+    assert "Custo a mais" not in text
+
+
+def test_check_flags_a_hand_written_retriever_sentence(tmp_path):
+    from scripts import fill_readme
+
+    hand = "<!-- retriever:begin -->\n- **Retrieval**: denso + cross-encoder sobre o top-10\n<!-- retriever:end -->"
+    problems = fill_readme._check_blocks(hand, tmp_path)
+    assert problems and "bloco retriever diferente" in problems[0]
+    generated = fill_readme.replace_block(hand, "retriever", fill_readme.retriever_block(tmp_path))
+    assert fill_readme._check_blocks(generated, tmp_path) == []  # o texto gerado passa; à mão, reprova
 
 
 def _choice_dir(tmp_path, monkeypatch, choice: dict):

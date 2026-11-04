@@ -3,6 +3,7 @@ conferido contra a própria evidência (declaradas, deterministas), sem contradi
 assunto, valor do mesmo tipo ao lado), fora das métricas ao vivo e do judge.json da manchete, misturadas na página sem
 marca (id cego, escolha e ordem pelo sal da página), importadas de volta pelo mesmo sal e contadas no relatório humano
 com a mesma regra de validação — que não valida o total sem negativos reais que o juiz reprove."""
+import csv
 import hashlib
 import json
 import os
@@ -710,6 +711,9 @@ def test_second_page_never_repeats_a_planted_answer_the_same_person_already_labe
 
 
 def test_label_of_an_answer_that_changed_since_is_left_out(tmp_path, monkeypatch):
+    """perturbed.json regerado depois da rotulagem. Com a página congelada (R11), o rótulo continua valendo sobre o
+    texto que a pessoa viu e nunca encontra o veredito do texto novo; sem ela (página de antes do congelamento), fica
+    fora da conta, listado, como sempre."""
     res = _results(tmp_path)
     monkeypatch.setattr(label, "RESULTS", res)
     _label_page(tmp_path, res)
@@ -718,6 +722,16 @@ def test_label_of_an_answer_that_changed_since_is_left_out(tmp_path, monkeypatch
         label.csv_path("Ana", tmp_path))})
     victim["answer"] += " Texto novo."  # perturbed.json regerado depois da rotulagem
     (res / perturb.FILE).write_text(json.dumps(data), encoding="utf-8")
+    jj = Judge(r["answer"] for r in ROWS)
+    judge.judge_into(jj, res / "live_official.json", out=res / "judge.json")
+    judge.judge_perturbed(jj, res)  # o juiz julga a versão nova (o texto novo do victim)
+    rep = label.report(results=res, out=tmp_path / "h.json", base=tmp_path)
+    assert rep["adulteradas"]["fora_da_conta"] == [] and rep["adulteradas"]["rotuladas"] == 3
+    jx = rep["juiz_x_humano"]
+    assert jx["adulteradas"]["casos"] == 2  # o victim não tem veredito do SEU texto: fora do juiz × humano
+    assert "1 rótulo(s) sem veredito do juiz sobre o texto rotulado" in rep["aviso_juiz"]
+    for page in label.VALIDATION_DIR.glob("*.json"):
+        page.unlink()
     rep = label.report(results=res, out=tmp_path / "h.json", base=tmp_path)
     assert rep["adulteradas"]["fora_da_conta"] == [victim["id"]] and rep["adulteradas"]["rotuladas"] == 2
 
@@ -897,10 +911,12 @@ def test_page_records_why_each_real_answer_was_chosen_outside_the_html_and_the_i
     assert {r["id"]: r["selecao"] for r in label.read_labels(label.csv_path("Bia", tmp_path))} == reasons
     assert label.export(4, results=res, path=tmp_path / "human_labels.carla.csv") == 4
     assert {r["selecao"] for r in label.read_labels(tmp_path / "human_labels.carla.csv")} == {"aleatoria"}
-    spare = next(r["id"] for r in ROWS if r["id"] not in marks)  # rotulado antes do registro, fora da página
+    spare = next(r for r in ROWS if r["id"] not in marks)  # rotulado antes do registro, fora da página
     with (tmp_path / "human_labels.dani.csv").open("w", encoding="utf-8", newline="") as fh:
-        fh.write("id,split,pergunta,resposta,fontes,ferramentas,humano,nota,tipo_falha,c1,c2,c3\n")
-        fh.write(f"{spare},official,q,a,,,fail,,,,,\n")
+        w = csv.writer(fh)  # o texto de hoje da resposta: rótulo de outro texto nem entraria na conta (R11)
+        w.writerow(["id", "split", "pergunta", "resposta", "fontes", "ferramentas", "humano", "nota", "tipo_falha",
+                    "c1", "c2", "c3"])
+        w.writerow([spare["id"], "official", spare["message"], spare["answer"], "", "", "fail", "", "", "", "", ""])
     jx = label.report(results=res, out=tmp_path / "h.json", base=tmp_path)["juiz_x_humano"]
     kept = [i for i, why in reasons.items() if why != "juiz"]
     assert (jx["casos"], jx["negatives"]) == (len(kept), sum(i in fail for i in kept))  # só o que independe do juiz

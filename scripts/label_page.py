@@ -19,7 +19,10 @@ antes delas. Por que cada resposta real entrou (sorteio, checagem, juiz) vai par
 amostra da página, nunca para o HTML; a importação passa o motivo ao CSV de cada pessoa, e só o que não dependeu do
 juiz valida o juiz (evals.judge.SELECTION_RULE): para a página 2 valer como validação, `--n` maior que `--suspects`
 (parte sorteada) ou suspeitas da checagem. A saída diz quantas por motivo e avisa quando nenhuma independe do juiz.
-A sessão publica
+A página congela, antes de alguém rotular, evals/validation/<amostra>.json (evals.label.freeze_page): o texto de cada
+item, o veredito do juiz naquele momento, a bateria (git_sha) e o motivo da escolha; o `--report` compara juiz e
+pessoas sobre esse conjunto, que continua valendo depois de bateria nova (evals.label.FROZEN_RULE). Vai para o git
+com os rótulos e nunca para o HTML (traz o veredito do juiz e quais são adulteradas). A sessão publica
 com `capabilities: {db: {rules: RULES}, user: {}, sample: {}}` (regras abaixo: cada pessoa grava e lê só a própria
 ficha, o dono lê todas; sample = botão "Traduzir" em conversa em inglês),
 cada pessoa faz os 2 exemplos de treino (gabarito na tela, fora da conta) e marca as situações no celular; a sessão
@@ -213,8 +216,12 @@ def mix_perturbed(picked: list[dict], pool: list[dict], k: int, salt: str, seed:
 
 
 def sample_id(rows: list[dict]) -> str:
-    """A `sample` da página (o que ela grava em cada ficha): impressão digital dos ids, na ordem em que aparecem."""
-    return hashlib.sha256(json.dumps([r["id"] for r in rows]).encode()).hexdigest()[:12]
+    """A `sample` da página (o que ela grava em cada ficha e o nome do conjunto congelado): impressão digital dos ids
+    e dos textos, na ordem em que aparecem. Só com os ids, a mesma amostra sorteada numa bateria nova (outros textos)
+    sobrescrevia o conjunto congelado da página de antes, e os rótulos dela perdiam o texto que as pessoas leram."""
+    from evals.judge import text_sha
+
+    return hashlib.sha256(json.dumps([[r["id"], text_sha(r.get("answer"))] for r in rows]).encode()).hexdigest()[:12]
 
 
 def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] | None = None,
@@ -271,6 +278,9 @@ def build(n: int, seed: int = 7, results: Path | None = None, splits: set[str] |
                     "lang": question_lang(r), "answer_lang": answer_lang(r)})
     if out:
         label.record_selection(sample_id(out), reasons)
+        # o texto de cada item, o veredito do juiz sobre ele e a bateria, antes de alguém rotular: a validação juiz ×
+        # pessoas sai daqui e não envelhece com bateria nova (evals.label.FROZEN_RULE)
+        label.freeze_page(sample_id(out), picked, reasons, results)
     return out, reasons
 
 
@@ -334,15 +344,17 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("sem linhas do held-out em evals/results/live_heldout.json: rode o held-out ao vivo antes")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(rows, raters), encoding="utf-8")
+    from evals import label
+
     info = {"out": str(args.out), "items": len(rows), "raters": raters,
             "capabilities": {"db": {"rules": RULES}, "user": {}, "sample": {}},
+            # o conjunto congelado vai para o git junto dos rótulos (o HTML não o traz)
+            "congelado": str(label.VALIDATION_DIR / f"{sample_id(rows)}.json") if rows else None,
             # quantas reais por motivo da escolha (nunca quais: quem roda o script pode ser quem rotula)
             "selecao": {why: list(reasons.values()).count(why) for why in sorted(set(reasons.values()))}}
     if args.perturb:
         info["adulteradas"] = _perturbed_counts(rows)
     print(json.dumps(info, ensure_ascii=False))
-    from evals import label
-
     if args.suspects and not {label.SELECTED_RANDOM, label.SELECTED_CHECK} & set(reasons.values()):
         print("AVISO: nenhuma resposta real desta página entrou sem depender do juiz (sorteio ou checagem automática): "
               "os rótulos dela não validam o juiz, só servem de diagnóstico (evals.judge.SELECTION_RULE). Use --n "

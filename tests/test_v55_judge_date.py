@@ -15,16 +15,23 @@ def test_judge_date_uses_the_row_then_the_report_then_the_business_clock(monkeyp
     assert judge.judge_date() == clock.today().isoformat()
 
 
-def test_rejudge_plan_takes_failed_and_dated_answers_only():
+def test_rejudge_plan_takes_dated_answers_only_passed_or_failed():
+    """R11: só pela data, nunca pelo veredito. A regra antiga rejulgava também os reprovados sem data (c3): nova chance
+    só para quem perdeu. O já julgado com o dia do negócio (c5) também fica: seria só um novo sorteio."""
     rows = {("live_a.json", "c1", 0): {"answer": "Seu depósito cai amanhã, 05/11."},
             ("live_a.json", "c2", 0): {"answer": "A taxa do débito é 1,89%."},
-            ("live_a.json", "c3", 0): {"answer": "A taxa do crédito é 3,19%."}}
-    report = {"verdicts": [
-        {"source": "live_a.json", "id": "c1", "run": 0, "grounded": True, "helpful": True, "language_ok": True},
-        {"source": "live_a.json", "id": "c2", "run": 0, "grounded": True, "helpful": True, "language_ok": True},
-        {"source": "live_a.json", "id": "c3", "run": 0, "grounded": False, "helpful": True, "language_ok": True}]}
+            ("live_a.json", "c3", 0): {"answer": "A taxa do crédito é 3,19%."},
+            ("live_a.json", "c4", 0): {"answer": "A venda de 02/11 foi recusada."},
+            ("live_a.json", "c5", 0): {"answer": "Hoje o depósito já caiu.", "business_date": "2026-11-03"}}
+    ok = {"grounded": True, "helpful": True, "language_ok": True}
+    report = {"verdicts": [{"source": "live_a.json", "id": "c1", "run": 0, **ok},
+                           {"source": "live_a.json", "id": "c2", "run": 0, **ok},
+                           {"source": "live_a.json", "id": "c3", "run": 0, **ok, "grounded": False},
+                           {"source": "live_a.json", "id": "c4", "run": 0, **ok, "helpful": False},
+                           {"source": "live_a.json", "id": "c5", "run": 0, **ok, "judge_date": "2026-11-03"}]}
     keep, again = judge.rejudge_plan(report, rows)
-    assert [v["id"] for v in keep] == ["c2"] and sorted(v["id"] for v in again) == ["c1", "c3"]
+    assert [v["id"] for v in keep] == ["c2", "c3", "c5"] and [v["id"] for v in again] == ["c1", "c4"]
+    assert [v["rejudge_reason"] for v in again] == ["data_relativa", "data_explicita"]
 
 
 def test_live_rows_record_the_business_date(monkeypatch):

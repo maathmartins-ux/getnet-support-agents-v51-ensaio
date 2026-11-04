@@ -7,6 +7,12 @@ split, com contagem, os casos afetados e 1 exemplo (pergunta, resposta curta, n�
 "olhar os traces antes de medir": cada modo vira uma correção ou uma checagem binária própria.
 Exemplo de saída: numbers (clima/câmbio e soma do LLM), language (termo pt numa pergunta en) e handoff (resposta
 direta onde se esperava humano) explicavam todas as falhas do official; cada uma foi corrigida ou declarada.
+
+Gerado, nunca à mão: scripts/live_eval.sh e scripts/final.sh rodam este módulo e o `fill_readme.py --check` reprova o
+arquivo que diferir de `generate()` (rodada 10: o FAILURE_MODES dizia "42 falhas em 281 execuções", de outra bateria,
+com os resultados commitados dando 5 em 315). Ficam fora: os splits `heldout*` (conjunto cego: ler as falhas dele
+para corrigir o motor o contamina, mesma regra de evals/error_analysis.py) e os arquivos laterais
+`live_<split>.degraded.json`/`.aborted_*.json` (não são medida).
 """
 
 from __future__ import annotations
@@ -22,6 +28,12 @@ ROOT = HERE.parent
 RESULTS = HERE / "results"
 ORDER = ("intent", "handoff", "handoff_outcome", "tools", "numbers", "claims", "language", "blocked", "no_leak",
          "replanned")
+BLIND_PREFIX = "heldout"  # heldout, heldout_h3, ...: todo split cego fica fora da análise de erros
+
+
+def is_blind(split: str | None) -> bool:
+    """Split cego (held-out): a medida final, que ninguém lê para ajustar o motor."""
+    return str(split or "").startswith(BLIND_PREFIX)
 
 
 def first_failed(checks: dict) -> str | None:
@@ -31,21 +43,41 @@ def first_failed(checks: dict) -> str | None:
     return next((k for k in ORDER if k in bad), bad[0])
 
 
+def live_files(results: Path = RESULTS) -> list[Path]:
+    """Os live_<split>.json da bateria; `.degraded`/`.aborted_*` ficam fora (a mesma regra do placar)."""
+    return [p for p in sorted(results.glob("live_*.json")) if p.name.count(".") == 1]
+
+
+def _rows(results: Path) -> tuple[list[dict], dict[str, int]]:
+    """(linhas fora do held-out, {split cego: execuções deixadas de fora})."""
+    rows: list[dict] = []
+    blind: dict[str, int] = defaultdict(int)
+    for path in live_files(results):
+        for row in json.loads(path.read_text(encoding="utf-8")).get("rows", []):
+            if is_blind(row.get("split")):
+                blind[row["split"]] += 1
+            else:
+                rows.append(row)
+    return rows, dict(sorted(blind.items()))
+
+
 def collect(results: Path = RESULTS) -> dict[str, dict]:
     """{modo: {"casos": {id: n_falhas}, "runs": total, "exemplo": linha, "splits": {split: n}}}"""
+    return _modes(_rows(results)[0])
+
+
+def _modes(rows: list[dict]) -> dict[str, dict]:
     modes: dict[str, dict] = {}
-    for path in sorted(results.glob("live_*.json")):
-        report = json.loads(path.read_text(encoding="utf-8"))
-        for row in report.get("rows", []):
-            mode = first_failed(row.get("checks") or {})
-            if not mode:
-                continue
-            m = modes.setdefault(
-                mode, {"casos": defaultdict(int), "runs": 0, "exemplo": row, "splits": defaultdict(int)}
-            )
-            m["casos"][row["id"]] += 1
-            m["runs"] += 1
-            m["splits"][row.get("split", "?")] += 1
+    for row in rows:
+        mode = first_failed(row.get("checks") or {})
+        if not mode:
+            continue
+        m = modes.setdefault(
+            mode, {"casos": defaultdict(int), "runs": 0, "exemplo": row, "splits": defaultdict(int)}
+        )
+        m["casos"][row["id"]] += 1
+        m["runs"] += 1
+        m["splits"][row.get("split", "?")] += 1
     return modes
 
 
@@ -58,7 +90,11 @@ def _short(text: str, n: int = 260) -> str:
     return text if len(text) <= n else text[: n - 1] + "…"
 
 
-def render(modes: dict[str, dict], total_rows: int) -> str:
+def _runs(n: int) -> str:
+    return f"{n} execução" if n == 1 else f"{n} execuções"
+
+
+def render(modes: dict[str, dict], total_rows: int, blind: dict[str, int] | None = None) -> str:
     out = [
         "# Modos de falha (eval ao vivo)",
         "",
@@ -67,11 +103,16 @@ def render(modes: dict[str, dict], total_rows: int) -> str:
         "no commit que cita o modo.",
         "",
     ]
+    if blind:  # declarado: quem soma as linhas do RESULTS acha a diferença aqui, não um número que não bate
+        out += ["Fora da conta: " + ", ".join(f"`{s}` ({_runs(n)})" for s, n in blind.items())
+                + ", o conjunto cego: ler as falhas dele para corrigir o motor o contamina. A medida dele fica nos "
+                "blocos ao vivo, do juiz e humano de `docs/RESULTS.md`.", ""]
     if not modes:
-        return "\n".join(out + ["Nenhuma falha nas linhas lidas.", ""])
+        return "\n".join(out + [f"Nenhuma falha em {_runs(total_rows)}: todas as checagens passam.", ""])
     total_fail = sum(m["runs"] for m in modes.values())
     out += [
-        f"{total_fail} falhas em {total_rows} execuções ({total_fail / max(total_rows, 1):.1%}).",
+        f"{total_fail} {'falha' if total_fail == 1 else 'falhas'} em {_runs(total_rows)} "
+        f"({total_fail / max(total_rows, 1):.1%}).",
         "",
         "| modo | falhas | casos distintos | splits |",
         "|---|---:|---:|---|",
@@ -97,22 +138,31 @@ def render(modes: dict[str, dict], total_rows: int) -> str:
     return "\n".join(out) + "\n"
 
 
+def generate(results: Path = RESULTS) -> str | None:
+    """O texto de docs/FAILURE_MODES.md para estes resultados; None sem live_*.json (nada a analisar). É o que o
+    `fill_readme.py --check` compara com o arquivo commitado."""
+    if not live_files(results):
+        return None
+    rows, blind = _rows(results)
+    return render(_modes(rows), len(rows), blind)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=ROOT / "docs" / "FAILURE_MODES.md")
     ap.add_argument("--results", type=Path, default=RESULTS)
     args = ap.parse_args(argv)
-    files = sorted(args.results.glob("live_*.json"))
-    if not files:
+    text = generate(args.results)
+    if text is None:
         print(f"Sem {args.results}/live_*.json: rode o eval ao vivo antes (scripts/live_eval.sh).", file=sys.stderr)
         return 1
-    total = sum(len(json.loads(p.read_text(encoding="utf-8")).get("rows", [])) for p in files)
-    text = render(collect(args.results), total)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(text, encoding="utf-8")
+    rows, blind = _rows(args.results)
     print(
         f"{args.out.relative_to(ROOT) if args.out.is_relative_to(ROOT) else args.out}: "
-        f"{sum(m['runs'] for m in collect(args.results).values())} falhas em {total} execuções"
+        f"{sum(m['runs'] for m in _modes(rows).values())} falhas em {len(rows)} execuções"
+        + (f" (fora: {', '.join(blind)})" if blind else "")
     )
     return 0
 

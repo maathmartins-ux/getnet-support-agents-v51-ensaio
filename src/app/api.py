@@ -7,11 +7,13 @@ Cliente: POST /chat · GET /conversations/{id} · POST /actions/{id}/confirm · 
 Operador (X-Operator-Token = chave pessoal ou token compartilhado "admin"):
   GET /operator (console) · GET /handoffs · POST /handoffs/{id}/reply (retoma a conversa na hora)
   POST /actions/{id}/approve | /reject (ação de risco alto) · POST /handoffs/sla-check · GET /analytics
-MCP (JWT obrigatório): /mcp — ferramentas ask, search_knowledge e crm_tool para qualquer cliente MCP.
+MCP (JWT obrigatório; mesma cota do /chat): /mcp — ferramentas ask, search_knowledge e crm_tool para qualquer
+  cliente MCP.
 Telegram (opcional): POST /telegram/webhook — resposta do operador pelo chat volta para a conversa.
 LGPD: DELETE /me/conversations/{id} (titular, pelo token) · POST /admin/retention/purge (operador) · GET /audit
 Infra: GET /health (vivo, com contagem de dados) · GET /ready (pronto: índice, banco gravável, LLM, orçamento; 503
-  com o motivo) · GET /metrics
+  com o motivo) · GET /metrics (Bearer METRICS_TOKEN quando definido)
+Produção (APP_ENV=production): não sobe com segredo fraco, sem OPERATOR_KEYS ou sem METRICS_TOKEN forte.
 """
 from __future__ import annotations
 
@@ -37,6 +39,8 @@ from .config import (
     llm_api_key,
     llm_provider,
     login_rate_per_min,
+    metrics_token,
+    operator_keys,
     operator_token,
     retriever_name,
     token_ttl_min,
@@ -55,17 +59,42 @@ UI_HTML = (Path(__file__).parent / "static" / "ui.html").read_text(encoding="utf
 MCP_APP = mcp_server.http_app()  # uma vez: cria o session manager que o lifespan abre
 
 
+def _weak_token(token: str) -> bool:
+    return token.startswith(("dev-", "troque-")) or len(token) < 16  # valor de exemplo ou curto: adivinhável
+
+
 def insecure_defaults() -> list[str]:
     """Segredo padrão ou curto torna o token forjável. Visível no /health e no log."""
     weak = keys.weak_secrets()  # HS256 do conjunto de chaves do JWT (AUTH_SECRET sem AUTH_KEYS)
-    token = operator_token()
-    weak += ["OPERATOR_TOKEN"] if token.startswith(("dev-", "troque-")) or len(token) < 16 else []
+    weak += ["OPERATOR_TOKEN"] if _weak_token(operator_token()) else []
     # senha de exemplo do compose (Postgres/Grafana) também conta: APP_ENV=production não sobe com ela
     if "change-me" in os.getenv("DATABASE_URL", ""):
         weak.append("POSTGRES_PASSWORD")
     if "change-me" in os.getenv("GF_SECURITY_ADMIN_PASSWORD", ""):
         weak.append("GRAFANA_ADMIN_PASSWORD")
     return weak
+
+
+def production_gaps() -> list[str]:
+    """O que a produção exige além do segredo forte; no dev os dois seguem opcionais (o /health mostra operator_auth).
+
+    OPERATOR_KEYS: sem chave pessoal, o OPERATOR_TOKEN compartilhado vale como "admin" e com ele se aprova escrita de
+    risco alto, purga a retenção e lê a auditoria, gravado sem o nome de uma pessoa. METRICS_TOKEN: sem ele (ou curto),
+    o /metrics responde a qualquer um na porta da API, e o proxy reverso na frente o repassaria.
+    """
+    gaps = [] if operator_keys() else ["OPERATOR_KEYS"]
+    return gaps + (["METRICS_TOKEN"] if _weak_token(metrics_token()) else [])
+
+
+def refuse_insecure_production() -> list[str]:
+    """Portão da subida: com APP_ENV=production, segredo fraco ou borda aberta (production_gaps) é RuntimeError;
+    no dev devolve os segredos fracos para o aviso no log."""
+    bad = insecure_defaults()
+    if os.getenv("APP_ENV") == "production":
+        bad += production_gaps()
+        if bad:
+            raise RuntimeError(f"segredos padrão em produção: {bad}")  # falha alto em vez de subir forjável
+    return bad
 
 
 def sla_check(now: float | None = None) -> list[dict]:
@@ -87,9 +116,7 @@ async def _sla_loop(seconds: int) -> None:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     keys.keyset()  # AUTH_KEYS/AUTH_ACTIVE_KID inválidos: a API não sobe (melhor que 401 em todo request)
-    bad = insecure_defaults()
-    if bad and os.getenv("APP_ENV") == "production":
-        raise RuntimeError(f"segredos padrão em produção: {bad}")  # falha alto em vez de subir forjável
+    bad = refuse_insecure_production()
     if bad:
         log.warning("insecure_defaults", extra={"extra_fields": {"vars": bad}})
     configure_otel()
@@ -472,8 +499,10 @@ def ready() -> JSONResponse:
 
 @app.get("/metrics", response_class=PlainTextResponse)
 def metrics(authorization: str | None = Header(default=None)) -> str:
-    """Prometheus. Com METRICS_TOKEN definido, exige `Authorization: Bearer <METRICS_TOKEN>` (o scrape manda)."""
-    expected = os.getenv("METRICS_TOKEN", "")
+    """Prometheus. Com METRICS_TOKEN definido (obrigatório em produção), exige `Authorization: Bearer <METRICS_TOKEN>`;
+    o Prometheus do overlay endurecido manda o mesmo valor, lido do segredo do compose (ops/prometheus.hardened.yml).
+    Sem token (dev), aberto: só contadores agregados, sem user_id nem segredo."""
+    expected = metrics_token()
     if expected and not hmac.compare_digest((authorization or "").encode(), f"Bearer {expected}".encode()):
         raise HTTPException(status_code=401, detail="metrics: token inválido")
     return METRICS.render()

@@ -57,7 +57,9 @@ def _labels(path, verdicts):
 def test_two_raters_give_inter_human_agreement(tmp_path):
     res = tmp_path / "results"
     res.mkdir()
-    rows = [{"id": f"c{i}", "split": "official", "run": 0, "checks": {"numbers": i % 2 == 0}} for i in range(4)]
+    # o texto que as duas leram é o de hoje ("a"): rótulo de outro texto não entra em conta nenhuma (R11)
+    rows = [{"id": f"c{i}", "split": "official", "run": 0, "message": "q", "answer": "a",
+             "checks": {"numbers": i % 2 == 0}} for i in range(4)]
     _write(res / "live_official.json", {"rows": rows})
     _labels(label.csv_path("ana", tmp_path), {"c0": "pass", "c1": "fail:invented_number 1,2", "c2": "pass",
                                                "c3": "pass"})

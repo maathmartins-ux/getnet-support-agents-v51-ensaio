@@ -144,3 +144,31 @@ def test_classifier_down_keeps_reading_but_holds_writes(monkeypatch):
     assert body["pending_action"] is None and "verificação de segurança" in body["answer"]
     with get_store()._db() as conn:
         assert not conn.execute("SELECT 1 FROM actions WHERE status = 'pending'").fetchall()
+
+
+def test_classifier_unavailable_runs_the_orchestration_without_any_llm_agent(monkeypatch):
+    """Com UNAVAILABLE, o pipeline força o caminho offline em volta de supervisor.run: o texto que o classificador
+    não conferiu não chega a um agente LLM. Com o classificador no ar e seguro, a orquestração roda normal."""
+    from app import llm, pipeline
+    from app.llm import LLMError
+
+    seen = {}
+    real_run = pipeline.supervisor.run
+    monkeypatch.setattr(pipeline.supervisor, "run",
+                        lambda plan, ctx, conf: (seen.__setitem__("offline", llm._FORCE_OFFLINE.get()),
+                                                 real_run(plan, ctx, conf))[1])
+
+    down, _ = fake_llm([LLMError("timeout", "connection")] * 4)
+    monkeypatch.setattr(guardrails, "get_llm", lambda role="agent": down)
+    monkeypatch.setattr(pipeline, "get_llm", lambda role="agent": down)
+    body = TestClient(app).post("/chat", json={"message": "Qual o prazo de entrega?"},
+                                headers={"Authorization": f"Bearer {issue_token('u1')}"}).json()
+    assert body["blocked"] is False and guardrails.UNAVAILABLE in body["guardrails"]
+    assert seen["offline"] is True  # a orquestração correu dentro de force_offline
+
+    safe, _ = classifier("safe")
+    monkeypatch.setattr(guardrails, "get_llm", lambda role="agent": safe)
+    monkeypatch.setattr(pipeline, "get_llm", lambda role="agent": safe)
+    TestClient(app).post("/chat", json={"message": "Qual o prazo de entrega?"},
+                         headers={"Authorization": f"Bearer {issue_token('u1')}"})
+    assert seen["offline"] is False  # classificador no ar e seguro: nada de forçar offline

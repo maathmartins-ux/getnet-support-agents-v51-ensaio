@@ -108,7 +108,7 @@ def _local_secret(name: str) -> str:
     """Segredo aleatório gerado uma vez e guardado ao lado do banco (var/, fora do git, arquivo 0600).
 
     Sem `.env`, não existe segredo conhecido para forjar token: o servidor e a CLI do mesmo diretório leem o mesmo
-    arquivo. O token de operador gerado sai uma vez no log, para o primeiro acesso ao painel.
+    arquivo. O token de operador gerado nunca vai para o log: o log diz onde ele está e quem opera lê o arquivo.
     """
     path = db_path().parent / "local_secrets.json"
     try:
@@ -140,8 +140,15 @@ def operator_token() -> str:
 
 def operator_keys() -> dict[str, str]:
     # "ana:<sha256>,bruno:<sha256>" — só o hash fica na configuração (python -m app.auth operator-key ana).
+    # Vazio = o OPERATOR_TOKEN compartilhado vale como "admin"; APP_ENV=production não sobe assim (api.production_gaps).
     pairs = (p.split(":", 1) for p in os.getenv("OPERATOR_KEYS", "").split(",") if ":" in p)
     return {name.strip(): digest.strip() for name, digest in pairs if name.strip() and digest.strip()}
+
+
+def metrics_token() -> str:
+    # Bearer do /metrics; vazio = aberto (dev). Aparado como o Prometheus apara o credentials_file: o mesmo valor do
+    # .env vale dos dois lados. Obrigatório (e forte) com APP_ENV=production (api.production_gaps).
+    return os.getenv("METRICS_TOKEN", "").strip()
 
 
 def token_ttl_min() -> int:
@@ -201,6 +208,10 @@ def rate_limit_per_min() -> int:
 # hybrid+cross (com o BM25 só no idioma do corpus, rag.lexical_fits) 0,895 / 0,921 / 0,830. Empate técnico;
 # dense+cross fica porque foi o validado ao vivo (2 baterias integrais: oficiais 96,7%), e o híbrido sem o filtro de
 # idioma tirou a fonte de uma pergunta em inglês nas 3 rodadas. RETRIEVER=hybrid troca.
+# Ordem `base` (rodada 10): a nota do cross-encoder só decide o portão sem fonte e a ordem fica a do denso. No gold do
+# ensaio Getnet (59 com fonte) a escolha automática deu dense+cross:base Recall@5 0,915 / Recall@3 0,898 / MRR 0,842
+# contra 0,907 / 0,873 / 0,859 reordenando (o portão é o mesmo nas duas), e a bateria integral ao vivo com ela teve
+# oficiais 30/30 aterradas. `--choose-retriever` mede as duas ordens no domínio; RERANK_ORDER=cross volta.
 KIT_RETRIEVER = {
     "retriever": "dense",
     "embed_model": "intfloat/multilingual-e5-large",
@@ -208,6 +219,7 @@ KIT_RETRIEVER = {
     "rerank_model": "BAAI/bge-reranker-v2-m3-int8",
     "rerank_pool": 10,
     "rerank_chars": 600,
+    "rerank_order": "base",
 }
 
 
@@ -263,9 +275,10 @@ def rerank_mode() -> str:
 
 
 def rerank_order() -> str:
-    # RERANK_ORDER=cross (padrão): a nota do cross-encoder reordena o top do base. base: a ordem do base fica e a nota
-    # só vai no trecho (o portão sem fonte usa a nota, MIN_RERANK). Escolha por medida no gold do domínio
-    # (`--choose-retriever` mede as duas e grava a escolha e a tabela em data/retriever.json).
+    # RERANK_ORDER=cross: a nota do cross-encoder reordena o top do base. base (padrão do kit, KIT_RETRIEVER): a ordem
+    # do base fica e a nota só vai no trecho (o portão sem fonte usa a nota, MIN_RERANK). Escolha por medida no gold do
+    # domínio (`--choose-retriever` mede as duas e grava a escolha e a tabela em data/retriever.json); uma escolha
+    # gravada sem `rerank_order` (anterior à medida das duas ordens) segue reordenando.
     mode = (os.getenv("RERANK_ORDER") or _bundle().get("rerank_order") or "cross").lower()
     return mode if mode in ("cross", "base") else "cross"
 

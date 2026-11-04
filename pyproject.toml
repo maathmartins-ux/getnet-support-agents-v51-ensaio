@@ -15,6 +15,11 @@ dependencies = [
     "mcp==2.3.0",  # servidor MCP em /mcp (a vaga pede MCP); 2.x renomeou FastMCP para MCPServer
     # backend Postgres do store (DATABASE_URL); na imagem padrão para a mesma imagem servir réplicas em vários hosts
     "psycopg[binary]>=3.2",
+    # JWT emitido e validado por biblioteca auditada (app/auth.py), não à mão; [crypto] traz EdDSA e RS256. Piso = a
+    # versão do lock, onde os testes provam crit, nbf/iat no futuro, aud em lista e sub/jti tipados.
+    "pyjwt[crypto]>=2.15",
+    # app/keys.py carrega as chaves PEM com ela: dependência direta, não só a que vinha pelo mcp → pyjwt (piso = lock)
+    "cryptography>=50",
 ]
 
 [project.optional-dependencies]

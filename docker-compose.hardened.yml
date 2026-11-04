@@ -1,7 +1,9 @@
 # Overlay de produção endurecido. Uso:
 #   docker compose -f docker-compose.yml -f docker-compose.hardened.yml up -d --build
-# Exige AUTH_SECRET e OPERATOR_TOKEN fortes no .env: APP_ENV=production recusa subir com segredo padrão.
-# Prova: tests/test_hardening.py (estrutura) e `docker compose ... config` no CI.
+# Exige no .env AUTH_SECRET, OPERATOR_TOKEN e METRICS_TOKEN fortes e OPERATOR_KEYS (chave pessoal por operador):
+# APP_ENV=production recusa subir sem eles (src/app/api.py, production_gaps).
+# Prova: tests/test_supply_chain.py::test_hardened_overlay (estrutura e memória),
+# tests/test_api.py::test_production_refuses_shared_operator_and_open_metrics e `docker compose ... config` no CI.
 services:
   api:
     environment:
@@ -15,9 +17,13 @@ services:
     security_opt:
       - no-new-privileges:true
     user: "10001:10001"  # o mesmo appuser da imagem, explícito: overlay não volta a root por engano
-    # limites: um loop de requisição ou de agente não derruba o host
-    mem_limit: 1g
-    cpus: 1.0
+    # limites: um loop de requisição ou de agente não derruba o host, e o buscador escolhido cabe. Medido neste overlay
+    # (04/11/2026, denso + cross, LLM offline, host de 4 vCPU): 2,4 GB ociosa e +~0,18 GB por FAQ simultânea (20 →
+    # 6,1–6,7 GB, sem OOM com 8g); a FAQ leva 1,3–2,2 s com 4 CPUs, 2,9–4,7 s com 2 e 7–11 s com 1. Regra: mem_limit
+    # = RAM do buscador (até o teto da escolha) + 20 FAQs simultâneas (tests/test_supply_chain.py::test_hardened_overlay);
+    # cpus acima das CPUs do host o Docker recusa.
+    mem_limit: 8g
+    cpus: 2.0
     pids_limit: 256
     # só a máquina local alcança a API; a exposição pública passa por proxy reverso com TLS na frente
     ports: !override
@@ -33,5 +39,15 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
-# Busca híbrida (EXTRAS=hybrid): o fastembed grava índice no cache do modelo em /opt/models; com rootfs só
-# leitura, monte esse caminho como volume ou tmpfs antes de ligar RETRIEVER=hybrid.
+  # perfil observability: em produção o /metrics exige o Bearer, que o scrape lê do segredo (nunca do yml)
+  prometheus:
+    volumes:
+      - ./ops/prometheus.hardened.yml:/etc/prometheus/prometheus.yml:ro
+    secrets:
+      - metrics_token
+secrets:
+  metrics_token:
+    environment: METRICS_TOKEN  # o mesmo valor do .env que a API lê; vira /run/secrets/metrics_token
+# rootfs só leitura serve o buscador escolhido: modelos (/opt/models) e vetores do corpus (/opt/vectors) vêm prontos
+# da imagem, e o cache em disco que não grava só deixa de ser gravado (rag.doc_vectors). Conferido neste overlay:
+# /health com retriever dense+cross:base e retriever_fallback vazio.

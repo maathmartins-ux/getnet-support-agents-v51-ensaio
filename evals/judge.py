@@ -25,13 +25,29 @@ elas na conta, o juiz × pessoas só sai validado se, além do resto da regra, h
 negativos de respostas reais e o juiz os reprovar com TNR >= VALIDATION_MIN_RATE (validation, PLANTED_RULE). Resposta
 real só entra na validação se foi escolhida sem depender do juiz — sorteio ou checagem automática; a que entrou porque
 o juiz a reprovou não mede o juiz (ele a reprova por construção) e sai à parte, como diagnóstico (SELECTION_RULE).
+
+Rejulgamento pela data (`--rejudge-dated`, REJUDGE_RULE): só pela data, nunca pelo veredito — toda resposta com data
+relativa ou explícita que não foi julgada com o dia em que foi gerada, aprovada ou reprovada; a sem data fica com o
+veredito da 1ª passada, aprovado ou reprovado. Rejulgar só os reprovados seria sortear de novo só quem perdeu (medido na
+rodada 10: a regra antiga levou junto 11 reprovadas sem data). Cada veredito rejulgado guarda o da 1ª passada em
+`first_pass`; o judge.json traz o bloco `rejudge` (por motivo, antes e depois por split), o resumo `judge` de cada
+live_*.json é reescrito e o antigo fica em `judge_first_pass`, com a data que o juiz usou. `--restore-first-pass`
+refaz isso sem LLM a partir do judge.json de antes de um rejulgamento antigo; `--check` confere a coerência.
+Cada veredito grava o texto que julgou (`answer_sha`), a data (`judge_date`) e o prompt (`prompt_sha`): rótulo de pessoa
+só se compara com veredito sobre o mesmo texto (evals.label), e `--validation` julga de novo, com o juiz de hoje, só os
+textos congelados das páginas de rotulagem (evals/validation/). Held-out (split heldout* ou adulterada de uma resposta
+dele): o veredito não grava o `reason`, só booleanos, nota e tipo — ninguém lê o erro do conjunto cego.
 """
 from __future__ import annotations
 
 import argparse
+import datetime
+import hashlib
 import json
 import os
+import re
 import sys
+import tempfile
 import threading
 from collections import defaultdict
 from pathlib import Path
@@ -79,6 +95,37 @@ SCHEMA = {"type": "object", "additionalProperties": False,
                          "language_ok": {"type": "boolean"}, "leaks_other_customer": {"type": "boolean"},
                          "score": {"type": "integer"}, "failure_type": {"type": "string", "enum": list(FAILURE_TYPES)},
                          "reason": {"type": "string"}}}
+# O texto que o juiz recebe por resposta (o mesmo de sempre, agora num lugar só). Com SYSTEM e SCHEMA, dá a identidade
+# do juiz (PROMPT_SHA): veredito gravado com outro prompt é de outro juiz, e a validação contra pessoas avisa.
+PROMPT = ("Data de hoje: {today}\n\nPergunta: {question}\n\n{who}Fontes:\n{sources}\n\n"
+          "Dados de ferramenta:\n{tools}\n\nResposta: {answer}")
+PROMPT_SHA = hashlib.sha256(json.dumps([SYSTEM, PROMPT, SCHEMA], ensure_ascii=False, sort_keys=True)
+                            .encode("utf-8")).hexdigest()[:12]
+# O que o veredito guarda de cada julgamento (sem os ids): o que first_pass e o conjunto congelado copiam.
+VERDICT_FIELDS = ("grounded", "helpful", "language_ok", "leaks_other_customer", "score", "failure_type", "reason",
+                  "judge_date", "answer_sha", "prompt_sha")
+BLIND_PREFIX = "heldout"  # splits do conjunto cego (heldout, heldout_h3...)
+
+
+def text_sha(text: str | None) -> str:
+    """Impressão digital de uma resposta com os espaços normalizados (a régua de evals.label._same_text): veredito e
+    rótulo de pessoa só se comparam sobre o mesmo texto."""
+    return hashlib.sha256(" ".join((text or "").split()).encode("utf-8")).hexdigest()[:16]
+
+
+def blind(row: dict) -> bool:
+    """Linha do held-out (split heldout*) ou adulterada de uma resposta dele (`original_split`): o veredito não grava
+    o `reason`. O motivo do juiz descreve o erro, e ler o erro do conjunto cego é treinar nele (rodada 10: quatro
+    classes de erro do held-out viraram correção do motor e o número dele passou a ser de desenvolvimento)."""
+    return any(str(row.get(k) or "").startswith(BLIND_PREFIX) for k in ("split", "original_split"))
+
+
+def without_reason(v: dict) -> dict:
+    """O veredito sem o `reason`, também o da 1ª passada guardada nele."""
+    out = {k: x for k, x in v.items() if k != "reason"}
+    if isinstance(out.get("first_pass"), dict):
+        out["first_pass"] = {k: x for k, x in out["first_pass"].items() if k != "reason"}
+    return out
 
 # Canários: defeito conhecido que um juiz útil reprova sempre. Sintéticos e neutros de domínio (a fonte vem junto,
 # em `context`), domínio fictício próprio nos e-mails (nunca example.com). O juiz só vale
@@ -114,8 +161,6 @@ def judge_date(row: dict | None = None, report: dict | None = None) -> str:
     ele, nunca contra o relógio de quando julga. Medido: bateria às 23h de Brasília julgada já depois da meia-noite
     UTC deu "fonte velha apresentada como atual" em todo caso com data relativa. Ordem: `business_date` da linha →
     `recorded_at` do relatório (UTC, convertido para o fuso do negócio) → hoje do negócio."""
-    import datetime
-
     from app import clock
 
     if row and row.get("business_date"):
@@ -247,6 +292,84 @@ def failure_type_counts(verdicts: list[dict]) -> dict:
         out["ALL"][kind] += 1
         out.setdefault(v.get("split", "?"), defaultdict(int))[kind] += 1
     return {s: dict(sorted(c.items())) for s, c in out.items()}
+
+
+def summarize(verdicts: list[dict]) -> dict:
+    """Taxas no total e por split, reprovações por tipo e, se algum veredito foi rejulgado, o bloco `rejudge`. Sai
+    sempre dos vereditos: o judge.json não guarda número que eles não sustentem (fundir um split novo depois de um
+    rejulgamento refaz o bloco com o que sobrou dele)."""
+    by_split: dict[str, list[dict]] = defaultdict(list)
+    for v in verdicts:
+        by_split[v["split"]].append(v)
+    out = {**_rates(verdicts), "by_split": {s: _rates(v) for s, v in sorted(by_split.items())},
+           "failure_types": failure_type_counts(verdicts)}
+    if block := rejudge_summary(verdicts):
+        out["rejudge"] = block
+    return out
+
+
+def _key(v: dict) -> tuple[str, str, int]:
+    return v.get("source"), v.get("id"), v.get("run", 0)
+
+
+def judged_passes(v: dict) -> bool:
+    """Aprovado pelo juiz: fundamentado, no idioma, sem vazamento e útil (a régua da pessoa, evals.label)."""
+    return not verdict_fails(v) and v.get("helpful", True) is not False
+
+
+def _first_pass(v: dict) -> dict:
+    """O veredito da 1ª passada de `v`, sem ids: o mais antigo, se `v` já tinha sido rejulgado antes."""
+    return dict(v["first_pass"]) if v.get("first_pass") else {k: v[k] for k in VERDICT_FIELDS if k in v}
+
+
+_RELATIVE = re.compile(r"(?i)\b(?:hoje|amanh[ãa]|ontem|anteontem|today|tomorrow|yesterday|tonight)\b")
+_EXPLICIT = re.compile(r"\b(?:\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}(?:/\d{2,4})?)\b")
+REJUDGE_REASONS = {"data_relativa": "data relativa (hoje, amanhã, ontem)",
+                   "data_explicita": "só data explícita (dd/mm, aaaa-mm-dd)"}
+REJUDGE_RULE = ("só pela data, nunca pelo veredito: julga de novo, com o dia em que a resposta foi gerada (fuso do "
+                "negócio), toda resposta com data relativa ou explícita que não foi julgada com esse dia, aprovada ou "
+                "reprovada na 1ª passada; a sem data fica com o veredito da 1ª passada, aprovado ou reprovado")
+
+
+def date_kind(answer: str | None) -> str | None:
+    """Por que o veredito depende do dia que o juiz assume: data relativa, só explícita, ou None (não depende)."""
+    text = str(answer or "")
+    if _RELATIVE.search(text):
+        return "data_relativa"
+    return "data_explicita" if _EXPLICIT.search(text) else None
+
+
+def rejudge_summary(verdicts: list[dict]) -> dict | None:
+    """O bloco `rejudge` do judge.json, tirado dos vereditos (os rejulgados guardam `first_pass`): a regra, quantos
+    por motivo, como estavam na 1ª passada, quantos viraram e, por split e no total, fundamentadas e úteis antes
+    (1ª passada) e depois. None se nenhum foi rejulgado."""
+    again = [v for v in verdicts if v.get("first_pass")]
+    if not again:
+        return None
+
+    def counts(vs: list[dict]) -> dict:
+        return {"casos": len(vs), "grounded": sum(bool(v.get("grounded")) for v in vs),
+                "helpful": sum(bool(v.get("helpful")) for v in vs)}
+
+    def block(vs: list[dict]) -> dict:
+        return {"rejulgados": sum(bool(v.get("first_pass")) for v in vs),
+                "antes": counts([v.get("first_pass") or v for v in vs]), "depois": counts(vs)}
+
+    by_split: dict[str, list[dict]] = defaultdict(list)
+    for v in verdicts:
+        by_split[v.get("split", "?")].append(v)
+    before = [judged_passes(v["first_pass"]) for v in again]
+    after = [judged_passes(v) for v in again]
+    days = sorted({str(d) for d in (v["first_pass"].get("judge_date") for v in again) if d})
+    return {"regra": REJUDGE_RULE, "rejulgados": len(again), "mantidos": len(verdicts) - len(again),
+            "mantidos_reprovados": sum(not judged_passes(v) for v in verdicts if not v.get("first_pass")),
+            "por_motivo": {k: n for k in REJUDGE_REASONS
+                           if (n := sum(v.get("rejudge_reason") == k for v in again))},
+            "primeira_passada": {"aprovados": sum(before), "reprovados": len(before) - sum(before)},
+            "viraram": {"reprovado_para_aprovado": sum(not b and a for b, a in zip(before, after, strict=True)),
+                        "aprovado_para_reprovado": sum(b and not a for b, a in zip(before, after, strict=True))},
+            "data_da_1a_passada": days or None,
+            "por_split": {s: block(vs) for s, vs in sorted(by_split.items())}, "ALL": block(verdicts)}
 
 
 def by_failure_type(pairs: list[tuple[str, str]]) -> dict:
@@ -392,10 +515,8 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
         # com `context` a evidência inteira já está nas fontes: aqui só as chamadas (sem repetir o texto)
         tools = _tool_text(item.get("tool_calls"), None if context else item.get("evidence"))
         # a data de hoje: sem ela o juiz não tem como ver fonte velha apresentada como atual (stale_source)
-        prompt = (f"Data de hoje: {today or judge_date(item)}\n\nPergunta: {question}\n\n{who}"
-                  f"Fontes:\n{sources}\n\n"
-                  f"Dados de ferramenta:\n{tools}\n\n"
-                  f"Resposta: {answer}")
+        prompt = PROMPT.format(today=today or judge_date(item), question=question, who=who, sources=sources,
+                               tools=tools, answer=answer)
         before = request_usage()["cost_usd"]
         reply = llm.complete(SYSTEM, [{"role": "user", "content": prompt}], max_tokens=4096, schema=SCHEMA)
         counted = request_usage()["cost_usd"] - before
@@ -405,6 +526,7 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
 
     status, verdicts, pairs_by_split = "ran", [], defaultdict(list)
     reason = None
+    blind_rows: set[tuple] = set()  # linhas do held-out lidas aqui (a adulterada só diz pela linha: original_split)
     kept = [v for v in (previous or {}).get("verdicts", []) if v.get("source") in {p.name for p in inputs}]
     refused = [v for v in (previous or {}).get("judge_refused", []) if v.get("source") in {p.name for p in inputs}]
     done = {(v["source"], v["id"], v.get("run", 0)) for v in kept + refused}
@@ -448,19 +570,21 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
                 continue
             report_in = json.loads(path.read_text(encoding="utf-8"))
             for r in report_in["rows"]:
+                if blind(r):
+                    blind_rows.add((path.name, r["id"], r.get("run", 0)))
                 if r.get("answer") and (path.name, r["id"], r.get("run", 0)) not in done:
                     pending.append((path.name, r, judge_date(r, report_in)))
 
-        def one(item: tuple[str, dict, str]) -> tuple[str, dict, dict | None]:
+        def one(item: tuple[str, dict, str]) -> tuple[str, dict, str, dict | None]:
             name, r, day = item
             try:
-                return name, r, judge_one(r, r["message"], r["answer"], day)
+                return name, r, day, judge_one(r, r["message"], r["answer"], day)
             except LLMError as exc:
                 # O juiz pode recusar julgar um caso do split hard (pergunta maliciosa de propósito); sem isto, a
                 # recusa derrubava a rodada inteira. Recusa é do CASO: anota e segue.
                 if "refusal" not in str(exc).lower():
                     raise
-                return name, r, None
+                return name, r, day, None
 
         # Em série, 352 vereditos a ~7 s cada levaram 41 min, mais que a bateria ao vivo inteira. Em paralelo
         # (JUDGE_WORKERS, padrão 8) a mesma conta cai para ~5 min; o teto ainda é conferido antes de cada chamada
@@ -473,19 +597,27 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
             failure: BaseException | None = None
             for fut in futures:
                 try:
-                    name, r, verdict = fut.result()
+                    name, r, day, verdict = fut.result()
                 except (BudgetExceeded, LLMError) as exc:
                     failure = failure or exc
                     continue
                 if verdict is None:
                     refused.append({"id": r["id"], "split": r["split"], "source": name, "run": r.get("run", 0)})
                     continue
-                verdicts.append({"id": r["id"], "split": r["split"], "source": name, "run": r.get("run", 0),
-                                 # a linha diz se o juiz viu dado de ferramenta: sem ele, "não grounded"
-                                 # de resposta com dado do CRM é cegueira do juiz, não alucinação
-                                 "saw_tool_data": bool(r.get("tool_calls") or r.get("evidence")),
-                                 "saw_tool_results": bool(r.get("evidence")),
-                                 **verdict})
+                entry = {"id": r["id"], "split": r["split"], "source": name, "run": r.get("run", 0),
+                         # a linha diz se o juiz viu dado de ferramenta: sem ele, "não grounded"
+                         # de resposta com dado do CRM é cegueira do juiz, não alucinação
+                         "saw_tool_data": bool(r.get("tool_calls") or r.get("evidence")),
+                         "saw_tool_results": bool(r.get("evidence")),
+                         **verdict,
+                         # o dia, o texto e o prompt deste julgamento: sem eles não se sabe se o veredito ainda é
+                         # sobre a resposta de hoje nem com que data e que juiz ela foi julgada
+                         "judge_date": day, "answer_sha": text_sha(r["answer"]), "prompt_sha": PROMPT_SHA,
+                         # adulterada: o split da original diz se ela é cópia de uma resposta do held-out
+                         **({"original_split": r["original_split"]} if r.get("original_split") else {})}
+                if blind(r):
+                    entry.pop("reason", None)
+                verdicts.append(entry)
             if failure is not None:
                 raise failure
     except BudgetExceeded:
@@ -494,9 +626,8 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
         # Limite de gasto da conta no meio da bateria (visto no 99º julgamento): sem isto o relatório inteiro se
         # perdia e só o erro era gravado. O parcial fica e `--resume` continua de onde parou.
         status, reason = ("aborted_quota" if is_quota_message(str(exc)) else "aborted_llm_error"), str(exc)[:300]
-    by_split = defaultdict(list)
-    for v in verdicts:
-        by_split[v["split"]].append(v)
+    # o veredito reaproveitado de antes da regra também sai sem o motivo do held-out
+    verdicts = [without_reason(v) if blind(v) or _key(v) in blind_rows else v for v in verdicts]
     all_pairs = [p for ps in pairs_by_split.values() for p in ps]
     caught = sum(c["caught"] for c in canaries)
     cal_report = {**_agreement(all_pairs), "misses": misses,
@@ -508,14 +639,14 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
                                    "missing": [*block["validation"]["missing"], HUMAN_LABELS_MISSING]}
     return {"status": status, **({"reason": reason} if reason else {}),
             "resumed_verdicts": len(kept), "model": llm.model, "provider": getattr(llm, "provider", "anthropic"),
+            "prompt_sha": PROMPT_SHA,
             **family_report(llm.model), "live_files": [p.name for p in inputs],
             "spent_usd": round(spent_box[0], 6), "max_usd": max_usd,
             # canário não rodado (teto) também conta: juiz sem os 4 reprovados não está validado
             "judge_unreliable": caught < len(CANARIES),
             "canaries": {"cases": len(CANARIES), "ran": len(canaries), "caught": caught,
                          "missed": [c["id"] for c in canaries if not c["caught"]], "details": canaries},
-            **_rates(verdicts), "by_split": {s: _rates(v) for s, v in sorted(by_split.items())},
-            "failure_types": failure_type_counts(verdicts),
+            **summarize(verdicts),
             "calibration": cal_report,
             "trust_reused": reused, "calibration_pairs": cal_pairs, "judge_refused": refused,
             "verdicts": verdicts}
@@ -548,8 +679,10 @@ def judge_into(llm, path: Path, out: Path = OUT, max_usd: float | None = None,
                 files[name] = other
         spent_before = float((previous or {}).get("spent_usd") or 0.0)
         if previous:
+            # a recusa da rodada de antes também sai: com o mesmo id, ela faria o juiz pular a resposta nova
             others = [v for v in previous.get("verdicts", []) if v.get("source") != path.name]
-            previous = {**previous, "verdicts": others}
+            refused = [r for r in previous.get("judge_refused", []) if r.get("source") != path.name]
+            previous = {**previous, "verdicts": others, "judge_refused": refused}
         report = run(llm, sorted(files.values()), calibration, max_usd, previous=previous, reuse_trust=True,
                      fresh={path.name})
         report["spent_usd"] = round(spent_before + float(report.get("spent_usd") or 0.0), 6)
@@ -611,15 +744,37 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--revalidate", action="store_true",
                     help="reaplica a regra de validação (origem dos rótulos) ao judge.json existente, sem chamar o LLM")
     ap.add_argument("--rejudge-dated", action="store_true",
-                    help="julga de novo, com a data do negócio de cada resposta, os vereditos reprovados e os de "
-                         "resposta com data relativa; os outros ficam (canários e calibração reaproveitados)")
+                    help="julga de novo SÓ pela data (REJUDGE_RULE): toda resposta com data relativa ou explícita, "
+                         "aprovada ou reprovada, que não foi julgada com o dia em que foi gerada; a sem data fica. "
+                         "A 1ª passada vai para first_pass e o resumo antigo dos live_*.json para judge_first_pass")
+    ap.add_argument("--restore-first-pass", type=Path, metavar="JSON",
+                    help="judge.json de antes de um rejulgamento pela regra antiga (git show <commit>:evals/results/"
+                         "judge.json > arquivo): refaz pela regra simétrica, sem LLM")
+    ap.add_argument("--validation", action="store_true",
+                    help="julga de novo, com o juiz de hoje, só os textos congelados das páginas de rotulagem "
+                         "(evals/validation/*.json) que ainda não têm veredito dele")
+    ap.add_argument("--check", action="store_true",
+                    help="confere sem LLM: resumo de cada live_*.json = judge.json, veredito do texto de hoje, "
+                         "held-out sem `reason`, human_review.json = o --report de hoje; sai com 1 se algo não bate")
+    ap.add_argument("--drop-blind-reasons", action="store_true",
+                    help="apaga, sem LLM, o `reason` dos vereditos do held-out já gravados (judge.json e "
+                         "judge_perturbed.json, de antes da regra)")
     ap.add_argument("--perturbed", action="store_true",
                     help="julga evals/results/perturbed.json (gera se faltar) → judge_perturbed.json, fora da manchete")
     args = ap.parse_args(argv)
+    if args.check:
+        return _main_check()
+    if args.drop_blind_reasons:
+        print(json.dumps({"sem_reason": drop_blind_reasons()}, ensure_ascii=False))
+        return 0
     if args.perturbed:
         return _main_perturbed(args.max_usd)
     if args.rejudge_dated:
         return _main_rejudge_dated(args.max_usd)
+    if args.restore_first_pass:
+        return _main_restore_first_pass(args.restore_first_pass)
+    if args.validation:
+        return _main_validation(args.max_usd)
     if args.revalidate:
         report = json.loads(OUT.read_text(encoding="utf-8"))
         cal = report.get("calibration") or {}
@@ -652,42 +807,367 @@ def main(argv: list[str] | None = None) -> int:
             report = {"status": "error", "reason": str(exc), "live_files": [p.name for p in inputs]}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    if report.get("status") not in ("skipped", "error"):  # juiz inteiro de novo: o resumo de cada split acompanha
+        sync_live_summaries(report, inputs, "python -m evals.judge (juiz inteiro de novo)")
     print(json.dumps({k: v for k, v in report.items() if k != "verdicts"}, ensure_ascii=False))
     return 0
 
 
-_DATED = __import__("re").compile(
-    r"(?i)\b(?:hoje|amanh[ãa]|ontem|anteontem|today|tomorrow|yesterday|tonight|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}(?:/\d{2,4})?)\b")
+# --- rejulgamento pela data, resumo dos live_*.json e coerência -------------------------------------------------------
+SUMMARY_COUNTS = ("verdicts", "grounded", "helpful")
+FIX_SUMMARY = ("rode `python -m evals.judge --restore-first-pass <judge.json da 1ª passada>` (sem LLM) ou "
+               "`--rejudge-dated`, que reescrevem o resumo e guardam o antigo em judge_first_pass")
 
 
-def rejudge_plan(report: dict, rows: dict[tuple[str, str, int], dict]) -> tuple[list[dict], list[dict]]:
-    """(vereditos que ficam, vereditos a julgar de novo): de novo os reprovados e os de resposta com data relativa
-    ou data explícita (onde o dia que o juiz assume muda o veredito); os outros não dependem da data."""
+def _live_inputs(report: dict, results: Path | None = None) -> tuple[list[Path], dict, dict]:
+    """Os live_*.json que `report` julgou, as linhas por (arquivo, id, rodada) e o `recorded_at` de cada arquivo."""
+    results = results or RESULTS_DIR
+    inputs = [results / n for n in report.get("live_files", []) if (results / n).exists()]
+    rows: dict[tuple[str, str, int], dict] = {}
+    when: dict[str, str | None] = {}
+    for path in inputs:
+        rep = json.loads(path.read_text(encoding="utf-8"))
+        when[path.name] = rep.get("recorded_at")
+        for r in rep.get("rows", []):
+            rows[(path.name, r["id"], r.get("run", 0))] = r
+    return inputs, rows, when
+
+
+def rejudge_plan(report: dict, rows: dict[tuple[str, str, int], dict],
+                 when: dict[str, str | None] | None = None) -> tuple[list[dict], list[dict]]:
+    """(vereditos que ficam, vereditos a julgar de novo) pela REJUDGE_RULE: de novo só os de resposta com data relativa
+    ou explícita (onde o dia que o juiz assume muda o veredito), aprovados ou reprovados, que não foram julgados com o
+    dia em que a resposta foi gerada (`judge_date` gravado; o veredito sem ele é de antes do registro e volta). O
+    veredito não decide nada: rejulgar os reprovados seria dar nova chance só a quem perdeu, e o já julgado com o dia
+    certo só ganharia um novo sorteio. `when`: {arquivo: recorded_at} (o dia da linha sem `business_date`). Cada um de
+    `again` leva o motivo em `rejudge_reason` (REJUDGE_REASONS)."""
     keep, again = [], []
     for v in report.get("verdicts", []):
-        row = rows.get((v.get("source"), v.get("id"), v.get("run", 0))) or {}
-        dated = bool(_DATED.search(str(row.get("answer") or "")))
-        (again if (verdict_fails(v) or not v.get("helpful", True) or dated) else keep).append(v)
+        row = rows.get(_key(v)) or {}
+        kind = date_kind(row.get("answer"))
+        if kind and v.get("judge_date") != judge_date(row, {"recorded_at": (when or {}).get(v.get("source"))}):
+            again.append({**v, "rejudge_reason": kind})
+        else:
+            keep.append(v)
     return keep, again
+
+
+def _with_verdicts(report: dict, verdicts: list[dict], **extra) -> dict:
+    """`report` com estes vereditos: taxas e bloco `rejudge` refeitos deles (summarize), os vereditos por último, e
+    nenhum `reason` do held-out (nem o da 1ª passada)."""
+    verdicts = [without_reason(v) if blind(v) else v for v in verdicts]
+    out = {k: v for k, v in report.items() if k not in ("verdicts", "rejudge")}
+    out.update(summarize(verdicts), **extra)
+    out["verdicts"] = verdicts
+    return out
+
+
+def merge_rejudged(report: dict, again: list[dict]) -> dict:
+    """O relatório do rejulgamento (run sobre os vereditos que ficaram) com o que a 1ª passada dizia: cada rejulgado
+    ganha `first_pass` e `rejudge_reason`; o que não voltou julgado (o juiz recusou agora, ou o teto acabou) fica com o
+    veredito da 1ª passada — nunca sai do denominador (a recusa nova vai em `rejudge_refused`, não em judge_refused)."""
+    first = {_key(v): v for v in again}
+    verdicts, back = [], set()
+    for v in report.get("verdicts", []):
+        if (fp := first.get(_key(v))) is not None:
+            v = {**v, "first_pass": _first_pass(fp), "rejudge_reason": fp["rejudge_reason"]}
+            back.add(_key(v))
+        verdicts.append(v)
+    refused_now = {_key(r) for r in report.get("judge_refused", [])} & set(first)
+    for k, fp in first.items():
+        if k not in back:
+            verdicts.append({**{x: y for x, y in fp.items() if x != "rejudge_reason"},
+                             **({"rejudge_refused": True} if k in refused_now else {})})
+    refused = [r for r in report.get("judge_refused", []) if _key(r) not in refused_now]
+    return _with_verdicts(report, verdicts, judge_refused=refused, rejudged_dated=len(back))
+
+
+def split_summary(report: dict, source: str, file: str | None = None) -> dict:
+    """O resumo do juiz que o live_<split>.json guarda (`judge`), contado dos vereditos deste arquivo: o mesmo que
+    evals.run_evals.judge_after_split grava logo depois do split."""
+    mine = [v for v in report.get("verdicts", []) if v.get("source") == source]
+    return {"status": report.get("status"), "file": file or OUT.name, "verdicts": len(mine),
+            "grounded": sum(bool(v.get("grounded")) for v in mine),
+            "helpful": sum(bool(v.get("helpful")) for v in mine),
+            "judge_unreliable": report.get("judge_unreliable")}
+
+
+def _first_pass_day(mine: list[dict]) -> str:
+    """O dia que o juiz da 1ª passada usou nestes vereditos (`judge_date`), ou dito que não foi gravado."""
+    days = sorted({str(d) for d in ((v.get("first_pass") or v).get("judge_date") for v in mine) if d})
+    return ", ".join(days) if days else "não gravada no veredito (juiz de antes do registro da data)"
+
+
+def sync_live_summaries(report: dict, paths: list[Path], why: str) -> list[str]:
+    """Reescreve o resumo `judge` de cada live_*.json que não bate mais com os vereditos de `report` e guarda o antigo
+    em `judge_first_pass` (o primeiro que houve, com a data que o juiz usou e o que o trocou). Sem isto, o 19/30 da 1ª
+    passada ficava commitado no live_official.json ao lado do 30/30 publicado (rodada 10). Arquivo sem resumo (o juiz
+    não rodou junto da bateria) ou com o de outro arquivo do juiz (ablação) fica como está. Devolve os reescritos."""
+    changed = []
+    for path in paths:
+        rep = _read(path)
+        old = (rep or {}).get("judge")
+        if not isinstance(old, dict) or old.get("file", OUT.name) != OUT.name:
+            continue
+        mine = [v for v in report.get("verdicts", []) if v.get("source") == path.name]
+        new = split_summary(report, path.name)
+        if n := sum(bool(v.get("first_pass")) for v in mine):
+            new["rejulgados"] = n
+        if all(old.get(k) == new.get(k) for k in (*SUMMARY_COUNTS, "status", "rejulgados")):
+            continue
+        if "judge_first_pass" not in rep:
+            rep["judge_first_pass"] = {**old, "data_do_juiz": _first_pass_day(mine), "trocado_por": why}
+        rep["judge"] = new
+        path.write_text(json.dumps(rep, indent=2, ensure_ascii=False), encoding="utf-8")
+        changed.append(path.name)
+    return changed
+
+
+def rejudge_dated(llm, out: Path | None = None, results: Path | None = None, max_usd: float | None = None) -> dict:
+    """`--rejudge-dated`: julga de novo pela REJUDGE_RULE (rejudge_plan), junta a 1ª passada (merge_rejudged), grava
+    o judge.json e reescreve o resumo dos live_*.json (sync_live_summaries; também quando não há nada a rejulgar).
+    Canários e calibração vêm do judge.json (mesmo modelo): só os vereditos com data são pagos."""
+    out = out or OUT
+    old = json.loads(out.read_text(encoding="utf-8"))
+    inputs, rows, when = _live_inputs(old, results)
+    keep, again = rejudge_plan(old, rows, when)
+    passed = sum(judged_passes(v) for v in again)
+    print(f"rejulgar {len(again)} de {len(keep) + len(again)} vereditos, só pela data ({passed} aprovados e "
+          f"{len(again) - passed} reprovados na 1ª passada; os sem data ficam como estão)")
+    report = old
+    if again:
+        report = merge_rejudged(run(llm, inputs, max_usd=max_usd, previous={**old, "verdicts": keep},
+                                    reuse_trust=True), again)
+        report["spent_usd"] = round(float(old.get("spent_usd") or 0.0) + float(report.get("spent_usd") or 0.0), 6)
+        out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    report["resumos_reescritos"] = sync_live_summaries(report, inputs, "python -m evals.judge --rejudge-dated")
+    return report
 
 
 def _main_rejudge_dated(max_usd: float | None) -> int:
     from app.llm import get_judge_llm
 
-    old = json.loads(OUT.read_text(encoding="utf-8"))
-    inputs = [RESULTS_DIR / n for n in old.get("live_files", []) if (RESULTS_DIR / n).exists()]
-    rows = {}
-    for path in inputs:
-        for r in json.loads(path.read_text(encoding="utf-8")).get("rows", []):
-            rows[(path.name, r["id"], r.get("run", 0))] = r
-    keep, again = rejudge_plan(old, rows)
-    print(f"rejulgar {len(again)} de {len(keep) + len(again)} vereditos (reprovados ou com data)")
-    report = run(get_judge_llm(), inputs, max_usd=max_usd, previous={**old, "verdicts": keep}, reuse_trust=True)
-    report["spent_usd"] = round(float(old.get("spent_usd") or 0.0) + float(report.get("spent_usd") or 0.0), 6)
-    report["rejudged_dated"] = len(again)
+    report = rejudge_dated(get_judge_llm(), max_usd=max_usd)
+    keep = ("status", "spent_usd", "rejudged_dated", "rejudge", "resumos_reescritos")
+    print(json.dumps({k: report[k] for k in keep if k in report}, ensure_ascii=False)[:1500])
+    return 0
+
+
+_CORE = tuple(f for f in VERDICT_FIELDS if f != "reason")
+
+
+def verdict_core(v: dict) -> dict:
+    """O que o veredito julgou (sem ids e sem o `reason`): o que o conjunto congelado e o rejulgamento dele guardam."""
+    return {k: v[k] for k in _CORE if k in v}
+
+
+def _same_call(a: dict, b: dict) -> bool:
+    """O mesmo julgamento: os campos que o juiz decide (o motivo e a nota incluídos) iguais."""
+    fields = ("grounded", "helpful", "language_ok", "leaks_other_customer", "score", "failure_type", "reason")
+    return all(a.get(k) == b.get(k) for k in fields)
+
+
+def restore_first_pass(current: dict, first: dict, results: Path | None = None) -> dict:
+    """Refaz pela REJUDGE_RULE, sem LLM, um judge.json rejulgado pela regra antiga (que levava também os reprovados sem
+    data) a partir do judge.json da 1ª passada (o do commit de antes do rejulgamento): o veredito sem data volta a ser
+    o da 1ª passada; o com data fica o rejulgado, com `first_pass` e o dia do negócio que o rejulgamento usou; o que a
+    1ª passada julgou e o rejulgamento perdeu (recusa) volta. Só linhas que ainda existem nos live_*.json. ValueError se
+    `first` não é a 1ª passada desta bateria (um veredito que ficou difere do dela)."""
+    _, rows, when = _live_inputs(current, results)
+    fp = {_key(v): v for v in first.get("verdicts", []) if _key(v) in rows}
+    olds = current.get("verdicts", [])
+    resumed = current.get("resumed_verdicts")
+    if current.get("rejudged_dated") and isinstance(resumed, int) and 0 <= resumed <= len(olds):
+        redone = {_key(v) for v in olds[resumed:]}  # o run põe primeiro os que ficaram, depois os rejulgados
+    else:
+        redone = {_key(v) for v in olds if _key(v) in fp and not _same_call(fp[_key(v)], v)}
+    if bad := [_key(v) for v in olds if _key(v) in fp and _key(v) not in redone and not _same_call(fp[_key(v)], v)]:
+        raise ValueError(f"{len(bad)} veredito(s) que o rejulgamento manteve diferem do arquivo dado (ex.: "
+                         f"{bad[0][1]}): ele não é a 1ª passada desta bateria")
+    refused = {_key(r) for r in current.get("judge_refused", [])}
+    out, seen = [], set()
+    for v in olds:
+        k = _key(v)
+        seen.add(k)
+        old = fp.get(k)
+        if old is None or k not in redone or v.get("first_pass"):
+            out.append(v)
+            continue
+        row = rows.get(k) or {}
+        if kind := date_kind(row.get("answer")):
+            day = v.get("judge_date") or judge_date(row, {"recorded_at": when.get(k[0])})
+            out.append({**v, "judge_date": day, "first_pass": _first_pass(old), "rejudge_reason": kind})
+        else:
+            out.append(old)
+    out += [{**v, **({"rejudge_refused": True} if k in refused else {})} for k, v in fp.items() if k not in seen]
+    keys = {_key(v) for v in out}
+    return _with_verdicts(current, out, judge_refused=[r for r in current.get("judge_refused", [])
+                                                        if _key(r) not in keys],
+                          rejudged_dated=sum(bool(v.get("first_pass")) for v in out))
+
+
+def _main_restore_first_pass(first_path: Path) -> int:
+    current = json.loads(OUT.read_text(encoding="utf-8"))
+    try:
+        report = restore_first_pass(current, json.loads(first_path.read_text(encoding="utf-8")))
+    except ValueError as exc:
+        print(f"ERRO: {exc}", file=sys.stderr)
+        return 2
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(json.dumps({k: v for k, v in report.items() if k not in ("verdicts", "calibration_pairs", "canaries")},
-                     ensure_ascii=False)[:1500])
+    changed = sync_live_summaries(report, _live_inputs(report)[0], "python -m evals.judge --restore-first-pass")
+    block = {k: v for k, v in (report.get("rejudge") or {}).items() if k != "por_split"}
+    print(json.dumps({"rejudge": block, "resumos_reescritos": changed}, ensure_ascii=False))
+    return 0
+
+
+def coherence_problems(results: Path | None = None, labels: Path | None = None) -> list[str]:
+    """O que a evidência commitada do juiz diz e não bate (sem LLM; `--check`, scripts/check.py):
+    - o resumo `judge` de cada live_*.json é a contagem dos vereditos dele no judge.json e, se algum foi rejulgado
+      (`first_pass`), o arquivo guarda o resumo da 1ª passada em `judge_first_pass`;
+    - todo veredito do judge.json é de uma linha que existe e, quando gravou o texto (`answer_sha`), do texto de hoje;
+    - nenhum veredito do held-out grava `reason` (judge.json e judge_perturbed.json, 1ª passada incluída);
+    - human_review.json é o que `python -m evals.label --report` dá hoje (`labels`: pasta dos human_labels*.csv)."""
+    results = results or RESULTS_DIR
+    problems: list[str] = []
+    head = _read(results / OUT.name)
+    if head and head.get("status") not in ("skipped", "error"):
+        lives = {p.name: _read(p) or {} for p in sorted(results.glob("live_*.json"))}
+        mine: dict[str, list[dict]] = defaultdict(list)
+        for v in head.get("verdicts", []):
+            mine[v.get("source")].append(v)
+        for name, rep in lives.items():
+            s = rep.get("judge")
+            if not isinstance(s, dict) or s.get("file", OUT.name) != OUT.name or "verdicts" not in s:
+                continue  # sem resumo (o juiz não rodou junto) ou de outro arquivo do juiz
+            want = split_summary(head, name)
+            if any(s.get(k) != want[k] for k in SUMMARY_COUNTS):
+                note = "; judge_first_pass existe, mas o `judge` não foi reescrito" if "judge_first_pass" in rep else ""
+                problems.append(f"{name}: o resumo do juiz diz {s.get('grounded')}/{s.get('verdicts')} fundamentadas "
+                                f"e {s.get('helpful')} úteis, o judge.json {want['grounded']}/{want['verdicts']} e "
+                                f"{want['helpful']}{note} — {FIX_SUMMARY}")
+            elif any(v.get("first_pass") for v in mine.get(name, [])) and "judge_first_pass" not in rep:
+                problems.append(f"{name}: há vereditos rejulgados no judge.json e o arquivo não guarda o resumo da 1ª "
+                                f"passada (judge_first_pass) — {FIX_SUMMARY}")
+        rows = {(n, r["id"], r.get("run", 0)): r for n, rep in lives.items() for r in rep.get("rows", [])}
+        gone = [f"{v.get('source')}:{v.get('id')}" for v in head.get("verdicts", []) if _key(v) not in rows]
+        other = [f"{v.get('source')}:{v.get('id')}" for v in head.get("verdicts", []) if _key(v) in rows
+                 and v.get("answer_sha") and v["answer_sha"] != text_sha(rows[_key(v)].get("answer"))]
+        for found, what in ((gone, "de linha que não existe mais nos live_*.json"),
+                            (other, "sobre outro texto (a resposta mudou depois do julgamento)")):
+            if found:
+                problems.append(f"judge.json: {len(found)} veredito(s) {what} ({', '.join(found[:5])}) — rode o juiz "
+                                "de novo nesses splits")
+    if leaked := [f"{name}:{v.get('id')}" for name, v in _blind_with_reason(results)]:
+        problems.append(f"{len(leaked)} veredito(s) do held-out com `reason` gravado ({', '.join(leaked[:5])}): o "
+                        "motivo do juiz descreve o erro do conjunto cego — `python -m evals.judge "
+                        "--drop-blind-reasons` apaga, sem LLM")
+    from evals import label
+
+    committed = _read(results / label.OUT.name)
+    if committed is not None:
+        with tempfile.TemporaryDirectory() as tmp:
+            fresh = label.report(results=results, out=Path(tmp) / label.OUT.name, base=labels or label.HERE)
+        if json.loads(json.dumps(fresh, ensure_ascii=False)) != committed:
+            problems.append(f"{label.OUT.name} não é o que `python -m evals.label --report` dá hoje (rótulos, páginas "
+                            "congeladas, juiz ou bateria mudaram depois): rode o --report e scripts/fill_readme.py")
+    return problems
+
+
+def _blind_with_reason(results: Path) -> list[tuple[str, dict]]:
+    """(arquivo, veredito) do held-out que ainda grava `reason` em judge.json e judge_perturbed.json; a adulterada de
+    antes do `original_split` no veredito diz o split da original pela linha de perturbed.json."""
+    from evals import perturb
+
+    origin = {r["id"]: r.get("original_split") for r in perturb.load(results)}
+    return [(name, v) for name in (OUT.name, PERTURBED_OUT) for v in (_read(results / name) or {}).get("verdicts", [])
+            if (blind(v) or str(origin.get(v.get("id")) or "").startswith(BLIND_PREFIX))
+            and (v.get("reason") or (v.get("first_pass") or {}).get("reason"))]
+
+
+def drop_blind_reasons(results: Path | None = None) -> dict[str, int]:
+    """`--drop-blind-reasons`: apaga, sem LLM, o `reason` dos vereditos do held-out já gravados (de antes da regra) em
+    judge.json e judge_perturbed.json, 1ª passada incluída; nada mais muda. Devolve {arquivo: vereditos limpos}."""
+    results = results or RESULTS_DIR
+    found: dict[str, set[tuple]] = defaultdict(set)
+    for name, v in _blind_with_reason(results):
+        found[name].add(_key(v))
+    for name, keys in found.items():
+        data = _read(results / name) or {}
+        data["verdicts"] = [without_reason(v) if _key(v) in keys else v for v in data.get("verdicts", [])]
+        (results / name).write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    return {name: len(keys) for name, keys in sorted(found.items())}
+
+
+def _main_check() -> int:
+    problems = coherence_problems()
+    for p in problems:
+        print(f"- {p}")
+    print(f"{len(problems)} problema(s) na evidência do juiz" if problems else "evidência do juiz coerente")
+    return 1 if problems else 0
+
+
+def _same_judge(entry: dict, model: str | None, prompt_sha: str | None) -> bool:
+    return entry.get("model") == model and entry.get("prompt_sha") == prompt_sha
+
+
+def judge_validation(llm, directory: Path | None = None, results: Path | None = None,
+                     max_usd: float | None = None) -> dict:
+    """`--validation`: julga de novo, com ESTE juiz (modelo + PROMPT_SHA), só os textos congelados das páginas de
+    rotulagem (evals/validation/<página>.json, evals.label.freeze_page) que ainda não têm veredito dele, com a entrada
+    que o juiz via na página (pergunta, resposta, evidência e o dia em que a resposta foi gerada). Mantém o juiz ×
+    pessoas medindo o juiz de hoje depois de mudar prompt ou modelo, sem bateria nova e sem pagar de novo canários e
+    calibração (reaproveitados do judge.json, mesmo modelo). O veredito vai para `rejulgamentos` do próprio arquivo; o
+    texto e o veredito congelados na página ficam como estavam."""
+    from evals import label
+
+    directory = directory or label.VALIDATION_DIR
+    results = results or RESULTS_DIR
+    head = _read(results / OUT.name) or {}
+    trust = {k: head[k] for k in ("canaries", "calibration_pairs", "model") if k in head} or None
+    out: dict = {"status": "ran", "paginas": 0, "julgados": 0, "spent_usd": 0.0}
+    for path in sorted(directory.glob("*.json")):
+        frozen = _read(path) or {}
+        items = [it for it in frozen.get("itens") or [] if (it.get("entrada_do_juiz") or {}).get("answer")]
+        done = [rj for rj in frozen.get("rejulgamentos") or [] if _same_judge(rj, llm.model, PROMPT_SHA)
+                and rj.get("status") == "ran"]
+        if not items or done:
+            continue
+        left = None if max_usd is None else max(0.0, max_usd - out["spent_usd"])
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / f"validacao_{path.stem}.json"
+            src.write_text(json.dumps({"rows": [
+                {"id": it["id"], "split": it.get("split") or "?", "run": 0,
+                 **({"original_split": it["original_split"]} if it.get("original_split") else {}),
+                 **it["entrada_do_juiz"]} for it in items]}, ensure_ascii=False), encoding="utf-8")
+            rep = run(llm, [src], max_usd=left, previous=trust, reuse_trust=True)
+        frozen.setdefault("rejulgamentos", []).append({
+            "model": llm.model, "prompt_sha": PROMPT_SHA, "status": rep["status"],
+            "em": datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds"),
+            "trust_reused": rep.get("trust_reused"), "judge_unreliable": rep.get("judge_unreliable"),
+            "spent_usd": rep.get("spent_usd"), "vereditos": {v["id"]: verdict_core(v) for v in rep["verdicts"]},
+            "recusados": sorted(r["id"] for r in rep.get("judge_refused", []))})
+        label.write_json(path, frozen)
+        out["paginas"] += 1
+        out["julgados"] += len(rep["verdicts"])
+        out["spent_usd"] = round(out["spent_usd"] + float(rep.get("spent_usd") or 0.0), 6)
+        if rep["status"] != "ran":
+            out["status"] = rep["status"]
+            break
+    return out
+
+
+def _main_validation(max_usd: float | None) -> int:
+    from app.config import llm_provider
+    from app.llm import LLMError, get_judge_llm
+
+    if llm_provider() != "anthropic" and os.getenv("JUDGE_PROVIDER", "anthropic") != "openai_compat":
+        print(json.dumps({"status": "skipped", "reason": "LLM_PROVIDER != anthropic (sem juiz no modo offline)"}))
+        return 0
+    try:
+        report = judge_validation(get_judge_llm(), max_usd=max_usd)
+    except LLMError as exc:
+        report = {"status": "error", "reason": str(exc)}
+    print(json.dumps(report, ensure_ascii=False))
     return 0
 
 

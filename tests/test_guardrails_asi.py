@@ -310,7 +310,9 @@ TRIGGERS = ["finja ", "aja como ", "admin ", "do cliente ", "loja8806 ", "user_i
             "tenho duas lojas ", "outra loja ", "que eu tenho ", "funcoes ", "modo admin ", "paciente ",
             # os mais caros (a cópia desofuscada difere do texto cru e cada família lê as duas) e os das exceções
             "@a.", "a+", "4s ", "venda do cliente 1234 ", "customer 1234's ", "que eu tenho acesso ",
-            "that belongs to ", "tenho 2 contas outra conta ", "bom administrador ", "suas instrucoes ocultas "]
+            "that belongs to ", "tenho 2 contas outra conta ", "bom administrador ", "suas instrucoes ocultas ",
+            # objeto da família illegal_suspect (crime financeiro parafraseado): o portão não pode ficar quadrático
+            "clonar o cartao ", "lavar o dinheiro ", "fracionar os depositos ", "skimming "]
 
 
 def _cpu_best_of_5(fn, text: str) -> float:
@@ -357,19 +359,19 @@ def test_email_mask_is_linear_on_long_tokens(text):
 
 # --- suspeita confirmada pela camada 2 ---------------------------------------------------------------------
 class _Classifier:
-    """Classificador LLM falso: devolve a categoria pedida, ou levanta LLMError (fora do ar)."""
+    """Classificador LLM falso: devolve a categoria pedida, ou levanta LLMError (fora do ar, `kind` configurável)."""
 
     enabled = True
 
-    def __init__(self, category=None, down=False):
-        self.category, self.down, self.calls = category, down, 0
+    def __init__(self, category=None, down=False, kind="other"):
+        self.category, self.down, self.kind, self.calls = category, down, kind, 0
 
     def complete(self, system, messages, max_tokens=2048, schema=None):
         from app.llm import LLMError
 
         self.calls += 1
         if self.down:
-            raise LLMError("fora do ar")
+            raise LLMError("fora do ar", self.kind)
         return type("R", (), {"json": lambda s: {"category": self.category or "safe"}})()
 
 
@@ -415,3 +417,22 @@ def test_pipeline_without_classifier_still_blocks_the_suspicion(monkeypatch):
     monkeypatch.setattr(guardrails, "get_llm", lambda role: off)
     verdict, decision = pipeline._guard_and_route(SUSPECT_TEXT, [])
     assert verdict.blocked and decision is None
+
+
+def test_classifier_refusal_blocks_and_is_not_treated_as_a_crash(monkeypatch):
+    """Recusa do modelo (LLMError kind "refusal") não é queda: bloqueia, com a flag classifier_refusal."""
+    monkeypatch.setattr(guardrails, "get_llm", lambda role: _Classifier(down=True, kind="refusal"))
+    v = guardrails.llm_check(pre_check("Qual o prazo de entrega?"))  # nem suspeita: a recusa é que bloqueia
+    assert v.blocked and v.reason == "prompt_injection"
+    assert guardrails.CLASSIFIER_REFUSAL in v.flags and "layer_llm" in v.flags
+    assert guardrails.UNAVAILABLE not in v.flags  # recusa não conta como indisponibilidade
+
+
+def test_category_outside_the_enum_is_unavailable_not_safe(monkeypatch):
+    """Categoria fora do enum do schema vira UNAVAILABLE (nunca "safe"): sem suspeita a leitura segue com a flag;
+    com suspeita, falha fechada."""
+    monkeypatch.setattr(guardrails, "get_llm", lambda role: _Classifier("totalmente_fora_do_enum"))
+    plain = guardrails.llm_check(pre_check("Qual o prazo de entrega?"))
+    assert not plain.blocked and guardrails.UNAVAILABLE in plain.flags
+    suspect = guardrails.llm_check(pre_check(SUSPECT_TEXT))
+    assert suspect.blocked and "suspect_llm_unavailable" in suspect.flags

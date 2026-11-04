@@ -10,11 +10,20 @@ from app.api import app
 from app.config import ROOT
 
 DASH = ROOT / "ops" / "grafana" / "dashboards" / "support.json"
-EMITTED_EXTRA = {"span_latency_ms_sum", "span_latency_ms_count"}  # linhas de latência do Metrics.render()
+SUFFIXES = ("_total", "_sum", "_count", "_bucket")  # _bucket: o painel de p95 lê o histograma
+
+
+def emitted_latency() -> set[str]:
+    """Séries de latência do Metrics.render() de verdade (não uma lista à mão): _bucket, _sum e _count."""
+    from app.observability import Metrics
+
+    m = Metrics()
+    m.observe("turn", 1.0)
+    return {line.split("{")[0] for line in m.render().splitlines() if line and not line.startswith("#")}
 
 
 def emitted_metrics() -> set[str]:
-    names = set(EMITTED_EXTRA)
+    names = emitted_latency()
     for path in (ROOT / "src" / "app").rglob("*.py"):
         names |= set(re.findall(r"METRICS\.(?:inc|add)\(\s*\"([a-z_]+)\"", path.read_text(encoding="utf-8")))
     return names
@@ -28,10 +37,20 @@ def test_every_dashboard_metric_is_emitted_by_the_code():
         assert p["targets"], p["title"]
         for t in p["targets"]:
             used |= set(re.findall(r"\b([a-z]+(?:_[a-z]+)+)\b(?=[\[{ (]|$)", t["expr"]))
-    metrics = {m for m in used if m.endswith(("_total", "_sum", "_count"))}
+    metrics = {m for m in used if m.endswith(SUFFIXES)}
     assert metrics, "nenhuma métrica encontrada nas expressões"
     ghosts = sorted(metrics - emitted_metrics())
     assert not ghosts, f"painel usa métrica que o código não emite: {ghosts}"
+
+
+def test_dashboard_has_the_p95_from_the_histogram_for_each_stage_and_for_the_turn():
+    """O p95 sai do Prometheus: histogram_quantile somando `le` entre réplicas (média de p95 por réplica não é p95)."""
+    panels = json.loads(DASH.read_text(encoding="utf-8"))["panels"]
+    quantiles = [t["expr"] for p in panels for t in p["targets"] if t["expr"].startswith("histogram_quantile(")]
+    assert any("sum by (span, le) (rate(span_latency_ms_bucket[5m]))" in e and "(0.95," in e for e in quantiles)
+    assert any('span_latency_ms_bucket{span="turn"}' in e and "(0.95," in e for e in quantiles)
+    assert all("le)" in e for e in quantiles), quantiles  # sem `le` no sum, o histogram_quantile não tem baldes
+    assert "span_latency_ms_bucket" in emitted_latency()
 
 
 def test_compose_has_observability_profile_bound_to_loopback():

@@ -123,7 +123,8 @@ if [[ "$1" == "-m" && "$2" == "evals.run_evals" ]]; then
   fi
   exit 0
 fi
-[[ "$1" == "scripts/fill_readme.py" ]] && exit 0
+[[ "$1" == "-m" && "$2" == "evals.failure_modes" ]] && echo "failure_modes" >> "{log}" && exit 0
+[[ "$1" == "scripts/fill_readme.py" ]] && echo "fill_readme" >> "{log}" && exit 0
 exec "{sys.executable}" "$@"
 """, encoding="utf-8")
     fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
@@ -131,7 +132,12 @@ exec "{sys.executable}" "$@"
                           "--max-usd", "10", "--repeat", "1", "--no-judge"], capture_output=True, text=True,
                          encoding="utf-8", timeout=120, env={**os.environ, "LIVE_EVAL_PY": str(fake)})
     assert out.returncode == 0, out.stdout + out.stderr
-    live = [line for line in log.read_text(encoding="utf-8").splitlines() if "--live" in line]
+    calls = log.read_text(encoding="utf-8").splitlines()
+    live = [line for line in calls if "--live" in line]
     assert len(live) == 1, live  # antes: um processo por split
     assert "--splits official,memory,replan" in live[0] and "--max-usd 6.5" in live[0]  # 65% de 10
     assert "official: complete" in out.stdout and "replan: complete" in out.stdout
+    # rodada 10: o FAILURE_MODES velho ("42 falhas em 281") contradizia o placar porque ninguém o regerava; agora a
+    # análise de erros sai da bateria que acabou de rodar, antes do README
+    assert calls.count("failure_modes") == 1
+    assert calls.index(live[0]) < calls.index("failure_modes") < calls.index("fill_readme")

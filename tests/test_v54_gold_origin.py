@@ -41,6 +41,19 @@ def test_build_gives_four_origins_cleans_breadcrumbs_and_skips_gold(tmp_path):
     assert len(built["no_source"]) >= gold_questions.MIN_NO_SOURCE
 
 
+def test_site_headers_and_banners_are_not_customer_questions():
+    # as 9 linhas-lixo do gold do ensaio (rodada 10, retrieval.d/page.jsonl:1,2,7,8,9,15,20,21,26)
+    junk = ["Qual a sua máquina?", "Gestão na palma da sua mão Já tem a sua Get Conta?",
+            "R$ 129,90/mês Venda mais na Black Friday Já é cliente Getnet?", "Dúvidas sobre Link de Pagamento?",
+            "Como você prefere continuar?", "Já é nosso cliente?", "Gestão na palma da sua mão Já tem o seu Get Tap?",
+            "Leroy Merlin Maquininhas e Plataforma Digital Dúvidas sobre as maquininhas?", "Dúvidas sobre Get Tap?"]
+    assert all(gold_questions.generic(q) for q in junk)
+    real = ["Quem já tem conta pode pedir outra máquina?", "Qual a sua taxa de débito?",
+            "Já recebi a máquina, e agora?", "Como eu contrato o Crediário e qual a taxa?",
+            "Tenho dúvidas sobre a taxa: ela muda por bandeira?"]
+    assert not any(gold_questions.generic(q) for q in real)  # minúscula no meio é pergunta: fica
+
+
 def test_write_puts_unlabelled_drafts_outside_the_eval_and_negatives_inside(tmp_path):
     b = _bench(tmp_path)
     paths = gold_questions.write(gold_questions.build(b["knowledge"], b["cases"], b["real"], b["gold"]),

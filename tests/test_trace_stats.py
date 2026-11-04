@@ -24,9 +24,13 @@ def default_slo(monkeypatch):
     monkeypatch.delenv("SLO_P95_S", raising=False)
 
 
-def row(split, ms, steps=None, case_id=None, turn_ms=None, crash=None):
+def row(split, ms, steps=None, case_id=None, turn_ms=None, crash=None, blocked=False, load=None):
     return {"id": case_id or f"{split}-{ms:g}", "split": split, "ms": ms, "turn_ms": turn_ms, "crash": crash,
-            "steps": [] if steps is None else steps}
+            "steps": [] if steps is None else steps, "blocked": blocked, "load": load}
+
+
+# a carga da bateria integral do kit: 12 splits num processo, 8 workers, teto 8 (scripts/live_eval.sh), 4 CPUs
+LOAD8 = {"cases_at_once": 8, "max_concurrent": 8, "workers": 8, "splits_in_process": 12, "cpus": 4}
 
 
 def step(agent, ms, decided_by=None, why=None, **extra):
@@ -261,14 +265,78 @@ def test_unknown_decider_is_kept_and_free_text_why_cannot_break_the_markdown():
 
 
 def test_load_rows_reads_every_live_file_with_the_split_of_the_report(tmp_path):
-    (tmp_path / "live_official.json").write_text(json.dumps({"split": "official", "rows": [
+    (tmp_path / "live_official.json").write_text(json.dumps({"split": "official", "concurrency": LOAD8, "rows": [
         {"id": "o1", "ms": 1000.0, "steps": [], "answer": "fica de fora"},
         {"id": "o2", "split": "official", "ms": 2000.0, "turn_ms": 1500.0, "crash": "Erro: x"}]}), encoding="utf-8")
+    (tmp_path / "live_guardrail.json").write_text(json.dumps({"split": "guardrail", "rows": [
+        {"id": "g1", "ms": 14.0, "steps": [], "blocked": True}]}), encoding="utf-8")  # gravação sem `concurrency`
     (tmp_path / "ablation_replan_live.json").write_text(json.dumps({"rows": [{"id": "z", "ms": 1.0}]}),
                                                         encoding="utf-8")  # ablação não é live_*.json
     assert trace_stats.load_rows(tmp_path) == [
-        {"id": "o1", "split": "official", "ms": 1000.0, "turn_ms": None, "crash": None, "steps": []},
-        {"id": "o2", "split": "official", "ms": 2000.0, "turn_ms": 1500.0, "crash": "Erro: x", "steps": None}]
+        {"id": "g1", "split": "guardrail", "ms": 14.0, "turn_ms": None, "crash": None, "steps": [], "blocked": True,
+         "load": None},
+        {"id": "o1", "split": "official", "ms": 1000.0, "turn_ms": None, "crash": None, "steps": [], "blocked": False,
+         "load": LOAD8},
+        {"id": "o2", "split": "official", "ms": 2000.0, "turn_ms": 1500.0, "crash": "Erro: x", "steps": None,
+         "blocked": False, "load": LOAD8}]
+
+
+def test_guardrail_blocks_leave_the_percentiles_and_the_slo_and_are_counted_apart():
+    """Ensaio: 39 bloqueios, que levam ms, baixavam o p50 do total de 17,6 s para 16,3 s; aqui eles viram o SLO."""
+    rows = ([row("official", 21000.0, case_id=f"o{i}", load=LOAD8) for i in range(3)]
+            + [row("guardrail", 14.0, case_id=f"g{i}", blocked=True, load=LOAD8) for i in range(5)]
+            + [row("guardrail", 6000.0, case_id="g-ok", load=LOAD8)])
+    s = trace_stats.summarize(rows, target=TARGET)
+    total, guard = s["ALL"], s["by_split"]["guardrail"]
+    # com os bloqueios, o p50 do total seria 14 ms (posição 4 de 9) e o total "cumpriria" o SLO
+    assert trace_stats.percentile([r["ms"] for r in rows], 0.5) == 14.0
+    assert (total["rows"], total["blocked"], total["p50_ms"], total["slo_ok"]) == (4, 5, 21000.0, False)
+    assert (guard["rows"], guard["blocked"], guard["p50_ms"], guard["slo_ok"]) == (1, 5, 6000.0, True)
+    md = trace_stats.markdown(s)
+    assert ("Total: p50 21.0 s, p95 21.0 s em 4 linhas (5 bloqueios do guardrail fora do p50/p95: a recusa leva "
+            "ms).") in md
+    assert "| `guardrail` | 1 (+5 bloqueadas) | 1 | 6.0 s | 6.0 s | sim |" in md
+    only_blocked = trace_stats.summarize([row("guardrail", 14.0, blocked=True)], target=TARGET)["by_split"]
+    assert only_blocked["guardrail"]["slo_ok"] is None  # só recusas: o split não entra na conta do SLO
+    crashed = trace_stats.markdown(trace_stats.summarize(
+        [row("official", 5000.0), row("official", 9.0, blocked=True), row("official", 1.0, crash="x")], target=TARGET))
+    assert "em 1 linha (1 bloqueio do guardrail fora do p50/p95: a recusa leva ms; 1 crash fora do p50/p95)." in crashed
+    assert "| `official` | 1 (+1 crash, +1 bloqueada) |" in crashed
+
+
+def test_slo_line_declares_the_load_it_was_measured_under():
+    one = {"cases_at_once": 1, "max_concurrent": 12, "workers": 1, "splits_in_process": 1, "cpus": 4}
+    md = trace_stats.markdown(trace_stats.summarize([row("official", 9000.0, load=LOAD8)] * 2, target=TARGET))
+    assert ("Carga da medida: até **8** conversas ao mesmo tempo no processo (12 splits × 8 workers; teto "
+            "`LIVE_MAX_CONCURRENT` 8), em 4 CPUs: o tempo do turno inclui a CPU dividida com as outras conversas "
+            "(carga do eval, não a de uma conversa sozinha). Cumprem **1 de 1** splits.") in md
+    mixed = trace_stats.markdown(trace_stats.summarize(
+        [row("official", 9000.0, load=LOAD8), row("replan", 9000.0, load=LOAD8), row("partial", 9000.0, load=one),
+         row("memory", 9000.0)], target=TARGET))
+    assert ("Carga da medida: até **8** conversas ao mesmo tempo no processo (12 splits × 8 workers; teto "
+            "`LIVE_MAX_CONCURRENT` 8), em 4 CPUs em `official`, `replan`; até **1** conversa ao mesmo tempo no "
+            "processo (1 split × 1 worker; teto `LIVE_MAX_CONCURRENT` 12), em 4 CPUs em `partial`; não registrada em "
+            "`memory` (gravação anterior ao campo `concurrency`): o tempo do turno inclui a CPU") in mixed
+    alone = trace_stats.markdown(trace_stats.summarize([row("official", 9000.0, load=one)], target=TARGET))
+    assert "até **1** conversa ao mesmo tempo" in alone and "CPU dividida" not in alone  # sozinha não divide
+    old = trace_stats.markdown(trace_stats.summarize([row("official", 9000.0)], target=TARGET))
+    assert "Carga da medida: não registrada nos live_*.json (gravação anterior ao campo `concurrency`)." in old
+
+
+def test_live_report_records_the_load_it_ran_under(monkeypatch):
+    class Client:
+        def send(self, message, user_id, conversation_id):
+            return {"conversation_id": "c1", "intent": "faq", "route": ["router", "faq"], "steps": [],
+                    "usage": {"cost_usd": 0.0}}
+
+    report = run_evals.run(split="official", workers=3, client=Client(), live=True)
+    saved = json.loads(Path(report["path"]).read_text(encoding="utf-8"))
+    cap = run_evals._MAX_CONCURRENT
+    assert saved["concurrency"] == {"cases_at_once": min(cap, 3), "max_concurrent": cap, "workers": 3,
+                                    "splits_in_process": 1, "cpus": run_evals.concurrency(1)["cpus"]}
+    assert run_evals.concurrency(8, 12)["cases_at_once"] == min(cap, 96)  # o teto do processo vale sobre todos
+    rows = trace_stats.load_rows(run_evals.RESULTS_DIR)
+    assert rows and all(r["load"] == saved["concurrency"] for r in rows)
 
 
 def test_live_row_times_the_last_turn_apart_from_the_conversation(monkeypatch):

@@ -1,4 +1,4 @@
-﻿# Eval ao vivo por split + juiz + README, no PowerShell do Windows (5.1 ou 7).
+﻿# Eval ao vivo por split + juiz + FAILURE_MODES + README, no PowerShell do Windows (5.1 ou 7).
 #
 # Uso (de qualquer pasta; roda bem em segundo plano desde T+30):
 #   powershell -ExecutionPolicy Bypass -File <projeto>\scripts\live_eval.ps1 -MaxUsd 3
@@ -78,4 +78,8 @@ if ($code -ne 0) { Write-Host "   saída $code (split abortado, degradado ou que
 if ($SemReadme) { exit 0 }
 $env:LLM_PROVIDER = "offline"
 & $py -m evals.run_evals | Out-Null   # relatório offline (bloco principal do README e gate)
+# análise de erros da bateria que acabou de rodar (gerada, nunca à mão: o fill_readme --check compara);
+# commite docs/FAILURE_MODES.md junto com evals/results/
+& $py -m evals.failure_modes
+if ($LASTEXITCODE -ne 0) { Write-Host "   docs/FAILURE_MODES.md não gerado (motivo acima)" }
 & $py scripts/fill_readme.py

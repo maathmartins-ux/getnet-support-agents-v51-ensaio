@@ -143,6 +143,82 @@ def test_empty_standalone_falls_back_to_the_message(corpus):
     assert plan.queries == ["Quanto custa o Plano Alfa?"]
 
 
+# --- buscas do plano em paralelo, na ordem do plano -------------------------------------------------------------------
+class SlowDense:
+    """Buscador "caro" (nome do denso): cada busca espera as outras do plano chegarem (barreira) e a 1ª termina por
+    último. Em série, a 1ª esperaria as outras para sempre: a barreira quebra em 5 s e o teste falha."""
+
+    name, gate = "dense", None
+
+    def __init__(self, parties: int):
+        import threading
+
+        self.barrier, self.threads = threading.Barrier(parties, timeout=5), {}
+
+    def search(self, query, k=3):
+        import threading
+        import time
+
+        self.threads[query] = threading.get_ident()
+        self.barrier.wait()
+        time.sleep(0.05 if query.startswith("a") else 0)
+        return [rag.Hit(rag.Doc(f"{query}-{i}", "t", f"https://x/{query}", f"{query} {i}"), 1.0, bm25=99.0)
+                for i in range(2)]
+
+
+def test_plan_searches_run_at_the_same_time_and_come_back_in_plan_order():
+    import threading
+
+    spy = SlowDense(3)
+    rankings = agents.plan_rankings(spy, ["a cliente", "b item", "c item"], k=3)
+    assert [[h.doc.id for h in r] for r in rankings] == [["a cliente-0", "a cliente-1"], ["b item-0", "b item-1"],
+                                                         ["c item-0", "c item-1"]]
+    assert spy.threads["a cliente"] == threading.get_ident()  # a 1ª na thread do agente, as outras ao lado
+    assert len(set(spy.threads.values())) == 3
+
+
+def test_parallel_searches_keep_the_callers_context_and_give_back_the_slots(monkeypatch):
+    from app.rag import MEMO_READS
+
+    seen = []
+
+    class Dense:
+        name, gate = "dense", None
+
+        def search(self, query, k=3):
+            seen.append(MEMO_READS.get())
+            if query == "b":
+                raise RuntimeError("modelo caiu")
+            return []
+
+    token = MEMO_READS.set(False)  # a medida de latência desliga o memo: a thread da busca tem de ver o mesmo
+    try:
+        with pytest.raises(RuntimeError):
+            agents.plan_rankings(Dense(), ["a", "b", "c"], k=3)
+    finally:
+        MEMO_READS.reset(token)
+    assert seen == [False] * 3
+    slots = agents._search_slots(agents.search_parallel())
+    assert all(slots.acquire(blocking=False) for _ in range(agents.search_parallel()))  # nenhuma vaga perdida
+    for _ in range(agents.search_parallel()):
+        slots.release()
+
+
+def test_without_a_slot_or_with_bm25_the_plan_runs_in_series(monkeypatch):
+    import threading
+
+    here = threading.get_ident()
+    monkeypatch.setenv("FAQ_SEARCH_PARALLEL", "0")
+    spy = SlowDense(1)
+    agents.plan_rankings(spy, ["a", "b", "c"], k=3)
+    assert set(spy.threads.values()) == {here}
+    monkeypatch.delenv("FAQ_SEARCH_PARALLEL")
+    bm25 = SlowDense(1)
+    bm25.name = "bm25"  # ~1 ms por busca: a thread custaria mais que a busca
+    agents.plan_rankings(bm25, ["a", "b", "c"], k=3)
+    assert set(bm25.threads.values()) == {here}
+
+
 # --- fusão e top-k ---------------------------------------------------------------------------------------------------
 def _hit(i):
     return rag.Hit(rag.Doc(i, i, f"https://x/{i}", i), 1.0)
@@ -206,13 +282,35 @@ def test_tool_results_are_marked_untrusted_and_only_covered_passages_enter(corpu
     assert empty["content"] == "Nenhuma passagem nova com fonte para esta consulta."
 
 
-def test_comparison_uses_the_whole_budget_and_the_writer_gets_no_tool(corpus, monkeypatch):
+def test_comparison_that_spent_the_budget_keeps_one_corrective_search(corpus, monkeypatch):
+    # Rodada 10 (official-01, 3 rodadas): a comparação gastou o teto no plano e o redator, sem a tool, marcou MISSING
+    # de um item com o trecho a uma busca de distância. Agora ele leva 1 busca corretiva; a 2ª volta como limite.
     monkeypatch.setenv("FAQ_MAX_SEARCHES", "2")
-    llm, msgs = fake_llm([resp("end_turn", text("Alfa R$ 10 [1]; Beta R$ 20 [2]."))], effort="medium")
+    llm, msgs = fake_llm([
+        resp("tool_use", tool_use("search", {"query": "troca do produto prazo"}, "s1")),
+        resp("tool_use", tool_use("search", {"query": "conta corrente"}, "s2")),
+        resp("end_turn", text("Alfa R$ 10 [1]; Beta R$ 20 [2]."))], effort="medium")
     monkeypatch.setattr(agents, "get_llm", lambda role="agent": llm)
+    spy = SpyRetriever()
+    monkeypatch.setattr(agents, "get_retriever", lambda: spy)
     r = agents.faq_agent(ctx("Qual a diferença entre o Plano Alfa e o Plano Beta?"))
-    assert "tools" not in msgs.sent[0] and r.status == "ok"
-    assert r.text == "Alfa R$ 10 [alfa-preco]; Beta R$ 20 [beta-preco]."
+    assert len(r.facts["faq_queries"]) == 3 and r.facts["faq_queries"][2] == "troca do produto prazo"
+    assert msgs.sent[0]["tools"][0]["name"] == "search" and "(até 1x)" in msgs.sent[0]["messages"][-1]["content"]
+    assert len(spy.queries) == 3  # 2 do plano + 1 corretiva
+    found = msgs.sent[1]["messages"][-1]["content"][0]
+    assert not found["is_error"] and "Troca" in found["content"]  # a corretiva trouxe o trecho que faltava
+    limit = msgs.sent[2]["messages"][-1]["content"][0]
+    assert limit["is_error"] and "limite de 3 buscas" in limit["content"]  # o teto do turno que valeu (2 + 1)
+    assert r.status == "ok" and r.text == "Alfa R$ 10 [alfa-preco]; Beta R$ 20 [beta-preco]."
+    assert "troca" in {s.id for s in r.sources}
+
+
+def test_plan_under_the_budget_keeps_the_same_tool_budget_and_limit_text(corpus, monkeypatch):
+    # a busca corretiva só muda o turno cujo plano gastou o teto: com sobra, o pedido ao LLM é o de antes
+    llm, msgs = fake_llm([resp("end_turn", text("R$ 10 [1]."))], effort="medium")
+    monkeypatch.setattr(agents, "get_llm", lambda role="agent": llm)
+    agents.faq_agent(ctx("Quanto custa o Plano Alfa?"))
+    assert "(até 2x)" in msgs.sent[0]["messages"][-1]["content"]  # 1 do plano, 2 da tool (FAQ_MAX_SEARCHES=3)
 
 
 def test_tool_loop_without_final_text_falls_back_to_extractive(corpus, monkeypatch):

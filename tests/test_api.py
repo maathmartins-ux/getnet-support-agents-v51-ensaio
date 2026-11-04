@@ -77,6 +77,35 @@ def test_production_refuses_default_secrets(monkeypatch):
         pass  # o lifespan roda ao entrar no TestClient
 
 
+def test_production_refuses_shared_operator_and_open_metrics(monkeypatch):
+    """Produção fechada por padrão: com AUTH_SECRET e OPERATOR_TOKEN fortes, mas sem OPERATOR_KEYS (o token
+    compartilhado valeria como "admin") e sem METRICS_TOKEN forte (/metrics aberto na porta da API), a API não sobe.
+    Com os dois, o portão passa e /metrics pede o Bearer. No dev nada muda: os dois seguem opcionais."""
+    import pytest
+
+    from app import auth
+    from app.api import production_gaps, refuse_insecure_production
+
+    monkeypatch.setenv("AUTH_SECRET", "x" * 32)
+    monkeypatch.setenv("OPERATOR_TOKEN", "y" * 32)
+    monkeypatch.delenv("OPERATOR_KEYS", raising=False)
+    monkeypatch.delenv("METRICS_TOKEN", raising=False)
+    assert refuse_insecure_production() == [] and production_gaps() == ["OPERATOR_KEYS", "METRICS_TOKEN"]  # dev sobe
+    monkeypatch.setenv("APP_ENV", "production")
+    with pytest.raises(RuntimeError, match=r"segredos padrão em produção: \['OPERATOR_KEYS', 'METRICS_TOKEN'\]"), \
+            TestClient(app):
+        pass  # o lifespan roda ao entrar no TestClient (e para antes de abrir o MCP)
+    monkeypatch.setenv("OPERATOR_KEYS", f"ana:{auth._hash('k' * 24)}")
+    monkeypatch.setenv("METRICS_TOKEN", "troque-por-um-token-longo")  # valor de exemplo vale como fraco, longo ou não
+    with pytest.raises(RuntimeError, match=r"\['METRICS_TOKEN'\]"):
+        refuse_insecure_production()
+    monkeypatch.setenv("METRICS_TOKEN", "m" * 24)
+    assert refuse_insecure_production() == []
+    assert client.get("/metrics").status_code == 401
+    assert client.get("/metrics", headers={"Authorization": "Bearer " + "m" * 24}).status_code == 200
+    assert auth.operator_name("y" * 32) is None and auth.operator_name("k" * 24) == "ana"  # sem admin anônimo
+
+
 def test_root_redirects_to_docs():
     r = client.get("/", follow_redirects=False)
     assert r.status_code in (302, 307) and r.headers["location"] == "/docs"

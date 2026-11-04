@@ -18,6 +18,8 @@ def test_invented_ids_are_dropped_and_list_is_capped():
 
 
 def test_retrieve_searches_customer_words_first_then_router_queries():
+    from app.rag import Doc, Hit
+
     seen = []
 
     class Fake:
@@ -25,12 +27,15 @@ def test_retrieve_searches_customer_words_first_then_router_queries():
 
         def search(self, query, k=3):
             seen.append(query)
-            return []
+            return [Hit(Doc(query, "t", f"https://x/{len(seen)}", query), 1.0, bm25=99.0)]
 
-    agents.retrieve("Do I need a bank account to receive via Pix?", retriever=Fake(), k=5,
-                    queries=["Pix conta corrente poupança conta de pagamento", "  "])
-    # a pergunta original vai primeiro: há caso oficial em que ela acha o fato em 1º e as consultas do LLM, não
-    assert seen == ["Do I need a bank account to receive via Pix?", "Pix conta corrente poupança conta de pagamento"]
+    found = agents.retrieve("Do I need a bank account to receive via Pix?", retriever=Fake(), k=5,
+                            queries=["Pix conta corrente poupança conta de pagamento", "  "])
+    # a pergunta original vai primeiro no plano e na fusão: há caso oficial em que ela acha o fato em 1º e as
+    # consultas do LLM, não. As buscas do plano rodam juntas (agents.plan_rankings): a ordem de CHEGADA não conta.
+    own = "Do I need a bank account to receive via Pix?"
+    assert found.plan.queries == [own, "Pix conta corrente poupança conta de pagamento"]
+    assert sorted(seen) == sorted(found.plan.queries) and found.hits[0].doc.id == own
     seen.clear()
     agents.retrieve("e a taxa?", standalone="taxa do Pix", retriever=Fake(), k=5, queries=["taxa do Pix"])
     assert seen == ["taxa do Pix"]  # sem busca repetida quando o LLM já usou as mesmas palavras
