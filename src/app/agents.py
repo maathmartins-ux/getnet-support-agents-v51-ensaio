@@ -282,11 +282,12 @@ def _lang_tail(ctx: Context) -> str:
 _NUM = re.compile(r"-?\d+(?:[.,]\d+)?")
 
 
-def live_missing(text: str, live: live_data.LiveResult, language: str) -> list[str]:
-    """Rótulos dos valores obrigatórios (live.must) que a resposta não traz: número com a tolerância do arredondamento
-    que o prompt permite ("19 °C" vale para 19,4). Vírgula ou ponto decimal, conforme o idioma da resposta."""
+def live_missing(text: str, live, language: str) -> list[str]:
+    """Rótulos dos valores obrigatórios (`live.must`, ou a própria lista) que a resposta não traz: número com a
+    tolerância do arredondamento que o prompt permite ("19 °C" vale para 19,4). Vírgula ou ponto decimal."""
+    must = getattr(live, "must", live) or []
     nums = [float(n.replace(",", ".")) for n in _NUM.findall(text or "")]
-    return [en if language == "en" else pt for pt, en, value, tol in live.must
+    return [en if language == "en" else pt for pt, en, value, tol in must
             if not any(abs(n - value) <= tol + 1e-9 for n in nums)]
 
 
@@ -318,7 +319,9 @@ def _live(ctx: Context, live: live_data.LiveResult) -> AgentResult:
                 METRICS.inc("live_data_repair_total", kind=live.kind, outcome=facts["live_repair"])
         except LLMError:
             text = template  # template já cita fonte e data
-    return AgentResult("faq", "ok", text=text, sources=[source], evidence=evidence, facts=facts)
+    result = AgentResult("faq", "ok", text=text, sources=[source], evidence=evidence, facts=facts)
+    result.live_must = live.must  # fora de `facts` (que vai ao contexto dos agentes): a resposta final é conferida
+    return result
 
 
 def _general(ctx: Context) -> AgentResult:

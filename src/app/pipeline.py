@@ -160,6 +160,19 @@ def _fix_language(answer: str, final: _Check, *, ctx: Context, evidence: list[st
     return (fixed, after) if ok else (answer, final)
 
 
+def _drops_live_values(outcome, language: str) -> bool:
+    """A resposta redigida pelo supervisor deixou de fora um valor obrigatório (mínima, máxima, chance de chuva; venda
+    e compra) que o texto do especialista de dado ao vivo traz?"""
+    from .agents import live_missing
+
+    for r in outcome.results:
+        must = getattr(r, "live_must", None)
+        if must and r.text and not live_missing(r.text, must, language) and live_missing(outcome.answer, must,
+                                                                                       language):
+            return True
+    return False
+
+
 def _enforce(answer: str, *, evidence: list[str], said: str, ctx: Context, outcome, handoff: Handoff,
              route: list[str], public: str) -> tuple[str, list[str], str, list[str], Handoff]:
     """Saída segura da resposta final: (resposta, números sem base, numbers_action, rótulos de risco, handoff).
@@ -314,6 +327,12 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
         _hold_writes(store, outcome, language)
 
     answer = outcome.answer or "\n\n".join(r.text for r in outcome.results if r.text)
+    if outcome.answer and _drops_live_values(outcome, language):
+        # a redação do supervisor LLM perdeu valor obrigatório do dado ao vivo que o especialista entregou conferido
+        # (medido: a mínima e a máxima ficaram, a chance de chuva saiu): vale a junção dos textos dos especialistas
+        METRICS.inc("supervisor_answer_dropped_live_total")
+        outcome.answer = None
+        answer = "\n\n".join(r.text for r in outcome.results if r.text)
     if not answer.strip():  # nunca 200 vazio: vazio no histórico vira 400 da API no turno seguinte
         answer = NO_ANSWER[language]
     docs = {d.id: d.text for d in get_index().docs}

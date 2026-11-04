@@ -59,3 +59,21 @@ def test_still_incomplete_falls_back_to_the_lookup_text(monkeypatch):
 def test_complete_answer_costs_one_call(monkeypatch):
     out, llm = _run(monkeypatch, ["Low 19 °C, high 24 °C, up to 81% chance of rain (wttr.in, 2026-11-04)."])
     assert len(llm.calls) == 1 and "live_repair" not in out.facts
+
+
+def test_final_answer_that_drops_a_live_value_falls_back_to_the_specialist_text():
+    """A redação do supervisor LLM não pode perder o valor que o especialista entregou conferido."""
+    from app.pipeline import _drops_live_values
+    from app.supervisor import Outcome
+
+    live = _weather()
+    ok = agents.AgentResult("faq", "ok", text="Low 19 °C, high 24 °C, up to 81% chance of rain.")
+    ok.live_must = live.must
+    out = Outcome(engine="llm")
+    out.results, out.answer = [ok], "Tomorrow: low 19 °C and high 24 °C."
+    assert _drops_live_values(out, "en")
+    out.answer = "Tomorrow: low 19 °C, high 24 °C, 81% chance of rain."
+    assert not _drops_live_values(out, "en")
+    plain = agents.AgentResult("faq", "ok", text="Texto sem dado ao vivo.")
+    out.results, out.answer = [plain], "Qualquer coisa."
+    assert not _drops_live_values(out, "pt")  # sem live_must: nada a conferir

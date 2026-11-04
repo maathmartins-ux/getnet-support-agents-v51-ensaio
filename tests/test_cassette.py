@@ -149,3 +149,13 @@ def test_replay_without_accepted_recording_refuses(tmp_path):
     (run_evals.cassettes_dir() / "memory.jsonl").write_text("", encoding="utf-8")
     summary = run_evals.run_replay()
     assert not summary["passed"] and "grave de novo" in summary["splits"]["memory"]["problems"][0]
+
+
+def test_smoke_outside_results_does_not_rerecord_the_ci_cassette(tmp_path, monkeypatch):
+    from evals import run_evals
+
+    monkeypatch.delenv("EVAL_CASSETTE", raising=False)
+    assert run_evals.records_cassette(None) and run_evals.records_cassette(run_evals.RESULTS_DIR / "live_x.json")
+    assert not run_evals.records_cassette(tmp_path / "smoke.json")  # fumaça fora de evals/results
+    monkeypatch.setenv("EVAL_CASSETTE", "off")
+    assert not run_evals.records_cassette(None)

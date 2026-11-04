@@ -693,7 +693,8 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
             os.environ["LLM_PROVIDER"] = "anthropic"
             from app.llm import start_recording
 
-            recorder = start_recording()  # cassete: cada resposta real fica gravada para o replay do CI
+            # cassete: cada resposta real fica gravada para o replay do CI (só a rodada que vai para evals/results)
+            recorder = start_recording() if records_cassette(out) else None
         if replay is not None and not url and not shared:
             from app.llm import reset_replay
 
@@ -1006,6 +1007,21 @@ def floors_of(report: dict) -> dict:
     st = report.get("stability") or {}
     floors.update({k: round(100 * st[k], 1) for k in FLOOR_KEYS_EXTRA if st.get(k) is not None})
     return {**floors, "max_crashes": m.get("crashes", 0)}
+
+
+def records_cassette(out: Path | None) -> bool:
+    """Grava o cassete do CI só quando o relatório vai para evals/results (a rodada aceita): fumaça com --out em outro
+    lugar regravava evals/cassettes/<split>.jsonl e o replay do CI passava a conferir uma rodada que não é a commitada.
+    EVAL_CASSETTE=off desliga de vez."""
+    if os.getenv("EVAL_CASSETTE", "").lower() == "off":
+        return False
+    if out is None:
+        return True
+    try:
+        Path(out).resolve().relative_to(RESULTS_DIR.resolve())
+        return True
+    except ValueError:
+        return False
 
 
 def save_cassette(recorder, name: str, report: dict) -> dict:
