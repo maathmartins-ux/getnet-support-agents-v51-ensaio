@@ -1,7 +1,7 @@
 {
   "_doc": "gerado por `python -m evals.run_evals --choose-retriever --apply`; não edite à mão",
-  "chosen_at": "2026-11-03T22:49:55+00:00",
-  "git_sha": "c3aaa79",
+  "chosen_at": "2026-11-04T06:52:47+00:00",
+  "git_sha": "ee44b31-dirty",
   "gold": "retrieval.jsonl",
   "criterion": "maior Recall@5 (o que o redator lê) com p95 <= 1500 ms e RAM <= 4096 MB (empate: MRR, Recall@3, cobertura do portão, p95)",
   "latency_budget_ms": 1500.0,
@@ -18,43 +18,41 @@
     "gate": {
       "min_score": 5.976,
       "min_cosine": 0.838,
-      "min_rerank": -5.5017
+      "min_rerank": -4.986
     }
   },
-  "rejected": {
-    "dense+cross": "p95 1503.7 ms > orçamento 1500 ms"
-  },
+  "rejected": {},
   "measured": {
     "bm25": {
-      "cases": 59,
-      "recall@3": 0.763,
-      "recall@5": 0.797,
-      "mrr": 0.709,
-      "hit@3": 0.797,
+      "cases": 48,
+      "recall@3": 0.729,
+      "recall@5": 0.76,
+      "mrr": 0.667,
+      "hit@3": 0.75,
       "hit@3_ci": {
-        "k": 47,
-        "n": 59,
-        "lo": 67.7,
-        "hi": 88.0
+        "k": 36,
+        "n": 48,
+        "lo": 61.2,
+        "hi": 85.1
       },
-      "ndcg@3": 0.707,
+      "ndcg@3": 0.672,
       "page": {
-        "recall@3": 0.941,
-        "mrr": 0.912,
-        "hit@3": 0.983,
+        "recall@3": 0.934,
+        "mrr": 0.913,
+        "hit@3": 0.979,
         "hit@3_ci": {
-          "k": 58,
-          "n": 59,
-          "lo": 91.0,
-          "hi": 99.7
+          "k": 47,
+          "n": 48,
+          "lo": 89.1,
+          "hi": 99.6
         }
       },
       "latency_ms": {
-        "p50": 0.7,
-        "p95": 1.0,
-        "mean": 0.7
+        "p50": 0.5,
+        "p95": 0.6,
+        "mean": 0.5
       },
-      "memory_mb": 39.9,
+      "memory_mb": 41.5,
       "dedupe_aliases": 8,
       "fallback": "",
       "config": {
@@ -63,14 +61,14 @@
       "gate": {
         "min_score": 7.287,
         "min_cosine": 2.0,
-        "pos_answered": 0.695,
+        "pos_answered": 0.688,
         "neg_refused": 0.955,
         "meets_floor": true,
         "pos_ci": {
-          "k": 41,
-          "n": 59,
-          "lo": 56.9,
-          "hi": 79.7
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
         },
         "neg_ci": {
           "k": 21,
@@ -78,50 +76,54 @@
           "lo": 78.2,
           "hi": 99.2
         },
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
         "neg_refusal_min": 0.85
       },
       "rerank_gate": null,
       "separation": {
-        "auc": 0.925,
+        "auc": 0.947,
         "gap": -4.766,
-        "positives": 59,
-        "negatives": 17,
-        "enough": true
+        "positives": 48,
+        "negatives": 22,
+        "enough": true,
+        "refused": {
+          "positives": 0,
+          "negatives": 5
+        }
       },
       "separation_rerank": null
     },
     "dense": {
-      "cases": 59,
-      "recall@3": 0.898,
-      "recall@5": 0.915,
-      "mrr": 0.842,
-      "hit@3": 0.915,
+      "cases": 48,
+      "recall@3": 0.917,
+      "recall@5": 0.938,
+      "mrr": 0.858,
+      "hit@3": 0.938,
       "hit@3_ci": {
-        "k": 54,
-        "n": 59,
-        "lo": 81.6,
-        "hi": 96.3
+        "k": 45,
+        "n": 48,
+        "lo": 83.2,
+        "hi": 97.9
       },
-      "ndcg@3": 0.84,
+      "ndcg@3": 0.856,
       "page": {
-        "recall@3": 0.916,
-        "mrr": 0.929,
-        "hit@3": 0.966,
+        "recall@3": 0.966,
+        "mrr": 0.965,
+        "hit@3": 1.0,
         "hit@3_ci": {
-          "k": 57,
-          "n": 59,
-          "lo": 88.5,
-          "hi": 99.1
+          "k": 48,
+          "n": 48,
+          "lo": 92.6,
+          "hi": 100.0
         }
       },
       "latency_ms": {
-        "p50": 265.5,
-        "p95": 1213.4,
-        "mean": 344.7
+        "p50": 65.2,
+        "p95": 83.3,
+        "mean": 68.1
       },
-      "memory_mb": 1540.6,
+      "memory_mb": 1542.1,
       "dedupe_aliases": 8,
       "fallback": "",
       "config": {
@@ -131,14 +133,14 @@
       "gate": {
         "min_score": 5.976,
         "min_cosine": 0.838,
-        "pos_answered": 0.898,
+        "pos_answered": 0.917,
         "neg_refused": 0.864,
         "meets_floor": true,
         "pos_ci": {
-          "k": 53,
-          "n": 59,
-          "lo": 79.5,
-          "hi": 95.3
+          "k": 44,
+          "n": 48,
+          "lo": 80.4,
+          "hi": 96.7
         },
         "neg_ci": {
           "k": 19,
@@ -146,50 +148,54 @@
           "lo": 66.7,
           "hi": 95.3
         },
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
         "neg_refusal_min": 0.85
       },
       "rerank_gate": null,
       "separation": {
-        "auc": 0.972,
+        "auc": 0.979,
         "gap": -0.045,
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
-        "enough": true
+        "enough": true,
+        "refused": {
+          "positives": 0,
+          "negatives": 0
+        }
       },
       "separation_rerank": null
     },
     "dense+cross": {
-      "cases": 59,
-      "recall@3": 0.873,
-      "recall@5": 0.907,
-      "mrr": 0.859,
-      "hit@3": 0.881,
+      "cases": 48,
+      "recall@3": 0.906,
+      "recall@5": 0.927,
+      "mrr": 0.875,
+      "hit@3": 0.917,
       "hit@3_ci": {
-        "k": 52,
-        "n": 59,
-        "lo": 77.5,
-        "hi": 94.1
+        "k": 44,
+        "n": 48,
+        "lo": 80.4,
+        "hi": 96.7
       },
-      "ndcg@3": 0.855,
+      "ndcg@3": 0.874,
       "page": {
-        "recall@3": 0.908,
-        "mrr": 0.941,
-        "hit@3": 0.949,
+        "recall@3": 0.943,
+        "mrr": 0.969,
+        "hit@3": 0.979,
         "hit@3_ci": {
-          "k": 56,
-          "n": 59,
-          "lo": 86.1,
-          "hi": 98.3
+          "k": 47,
+          "n": 48,
+          "lo": 89.1,
+          "hi": 99.6
         }
       },
       "latency_ms": {
-        "p50": 1016.2,
-        "p95": 1503.7,
-        "mean": 1077.9
+        "p50": 1063.5,
+        "p95": 1224.3,
+        "mean": 1075.3
       },
-      "memory_mb": 2381.8,
+      "memory_mb": 2383.5,
       "dedupe_aliases": 8,
       "fallback": "",
       "config": {
@@ -202,93 +208,101 @@
       },
       "gate": {
         "min_score": 5.976,
-        "min_cosine": 0.838,
-        "pos_answered": 0.864,
-        "neg_refused": 0.864,
+        "min_cosine": 0.85,
+        "pos_answered": 0.896,
+        "neg_refused": 0.955,
         "meets_floor": true,
         "pos_ci": {
-          "k": 51,
-          "n": 59,
-          "lo": 75.5,
-          "hi": 93.0
+          "k": 43,
+          "n": 48,
+          "lo": 77.8,
+          "hi": 95.5
         },
         "neg_ci": {
-          "k": 19,
+          "k": 21,
           "n": 22,
-          "lo": 66.7,
-          "hi": 95.3
+          "lo": 78.2,
+          "hi": 99.2
         },
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
         "neg_refusal_min": 0.85
       },
       "rerank_gate": {
-        "min_rerank": -5.5017,
-        "pos_answered": 0.983,
-        "neg_refused": 0.864,
+        "min_rerank": -4.986,
+        "pos_answered": 1.0,
+        "neg_refused": 0.909,
         "meets_floor": true,
         "pos_ci": {
-          "k": 58,
-          "n": 59,
-          "lo": 91.0,
-          "hi": 99.7
+          "k": 48,
+          "n": 48,
+          "lo": 92.6,
+          "hi": 100.0
         },
         "neg_ci": {
-          "k": 19,
+          "k": 20,
           "n": 22,
-          "lo": 66.7,
-          "hi": 95.3
+          "lo": 72.2,
+          "hi": 97.5
         },
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
         "neg_refusal_min": 0.85,
         "enough": true
       },
       "separation": {
-        "auc": 0.975,
-        "gap": -0.043,
-        "positives": 59,
+        "auc": 0.978,
+        "gap": -0.045,
+        "positives": 48,
         "negatives": 22,
-        "enough": true
+        "enough": true,
+        "refused": {
+          "positives": 0,
+          "negatives": 0
+        }
       },
       "separation_rerank": {
-        "auc": 0.971,
-        "gap": -8.397,
-        "positives": 59,
+        "auc": 0.982,
+        "gap": -5.729,
+        "positives": 48,
         "negatives": 22,
-        "enough": true
+        "enough": true,
+        "refused": {
+          "positives": 0,
+          "negatives": 0
+        }
       }
     },
     "dense+cross:base": {
-      "cases": 59,
-      "recall@3": 0.898,
-      "recall@5": 0.915,
-      "mrr": 0.842,
-      "hit@3": 0.915,
+      "cases": 48,
+      "recall@3": 0.917,
+      "recall@5": 0.938,
+      "mrr": 0.858,
+      "hit@3": 0.938,
       "hit@3_ci": {
-        "k": 54,
-        "n": 59,
-        "lo": 81.6,
-        "hi": 96.3
+        "k": 45,
+        "n": 48,
+        "lo": 83.2,
+        "hi": 97.9
       },
-      "ndcg@3": 0.84,
+      "ndcg@3": 0.856,
       "page": {
-        "recall@3": 0.916,
-        "mrr": 0.929,
-        "hit@3": 0.966,
+        "recall@3": 0.966,
+        "mrr": 0.965,
+        "hit@3": 1.0,
         "hit@3_ci": {
-          "k": 57,
-          "n": 59,
-          "lo": 88.5,
-          "hi": 99.1
+          "k": 48,
+          "n": 48,
+          "lo": 92.6,
+          "hi": 100.0
         }
       },
       "latency_ms": {
-        "p50": 953.5,
-        "p95": 1308.8,
-        "mean": 1004.6
+        "p50": 1091.8,
+        "p95": 1311.7,
+        "mean": 1104.9
       },
-      "memory_mb": 2381.8,
+      "memory_mb": 2383.5,
       "dedupe_aliases": 8,
       "fallback": "",
       "config": {
@@ -303,14 +317,14 @@
       "gate": {
         "min_score": 5.976,
         "min_cosine": 0.838,
-        "pos_answered": 0.898,
+        "pos_answered": 0.917,
         "neg_refused": 0.864,
         "meets_floor": true,
         "pos_ci": {
-          "k": 53,
-          "n": 59,
-          "lo": 79.5,
-          "hi": 95.3
+          "k": 44,
+          "n": 48,
+          "lo": 80.4,
+          "hi": 96.7
         },
         "neg_ci": {
           "k": 19,
@@ -318,45 +332,53 @@
           "lo": 66.7,
           "hi": 95.3
         },
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
         "neg_refusal_min": 0.85
       },
       "rerank_gate": {
-        "min_rerank": -5.5017,
-        "pos_answered": 0.983,
-        "neg_refused": 0.864,
+        "min_rerank": -4.986,
+        "pos_answered": 1.0,
+        "neg_refused": 0.909,
         "meets_floor": true,
         "pos_ci": {
-          "k": 58,
-          "n": 59,
-          "lo": 91.0,
-          "hi": 99.7
+          "k": 48,
+          "n": 48,
+          "lo": 92.6,
+          "hi": 100.0
         },
         "neg_ci": {
-          "k": 19,
+          "k": 20,
           "n": 22,
-          "lo": 66.7,
-          "hi": 95.3
+          "lo": 72.2,
+          "hi": 97.5
         },
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
         "neg_refusal_min": 0.85,
         "enough": true
       },
       "separation": {
-        "auc": 0.972,
+        "auc": 0.979,
         "gap": -0.045,
-        "positives": 59,
+        "positives": 48,
         "negatives": 22,
-        "enough": true
+        "enough": true,
+        "refused": {
+          "positives": 0,
+          "negatives": 0
+        }
       },
       "separation_rerank": {
-        "auc": 0.971,
-        "gap": -8.397,
-        "positives": 59,
+        "auc": 0.982,
+        "gap": -5.729,
+        "positives": 48,
         "negatives": 22,
-        "enough": true
+        "enough": true,
+        "refused": {
+          "positives": 0,
+          "negatives": 0
+        }
       }
     }
   }
