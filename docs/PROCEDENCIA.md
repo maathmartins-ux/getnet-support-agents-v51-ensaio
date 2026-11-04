@@ -84,7 +84,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 7 | 5 | 1 |
 | `Makefile` | 38 | 2 | 2 | 1 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 116 | 77 | 1 |
+| `README.md` | 319 | 118 | 77 | 1 |
 | `data` | 34 | 409 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
 | `data/intent_examples.d` | 0 | 28 | 0 | 0 |
@@ -93,13 +93,13 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `docker-compose.hardened.yml` | 37 | 0 | 0 | 0 |
 | `docker-compose.scale.yml` | 28 | 0 | 0 | 0 |
 | `docker-compose.yml` | 91 | 3 | 0 | 1 |
-| `docs` | 429 | 1199 | 28 | 5 |
+| `docs` | 429 | 1244 | 28 | 5 |
 | `docs/adr` | 255 | 66 | 37 | 2 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
-| `evals` | 4993 | 2207 | 222 | 16 |
+| `evals` | 4993 | 2825 | 248 | 16 |
 | `evals/cases.d` | 0 | 66 | 0 | 0 |
-| `evals/cassettes` | 0 | 1465 | 0 | 0 |
+| `evals/cassettes` | 0 | 1466 | 0 | 0 |
 | `evals/essential` | 0 | 1529 | 0 | 0 |
 | `evals/judge_calibration.d` | 0 | 48 | 0 | 0 |
 | `evals/proxy` | 286 | 0 | 0 | 0 |
@@ -110,12 +110,12 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
-| `scripts` | 4505 | 878 | 376 | 25 |
-| `src/app` | 10844 | 2133 | 118 | 25 |
-| `tests` | 12008 | 3167 | 227 | 92 |
+| `scripts` | 4505 | 1061 | 385 | 26 |
+| `src/app` | 10844 | 2159 | 119 | 25 |
+| `tests` | 12008 | 3922 | 229 | 93 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **13867** escritas no relógio (27% do total). Arquivos do kit alterados no relógio: 178. Fora da conta, por serem gerados: 146978 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **15497** escritas no relógio (30% do total). Arquivos do kit alterados no relógio: 180. Fora da conta, por serem gerados: 152196 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

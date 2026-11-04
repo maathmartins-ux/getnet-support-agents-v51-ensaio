@@ -222,23 +222,25 @@ Quem decide (396 passos do turno, fora a resposta da operadora e o aviso de caso
 ## Juiz LLM sobre as respostas ao vivo
 
 <!-- judge:begin -->
-Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_dependent.json, live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_parallel.json, live_partial.json, live_real.json, live_replan.json · gasto US$ 28.714888
+Modelo `claude-opus-5-5` · status `ran` · arquivos live_approval.json, live_dependent.json, live_guardrail.json, live_hard.json, live_heldout.json, live_memory.json, live_official-var.json, live_official.json, live_parallel.json, live_partial.json, live_real.json, live_replan.json · gasto US$ 31.621308
+
+Rejulgados 131 vereditos (os reprovados e os de resposta com data) com a data em que cada resposta foi gerada, no fuso do negócio (`evals.judge --rejudge-dated`): o juiz usava a data do relógio dele (UTC) e, numa bateria perto da meia-noite, julgava "hoje/amanhã/ontem" contra o dia seguinte.
 
 | split | casos | grounded | helpful | nota média |
 |---|---:|---:|---:|---:|
 | approval | 4 | 1.0 [IC95 51.0–100.0; n=4] | 1.0 [IC95 51.0–100.0; n=4] | 5.0 |
-| dependent | 14 | 0.786 [IC95 52.4–92.4; n=14] | 1.0 [IC95 78.5–100.0; n=14] | 4.43 |
-| guardrail | 32 | 1.0 [IC95 89.3–100.0; n=32] | 0.938 [IC95 79.9–98.3; n=32] | 4.69 |
-| hard | 5 | 0.8 [IC95 37.6–96.4; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 4.6 |
-| heldout | 78 | 0.756 [IC95 65.1–83.8; n=78] | 0.885 [IC95 79.5–93.8; n=78] | 4.19 |
-| memory | 66 | 0.788 [IC95 67.5–86.9; n=66] | 0.97 [IC95 89.6–99.2; n=66] | 4.42 |
-| official | 30 | 0.633 [IC95 45.5–78.1; n=30] | 0.7 [IC95 52.1–83.3; n=30] | 3.9 |
-| official-var | 12 | 1.0 [IC95 75.8–100.0; n=12] | 1.0 [IC95 75.8–100.0; n=12] | 4.75 |
-| parallel | 4 | 0.5 [IC95 15.0–85.0; n=4] | 0.75 [IC95 30.1–95.4; n=4] | 3.5 |
+| dependent | 14 | 1.0 [IC95 78.5–100.0; n=14] | 1.0 [IC95 78.5–100.0; n=14] | 5.0 |
+| guardrail | 32 | 1.0 [IC95 89.3–100.0; n=32] | 0.969 [IC95 84.3–99.4; n=32] | 4.72 |
+| hard | 5 | 1.0 [IC95 56.6–100.0; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 5.0 |
+| heldout | 78 | 0.949 [IC95 87.5–98.0; n=78] | 0.962 [IC95 89.3–98.7; n=78] | 4.63 |
+| memory | 66 | 0.955 [IC95 87.5–98.4; n=66] | 0.985 [IC95 91.9–99.7; n=66] | 4.68 |
+| official | 30 | 1.0 [IC95 88.6–100.0; n=30] | 1.0 [IC95 88.6–100.0; n=30] | 4.93 |
+| official-var | 12 | 1.0 [IC95 75.8–100.0; n=12] | 1.0 [IC95 75.8–100.0; n=12] | 4.83 |
+| parallel | 4 | 1.0 [IC95 51.0–100.0; n=4] | 0.75 [IC95 30.1–95.4; n=4] | 4.5 |
 | partial | 5 | 1.0 [IC95 56.6–100.0; n=5] | 1.0 [IC95 56.6–100.0; n=5] | 4.8 |
-| real | 40 | 0.825 [IC95 68.1–91.3; n=40] | 0.975 [IC95 87.1–99.6; n=40] | 4.12 |
-| replan | 20 | 0.85 [IC95 64.0–94.8; n=20] | 0.95 [IC95 76.4–99.1; n=20] | 4.6 |
-| ALL | 310 | 0.806 [IC95 75.9–84.7; n=310] | 0.919 [IC95 88.4–94.5; n=310] | 4.33 |
+| real | 40 | 0.95 [IC95 83.5–98.6; n=40] | 0.95 [IC95 83.5–98.6; n=40] | 4.38 |
+| replan | 20 | 1.0 [IC95 83.9–100.0; n=20] | 1.0 [IC95 83.9–100.0; n=20] | 5.0 |
+| ALL | 310 | 0.971 [IC95 94.6–98.5; n=310] | 0.974 [IC95 95.0–98.7; n=310] | 4.71 |
 
 Gabarito de calibração (rótulos da SPEC, não humanos salvo rotulagem): 48 rótulos · concordância **1.0** [IC95 92.6–100.0; n=48] · kappa de Cohen **1.0** · TPR 1.0 [IC95 86.2–100.0; n=24] (24 grounded) · TNR 1.0 [IC95 86.2–100.0; n=24] (24 não grounded) · discordâncias: —
 - official: concordância 1.0 [IC95 92.6–100.0; n=48] · kappa 1.0 (48 rótulos)
@@ -288,5 +290,5 @@ Gold `retrieval.jsonl`, medido em 2026-11-03T22:49:55+00:00 (commit `c3aaa79`), 
 - `replan-14` (offline): faq:no_source->escalation
 - `replan-15` (offline): faq:no_source->escalation
 
-Ablação ao vivo sem `needs` (real): não comparável (status aborted_max_usd, 28 × 40 casos).
+Ablação ao vivo sem `needs` (real, com × sem): mesmos 40 casos, commits `35020c4` × `318f3af`; fundamentadas pelo juiz **38/40 com** × **39/40 sem**; úteis 38/40 × 39/40; números com base 100.0% × 100.0%; frases com base 100.0% × 100.0%; p50 24.4 s × 34.1 s; US$ por caso 0.045 × 0.046.
 <!-- replan:end -->

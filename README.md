@@ -25,8 +25,8 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 |---|---:|---|
 | Oficiais resolvidas (sem humano + todo fato + fonte) | 0.97 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
 | Oficiais resolvidas: pass^k (todas as rodadas) | 0.90 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 0.63 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
-| Juiz: respostas oficiais úteis (helpful) | 0.70 | juiz LLM: a resposta resolve o que o lojista perguntou |
+| Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
 | Memória ao vivo: pass@1 | 0.98 | conversas de vários turnos: o fato do turno anterior chega à resposta |
 | Busca: Recall@3 | 0.88 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
 | Busca: MRR | 0.84 | posição média da primeira página certa (1 = sempre em primeiro) |
@@ -328,7 +328,6 @@ e como comparar pela primeira entrega.
 | hora (UTC; Brasília = UTC−3) | min | commit |
 |---|---:|---|
 | 12:15:01 | 0 | chore: repositório (antes do relógio) |
-| 13:45:50 | 91 | chore: scaffold from entregar-desafio-cronometrado kit v5.4.0 |
 | 13:48:57 | 94 | spec: oficiais (10 casos com expect.facts e expect.entities) |
 | 13:50:15 | 95 | spec: taxonomia, desempates, parcial, standalone; casos replan 20, dependent 11, parallel 4, approval 4, memory 16 |
 | 14:10:29 | 115 | eval: fumaça ao vivo official repeat 1 (10/10 intent, 0 handoff, US$ 0,195, 0 erros; 01/04/06 parciais) |
@@ -346,9 +345,10 @@ e como comparar pela primeira entrega.
 | 21:20:50 | 546 | eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página de rotulagem (37 rótulos humanos, juiz × humano 94,6%) |
 | 22:32:42 | 618 | eval: offline com a ordem do denso e o portão pela nota do cross (gate de intenção 90,5%) |
 | 23:21:59 | 667 | eval offline no código atual (corpus com quebra de linha, cartão com listas fechadas, buscador dense+cross:base) |
-| 01:50:32 | 816 | guardrail (kit 75c0432): famílias novas da regex como suspeita que o classificador decide; sem LLM, falha fechada |
+| 02:16:03 | 841 | eval: bateria integral ao vivo da rodada 10 no código 35020c4 (12 splits complete, US$ 13,73 de conversa) |
+| 02:53:40 | 879 | docs: README sem afirmações velhas (check, ablação, red team), DEMO da bateria final; check espera 180 s pela 1ª subida do container |
 
-Do primeiro ao último commit: **816 min**, 125 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **879 min**, 130 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
