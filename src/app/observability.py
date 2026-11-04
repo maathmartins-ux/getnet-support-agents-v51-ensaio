@@ -17,7 +17,7 @@ from collections import defaultdict
 from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
 
-from .config import PRICES_PER_MTOK, otel_exporter
+from .config import CACHE_READ_PER_MTOK, CACHE_WRITE_FACTOR, PRICES_PER_MTOK, otel_exporter
 
 _trace_id: ContextVar[str] = ContextVar("trace_id", default="-")
 _usage: ContextVar[dict | None] = ContextVar("usage", default=None)
@@ -213,12 +213,27 @@ def span(name: str, **fields):
             log.info("span", extra={"extra_fields": {"span": name, "ms": round(ms, 2), **fields}})
 
 
-def record_llm_usage(model: str, input_tokens: int, output_tokens: int) -> float:
+def llm_cost(model: str, input_tokens: int, output_tokens: int, cache_write: int = 0, cache_read: int = 0) -> float:
+    """US$ da chamada: entrada sem cache + escrita no cache (1,25× a entrada) + leitura do cache (preço do modelo) +
+    saída. Com cache, `input_tokens` da API já exclui o que foi lido ou escrito no cache: as três parcelas somam."""
+    price = PRICES_PER_MTOK.get(model)
+    if not price:
+        return 0.0
+    read = CACHE_READ_PER_MTOK.get(model, price[0] * 0.1)
+    return (input_tokens * price[0] + cache_write * price[0] * CACHE_WRITE_FACTOR + cache_read * read
+            + output_tokens * price[1]) / 1_000_000
+
+
+def record_llm_usage(model: str, input_tokens: int, output_tokens: int, cache_write: int = 0,
+                     cache_read: int = 0) -> float:
     """Contabiliza tokens e custo da chamada no request atual, nas métricas e no log."""
     price = PRICES_PER_MTOK.get(model)
-    cost = (input_tokens * price[0] + output_tokens * price[1]) / 1_000_000 if price else 0.0
+    cost = llm_cost(model, input_tokens, output_tokens, cache_write, cache_read)
     METRICS.add("llm_tokens_total", input_tokens, model=model, kind="input")
     METRICS.add("llm_tokens_total", output_tokens, model=model, kind="output")
+    if cache_write or cache_read:
+        METRICS.add("llm_tokens_total", cache_write, model=model, kind="cache_write")
+        METRICS.add("llm_tokens_total", cache_read, model=model, kind="cache_read")
     METRICS.add("llm_cost_usd_total", cost, model=model)
     if price is None:
         METRICS.inc("llm_unpriced_calls_total", model=model)
@@ -230,9 +245,13 @@ def record_llm_usage(model: str, input_tokens: int, output_tokens: int) -> float
         with _usage_lock:
             usage["input_tokens"] += input_tokens
             usage["output_tokens"] += output_tokens
+            if cache_read or cache_write:  # só quando houve cache: o formato antigo do resumo não muda
+                usage["cache_read_tokens"] = usage.get("cache_read_tokens", 0) + cache_read
+                usage["cache_write_tokens"] = usage.get("cache_write_tokens", 0) + cache_write
             usage["cost_usd"] = round(usage["cost_usd"] + cost, 6)
     log.info("llm_usage", extra={"extra_fields": {"model": model, "input_tokens": input_tokens,
-                                                  "output_tokens": output_tokens, "cost_usd": round(cost, 6)}})
+                                                  "output_tokens": output_tokens, "cache_read_tokens": cache_read,
+                                                  "cache_write_tokens": cache_write, "cost_usd": round(cost, 6)}})
     return cost
 
 

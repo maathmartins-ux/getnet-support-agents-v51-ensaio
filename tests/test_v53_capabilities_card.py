@@ -36,8 +36,10 @@ def test_card_lists_the_closed_values_each_tool_accepts():
     tools["get_transactions"]["input_schema"]["properties"]["period"]["default"] = "last_7_days"
     text = capabilities.card("pt", tools=tools, extra=[])
     line = next(ln for ln in text.splitlines() if ln.startswith("- Valores que as consultas"))
-    assert "get_settlements — period: yesterday | today | last_7_days" in line
-    assert "get_transactions — period (padrão last_7_days): yesterday | today | last_7_days; status: approved" in line
+    # cada valor pelo rótulo legível (o valor cru fica no schema, para a chamada): sem rótulo do domínio, sem "_"
+    assert "get_settlements — period: yesterday | today | last 7 days" in line
+    assert "get_transactions — period (padrão last 7 days): yesterday | today | last 7 days; status: approved" in line
     assert "open_ticket — period: now | later" in line  # cada tool com a sua lista e o seu padrão
     assert "method" not in line  # parâmetro livre não entra
-    assert "Values the lookups and actions accept" in capabilities.card("en", tools=tools, extra=[])
+    en = capabilities.card("en", tools=tools, extra=[])
+    assert "Values the lookups and actions accept" in en and "(default last 7 days)" in en

@@ -31,12 +31,17 @@ def test_history_survives_restart():
     assert [m["role"] for m in fresh.history(conv)] == ["user", "assistant"]
 
 
-def test_long_term_summary_spans_conversations():
-    chat("Onde está meu pedido 1002?")
-    chat("Qual o prazo de entrega?")  # outra conversa
-    summary = get_store().user_summary("u1")
-    assert "records" in summary and "faq" in summary
-    assert get_store().user_summary("u2") == ""  # memória é por usuário
+def test_long_term_profile_spans_conversations():
+    from app import memory
+
+    first = chat("Onde está meu pedido 1002?")["conversation_id"]
+    second = chat("Qual o prazo de entrega?")["conversation_id"]  # outra conversa
+    items = {(i["k"], i["v"]): i for i in memory.load_profile(get_store(), "u1").items}
+    # cada item com tipo, valor, conversa de origem e data: o registro e o produto da 1ª, o assunto da 2ª
+    assert items[("record", "1002")]["conv"] == first and items[("product", "Livro B")]["c"] == "1002"
+    assert items[("topic", "Qual o prazo de entrega?")]["conv"] == second
+    assert all(isinstance(i["ts"], int) for i in items.values())
+    assert get_store().user_summary("u2") == "" and memory.load_profile(get_store(), "u2").items == []  # por usuário
 
 
 def test_pii_never_stored_raw():

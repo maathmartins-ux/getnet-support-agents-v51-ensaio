@@ -41,7 +41,6 @@ NO_ANSWER = {
     "pt": "Não encontrei base para responder com segurança. Posso encaminhar para um atendente humano.",
     "en": "I couldn't find a reliable basis to answer. I can hand this to a human agent.",
 }
-SUMMARY_TURNS = 5
 HISTORY_WINDOW = 20  # mensagens recentes inteiras no contexto (10 turnos)
 DIGEST_ITEMS = 8  # falas antigas resumidas além da janela
 # O roteador recebe a conversa INTEIRA: o assunto do turno 1 decide "e ele já saiu?" no turno 14 (medido: com só
@@ -56,56 +55,150 @@ def _router_history(store, conversation_id: str, history: list[dict]) -> list[di
     return older[-ROUTER_OLDER_MAX:] + history
 
 
-def _update_summary(store, user_id: str, intent: str, text: str) -> None:
-    """Memória de longo prazo determinística: últimos assuntos do usuário, entre conversas.
-
-    Determinística de propósito: auditável, sem custo e sem PII (o texto já chega mascarado).
+def _update_summary(store, user_id: str, conversation_id: str, ledger: memory.Ledger, handoff: Handoff) -> None:
+    """Memória de longo prazo, entre conversas: o perfil do usuário (app/memory.py) recebe, com a conversa de origem e
+    a data, o que o livro desta conversa já extraiu por código (registros citados, produto, assunto) e o protocolo
+    aberto no turno. Determinística de propósito: auditável, sem custo e sem PII (o livro só tem texto mascarado).
     """
-    items = [i for i in store.user_summary(user_id).split(" | ") if i]
-    items.append(f"{intent}: {text[:80]}")
-    store.set_user_summary(user_id, " | ".join(items[-SUMMARY_TURNS:]))
+    protocol = (handoff.ticket_id, handoff.reason or "") if handoff.required and handoff.ticket_id else None
+    memory.remember_turn(store, user_id, ledger, conversation_id=conversation_id, protocol=protocol)
 
 
-_INTERNAL_NAMES = {"faq_agent": ("a base de conhecimento", "the knowledge base"),
-                   "records_agent": ("os dados da sua conta", "your account data"),
-                   "escalation_agent": ("o atendimento humano", "a human agent")}
-_INTERNAL_RE = re.compile(r"(?:\b(?:o|a|the)\s+)?`?\b(" + "|".join(_INTERNAL_NAMES) + r")\b`?", re.IGNORECASE)
+def _user_memory(store, user_id: str, conversation_id: str) -> tuple[str, str]:
+    """(perfil para o contexto dos agentes, perfil para a evidência do turno); ("", "") quando não há.
+
+    Só o que veio de OUTRAS conversas do usuário (o desta já está no livro e no histórico), datado e numa moldura de
+    dado. O protocolo sai com a situação lida agora no banco. A versão da evidência (checagem numérica, frases e juiz)
+    vai sem as datas: a data de uma conversa antiga viraria base de qualquer "3 dias" ou "dia 11" da resposta.
+    """
+    profile = memory.load_profile(store, user_id)
+    status = {}
+    for p in profile.of("protocol"):
+        ticket = store.get_ticket(p["v"]) if p["conv"] != conversation_id else None
+        if ticket and ticket.get("user_id") == user_id:
+            status[p["v"]] = ticket["status"]
+    shown = profile.render(exclude=conversation_id, status=status)
+    if shown:
+        METRICS.inc("user_memory_used_total")  # turnos que receberam memória de outra conversa
+    return shown, profile.render(exclude=conversation_id, status=status, dated=False)
 
 
-# Citação do cartão de capacidades ("[policy:capabilities]") é para o verificador, não para o cliente. Sem esta
-# limpeza, 19 de 69 respostas ao vivo (3 das 10 oficiais) mostravam o código ao cliente.
-# "Conforme [policy:x], o..." vira "O..."; no fim de frase, some com o espaço e os parênteses em volta.
-_POLICY_LEAD_RE = re.compile(r"\b(?:per|according to|as per|by|under|conforme|segundo|de acordo com|pelo|pela|"
-                             r"pelas|pelos|na|no)\s+"
-                             r"\(?\[policy:[\w.-]+\]\)?,?\s*(\w)?", re.IGNORECASE)
-_POLICY_REF_RE = re.compile(r"\s*\(?\[policy:[\w.-]+\]\)?")
+# Nome interno de agente vira palavras, com o artigo e a contração da frase: "do faq_agent" → "da base de
+# conhecimento" (trocar só o nome dava "do a base de conhecimento").
+_INTERNAL_NAMES = {"faq_agent": ("a", "base de conhecimento", "the knowledge base"),
+                   "records_agent": ("os", "dados da sua conta", "your account data"),
+                   "escalation_agent": ("o", "atendimento humano", "a human agent")}
+_INTERNAL_RE = re.compile(r"(?:\b(?P<det>o|a|os|as|do|da|dos|das|no|na|nos|nas|pelo|pela|pelos|pelas|ao|aos|à|às|"
+                          r"the)\s+)?`?\b(?P<name>" + "|".join(_INTERNAL_NAMES) + r")\b`?", re.IGNORECASE)
+_TO = {"o": "ao", "a": "à", "os": "aos", "as": "às"}  # preposição "a" + artigo
+
+
+def _agent_words(m: re.Match, language: str) -> str:
+    art, noun, english = _INTERNAL_NAMES[m.group("name").lower()]
+    det = (m.group("det") or "").lower()
+    if language == "en":
+        out = english
+    elif det in ("ao", "aos", "à", "às"):
+        out = f"{_TO[art]} {noun}"
+    else:  # do/da... = "d" + artigo; no/na... = "n" + artigo; pelo/pela... = "pel" + artigo; o/a/os/as = artigo
+        out = f"{next((p for p in ('pel', 'd', 'n') if det.startswith(p)), '')}{art} {noun}"
+    return out[0].upper() + out[1:] if next((c for c in m.group(0) if c.isalpha()), "").isupper() else out
+
+
+# Citação do cartão de capacidades ("[policy:capabilities]") é para o verificador, não para o cliente: sem limpeza,
+# 19 de 69 respostas ao vivo mostravam o código. Tirar só o código deixava a oração pela metade (medido nos textos
+# gravados do ensaio, rodada 11: 5 de 266 com citação; 0 com esta versão): "Segundo a [policy:x], a antecipação" →
+# "Segundo a, a antecipação"; "confirmar (conforme [policy:x])." → "confirmar (."; "From [policy:x], I can" → "From,
+# I can"; "(conforme [policy:x])\n\nNão..." → "(Não..."; "Fonte: [policy:x]" → "Fonte:".
+# Agora sai a oração da citação inteira: as palavras que só existiam por causa dela (preposição, artigo, locução:
+# "segundo a", "de acordo com o", "as stated in"), os parênteses, as vírgulas e o rótulo ("Fonte:") que a
+# delimitavam. O resto da frase fica como estava; a maiúscula muda só quando a frase passa a começar ali.
+_REF = r"\[policy:[\w.-]+\]"
+_REF_RUN = re.compile(rf"{_REF}(?:[ \t]*(?:[,;]|\be\b|\band\b)?[ \t]*{_REF})*", re.IGNORECASE)
+_LEAD_WORDS = ("de acordo com|com base n[oa]s?|com base em|nos termos d[oa]s?|conforme|segundo|consoante|vide|ver|"
+               "veja|consulte|cf\\.|pel[oa]s?|n[oa]s?|d[oa]s?|em|de|por|para|sob|ao|aos|às?|os?|as?|uma?|"
+               "according to|as per|as stated in|as described in|as set out in|as shown in|in line with|"
+               "in accordance with|based on|per|under|by|from|in|on|at|see|the|an|our")
+_LEAD_TAIL = re.compile(rf"(?:(?<![\w-])(?:{_LEAD_WORDS})[ \t]+)+$", re.IGNORECASE)
+# começo de frase, de linha ou de item de lista; depois de ":" a oração também começa, mas sem maiúscula
+_LINE_START = r"(?:^|\n)[ \t]*(?:[-*•]|\d+[.)])?[ \t]*"
+_CLAUSE_START = re.compile(rf"(?:{_LINE_START}|[.!?][\"”')\]*]*[ \t]+|(?P<colon>:)[ \t]+)$")
+_SENTENCE_HEAD = re.compile(rf"(?:{_LINE_START}|[.!?][\"”')\]*]*\s+)(?P<words>[^.!?\n]*)$")
+_ENDS_SENTENCE = re.compile(r"[ \t]*(?:[.!?]+|(?=\n)|$)")
+
+
+def _join(left: str, right: str) -> str:
+    """Cola os dois lados do que saiu: um espaço entre palavras, nenhum antes de pontuação ou de quebra de linha."""
+    right = right.lstrip(" \t")
+    if not right.strip():
+        return left.rstrip()
+    if right[0] in "\n.,;:!?)]":
+        return left.rstrip(" \t") + right
+    return f"{left} {right}" if left and not left[-1].isspace() and left[-1] not in "([" else left + right
+
+
+def _only_points(words: str, had_lead: bool) -> bool:
+    """A frase só existia para apontar a citação: nada além dela ("Veja [ref]."), um rótulo ("Fonte: [ref]") ou,
+    tirada a preposição dela, até 2 palavras ("Você pode ver [ref]." → "Você pode." não é frase). Nunca quando ela
+    responde ("Sim, conforme [ref].") nem quando a citação era um adendo depois de vírgula."""
+    words = words.strip()
+    if re.match(r"(?:sim|n[ãa]o|yes|no)\b", words, re.IGNORECASE) or words.endswith((",", ";", "—", "–")):
+        return False
+    return not words or (words.endswith(":") and len(words.split()) <= 3) or (had_lead and len(words.split()) <= 2)
+
+
+def _drop_citation(left: str, right: str) -> str:
+    """O texto sem a citação que estava entre `left` e `right`, sem delimitador nem palavra órfã."""
+    lead = _LEAD_TAIL.search(left)
+    if lead:
+        left = left[:lead.start()]
+    bare = left.rstrip(" \t")
+    if bare.endswith("("):  # "(conforme [ref])" some inteiro; "([ref], prazo)" fica "(prazo)"
+        if close := re.match(r"[ \t]*\)", right):
+            return _join(bare[:-1], right[close.end():])
+        return bare + re.sub(r"^[ \t]*(?:[,;][ \t]*)?", "", right)
+    end = _ENDS_SENTENCE.match(right)
+    if end and (head := _SENTENCE_HEAD.search(left)) and _only_points(head.group("words"), lead is not None):
+        return _join(left[:head.start("words")], right[end.end():])  # a frase inteira sai
+    if start := _CLAUSE_START.search(left):  # a citação abria a oração: sai o separador que a fechava
+        right = re.sub(r"^[ \t]*[,;:][ \t]*", "", right)
+        if start.group("colon") is None:
+            right = re.sub(r"^([ \t]*[*_]*)([a-zà-ÿ])", lambda m: m.group(1) + m.group(2).upper(), right)
+        return _join(left, right)
+    if bare[-1:] in (",", ";", "—", "–"):  # entre separadores: "A antecipação, segundo a [ref], precisa"
+        return _join(bare[:-1], re.sub(r"^[ \t]*[,;—–](?=[ \t])", "", right))
+    return _join(left, right)
 
 
 def _scrub_internal(answer: str, language: str) -> str:
-    """Nome interno de agente (ex.: "faq_agent") e código do cartão de capacidades não chegam ao
-    cliente."""
-    i = 1 if language == "en" else 0
-    answer = _INTERNAL_RE.sub(lambda m: _INTERNAL_NAMES[m.group(1)][i], answer)
-    answer = _POLICY_LEAD_RE.sub(lambda m: (m.group(1) or "").upper(), answer)
-    answer = _POLICY_REF_RE.sub("", answer)
-    # o que sobrou da citação tirada: "atendente, ." → "atendente."; ", ," → ","; espaço antes de pontuação
+    """Nome interno de agente (ex.: "faq_agent"), valor interno de lista fechada (ex.: "sem_sinal") e código do cartão
+    de capacidades não chegam ao cliente, e o que os cercava não fica pela metade."""
+    answer = _INTERNAL_RE.sub(lambda m: _agent_words(m, language), answer)
+    answer = capabilities.readable_values(answer, language)
+    while ref := _REF_RUN.search(answer):
+        answer = _drop_citation(answer[:ref.start()], answer[ref.end():])
+    # rede de segurança (nunca é texto legítimo): parênteses vazios ou abertos sem conteúdo, "atendente, ."
+    answer = re.sub(r"[ \t]*\([ \t]*\)", "", answer)
+    answer = re.sub(r"[ \t]*\((?=[ \t]*[.,;:!?](?:\s|$))", "", answer)
     answer = re.sub(r"\s*,\s*(?=[.;:!?])", "", answer)
-    return re.sub(r"[ \t]+([,.;:!?])", r"\1", answer)
+    answer = re.sub(r"[ \t]+([,.;:!?])", r"\1", answer)
+    # resposta que era só a citação: nunca 200 vazio (vazio no histórico vira 400 da API no turno seguinte)
+    return answer if re.search(r"\w", answer) else NO_ANSWER.get(language, NO_ANSWER["pt"])
 
 
 # --- resposta primeiro --------------------------------------------------------------------------------------------
-# Medido no ensaio (rodada 10, official-04, rodada 0 de 3): a resposta abriu com "The sources don't say a bank account
-# is mandatory." e a frase seguinte, com citação, trazia a regra que responde; o fim repetia a ausência. O cliente lê a
-# ressalva antes da resposta (o eval marca não resolvido). O prompt já pede "a 1ª frase responde" (prompts/faq.md),
-# mas nada no código impunha. A guarda tira essa 1ª frase só quando nada se perde e a resposta segue legível:
+# Defeito medido em resposta ao vivo: a resposta abria com a ausência ("The sources don't say X is mandatory.") e só
+# a frase seguinte, com citação, trazia a regra que responde; o fim repetia a ausência. O cliente lê a ressalva antes
+# da resposta (o eval marca não resolvido). O prompt já pede "a 1ª frase responde" (prompts/faq.md), mas nada no
+# código impunha. A guarda tira essa 1ª frase só quando nada se perde e a resposta segue legível:
 # - a 1ª frase ABRE dizendo que as fontes não trazem algo e não cita fonte;
 # - a 2ª cita fonte do turno, não é outra ausência nem ressalva de "só achei..." (que continua a 1ª);
 # - outra frase diz, sem citação, o que AS FONTES não trazem (ou "não encontrei") e fecha a resposta: o cliente
 #   continua lendo o que falta. Ressalva de um trecho só ("o trecho não diz a que plano vale") não conta;
 # - a 2ª não depende da 1ª: "They do say X [n]" vira "X [n]"; "They describe it..." deixa tudo como está.
-# Levar a 1ª frase para o fim (quando ela é a única ausência) ficou de fora de propósito: nas respostas gravadas do
-# ensaio isso valeria em 3 (memory-15 ×2, real-29) e pioraria as 3, porque ali a ressalva era a resposta direta
-# ("the sources don't say whether X connects over Wi-Fi") e a frase seguinte dependia dela.
+# Levar a 1ª frase para o fim (quando ela é a única ausência) ficou de fora de propósito: nas respostas gravadas isso
+# valeria em 3 e pioraria as 3, porque ali a ressalva era a resposta direta ("the sources don't say whether X
+# connects over Wi-Fi") e a frase seguinte dependia dela.
 _NOT_EN = r"(?:don[’']?t|do\s+not|doesn[’']?t|does\s+not)"
 _SOURCES = r"(?:(?:the|these)\s+(?:sources?|passages)|(?:as|essas)\s+(?:fontes|passagens)|os\s+trechos)\b"
 _NOT_FOUND = (r"(?:n[ãa]o\s+(?:encontrei|achei|localizei)"
@@ -394,8 +487,10 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
 
     language = decision.language
     ledger = memory.load(store, conversation_id)  # fatos da conversa: sobrevivem ao resumo (app/memory.py)
+    # perfil do usuário (fatos de conversas anteriores dele, datados, como dado): supervisor e especialistas o leem
+    user_memory, user_memory_evidence = _user_memory(store, user_id, conversation_id)
     ctx = Context(text=verdict.text, language=language, user_id=user_id, conversation_id=conversation_id,
-                  intent=decision.intent, history=history, user_summary=store.user_summary(user_id),
+                  intent=decision.intent, history=history, user_summary=user_memory,
                   conversation_digest=_digest(store, conversation_id, ledger), ledger=ledger.render())
     case_action = casestate.observe(conversation_id, verdict.text)  # o cliente confirmou, ou continua com o problema
     if case_action == "escalate":
@@ -442,6 +537,8 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
     # o que o redator recebeu como "Fatos da conversa" também é base do turno, e vai para quem audita (juiz, eval):
     # sem isso, resposta que usa o status da maquininha lido 2 turnos antes parecia sem fonte
     remembered = [f"[memória da conversa] {mem}"] if (mem := ledger.render()) else []
+    if user_memory_evidence:  # idem para o perfil de outras conversas (sem as datas: ver _user_memory)
+        remembered.append(f"[memória de conversas anteriores] {user_memory_evidence}")
     evidence = turn_evidence + remembered + [card]
     handoff = next((r.handoff for r in outcome.results if r.handoff), None) or Handoff()
     route = ["router", *outcome.route]
@@ -484,10 +581,10 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
         log.warning("risk_flagged", extra={"extra_fields": {"trace_id": trace_id, "flags": risks}})
     store.add_message(conversation_id, user_id, "user", verdict.text, decision.intent)  # texto já mascarado
     store.add_message(conversation_id, user_id, "assistant", answer, decision.intent)
-    _update_summary(store, user_id, decision.intent, verdict.text)
     memory.update(ledger, user_text=verdict.text, intent=decision.intent, evidence=turn_evidence + [card],
                   states_subject=router.has_stated_subject(verdict.text))
     memory.save(store, conversation_id, ledger)
+    _update_summary(store, user_id, conversation_id, ledger, handoff)  # depois do livro: o perfil sai dele
 
     METRICS.inc("chat_requests_total", intent=decision.intent)
     if handoff.required:

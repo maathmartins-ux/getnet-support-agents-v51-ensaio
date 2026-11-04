@@ -5,8 +5,10 @@
 - ação pendente expira (ACTION_TTL_MIN); caso aberto com SLA vencido sobe de prioridade uma vez;
 - duas respostas simultâneas ao mesmo caso: uma vence.
 """
+import hashlib
 import threading
 
+import pytest
 from fakes import fake_llm, resp, text
 from fastapi.testclient import TestClient
 
@@ -17,6 +19,14 @@ from app.store import get_store
 
 client = TestClient(app)
 OP = {"X-Operator-Token": "test-operator"}
+ANA = {"X-Operator-Token": "chave-pessoal-da-ana"}  # OPERATOR_KEYS do fixture `personal_key`
+
+
+@pytest.fixture
+def personal_key(monkeypatch):
+    """Chave pessoal da Ana ao lado do token compartilhado (migração: os dois valem) — só ela aprova risco alto."""
+    monkeypatch.setenv("OPERATOR_KEYS", "ana:" + hashlib.sha256(b"chave-pessoal-da-ana").hexdigest())
+    monkeypatch.setenv("OPERATOR_SHARED_TOKEN", "on")
 
 
 def auth(user="u1"):
@@ -67,7 +77,7 @@ def test_two_simultaneous_replies_only_one_wins():
 
 
 # --- aprovação de quatro olhos ---------------------------------------------------------------------------
-def test_high_risk_action_needs_owner_then_operator_and_runs_once():
+def test_high_risk_action_needs_owner_then_operator_and_runs_once(personal_key):
     r = chat("Quero o estorno do pedido 1001")
     aid = r["pending_action"]
     assert aid and "Nada foi feito" in r["answer"]
@@ -78,20 +88,23 @@ def test_high_risk_action_needs_owner_then_operator_and_runs_once():
     assert any(t["kind"] == "approval" and t["action_id"] == aid for t in queue)
 
     assert client.post(f"/actions/{aid}/approve", headers={"X-Operator-Token": "errado"}).status_code == 403
-    done = client.post(f"/actions/{aid}/approve", headers=OP).json()
-    assert done["result"]["ok"] is True and done["action"]["approved_by"] == "admin"
-    assert client.post(f"/actions/{aid}/approve", headers=OP).status_code == 409  # executa uma vez só
+    # o token compartilhado não aprova risco alto: a aprovação tem dono (chave pessoal) na auditoria
+    assert client.post(f"/actions/{aid}/approve", headers=OP).status_code == 403
+    assert get_store().get_action(aid)["status"] == "awaiting_operator"
+    done = client.post(f"/actions/{aid}/approve", headers=ANA).json()
+    assert done["result"]["ok"] is True and done["action"]["approved_by"] == "ana"
+    assert client.post(f"/actions/{aid}/approve", headers=ANA).status_code == 409  # executa uma vez só
     conv = r["conversation_id"]
     last = client.get(f"/conversations/{conv}", headers=auth()).json()["messages"][-1]
     assert last["role"] == "assistant" and "aprovad" in last["content"].lower()
 
 
-def test_rejected_high_risk_action_runs_nothing():
+def test_rejected_high_risk_action_runs_nothing(personal_key):
     aid = chat("Quero o estorno do pedido 1001")["pending_action"]
     client.post(f"/actions/{aid}/confirm", headers=auth())
     out = client.post(f"/actions/{aid}/reject", json={"answer": "Fora da política."}, headers=OP).json()
     assert out["action"]["status"] == "rejected" and out["result"] is None
-    assert client.post(f"/actions/{aid}/approve", headers=OP).status_code == 409
+    assert client.post(f"/actions/{aid}/approve", headers=ANA).status_code == 409
 
 
 def test_normal_write_action_still_runs_on_owner_confirmation():

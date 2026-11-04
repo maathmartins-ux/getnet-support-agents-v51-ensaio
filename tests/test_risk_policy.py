@@ -1,5 +1,7 @@
 """Limite de valor por ação (risk.py): até o limite só o dono confirma; acima, dono + operador (quatro olhos);
 acima do teto, nada é proposto; valor desconhecido vai a quatro olhos. A regra aparece no texto da ferramenta."""
+import hashlib
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -10,6 +12,14 @@ from app.store import get_store
 
 client = TestClient(app)
 OP = {"X-Operator-Token": "test-operator"}
+ANA = {"X-Operator-Token": "chave-pessoal-da-ana"}  # OPERATOR_KEYS do fixture `personal_key`
+
+
+@pytest.fixture
+def personal_key(monkeypatch):
+    """Chave pessoal da Ana ao lado do token compartilhado (migração: os dois valem) — só ela aprova risco alto."""
+    monkeypatch.setenv("OPERATOR_KEYS", "ana:" + hashlib.sha256(b"chave-pessoal-da-ana").hexdigest())
+    monkeypatch.setenv("OPERATOR_SHARED_TOKEN", "on")
 def u1():
     return {"Authorization": f"Bearer {issue_token('u1')}"}
 
@@ -38,15 +48,16 @@ def test_below_limit_needs_only_the_owner(anticipation):
     assert done == {"ok": True, "data": {"anticipated": 4999.99}}
 
 
-def test_limit_itself_is_owner_only_and_above_goes_to_four_eyes(anticipation):
+def test_limit_itself_is_owner_only_and_above_goes_to_four_eyes(anticipation, personal_key):
     assert propose(5000)["risk"] == "normal"
     r = propose(5000.01)
     assert r["risk"] == "high"
     first = client.post(f"/actions/{r['action_id']}/confirm", headers=u1()).json()
     assert first["awaiting_operator"] and get_store().get_action(r["action_id"])["status"] == "awaiting_operator"
-    approved = client.post(f"/actions/{r['action_id']}/approve", headers=OP).json()
+    assert client.post(f"/actions/{r['action_id']}/approve", headers=OP).status_code == 403  # compartilhado
+    approved = client.post(f"/actions/{r['action_id']}/approve", headers=ANA).json()
     assert approved["result"] == {"ok": True, "data": {"anticipated": 5000.01}}
-    assert approved["action"]["approved_by"] == "admin"
+    assert approved["action"]["approved_by"] == "ana"
 
 
 def test_above_ceiling_is_not_proposed(anticipation):

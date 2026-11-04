@@ -108,7 +108,7 @@ BLIND_PREFIX = "heldout"  # splits do conjunto cego (heldout, heldout_h3...)
 
 
 def text_sha(text: str | None) -> str:
-    """Impressão digital de uma resposta com os espaços normalizados (a régua de evals.label._same_text): veredito e
+    """Impressão digital de uma resposta com os espaços normalizados (o critério de evals.label._same_text): veredito e
     rótulo de pessoa só se comparam sobre o mesmo texto."""
     return hashlib.sha256(" ".join((text or "").split()).encode("utf-8")).hexdigest()[:16]
 
@@ -313,7 +313,7 @@ def _key(v: dict) -> tuple[str, str, int]:
 
 
 def judged_passes(v: dict) -> bool:
-    """Aprovado pelo juiz: fundamentado, no idioma, sem vazamento e útil (a régua da pessoa, evals.label)."""
+    """Aprovado pelo juiz: fundamentado, no idioma, sem vazamento e útil (o critério da pessoa, evals.label)."""
     return not verdict_fails(v) and v.get("helpful", True) is not False
 
 
@@ -634,7 +634,7 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
                   "by_split": {s: _agreement(p) for s, p in sorted(pairs_by_split.items()) if s != "ALL"},
                   "by_failure_type": by_failure_type(type_pairs), **labels_origin(calib)}
     if cal_report["labels_origin"] != "human":  # concordância com rótulo escrito da SPEC não valida o juiz
-        for block in (cal_report, *cal_report["by_split"].values()):  # por split também (a régua viu true × false)
+        for block in (cal_report, *cal_report["by_split"].values()):  # por split também (senão o split dizia true)
             block["validation"] = {**block["validation"], "validated": False,
                                    "missing": [*block["validation"]["missing"], HUMAN_LABELS_MISSING]}
     return {"status": status, **({"reason": reason} if reason else {}),

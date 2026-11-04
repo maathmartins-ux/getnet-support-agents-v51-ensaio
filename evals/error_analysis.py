@@ -12,8 +12,8 @@ Fluxo:
 
 Separado da rotulagem cega (evals/label.py, scripts/label_page.py): estes traces são de AJUSTE (o rascunho do modelo
 fica no CSV daqui e nunca entra em live_*.json, então a página cega não tem como mostrá-lo) e todo split `heldout*`
-fica de fora (heldout, heldout_h3...: o held-out continua intocado; a régua da rodada 10 leu "o held-out deixou de ser
-cego em 4 classes de erro", e um lote cego novo só serve se nenhuma ferramenta o ler). Cada modo tem nome de
+fica de fora (heldout, heldout_h3...: o held-out continua intocado; corrigir pelos erros dele já o tirou do cego em 4
+classes de erro, e um lote cego novo só serve se nenhuma ferramenta o ler). Cada modo tem nome de
 comportamento e UMA checagem binária em MODE_CHECKS,
 que roda sobre a linha gravada; modo que o dono criar sem checagem aparece no relatório como "sem checagem".
 """

@@ -9,7 +9,7 @@ junta, por split e no total:
   ordenada, sem interpolação): num split de turno único, sem crash e sem bloqueio os números batem com os do bloco
   ao vivo. Linha com crash fica fora dos percentis (o tempo dela é o de uma falha, não o de um turno) e sai contada
   à parte. Linha bloqueada pelo guardrail (`blocked`) também: a recusa leva ms, e 39 delas baixavam o p50 do total
-  de 17,6 s para 16,3 s no ensaio (o número que a régua citou misturava turno e recusa); sai contada à parte, e
+  de 17,6 s para 16,3 s numa bateria medida (o p50 publicado misturava turno e recusa); sai contada à parte, e
   fica fora da fatia. A linha de um caso com turnos anteriores (`before`, casos de memória) cronometra a conversa
   inteira; o turno dela vale ms ÷ turnos (a média dos turnos daquela conversa) e a conversa sai à parte, para não
   esconder a cauda. Caso que não está nos arquivos de casos conta como 1 turno: o erro possível superestima a
@@ -104,8 +104,10 @@ def load_rows(results: Path = RESULTS) -> list[dict]:
 
 
 def turns_by_case(cases: list[dict]) -> dict[str, int]:
-    """Turnos que a linha de cada caso cronometra: os anteriores (`before`) mais o turno avaliado."""
-    return {c["id"]: 1 + len(c.get("before") or []) for c in cases if c.get("id")}
+    """Turnos que a linha de cada caso cronometra: os das conversas anteriores, os de `before` e o turno avaliado."""
+    from evals.run_evals import case_turns as turns  # tardio, como em case_turns: run_evals é pesado
+
+    return {c["id"]: turns(c) for c in cases if c.get("id")}
 
 
 def case_turns(paths: tuple[Path, ...] | None = None) -> dict[str, int]:

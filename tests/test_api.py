@@ -106,6 +106,32 @@ def test_production_refuses_shared_operator_and_open_metrics(monkeypatch):
     assert auth.operator_name("y" * 32) is None and auth.operator_name("k" * 24) == "ana"  # sem admin anônimo
 
 
+def test_production_refuses_demo_identity(monkeypatch):
+    """AUTH_MODE=demo aceita o user_id do corpo/da query como identidade: no dev segue opt-in (visível no /health e
+    marcado identity_verified=false); com APP_ENV=production a API não sobe, com a mesma mensagem e a mesma saída
+    (RuntimeError no lifespan) do portão dos segredos, mesmo com todo o resto forte."""
+    import pytest
+
+    from app import auth
+    from app.api import production_gaps, refuse_insecure_production
+
+    for name, value in {"AUTH_SECRET": "x" * 32, "OPERATOR_TOKEN": "y" * 32, "METRICS_TOKEN": "m" * 24,
+                        "OPERATOR_KEYS": f"ana:{auth._hash('k' * 24)}"}.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setenv("AUTH_MODE", "demo")
+    assert refuse_insecure_production() == [] and production_gaps() == ["AUTH_MODE=demo"]  # dev sobe
+    body = client.post("/chat", json={"message": "oi", "user_id": "u-demo"}).json()
+    assert client.get("/health").json()["auth_mode"] == "demo" and body["identity_verified"] is False
+    monkeypatch.setenv("APP_ENV", "production")
+    with pytest.raises(RuntimeError, match=r"segredos padrão em produção: \['AUTH_MODE=demo'\]"), TestClient(app):
+        pass  # o lifespan roda ao entrar no TestClient (e para antes de abrir o MCP)
+    monkeypatch.setenv("AUTH_MODE", "DEMO")  # o modo efetivo (config.auth_mode ignora a caixa) é o que o portão lê
+    with pytest.raises(RuntimeError, match=r"\['AUTH_MODE=demo'\]"):
+        refuse_insecure_production()
+    monkeypatch.setenv("AUTH_MODE", "required")
+    assert refuse_insecure_production() == []
+
+
 def test_root_redirects_to_docs():
     r = client.get("/", follow_redirects=False)
     assert r.status_code in (302, 307) and r.headers["location"] == "/docs"

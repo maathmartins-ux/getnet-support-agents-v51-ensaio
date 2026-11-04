@@ -10,7 +10,10 @@ dele contam, ex. o TTL) e no `context` que o juiz lê.
 
 O domínio acrescenta linhas próprias com `POLICY_LINES` (lista de frases, ou {"pt": [...], "en": [...]}) e ajusta
 as palavras de cada ação com `ACTION_KEYWORDS` ({tool: [palavras]}), usadas pela checagem de ação oferecida
-(app/claims.py). Sem LLM e sem I/O: o mesmo registro dá sempre o mesmo texto.
+(app/claims.py). `LABELS` ({nome ou valor interno: "palavras" ou {"pt": ..., "en": ...}}) dá as palavras que o
+cliente lê no lugar de um valor de lista fechada ("sem_sinal" → "sem sinal" / "no signal"), de um parâmetro e de
+uma tool de escrita (aviso da decisão do operador, app/actions.py); sem rótulo, o valor sai com espaços no lugar
+de "_". Sem LLM e sem I/O: o mesmo registro dá sempre o mesmo texto.
 """
 from __future__ import annotations
 
@@ -36,6 +39,7 @@ _TEXT = {
                     "atendente humano; o assistente não decide."),
         "ids": "Identificadores que as consultas aceitam",
         "options": "Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito)",
+        "default": "padrão",
     },
     "en": {
         "head": "Capabilities and action policy of this assistant (generated from the system's tool registry):",
@@ -51,6 +55,7 @@ _TEXT = {
                     "agent; the assistant does not decide it."),
         "ids": "Identifiers the lookups accept",
         "options": "Values the lookups and actions accept (closed list: no other value is accepted)",
+        "default": "default",
     },
 }
 
@@ -104,11 +109,54 @@ def _id_lines(tools: dict[str, dict]) -> list[str]:
     return list(seen.values())
 
 
-def _option_lines(tools: dict[str, dict]) -> list[str]:
+def label(name: object, language: str = "pt") -> str | None:
+    """Palavras que o domínio deu (`LABELS`) a um nome ou valor interno, no idioma; None se ele não deu."""
+    found = (getattr(domain.active(), "LABELS", None) or {}).get(str(name))
+    if isinstance(found, dict):
+        found = found.get(language) or found.get("pt")
+    return " ".join(str(found or "").split()) or None
+
+
+def option_label(value: object, language: str = "pt") -> str:
+    """O que o cliente lê no lugar de um valor de lista fechada: o rótulo do domínio ou o valor sem "_"."""
+    return label(value, language) or " ".join(str(value).replace("_", " ").split())
+
+
+def _enum_values(tools: dict[str, dict]) -> set[str]:
+    return {str(v) for tool in tools.values()
+            for spec in ((tool.get("input_schema") or tool.get("parameters") or {}).get("properties") or {}).values()
+            if isinstance(spec, dict) and isinstance(spec.get("enum"), list) for v in spec["enum"]}
+
+
+def readable_values(text: str, language: str = "pt", tools: dict[str, dict] | None = None) -> str:
+    """Valor interno de lista fechada escrito na resposta vira o rótulo: medido no ensaio (rodada 11), 36 de 362
+    respostas ao vivo mostravam "sem_sinal" ou "sem_conexao" ao cliente. Só valor com "_": "pix" e "today" já são
+    palavras. A crase em volta sai junto; a tradução que o modelo pôs entre parênteses não fica repetida."""
+    values = sorted((v for v in _enum_values(_tools() if tools is None else tools) if "_" in v), key=len, reverse=True)
+    if not values or not any(v in text for v in values):
+        return text
+    used: set[str] = set()
+
+    def words(m: re.Match) -> str:
+        said = option_label(m.group(1), language)
+        used.add(said)
+        return said
+
+    text = re.sub(r"`?(?<![\w/@.-])(" + "|".join(map(re.escape, values)) + r")(?![\w/@-])`?", words, text)
+    for said in used:  # "sem_conexao" (no connection), com o rótulo "no connection" → "no connection"
+        said = re.escape(said)
+        text = re.sub(rf"({said})([\"”']?)[ \t]*\([ \t]*{said}[ \t]*\)", r"\1\2", text, flags=re.IGNORECASE)
+    return text
+
+
+def _option_lines(tools: dict[str, dict], language: str = "pt") -> list[str]:
     """Valores de cada parâmetro de lista fechada (enum), POR TOOL, com o padrão quando o schema o declara. "A consulta
     cobre ontem, hoje e os últimos 7 dias" é verdade do sistema, mas estava só no schema da tool, que o redator lê e o
     juiz não: a frase verdadeira contava como afirmação sem base. Por tool porque o mesmo parâmetro (período) tem
-    padrão diferente em cada consulta; juntar as duas fazia o modelo escolher o período errado."""
+    padrão diferente em cada consulta; juntar as duas fazia o modelo escolher o período errado.
+    Cada valor sai pelo rótulo legível (o valor cru fica no schema, para a chamada): o redator copiava o valor do
+    cartão para o cliente ("with the reason \"sem_sinal\" or \"sem_conexao\"")."""
+    default_word = _TEXT.get(language, _TEXT["pt"])["default"]
     out = []
     for tool_name, tool in tools.items():
         props = ((tool.get("input_schema") or tool.get("parameters") or {}).get("properties") or {})
@@ -116,8 +164,10 @@ def _option_lines(tools: dict[str, dict]) -> list[str]:
         for name, spec in props.items():
             values = spec.get("enum") if isinstance(spec, dict) else None
             if isinstance(values, list) and values:
-                default = f" (padrão {spec['default']})" if spec.get("default") is not None else ""
-                params.append(f"{name}{default}: " + " | ".join(str(v) for v in values))
+                default = (f" ({default_word} {option_label(spec['default'], language)})"
+                           if spec.get("default") is not None else "")
+                params.append(f"{label(name, language) or name}{default}: "
+                              + " | ".join(option_label(v, language) for v in values))
         if params:
             out.append(f"{tool_name} — " + "; ".join(params))
     return out
@@ -141,7 +191,7 @@ def card(language: str = "pt", tools: dict[str, dict] | None = None, extra: list
     ids = _id_lines(tools)
     if ids:
         lines.append(f"- {t['ids']}: " + "; ".join(ids) + ".")
-    options = _option_lines(tools)
+    options = _option_lines(tools, language)
     if options:
         lines.append(f"- {t['options']}: " + " · ".join(options) + ".")
     lines += [f"- {line}" for line in (_domain_lines(language) if extra is None else extra)]

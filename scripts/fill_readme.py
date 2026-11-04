@@ -23,7 +23,7 @@ próprio README). Sem esta conferência a §5 já veio de um eval não commitado
 a linha do tempo parou antes do último commit ("50 min" em vez de 54). Também falha se faltar um dos títulos que o
 enunciado pede que o README cubra (REQUIRED_HEADINGS) ou o bloco quickstart, se docs/FAILURE_MODES.md não for o que
 `python -m evals.failure_modes` gera dos live_*.json commitados, ou se docs/TIMESHEET.md tiver menos commits que o
-git log (os dois saem do scripts/final.sh; rodada 10: os dois estavam velhos e a régua leu como contradição).
+git log (os dois saem do scripts/final.sh; gerados à mão, ficaram velhos e contradiziam o placar).
 Blocos densos do docs/RESULTS.md abrem com uma linha "Como ler" gerada (HOW_TO_READ): o que mede, de onde vem, como
 ler o IC.
 Linha do tempo: `{{`/`}}` e `|` dos títulos de commit são neutralizados (sem isso, um título com `{{N}}` vira
@@ -41,7 +41,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from evals import failure_modes  # noqa: E402
-from evals.run_evals import fmt_cell, fmt_ci, to_markdown  # noqa: E402
+from evals.run_evals import SUMMARY_KEYS, fmt_cell, fmt_ci, to_markdown  # noqa: E402
 from scripts import scorecard  # noqa: E402
 
 REQUIRED = ("timeline",)  # o bloco `eval` pode ficar no README ou em docs/RESULTS.md (main confere)
@@ -89,19 +89,41 @@ def offline_block(results: Path) -> str:
     report = _load(results / "latest.json")
     if not report:
         sys.exit("ERRO: rode `python -m evals.run_evals` antes; evals/results/latest.json não existe.")
-    return f"Modo: `{report['mode']}` · provedor `{report.get('provider', 'offline')}`\n\n" + to_markdown(report)
+    return (f"Modo: `{report['mode']}` · provedor `{report.get('provider', 'offline')}`\n\n"
+            + _fold_metric_table(to_markdown(report)))
+
+
+def _fold_metric_table(md: str) -> str:
+    """A tabela métrica × split do offline vai para um bloco recolhido; à vista ficam o "como ler", a linha de
+    resolvidas, o gate, o red team e a busca (o que reprova o CI). A tabela inteira à vista escondia o que reprova
+    atrás de taxas repetidas por split."""
+    lines = md.split("\n")
+    start = next((i for i, line in enumerate(lines) if line.startswith("| Métrica |")), None)
+    if start is None:
+        return md
+    end = start
+    while end + 1 < len(lines) and lines[end + 1].startswith("|"):
+        end += 1
+    folded = ["<details><summary>Todas as taxas offline (métrica × split)</summary>", "", *lines[start:end + 1], "",
+              "</details>"]
+    before = lines[:start] + ([""] if start and lines[start - 1].strip() else [])  # HTML só abre bloco após linha vazia
+    return "\n".join(before + folded + lines[end + 1:])
 
 
 # "Como ler" no topo de cada bloco denso do docs/RESULTS.md: o que mede, de onde vem e como ler o IC, em texto gerado
-# e sem número (os números são os do bloco). A régua da rodada 10 leu "tabelas densas de IC95 por split no lugar de
-# explicação". O do bloco offline sai de evals.run_evals.how_to_read (vale também para o console do run_evals).
+# e sem número (os números são os do bloco): tabela densa de IC95 por split sem explicação não se lê. O do bloco
+# offline sai de evals.run_evals.how_to_read (vale também para o console do run_evals).
 HOW_TO_READ = {
     "eval-live": (
-        "uma seção por split, de `evals/results/live_<split>.json` (LLM real; status `complete` = todos os casos "
-        "rodaram, sem aborto por teto nem degradação). Cada taxa vem com o IC95 de Wilson entre colchetes e o n de "
-        "execuções (casos × rodadas): com n pequeno o intervalo é largo, e taxas com intervalos que se sobrepõem não "
-        "se distinguem. A causa de cada falha está em `docs/FAILURE_MODES.md`, agrupada pela primeira checagem que "
-        "falhou; o held-out fica fora dela, por ser o conjunto cego."),
+        "uma linha por split, de `evals/results/live_<split>.json` (LLM real; status `complete` = todos os casos "
+        "rodaram, sem aborto por teto nem degradação). \"Principal\" é a checagem que define o split (a primeira que "
+        "vale nesta ordem: resolvidas, fato da conversa, humano no turno, bloqueio, ação pendente, tarefa concluída, "
+        "replanejou, intenção, humano certo, números com base), com o IC95 de Wilson e o n de execuções (casos × "
+        "rodadas); \"todas as checagens\" conta as execuções sem nenhuma checagem falhando. Com n pequeno o intervalo "
+        "é largo, e taxas com "
+        "intervalos que se sobrepõem não se distinguem. As outras taxas de cada split ficam no bloco recolhido logo "
+        "abaixo da tabela, e a causa de cada falha em `docs/FAILURE_MODES.md` (o held-out fica fora dela, por ser o "
+        "conjunto cego)."),
     "trace": (
         "as mesmas linhas ao vivo (`evals/results/live_<split>.json`, contadas por `evals/trace_stats.py`): a "
         "latência do turno por split contra o SLO declarado, a fatia do tempo de cada agente e quem decidiu cada "
@@ -139,17 +161,65 @@ def with_how_to_read(tag: str, body: str, **facts: str) -> str:
     return f"**Como ler:** {HOW_TO_READ[tag].format(**facts)}\n\n{body}"
 
 
+# A checagem que define cada split, na ordem em que vale (a 1ª presente no split): a tabela mostra uma taxa por split
+# em vez de uma linha de taxas por split (14 seções de taxas com IC95 escondiam o que importa).
+HEADLINE_KEYS = ("resolved_acc", "memory_acc", "human_in_turn_acc", "blocked_acc", "pending_action_acc",
+                 "completed_acc", "replanned_acc", "intent_acc", "handoff_acc", "numbers_acc")
+FIRST_SPLITS = ("official", "official-var")  # os cenários do enunciado abrem a tabela; o resto em ordem alfabética
+_LABELS = {**dict(SUMMARY_KEYS), "pending_action_acc": "ação pendente", "completed_acc": "tarefa concluída"}
+FAILED_IDS_SHOWN = 5  # casos com falha listados por linha; o resto vira "+N" (todos estão no bloco recolhido)
+
+
+def _rows_failed(report: dict) -> list[str]:
+    """Ids das execuções com alguma checagem falhando (ou que quebraram), uma vez por execução."""
+    return [r["id"] for r in report.get("rows", [])
+            if r.get("crash") or any(v is False for v in (r.get("checks") or {}).values())]
+
+
+def live_row(report: dict, name: str) -> str:
+    """Uma linha da tabela ao vivo: a taxa principal com IC95 e n, as execuções sem falha, os casos que falharam
+    (com quantas vezes), p50 · p95 e o gasto. Status diferente de `complete` aparece ao lado do split."""
+    m = report["metrics"]["ALL"]
+    ci = m.get("ci") or {}
+    key = next((k for k in HEADLINE_KEYS if m.get(k) is not None), None)
+    if key:
+        c = ci.get(key) or {}
+        rng = f" [{c['lo']:g}–{c['hi']:g}]" if c.get("lo") is not None else ""
+        main = f"{_LABELS.get(key, key)} **{m[key]:g}%**{rng} (n={c.get('n', m.get('cases'))})"
+    else:
+        main = "—"
+    runs = len(report.get("rows", []))
+    failed = _rows_failed(report)
+    counts: dict[str, int] = {}
+    for i in failed:
+        counts[i] = counts.get(i, 0) + 1
+    ids = [f"`{i}`" + (f" ×{n}" if n > 1 else "") for i, n in sorted(counts.items())]
+    shown = ", ".join(ids[:FAILED_IDS_SHOWN]) + (f" +{len(ids) - FAILED_IDS_SHOWN}" if len(ids) > FAILED_IDS_SHOWN
+                                                  else "")
+    lat = " · ".join(f"{m[k] / 1000:.1f} s" for k in ("p50_ms", "p95_ms") if m.get(k)) or "—"
+    split = f"`{report.get('split', Path(name).stem)}`"
+    if report.get("status") != "complete":
+        split += f" ({report.get('status')})"
+    spent = report.get("spent_usd")
+    return (f"| {split} | {main} | {runs - len(failed)}/{runs} | {shown or 'nenhum'} | {lat} | "
+            f"{f'{spent:.2f}' if isinstance(spent, (int, float)) else '—'} |")
+
+
 def live_block(results: Path) -> str:
     files = sorted(results.glob("live_*.json"))
     if not files:
         return "_Eval ao vivo não rodado (sem chave no relógio ou cortado). Ver Limitações._"
-    parts = []
-    for f in files:
-        r = _load(f)
-        parts.append(f"### Split `{r.get('split', f.stem)}` — `{f.name}`\n\n"
-                     f"Provedor `{r.get('provider')}` · status `{r.get('status')}` · "
-                     f"gasto US$ {r.get('spent_usd')} (teto {r.get('max_usd')})\n\n" + to_markdown(r, split_view=True))
-    return with_how_to_read("eval-live", "\n\n".join(parts))
+    loaded = sorted(((f, _load(f)) for f in files), key=lambda fr: (
+        FIRST_SPLITS.index(s) if (s := fr[1].get("split", fr[0].stem)) in FIRST_SPLITS else len(FIRST_SPLITS), s))
+    table = ["| Split | Principal | Todas as checagens | Casos com falha | p50 · p95 | US$ |",
+             "|---|---|---:|---|---:|---:|", *(live_row(r, f.name) for f, r in loaded)]
+    parts = [f"#### Split `{r.get('split', f.stem)}` — `{f.name}`\n\n"
+             f"Provedor `{r.get('provider')}` · status `{r.get('status')}` · "
+             f"gasto US$ {r.get('spent_usd')} (teto {r.get('max_usd')})\n\n" + to_markdown(r, split_view=True)
+             for f, r in loaded]
+    details = ("<details><summary>Todas as taxas de cada split (IC95, estabilidade e casos)</summary>\n\n"
+               + "\n\n".join(parts) + "\n\n</details>")
+    return with_how_to_read("eval-live", "\n".join(table) + "\n\n" + details)
 
 
 def judge_block(results: Path) -> str:
@@ -195,7 +265,7 @@ def _rejudge_lines(rj: dict) -> list[str]:
     """O rejulgamento pela data (`evals.judge --rejudge-dated`, bloco `rejudge` do judge.json) com a regra e, por
     split, fundamentadas e úteis da 1ª passada (o juiz que rodou junto da bateria, cujo resumo fica em
     `judge_first_pass` de cada live_*.json) → rejulgado. Sem isto, o 19/30 do resumo commitado e o 30/30 publicado
-    pareciam uma contradição (rodada 10, as 3 réguas)."""
+    pareciam uma contradição."""
     from evals.judge import REJUDGE_REASONS
 
     first, flips = rj.get("primeira_passada") or {}, rj.get("viraram") or {}
@@ -508,7 +578,9 @@ def _prompts_differ(a: dict, b: dict) -> list[str]:
 
 # Destino de cada achado no braço com `needs` (supervisor.NEED_OUTCOMES), na ordem em que sai na linha.
 NEED_OUTCOME_LABEL = {"called": "o modelo chamou o agente pedido", "reminded": "chamou depois do lembrete",
-                      "ignored": "ignorou mesmo com o lembrete (`need_ignored`)", "inserted": "a tabela inseriu",
+                      "ignored": "ignorou mesmo com o lembrete (`need_ignored`)",
+                      "seen": "leu e não chamou (fora da regra do domínio, sem lembrete)",
+                      "inserted": "a tabela inseriu",
                       "planned": "já estava no plano", "ran": "o agente já tinha rodado",
                       "blocked": "regra do turno barrou", "hidden": "não chegou ao modelo"}
 

@@ -52,7 +52,7 @@ def test_dense_fusion_uses_only_the_embedding_order_but_keeps_bm25_for_the_gate(
     q = "Como peço reembolso?"
     hits = HybridRetriever(get_index(), ConceptEmbedder(), fusion="dense").search(q)
     assert hits[0].doc.id == "faq-troca" and hits[0].bm25 == 0 and hits[0].cosine > 0.9
-    assert HybridRetriever(get_index(), ConceptEmbedder(), fusion="dense").name == "dense"
+    assert HybridRetriever(get_index(), ConceptEmbedder(), fusion="dense", windows=False).name == "dense"
 
 
 class CountingEmbedder(ConceptEmbedder):
@@ -575,7 +575,7 @@ def test_fast_choice_measures_only_the_preselected_configs(tmp_path, monkeypatch
 
     monkeypatch.setattr(rv, "compare", fake_compare)
     assert run_evals.main(["--choose-retriever", "--fast", "--apply", "--ram-budget-mb", "3000"]) == 0
-    assert seen == list(rv.FAST_CONFIGS) and len(seen) == 4
+    assert seen == list(rv.FAST_CONFIGS) and len(seen) == 5  # rodada 12: + o denso com janelas (segundos)
     saved = json.loads((data / "retriever.json").read_text(encoding="utf-8"))
     assert saved["ram_budget_mb"] == 3000 and "RAM <= 3000 MB" in saved["criterion"]
 

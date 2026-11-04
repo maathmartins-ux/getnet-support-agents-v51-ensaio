@@ -8,6 +8,11 @@ data/retriever.json que `run_evals --choose-retriever --apply` grava):
 O embedder padrão é o fastembed (ONNX, CPU); os vetores dos trechos ficam em disco, chaveados por modelo + hash do
 corpus. Sem fastembed ou sem o modelo, cai no BM25 e grava o motivo em `fallback` (eval, /health, log).
 
+Janelas (RAG_WINDOWS / "windows" da escolha; padrão do kit): o denso também embute cada trecho longo em janelas
+curtas de linhas inteiras, com sobreposição, e a nota densa do trecho passa a ser a da melhor janela quando ela casa
+claramente melhor que o trecho inteiro (MaxP com o viés de cada trecho descontado); o redator continua recebendo o
+trecho inteiro (mesmos ids e citações) e o cross-encoder lê a partir da janela que casou.
+
 Por cima de qualquer um, rerank (RERANK): `cross` = cross-encoder local (fastembed TextCrossEncoder) sobre o top-N;
 `llm` = o LLM (papel "reranker") reordena o top-20. Erro em qualquer rerank cai na ordem do base.
 
@@ -35,6 +40,7 @@ from .config import (
     data_dir,
     embed_cache_dir,
     embed_model,
+    rag_windows,
     rerank_chars,
     rerank_mode,
     rerank_model,
@@ -101,8 +107,9 @@ class Hit:
     doc: Doc
     score: float  # score de ranqueamento do retriever (BM25 bruto ou RRF)
     bm25: float = 0.0  # score BM25 bruto (0 = sem termo em comum)
-    cosine: float | None = None  # similaridade densa (só no híbrido)
+    cosine: float | None = None  # similaridade densa (só no híbrido); com janela que conta, a da janela
     rerank: float | None = None  # nota do cross-encoder (só com rerank): o sinal que melhor separa com × sem fonte
+    window: tuple[int, int] | None = None  # (início, fim) em doc.text da janela que deu a nota densa; None = o trecho
 
 
 class Index:
@@ -421,25 +428,100 @@ def lexical_fits(query: str) -> bool:
     return lang is None or lang == corpus_language()
 
 
+# Janelas do índice denso (small-to-big: busca pela parte, entrega o trecho; nota do trecho = a da melhor passagem
+# quando ela se destaca, o MaxP de Dai & Callan, 2019, com o viés de cada trecho descontado).
+# Medido no ensaio (rodada 11): o trecho prod-taxas-02 junta a tabela de taxas do Get Tap (os ~600 primeiros
+# caracteres) e o cartão de recursos da Get Clássica; o vetor do trecho inteiro puxa para a tabela (o embedding pesa o
+# começo do texto) e ele ficava em 12º–18º para "Get Clássica recursos", fora dos 10 que o cross-encoder lê.
+WINDOW_CHARS = 240  # tamanho-alvo: linhas inteiras até passar disto (a mediana dos trechos do ensaio é 394)
+WINDOW_STRIDE = 120  # o começo da próxima janela fica a >= isto do anterior: ~metade de sobreposição
+# A janela só vale quando o ganho dela sobre o trecho inteiro, descontado o ganho típico do trecho, fica entre os 5%
+# maiores da consulta. Medido no gold do ensaio (48 com fonte): com o máximo puro, Recall@5 0,938 → 0,917 e Recall@3
+# 0,917 → 0,875 (janelas de assunto vizinho ganhavam disputas de 0,001); com o desconto, o gold fica igual nos
+# percentis 90 a 99 e os dois trechos do defeito sobem em 90 e 95 (no 80 volta a perder pergunta; no 97, o do teste de
+# comunicação já não sobe). 95 e não 90: o top-5 do redator muda em 45% das buscas gravadas, contra 52%.
+WINDOW_GAIN_PCT = 95
+WINDOW_PROBES = 512  # trechos usados como sondas no ganho típico: tempo e RAM da montagem limitados em corpus grande
+
+
+def _percentile(values: list[float], pct: float) -> float:
+    """Percentil com interpolação linear (a do numpy), sem depender dele."""
+    s = sorted(values)
+    pos = (len(s) - 1) * pct / 100
+    lo = int(pos)
+    return s[lo] + (s[min(lo + 1, len(s) - 1)] - s[lo]) * (pos - lo)
+
+
+def window_spans(text: str, size: int = WINDOW_CHARS, stride: int = WINDOW_STRIDE) -> list[tuple[int, int]]:
+    """(início, fim) em caracteres das janelas de um trecho: linhas inteiras a partir de um começo de linha até passar
+    de `size`; a próxima começa na 1ª linha a `stride` ou mais caracteres do começo desta (dentro dela: sobreposição).
+
+    Nenhuma janela tem menos de `size` caracteres: a última fica ancorada no fim do trecho e recua por linhas inteiras
+    até ter o tamanho. Medido no ensaio: com a sobra do fim virando janela sozinha, "Respondeu à sua dúvida?" (23
+    caracteres) e uma pergunta de FAQ cuja resposta está no trecho seguinte (103) ganhavam cosseno acima do trecho
+    inteiro e tiravam o trecho certo do 1º lugar (Recall@3 do gold 0,917 → 0,844). Trecho que cabe numa janela não
+    ganha nenhuma, e janela igual ao trecho inteiro sai (o trecho já está embutido)."""
+    if len(text) <= size:
+        return []
+    lines, pos = [], 0
+    for line in text.split("\n"):
+        lines.append((pos, pos + len(line)))
+        pos += len(line) + 1
+    spans, i = [], 0
+    while True:
+        a, j = lines[i][0], i
+        while j + 1 < len(lines) and lines[j][1] - a < size:
+            j += 1
+        if j == len(lines) - 1:  # chegou ao fim: ancora no fim, com pelo menos `size` caracteres
+            while i > 0 and len(text) - lines[i][0] < size:
+                i -= 1
+            tail = (lines[i][0], len(text))
+            if tail != (0, len(text)) and tail not in spans:
+                spans.append(tail)
+            return spans
+        spans.append((a, lines[j][1]))
+        i = next((m for m in range(i + 1, j + 1) if lines[m][0] - a >= stride), j if j > i else i + 1)
+
+
+def windows_enabled() -> bool:
+    """RAG_WINDOWS=on|off; senão o "windows" da escolha gravada (ausente = sem janelas, como ela foi medida); senão o
+    padrão do kit (config.KIT_RETRIEVER)."""
+    return rag_windows()
+
+
 class HybridRetriever:
     """fusion="rrf" (nome hybrid): BM25 + denso por RRF. fusion="dense" (nome dense): só a ordem densa.
 
     Num corpus real de FAQ o e5-large sozinho superou a fusão com o BM25 (o BM25 puxava trechos com termo em comum e
     assunto errado para o top-3); por isso os dois modos existem e quem escolhe é o --choose-retriever.
+
+    `windows` (None = windows_enabled()): cada trecho longo também é embutido em janelas (`window_spans`, com o mesmo
+    cabeçalho do trecho) e a nota densa do trecho passa a ser a da melhor janela quando ela casa claramente melhor que
+    o trecho inteiro (`_best_windows`); o Hit leva a janela vencedora (`window`) para o cross-encoder ler. Ids, textos
+    e citações são os do trecho. Nome "+windows".
     """
 
-    def __init__(self, index: Index, embedder: Embedder, fusion: str = "rrf") -> None:
+    def __init__(self, index: Index, embedder: Embedder, fusion: str = "rrf", windows: bool | None = None) -> None:
         self.index, self.embedder, self.fusion = index, embedder, fusion
-        self.name = "dense" if fusion == "dense" else "hybrid"
+        self.windows = windows_enabled() if windows is None else bool(windows)
+        self.name = ("dense" if fusion == "dense" else "hybrid") + ("+windows" if self.windows else "")
         texts = [f"{d.head}. {d.text}" for d in index.docs]
         self.vectors = doc_vectors(embedder, texts)
         self._units = [_unit(v) for v in self.vectors]  # normalizados 1x: a busca faz só o produto interno
+        # (trecho, início, fim) de cada janela, em ordem de trecho; vetores só normalizados (sem cópia crua)
+        self._spans = [(n, a, b) for n, d in enumerate(index.docs) for a, b in window_spans(d.text)] \
+            if self.windows else []
+        self._wunits = [_unit(v) for v in doc_vectors(
+            embedder, [f"{index.docs[n].head}. {index.docs[n].text[a:b]}" for n, a, b in self._spans])] \
+            if self._spans else []
         try:  # numpy vem com o fastembed; o produto em Python puro (400 trechos x 1024 dim) custava dezenas de ms
             import numpy as np
 
             self._matrix = np.asarray(self._units, dtype=np.float64) if self._units else None
+            self._wmatrix = np.asarray(self._wunits, dtype=np.float64) if self._wunits else None
         except ImportError:
-            self._matrix = None
+            self._matrix = self._wmatrix = None
+        self._wbias = self._window_bias() if self._spans else {}
 
     def _cosines(self, qv: list[float]) -> list[float]:
         if self._matrix is not None:
@@ -448,12 +530,71 @@ class HybridRetriever:
             return [float(x) for x in self._matrix @ np.asarray(qv, dtype=np.float64)]
         return [sum(x * y for x, y in zip(qv, v, strict=True)) for v in self._units]
 
+    def _window_cosines(self, qv: list[float]) -> list[float]:
+        if self._matrix is not None and self._wmatrix is not None:
+            import numpy as np
+
+            return (self._wmatrix @ np.asarray(qv, dtype=np.float64)).tolist()
+        return [sum(x * y for x, y in zip(qv, v, strict=True)) for v in self._wunits]
+
+    def _window_bias(self) -> dict[int, float]:
+        """Ganho típico das janelas de cada trecho, sem consulta: com outros trechos do corpus como sondas, a média de
+        (melhor janela do trecho − trecho inteiro). Medido no ensaio: alguns trechos ganham ~0,025 de cosseno com a
+        janela para QUALQUER consulta (sup-antecipacao-04 com "Get Clássica", "teste de comunicação" e "Pix"): é viés
+        do trecho, não casamento com a pergunta, e sem o desconto eles ocupavam as vagas do corte."""
+        n = len(self.index.docs)
+        probes = list(range(0, n, max(1, -(-n // WINDOW_PROBES))))[:WINDOW_PROBES]
+        at = {p: i for i, p in enumerate(probes)}
+        groups: dict[int, list[int]] = {}
+        for w, (d, _, _) in enumerate(self._spans):
+            groups.setdefault(d, []).append(w)  # janelas de um trecho são contíguas em _spans
+        out: dict[int, float] = {}
+        if self._matrix is not None and self._wmatrix is not None:  # matrizes numpy: produto e máximo vetorizados
+            sample = self._matrix[probes]
+            to_windows, to_chunks = sample @ self._wmatrix.T, sample @ self._matrix.T  # sondas × janelas / trechos
+            for d, ws in groups.items():
+                gains = to_windows[:, ws[0]:ws[-1] + 1].max(axis=1) - to_chunks[:, d]
+                total, count = float(gains.sum()), len(probes)
+                if d in at:  # o próprio trecho não é sonda dele
+                    total, count = total - float(gains[at[d]]), count - 1
+                out[d] = total / count if count else 0.0
+            return out
+
+        def dot(a: list[float], b: list[float]) -> float:
+            return sum(x * y for x, y in zip(a, b, strict=True))
+
+        for d, ws in groups.items():
+            gains = [max(dot(self._units[p], self._wunits[w]) for w in ws) - dot(self._units[p], self._units[d])
+                     for p in probes if p != d]
+            out[d] = sum(gains) / len(gains) if gains else 0.0
+        return out
+
+    def _best_windows(self, qv: list[float], cos: list[float]) -> tuple[list[float], list[tuple[int, int] | None]]:
+        """(nota densa por trecho, janela vencedora ou None). A melhor janela de um trecho substitui a nota dele quando
+        casa melhor que o trecho inteiro E o ganho, descontado o típico do trecho (`_window_bias`), fica acima de zero
+        e acima do percentil WINDOW_GAIN_PCT dos ganhos desta consulta (com menos de 100/(100 − pct) trechos com janela
+        essa fatia de cima não tem nem um trecho: vale ganho descontado > 0). Empate fica com o trecho."""
+        best, won = list(cos), [None] * len(cos)
+        if not self._spans:
+            return best, won
+        top: dict[int, tuple[float, tuple[int, int]]] = {}
+        for (n, a, b), c in zip(self._spans, self._window_cosines(qv), strict=True):
+            if n not in top or c > top[n][0]:
+                top[n] = (c, (a, b))
+        adj = {n: c - cos[n] - self._wbias.get(n, 0.0) for n, (c, _) in top.items()}
+        enough = len(adj) * (100 - WINDOW_GAIN_PCT) >= 100
+        cut = max(_percentile(list(adj.values()), WINDOW_GAIN_PCT), 0.0) if enough else 0.0
+        for n, (c, span) in top.items():
+            if c > cos[n] and adj[n] > cut:
+                best[n], won[n] = float(c), span
+        return best, won
+
     def search(self, query: str, k: int = 3) -> list[Hit]:
         if not self.index.docs:
             return []
         bm = self.index.scores(query)
         qv = _unit(query_vector(self.embedder, query))
-        cos = self._cosines(qv)
+        cos, win = self._best_windows(qv, self._cosines(qv))
         ids = [d.id for d in self.index.docs]
         dense = [i for i, _ in sorted(zip(ids, cos, strict=True), key=lambda x: (-x[1], x[0]))]
         if self.fusion == "dense" or not lexical_fits(query):
@@ -461,9 +602,10 @@ class HybridRetriever:
         else:
             lex = [i for i, s in sorted(zip(ids, bm, strict=True), key=lambda x: -x[1]) if s > 0][:CANDIDATES]
             fused = rrf([lex, dense[:CANDIDATES]])
-        by_id = {d.id: (d, b, c) for d, b, c in zip(self.index.docs, bm, cos, strict=True)}
+        by_id = {d.id: (d, b, c, w) for d, b, c, w in zip(self.index.docs, bm, cos, win, strict=True)}
         top = sorted(fused.items(), key=lambda x: (-x[1], x[0]))  # desempate por id: determinístico
-        return diversify([Hit(by_id[i][0], s, bm25=by_id[i][1], cosine=by_id[i][2]) for i, s in top], k)
+        return diversify([Hit(by_id[i][0], s, bm25=by_id[i][1], cosine=by_id[i][2], window=by_id[i][3])
+                          for i, s in top], k)
 
 
 DEDUPE_MIN = 0.9  # fração dos 5-gramas do trecho menor que aparece no maior: acima disso é o mesmo texto
@@ -570,9 +712,9 @@ def _embedder_for(model: str) -> FastEmbedEmbedder:
 
 @lru_cache(maxsize=4)
 def _hybrid_for(directory: str, stamp: tuple, model: str, fusion: str = "rrf",
-                dedup: bool = True) -> HybridRetriever | None:
+                dedup: bool = True, windows: bool = False) -> HybridRetriever | None:
     try:
-        return HybridRetriever(_index_for(directory, stamp, dedup), _embedder_for(model), fusion)
+        return HybridRetriever(_index_for(directory, stamp, dedup), _embedder_for(model), fusion, windows)
     except Exception as exc:  # ImportError (sem fastembed) ou modelo ausente/sem rede: degrada para BM25
         _FALLBACKS[(directory, stamp, model, fusion)] = reason = _reason(exc)
         METRICS.inc("retriever_fallback_total")
@@ -659,6 +801,21 @@ class FastEmbedCrossEncoder:
 CROSS_CHARS = 1500  # padrão: o cross-encoder trunca em ~512 tokens; o corte só evita tokenizar texto inútil
 
 
+def cross_text(hit: Hit, chars: int) -> str:
+    """O que o cross-encoder lê de um trecho: cabeçalho + texto, cortado em `chars`. Com a janela que deu a nota densa
+    (Hit.window) e um trecho maior que o corte, a leitura começa no início da janela (e recua por linhas inteiras se o
+    resto do trecho não enche o corte): a nota do portão mede a parte que casou, não os primeiros caracteres. Sem
+    janela, ou trecho que cabe inteiro, é o mesmo texto de antes."""
+    head, text = f"{hit.doc.head}. ", hit.doc.text
+    if hit.window is None or len(head) + len(text) <= chars:
+        return (head + text)[:chars]
+    budget, start = chars - len(head), hit.window[0]
+    if len(text) - start < budget:  # janela no fim do trecho: a linha mais cedo cujo resto ainda cabe no corte
+        starts = [0] + [m.end() for m in re.finditer("\n", text[:start])]
+        start = next((s for s in starts if len(text) - s <= budget), start)
+    return (head + text[start:])[:chars]
+
+
 class CrossRerankRetriever:
     """Reordena o top-`pool` do base pelo score do cross-encoder. Mantém bm25/cosseno do base (portão de cobertura).
 
@@ -688,7 +845,7 @@ class CrossRerankRetriever:
         scored = diversify(cands, k) if keep_base else cands
         t0 = time.perf_counter()
         try:
-            scores = self.scorer.score(query, [f"{h.doc.head}. {h.doc.text}"[:self.chars] for h in scored])
+            scores = self.scorer.score(query, [cross_text(h, self.chars) for h in scored])
             if len(scores) != len(scored):
                 raise ValueError(f"{len(scores)} scores para {len(scored)} trechos")
         except Exception as exc:  # modelo quebrado em produção: a ordem do base ainda responde
@@ -733,7 +890,7 @@ def get_retriever(name: str | None = None, embedder: Embedder | None = None, rer
             d = data_dir()
             stamp, model = _stamp(d), embed_model()
             with _BUILD_LOCK:  # sem trava, cada thread que chegava durante a 1ª montagem montava a sua
-                hybrid = _hybrid_for(str(d), stamp, model, fusion, dedupe_enabled())
+                hybrid = _hybrid_for(str(d), stamp, model, fusion, dedupe_enabled(), windows_enabled())
             if hybrid is not None:
                 base = hybrid
             else:

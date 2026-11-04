@@ -219,6 +219,11 @@ class PgStore(Store):
         # Só a chave do limitador fica serializada (dois réplicas contando "u1" esperam uma a outra; "u2" não espera).
         conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", (f"rate:{key}",))
 
+    def _lock_open(self, conn, key: str) -> None:
+        # a mesma trava de `_lock_key` (o apagamento do perfil espera o turno que o está gravando, e vice-versa): no
+        # Postgres a transação já está aberta e a trava consultiva vale até o fim dela
+        self._lock_key(conn, key)
+
     @staticmethod
     def _claim_overdue(conn, now: float) -> list[str]:
         # SKIP LOCKED: duas réplicas rodando o laço de SLA ao mesmo tempo pegam linhas diferentes, nenhuma espera a

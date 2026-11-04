@@ -802,7 +802,7 @@ def _load_consensus(base: Path) -> dict | None:
 JUDGE_FILE, JUDGE_PERTURBED = "judge.json", "judge_perturbed.json"
 JUDGE_VERDICT = "fundamentada, útil, no idioma da pergunta e sem vazamento — as 3 perguntas da página"
 # As duas leituras do "juiz reprova", lado a lado nas respostas reais: o `helpful` entrou na definição depois de uma
-# medida, e trocar a régua depois de ver o número sem mostrar a de antes é caminho bifurcado.
+# medida, e trocar o critério depois de ver o número sem mostrar o de antes é caminho bifurcado.
 JUDGE_READINGS = {"antes": "não fundamentada, idioma errado ou vazamento (evals.judge.verdict_fails)",
                   "depois": "não fundamentada, idioma errado, vazamento ou não atende ao pedido (+ helpful=False: as "
                             "3 perguntas da página)"}
@@ -812,7 +812,7 @@ JUDGE_READING_WHY = ("a pessoa reprova se qualquer das 3 perguntas da página sa
 
 
 def judge_passes(v: dict) -> bool:
-    """O juiz aprova pela mesma régua da pessoa. A página reprova se qualquer pergunta sai ruim: não responde ao
+    """O juiz aprova pelo mesmo critério da pessoa. A página reprova se qualquer pergunta sai ruim: não responde ao
     pedido (c1), algo sem base (c2), idioma diferente (c3). O juiz responde as mesmas três em `helpful`, `grounded` e
     `language_ok` (mais o vazamento); deixar `helpful` de fora faria a resposta fundamentada que não atende ao pedido
     (ex.: fato_removido) aparecer como erro do juiz, quando é só critério diferente. Campo ausente não reprova. A
@@ -882,7 +882,7 @@ def judge_vs_humans(by_rater: dict[str, dict[str, bool]], consensus: dict | None
                     selection: dict[str, str] | None = None, verdicts: dict[str, dict] | None = None,
                     warning: str | None = None) -> dict | None:
     """Juiz × humanos em respostas reais (método do rótulo em trace real) e nas adulteradas declaradas: o veredito
-    do juiz pela régua da pessoa (judge_passes) contra o humano — o consenso quando houver, senão a concordância dos
+    do juiz pelo critério da pessoa (judge_passes) contra o humano — o consenso quando houver, senão a concordância dos
     dois, senão o 1º rotulador. Complementa a calibração em casos construídos (judge.json `calibration`), que mede
     outra coisa: casos escritos à mão, com a evidência escrita à mão. Mesma regra de validação, fixada antes de medir
     (evals.judge.validation), no total, só nas reais e só nas adulteradas (`perturbed`: {id: linha de

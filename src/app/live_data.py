@@ -1,13 +1,16 @@
-"""Dados ao vivo resolvidos no código para a intenção `general`: câmbio (PTAX do Banco Central) e clima (Open-Meteo).
+"""Dados ao vivo da intenção `general`: câmbio (PTAX do Banco Central) e clima (Open-Meteo; wttr.in de segunda fonte).
 
-Por que no código e não na busca web: a busca do provedor devolve o corpo da página cifrado, e a checagem numérica só
+Por que API e não a busca web: a busca do provedor devolve o corpo da página cifrado, e a checagem numérica só
 enxergava título e trecho citado (medido: números dos cenários oficiais 80% ao vivo, clima e câmbio sem base).
-Aqui a pergunta dispara uma consulta montada por nós; o TEXTO bruto da API vira evidência do turno e a resposta cita
-fonte e data. Fonte real com data é o que deixa a resposta conferível.
+Aqui a consulta é montada por nós; o TEXTO bruto da API vira evidência do turno e a resposta cita fonte e data.
+Fonte real com data é o que deixa a resposta conferível.
 
-Detector estreito de propósito: câmbio exige palavra de cotação E uma moeda conhecida da PTAX; clima exige palavra de
-clima E uma cidade que o geocoding encontre. Qualquer falha (sem moeda, cidade desconhecida, timeout de 3 s, HTTP,
-JSON inesperado) devolve None e o agente cai na busca web. Flag `LIVE_DATA=on|off` (padrão on).
+Interface por parâmetro: `fx_quote(moeda, data)` e `forecast(cidade, dia)` devolvem (resultado, desfecho). Quem
+escolhe a consulta, com LLM, é o MODELO: as tools `currency_rate` e `weather_forecast` do agente geral
+(app/agents.py) validam a entrada e chamam estas funções. Sem LLM (offline ou queda), o detector `lookup` decide no
+lugar dele, estreito de propósito: câmbio exige palavra de cotação E uma moeda conhecida da PTAX; clima exige palavra
+de clima E uma cidade que o geocoding encontre. Qualquer falha (sem cotação, cidade desconhecida, timeout de 3 s,
+HTTP, JSON inesperado) devolve None e o desfecho; o agente cai na busca web. Flag `LIVE_DATA=on|off` (padrão on).
 
 - PTAX: `CotacaoMoedaPeriodo` numa janela de 7 dias até a data pedida; usa o último boletim de "Fechamento" (ou o
   último do dia mais recente). Fim de semana e feriado caem sozinhos no último dia útil, numa chamada só.
@@ -57,6 +60,7 @@ class LiveResult:
     # valores que a resposta TEM de trazer (o prompt pede; o código confere): (rótulo pt, rótulo en, valor, tolerância
     # do arredondamento que o prompt permite). Clima: mínima, máxima e chance de chuva; câmbio: venda e compra.
     must: list[tuple[str, str, float, float]] = field(default_factory=list)
+    subject: str = ""  # moeda ou cidade consultada: separa os rótulos quando o turno traz mais de uma consulta
 
     def text(self, language: str) -> str:
         return self.text_en if language == "en" else self.text_pt
@@ -165,6 +169,8 @@ _CURRENCIES = [
     ("NOK", r"coroa norueguesa|norwegian krone|\bnok\b"),
     ("SEK", r"coroa sueca|swedish krona|\bsek\b"),
 ]
+CURRENCIES = tuple(code for code, _ in _CURRENCIES)  # ISO 4217 que a consulta aceita (tool do LLM e detector)
+DAYS = {"hoje": 0, "amanhã": 1, "depois de amanhã": 2}  # dias da previsão (a tool expõe as chaves)
 _FX_WORDS = re.compile(r"\bcambio\b|\bcotac(ao|oes)\b|exchange rate|\bfx\b|\brate\b|quanto (esta|ta|vale|custa) o"
                        r"|how much is (the|one|1)|\bconver(t|ter|sao)\b")
 
@@ -207,7 +213,7 @@ def fx(code: str, wanted: date) -> LiveResult | None:
     rounded = f"Arredondado: venda R$ {_br(sell, 2)}, compra R$ {_br(buy, 2)} ({sell:.2f} / {buy:.2f})"
     must = [("a venda", "the sell rate", sell, 0.0051), ("a compra", "the buy rate", buy, 0.0051)]
     return LiveResult("fx", "Banco Central do Brasil (PTAX)", "https://www.bcb.gov.br/estabilidadefinanceira/"
-                      "historicocotacoes", last_day, text_pt, text_en, must=must,
+                      "historicocotacoes", last_day, text_pt, text_en, must=must, subject=code,
                       evidence=[f"PTAX {code} (API do Banco Central): cotacaoCompra {buy:.4f}; "
                                 f"cotacaoVenda {sell:.4f}; dataHoraCotacao {row.get('dataHoraCotacao')}; "
                                 f"tipoBoletim {kind}",
@@ -308,7 +314,8 @@ def weather(city: str, offset: int) -> LiveResult | None:
     flat = "; ".join(f"{k} {v[0] if isinstance(v, list) and v else v}" for k, v in daily.items())
     where = f"{place.get('name')} (lat {place.get('latitude')}, lon {place.get('longitude')}, {tz})"
     return LiveResult("weather", "Open-Meteo", "https://open-meteo.com/", day.isoformat(), text_pt, text_en,
-                      evidence=[f"Open-Meteo (API) para {where}: {flat}", rounded], must=weather_must(tmin, tmax, rain))
+                      evidence=[f"Open-Meteo (API) para {where}: {flat}", rounded], must=weather_must(tmin, tmax, rain),
+                      subject=place.get("name") or city)
 
 
 WTTR = "https://wttr.in/{where}"
@@ -323,8 +330,8 @@ def weather_must(tmin: float, tmax: float, rain) -> list[tuple[str, str, float, 
 
 
 def weather_backup(city: str, offset: int) -> LiveResult | None:
-    """Segunda fonte de clima (wttr.in, sem chave): o Open-Meteo devolve 429/timeout sob carga e o cenário oficial
-    de clima caía na recusa. Mesmo formato de evidência; a fonte citada é a que respondeu."""
+    """Segunda fonte de clima (wttr.in, sem chave): o Open-Meteo devolve 429/timeout sob carga e a pergunta de clima
+    caía na recusa. Mesmo formato de evidência; a fonte citada é a que respondeu."""
     data = _fetch(WTTR.format(where=city.replace(" ", "+")), {"format": "j1", "lang": "pt"})
     days = data.get("weather") or []
     if len(days) <= offset:
@@ -344,7 +351,7 @@ def weather_backup(city: str, offset: int) -> LiveResult | None:
     flat = f"date {day.isoformat()}; mintempC {d['mintempC']}; maxtempC {d['maxtempC']}; chanceofrain_max {rain}"
     return LiveResult("weather", "wttr.in", "https://wttr.in/", day.isoformat(), text_pt, text_en,
                       evidence=[f"wttr.in (API) para {city}: {flat}", "Fonte desta previsão: wttr.in."],
-                      must=weather_must(tmin, tmax, rain))
+                      must=weather_must(tmin, tmax, rain), subject=city)
 
 
 def followup_query(text: str, previous: str | None) -> str | None:
@@ -368,8 +375,64 @@ def followup_query(text: str, previous: str | None) -> str | None:
     return None
 
 
+# --- consulta por parâmetro (tool do LLM e detector offline) ---------------------------------------------------------
+def fx_quote(code: str, wanted: date | None = None) -> tuple[LiveResult | None, str]:
+    """Câmbio por parâmetro: PTAX de `code` (um de CURRENCIES) em `wanted` (padrão: hoje do negócio, app.clock).
+
+    Devolve (resultado, desfecho): ok | empty (sem boletim na semana até a data) | error (rede, HTTP, JSON) | off.
+    """
+    if code not in CURRENCIES:
+        raise ValueError(f"moeda fora da PTAX: {code!r}")
+    return _consult("fx", lambda budget: fx(code, wanted or clock.today()))
+
+
+def forecast(city: str, offset: int = 0) -> tuple[LiveResult | None, str]:
+    """Clima por parâmetro: previsão de `city` para hoje (0), amanhã (1) ou depois de amanhã (2). Mesmo desfecho de
+    `fx_quote`; empty = cidade que o geocoding não achou."""
+    if offset not in DAYS.values():
+        raise ValueError(f"dia fora da previsão: {offset!r}")
+    return _consult("weather", lambda budget: _two_sources(city, offset, budget))
+
+
+def _two_sources(city: str, offset: int, budget: float) -> LiveResult | None:
+    # 1ª fonte com 60% do teto; o resto fica para a segunda: a consulta inteira continua dentro do teto
+    start = time.monotonic()
+    if budget > 0:
+        _DEADLINE.set(start + budget * 0.6)
+    try:
+        return weather(city, offset)
+    except Exception:  # noqa: BLE001 — 429/timeout no Open-Meteo: a segunda fonte
+        METRICS.inc("live_data_total", kind="weather", outcome="backup")
+        if budget > 0:
+            _DEADLINE.set(start + budget)
+        return weather_backup(city, offset)
+
+
+def _consult(kind: str, run) -> tuple[LiveResult | None, str]:
+    """Uma consulta dentro do teto da consulta inteira, com span, métrica e log. Nunca levanta: quem chamou decide
+    (tool_result de erro para o modelo, ou a busca web)."""
+    if not enabled():
+        return None, "off"
+    budget = budget_s()
+    token = _DEADLINE.set(time.monotonic() + budget if budget > 0 else None)
+    try:
+        with span("live_data", kind=kind):
+            result = run(budget)
+    except Exception as exc:  # noqa: BLE001 — timeout, HTTP, JSON: a busca web assume
+        METRICS.inc("live_data_total", kind=kind, outcome="error")
+        log.warning("live_data_failed", extra={"extra_fields": {"kind": kind, "error": type(exc).__name__}})
+        return None, "error"
+    finally:
+        _DEADLINE.reset(token)
+    outcome = "ok" if result else "empty"
+    METRICS.inc("live_data_total", kind=kind, outcome=outcome)
+    return result, outcome
+
+
+# --- detector do motor sem LLM ---------------------------------------------------------------------------------------
 def lookup(text: str, today: date | None = None, previous: str | None = None) -> LiveResult | None:
-    """Dado ao vivo para a pergunta (ou para o seguimento dela, com a fala anterior do cliente), ou None."""
+    """Detector do motor SEM LLM (offline ou queda): a pergunta (ou o seguimento dela, com a fala anterior do
+    cliente) vira parâmetros por regex e a consulta roda; None no resto. Com LLM quem escolhe é o modelo (tools)."""
     full = followup_query(text, previous)
     if full:
         return _lookup(full, today)
@@ -381,32 +444,8 @@ def _lookup(text: str, today: date | None = None) -> LiveResult | None:
     if not enabled():
         return None
     code, city = currency_of(text), city_of(text)
-    if not code and not city:
-        return None
-    kind = "fx" if code else "weather"
-    budget = budget_s()
-    token = _DEADLINE.set(time.monotonic() + budget if budget > 0 else None)
-    try:
-        with span("live_data", kind=kind):
-            if code:
-                result = fx(code, today or clock.today())
-            else:
-                # 1ª fonte com 60% do teto; o resto fica para a segunda: a consulta inteira continua dentro do teto
-                start = time.monotonic()
-                if budget > 0:
-                    _DEADLINE.set(start + budget * 0.6)
-                try:
-                    result = weather(city, _day_offset(text))
-                except Exception:  # noqa: BLE001 — 429/timeout no Open-Meteo: a segunda fonte
-                    METRICS.inc("live_data_total", kind=kind, outcome="backup")
-                    if budget > 0:
-                        _DEADLINE.set(start + budget)
-                    result = weather_backup(city, _day_offset(text))
-    except Exception as exc:  # noqa: BLE001 — timeout, HTTP, JSON: a busca web assume
-        METRICS.inc("live_data_total", kind=kind, outcome="error")
-        log.warning("live_data_failed", extra={"extra_fields": {"kind": kind, "error": type(exc).__name__}})
-        return None
-    finally:
-        _DEADLINE.reset(token)
-    METRICS.inc("live_data_total", kind=kind, outcome="ok" if result else "empty")
-    return result
+    if code:
+        return fx_quote(code, today)[0]
+    if city:
+        return forecast(city, _day_offset(text))[0]
+    return None

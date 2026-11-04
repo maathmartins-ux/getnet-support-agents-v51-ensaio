@@ -21,8 +21,11 @@ chamado), pending_action, replanned, not_contains, doc_ids (relevantes → Recal
 forbidden_agents (handoff por desfecho), must_include_agents / must_mention (conclusão da tarefa → completed_acc:
 a resposta tem as partes esperadas), facts (regex sem caixa que a resposta TEM de conter → facts_acc e a
 manchete `resolved`: sem humano E todo fato na resposta E ao menos uma fonte citada ou dado de ferramenta),
-human_in_turn (a resposta do operador saiu NO MESMO turno: algum passo com `answered_live`).
-`before`: mensagens anteriores na mesma conversa (casos de memória).
+human_in_turn (a resposta do operador saiu NO MESMO turno: algum passo com `answered_live`), after_human (agentes
+que rodam no mesmo turno DEPOIS da resposta do humano: o plano continuou com ela → after_human_acc).
+`before`: mensagens anteriores na mesma conversa (casos de memória). `earlier_conversations`: conversas anteriores
+do MESMO usuário, [[fala, ...], ...], cada uma aberta do zero e rodada antes de tudo; o turno avaliado (com o seu
+`before`) vem numa conversa nova e só sabe delas pelo perfil de longo prazo do usuário (app/memory.py).
 Humano no laço (split `hitl`): o caso traz `"operator": {"answer": ..., "after_s": ...}` (a operadora simulada,
 evals/operator_sim.py, responde o caso que o turno abrir `after_s` s depois de o turno começar a esperar) e `"wait_s"`
 (espera síncrona só deste caso, hitl_sync.override; sem ele vale o env). Depois do turno, o eval espera a resposta
@@ -189,15 +192,26 @@ def load_cases(paths: tuple[Path, ...] | None = None) -> list[dict]:
             raise ValueError(f"caso {c['id']}: todo fato já está na pergunta ({field}); eco não mede a resposta: "
                              "acrescente um fato que só a resposta certa traz (valor, prazo, condição da fonte)")
         _check_operator(c)
+        earlier = c.get("earlier_conversations")
+        if earlier is not None and not (isinstance(earlier, list) and all(
+                isinstance(conv, list) and conv and all(isinstance(m, str) and m.strip() for m in conv)
+                for conv in earlier)):
+            raise ValueError(f"caso {c['id']}: earlier_conversations é uma lista de conversas, cada uma uma lista de "
+                             "falas do cliente não vazias")
     return cases
+
+
+def case_turns(case: dict) -> int:
+    """Turnos que o caso roda: os das conversas anteriores (`earlier_conversations`), os de `before` e o avaliado."""
+    return 1 + len(case.get("before") or []) + sum(len(c) for c in case.get("earlier_conversations") or [])
 
 
 def echo_facts(case: dict) -> str | None:
     """A lista de fatos que casa INTEIRA com a própria pergunta (`expect.facts` ou `expect.expects_fact`), ou None.
 
-    Com ela, repetir a pergunta passa na checagem: rodada 10, o official-10 ("Can I sell through WhatsApp using the
-    Payment Link?", fatos "whats ?app" e "payment link") contava como resolvido sem nenhum dado da fonte, e mais 3
-    casos tinham só "whats ?app". Cada lista é olhada sozinha porque cada uma alimenta uma checagem (`facts`/
+    Com ela, repetir a pergunta passa na checagem. Medido: um caso cujos fatos eram só os dois nomes que a própria
+    pergunta traz ("Can I sell through <canal> using <produto>?") contava como resolvido sem nenhum dado da fonte, e
+    mais 3 casos tinham só o nome do canal. Cada lista é olhada sozinha porque cada uma alimenta uma checagem (`facts`/
     `resolved` e `memory`), com o mesmo casamento delas (regex sem caixa; fact_present na memória)."""
     exp, message = case.get("expect") or {}, case.get("message") or ""
     if exp.get("facts") and not facts_missing(exp, message):
@@ -259,8 +273,8 @@ class Client:
 
 def route_equivalent(expected: str, got: str | None, route: list[str] | None) -> bool:
     """Rota certa pelo RESULTADO: o rótulo bate, ou os dois rótulos levam ao mesmo plano de especialistas do domínio
-    (PLANS) e esses especialistas foram chamados. Exemplo medido (q-memory-04/05/15): "E a outra maquininha?"
-    rotulado troubleshoot com gabarito support — os dois vão ao records, a resposta trouxe a T1988B offline certa e,
+    (PLANS) e esses especialistas foram chamados. Exemplo medido em 3 casos de memória: o seguimento "E a outra?"
+    rotulado troubleshoot com gabarito support — os dois vão ao records, a resposta trouxe o equipamento certo e,
     pelo rótulo, o caso contava como perda de roteamento. Mede-se o resultado, não a taxonomia.
     Nunca mais fraco que o rótulo (rótulo certo = rota certa); `intent` segue medido e publicado à parte."""
     if got == expected:
@@ -327,6 +341,8 @@ def score(case: dict, got: dict) -> dict[str, bool]:
         # a resposta da operadora chega ao cliente UMA vez: no turno (e a retomada não manda de novo) ou só pela
         # retomada assíncrona, quando chegou depois da espera
         checks["human_once"] = len(got.get("resumed") or []) == (0 if answered_live(got) else 1)
+    if "after_human" in exp:  # o plano seguiu DEPOIS da resposta do humano: o agente roda depois da escalada
+        checks["after_human"] = set(exp["after_human"]) <= agents_after_human(got)
     if exp.get("expects_fact"):  # valores de turnos anteriores que a resposta deve conter (evals/memory_metrics.py)
         from .memory_metrics import facts_ok
 
@@ -507,6 +523,12 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
             if Path(get_store().path) != Path(db):
                 raise RuntimeError(f"isolamento do eval falhou: banco {get_store().path}, esperado {db}")
         conv, user = None, case.get("user_id", "u1")
+        for earlier in case.get("earlier_conversations") or []:  # outras conversas do mesmo usuário, cada uma do zero
+            prev = None
+            for prior in earlier:
+                sent = client.send(prior, user, prev)
+                prev = sent["conversation_id"]
+                prior_cost += (sent.get("usage") or {}).get("cost_usd", 0) or 0
         for prior in case.get("before", []):
             sent = client.send(prior, user, conv)
             conv = sent["conversation_id"]
@@ -595,7 +617,7 @@ def summarize(rows: list[dict]) -> dict:
 
     checks = ("resolved", "facts", "intent", "handoff", "handoff_outcome", "blocked", "language", "tools",
               "pending_action", "replanned", "completed", "no_leak", "numbers", "memory", "claims", "human_in_turn",
-              "human_once")
+              "human_once", "after_human")
 
     def vals(items: list[dict], key: str) -> list[bool]:
         return [r["checks"][key] for r in items if key in r["checks"]]
@@ -695,7 +717,7 @@ def split_weights(splits: list[str], repeat: dict[str, int]) -> dict[str, float]
         mine = [c for c in cases if c["split"] == s]
         measured = _measured_usd_per_case(s)
         rep = max(1, repeat.get(s, 1))
-        turns = float(sum((1 + len(c.get("before") or [])) for c in mine) * rep)
+        turns = float(sum(case_turns(c) for c in mine) * rep)
         if measured is not None and per_turn > 0:
             # piso = os turnos: rodada anterior que morreu em timeout (US$ 0,002 por caso) não pode encolher a cota
             out[s] = round(max(len(mine) * rep * measured / per_turn, turns), 4)
@@ -822,7 +844,7 @@ def run(url: str | None = None, out: Path | None = None, split: str | None = Non
             get_store()
             original_db_path = _install_case_db()
             # buscador (e modelos do denso/rerank) aquecido antes do 1º caso, como a API faz no startup: frio, a
-            # carga dos modelos estourava o NODE_TIMEOUT do 1º caso e ele ia ao humano (visto no official-01)
+            # carga dos modelos estourava o NODE_TIMEOUT do 1º caso da bateria e ele ia ao humano
             from app.rag import get_retriever
 
             get_retriever().search("aquecimento", k=1)
@@ -1346,7 +1368,8 @@ def _retrieval_cache_key(path: Path) -> str | None:
     # placar gravado da ordem base, e a comparação das duas ordens saía idêntica)
     h.update(repr((config.retriever_name(), config.embed_model(), config.rerank_mode(), config.rerank_model(),
                    config.rerank_pool(), config.rerank_chars(), config.rerank_order(), config.faq_top_k(),
-                   config.faq_max_searches(), os.getenv("HYBRID_LANG_GATE", "on"), os.getenv("DOMAIN", ""))).encode())
+                   config.faq_max_searches(), os.getenv("HYBRID_LANG_GATE", "on"), os.getenv("DOMAIN", ""),
+                   config.rag_windows())).encode())
     for f in ("src/app/rag.py", "src/app/agents.py", "src/app/ingest.py", "evals/retrieval_eval.py"):
         p = HERE.parent / f
         if p.exists():
@@ -1767,9 +1790,18 @@ def _lang_cell(lang: str, v: dict) -> str:
 
 SUMMARY_KEYS = (("resolved_acc", "resolvidas"), ("intent_acc", "intenção"),
                 ("handoff_acc", "humano certo"), ("human_in_turn_acc", "humano no turno certo"),
-                ("human_once_acc", "resposta do humano uma vez só"), ("replanned_acc", "replanejou"),
+                ("human_once_acc", "resposta do humano uma vez só"),
+                ("after_human_acc", "plano seguiu depois do humano"), ("replanned_acc", "replanejou"),
                 ("memory_acc", "fato da conversa"), ("numbers_acc", "números com base"),
                 ("blocked_acc", "bloqueio certo"), ("language_acc", "idioma"))
+
+
+def agents_after_human(got: dict) -> set[str]:
+    """Agentes que rodaram depois da escalada que o humano respondeu no turno (a rota é a ordem de execução)."""
+    route = [a for a in got.get("route") or [] if a not in ("router", "guardrails")]
+    if not answered_live(got) or ESCALATION_AGENT not in route:
+        return set()
+    return set(route[len(route) - route[::-1].index(ESCALATION_AGENT):])
 
 
 def split_summary(report: dict) -> str:
@@ -1813,7 +1845,7 @@ def _rerank_gate_in_use() -> float | None:
 
 def how_to_read(report: dict) -> str:
     """1ª linha do relatório: o que mede, de onde vem e como ler o IC. Texto gerado e sem número (os números são os da
-    tabela logo abaixo); a régua da rodada 10 leu no RESULTS "tabelas densas de IC95 por split no lugar de explicação".
+    tabela logo abaixo): sem ela, o RESULTS era só tabela densa de IC95 por split, sem dizer o que cada uma mede.
     """
     if report.get("live"):
         origin = f"LLM real, de `evals/results/live_{report.get('split') or 'all'}.json`"
@@ -1982,10 +2014,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--ram-budget-mb", type=float, default=None,
                     help="RAM residente máxima do processo na escolha (padrão 4096; 0 = sem teto)")
     ap.add_argument("--fast", action="store_true",
-                    help="com --choose-retriever: mede só bm25, dense[e5-large] e "
-                         "dense[e5-large]+cross[bge-m3-int8@10/600c]")
+                    help="com --choose-retriever: mede só bm25, dense[e5-large] sem e com janelas e "
+                         "dense[e5-large]+windows+cross[bge-m3-int8@10/600c] nas duas ordens")
     ap.add_argument("--reuse", action="store_true",
                     help="com --choose-retriever: refaz só a escolha sobre evals/results/retrieval_compare.json")
+    ap.add_argument("--windows", action="store_true",
+                    help="com --choose-retriever: mede cada denso com e sem janelas no índice (a escolha decide)")
     ap.add_argument("--verify", action="store_true",
                     help="com --choose-retriever: sai 1 se a escolha medida agora divergir de data/retriever.json")
     ap.add_argument("--embed-models", help="modelos de embedding a comparar, separados por vírgula")

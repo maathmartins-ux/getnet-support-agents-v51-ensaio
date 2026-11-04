@@ -281,10 +281,10 @@ KEEP_REPEATED = 80  # linha repetida em várias páginas com isso ou mais é con
 
 
 def glue_short(lines: list) -> list:
-    """Junta linhas curtas consecutivas numa só ("Get Clássica · R$ 79,90/mês").
+    """Junta linhas curtas consecutivas numa só ("Plano Básico · R$ 79,90/mês").
 
-    Medido: a tabela de preços e faixas (células "Get Clássica", "R$ 79,90/mês") saía inteira por
-    ter linhas < 15 caracteres, e o cenário oficial "diferença entre Get Clássica e Get Smart" ficava sem fonte.
+    Medido: a tabela de preços e faixas (células "Plano Básico", "R$ 79,90/mês") saía inteira por ter linhas < 15
+    caracteres, e a pergunta que compara dois produtos da tabela ficava sem fonte.
     Juntas, as células viram uma linha de tabela; menus juntos viram uma linha repetida em toda página e saem
     pela regra de repetição.
     Aceita linhas soltas ou pares (seção, linha); a linha colada fica com a seção da primeira. Não cola através de

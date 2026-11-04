@@ -18,6 +18,10 @@ PRICES_PER_MTOK = {
     "claude-sonnet-5-5": (2.00, 10.00),
     "claude-opus-5-5": (4.00, 20.00),
 }
+# Cache de prompt (skill claude-api): escrita de 5 min = 1,25× a entrada; leitura por modelo (US$/MTok). O Opus 5.5 lê
+# a 0,05× (US$ 0,20); Sonnet e Haiku a 0,1×. Modelo sem preço de leitura conta a leitura a 0,1× da entrada.
+CACHE_WRITE_FACTOR = 1.25
+CACHE_READ_PER_MTOK = {"claude-haiku-5-5": 0.01, "claude-sonnet-5-5": 0.20, "claude-opus-5-5": 0.20}
 
 # Papel → (modelo, effort). Cada um troca por env: ROUTER_MODEL, ROUTER_EFFORT, SUPERVISOR_MODEL...
 # Effort é declarado sempre (output_config.effort): os padrões mudam entre modelos.
@@ -98,8 +102,8 @@ def llm_provider() -> str:
 
 def auth_mode() -> str:
     # required: identidade só do Bearer token assinado (padrão seguro).
-    # demo: aceita user_id do corpo (payload literal de enunciado) e marca identity_verified=false.
-    # Ver docs/adr/0001-auth-mode-demo.md.
+    # demo: aceita user_id do corpo (payload literal de enunciado) e marca identity_verified=false; APP_ENV=production
+    # não sobe assim (api.production_gaps). Ver docs/adr/0001-auth-mode-demo.md.
     mode = os.getenv("AUTH_MODE", "required").lower()
     return mode if mode in ("demo", "required") else "required"
 
@@ -140,7 +144,8 @@ def operator_token() -> str:
 
 def operator_keys() -> dict[str, str]:
     # "ana:<sha256>,bruno:<sha256>" — só o hash fica na configuração (python -m app.auth operator-key ana).
-    # Vazio = o OPERATOR_TOKEN compartilhado vale como "admin"; APP_ENV=production não sobe assim (api.production_gaps).
+    # Vazio = o OPERATOR_TOKEN compartilhado vale como "admin" (fila, resposta e recusa; aprovar risco alto exige chave
+    # pessoal); APP_ENV=production não sobe assim (api.production_gaps).
     pairs = (p.split(":", 1) for p in os.getenv("OPERATOR_KEYS", "").split(",") if ":" in p)
     return {name.strip(): digest.strip() for name, digest in pairs if name.strip() and digest.strip()}
 
@@ -212,6 +217,9 @@ def rate_limit_per_min() -> int:
 # ensaio Getnet (59 com fonte) a escolha automática deu dense+cross:base Recall@5 0,915 / Recall@3 0,898 / MRR 0,842
 # contra 0,907 / 0,873 / 0,859 reordenando (o portão é o mesmo nas duas), e a bateria integral ao vivo com ela teve
 # oficiais 30/30 aterradas. `--choose-retriever` mede as duas ordens no domínio; RERANK_ORDER=cross volta.
+# Janelas (rodada 12, rag.window_spans): no gold do ensaio Getnet o denso com janelas deu o mesmo Recall@3/@5, MRR e
+# portão que sem elas, e o trecho da Get Clássica (12º–18º, fora do pool do cross) subiu ao top-5 do redator no
+# official-01. Escolha gravada sem a chave = sem janelas (foi medida sem elas); RAG_WINDOWS=off desliga.
 KIT_RETRIEVER = {
     "retriever": "dense",
     "embed_model": "intfloat/multilingual-e5-large",
@@ -220,6 +228,7 @@ KIT_RETRIEVER = {
     "rerank_pool": 10,
     "rerank_chars": 600,
     "rerank_order": "base",
+    "windows": True,
 }
 
 
@@ -281,6 +290,15 @@ def rerank_order() -> str:
     # gravada sem `rerank_order` (anterior à medida das duas ordens) segue reordenando.
     mode = (os.getenv("RERANK_ORDER") or _bundle().get("rerank_order") or "cross").lower()
     return mode if mode in ("cross", "base") else "cross"
+
+
+def rag_windows() -> bool:
+    # Janelas no índice denso (rag.window_spans): RAG_WINDOWS=on|off; senão o "windows" do pacote. Escolha gravada sem a
+    # chave = sem janelas (foi medida sem elas: o README e o --verify descrevem essa busca).
+    value = os.getenv("RAG_WINDOWS", "").strip().lower()
+    if value in ("on", "1", "true", "off", "0", "false"):
+        return value in ("on", "1", "true")
+    return bool(_bundle().get("windows"))
 
 
 def rerank_enabled() -> bool:
@@ -391,7 +409,9 @@ def choice_gate() -> dict:
             and (not c.get("rerank_model") or rerank_model() == c.get("rerank_model"))
             and (not c.get("rerank") or rerank_order() == (c.get("rerank_order") or "cross"))
             and (not c.get("rerank_pool") or rerank_pool() == int(c["rerank_pool"]))
-            and (not c.get("rerank_chars") or rerank_chars() == int(c["rerank_chars"])))
+            and (not c.get("rerank_chars") or rerank_chars() == int(c["rerank_chars"]))
+            # janelas mudam a nota densa e o que o cross lê: limiar medido com (ou sem) elas só vale igual
+            and (c.get("retriever") not in ("dense", "hybrid") or rag_windows() == bool(c.get("windows"))))
     gate = c.get("gate") if same else None
     return gate if isinstance(gate, dict) else {}
 

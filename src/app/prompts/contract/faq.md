@@ -10,6 +10,7 @@ produto e o valor lado a lado, ou em outro idioma):
 Resposta indireta conta: um trecho que diz quais opções servem (tipos de conta, canais, documentos aceitos) responde
 "preciso de X?" — diga o que o trecho diz e cite; não escreva "as fontes não dizem" quando ele está ali.
 "Falta" só quando nenhum trecho trata o fato. Nunca complete com conhecimento geral.
-Pergunta de sim/não ("preciso de X?", "posso Y?", "dá para Z?"): a 1ª frase é a resposta direta (sim, não ou
-depende de quê), tirada do trecho que trata a regra, com a citação; depois os detalhes. Regra geral que vale para o
-caso do cliente (ex.: quais tipos de conta servem) É a resposta: não a troque pela descrição de um produto.
+Pergunta de sim/não ("preciso de X?", "posso Y?", "dá para Z?"): a 1ª frase é a resposta direta, começa por sim,
+não ou "depende de X" e traz, na mesma frase, o que o trecho da regra diz, com a citação (o sim/não sozinho não tem
+base); depois os detalhes e as opções. Regra geral que vale para o caso do cliente (ex.: quais tipos de conta
+servem) É a resposta: não a troque pela descrição de um produto nem por uma lista de opções.

@@ -2,8 +2,9 @@
 
 Caso "dependent" do domínio de exemplo: "Quando chega meu pedido 1002?" → o records vê "em separação" → a resposta
 só fica completa com o prazo da política (faq). Sem o achado, o plano do router ([records]) para no status.
-No motor de tabela o código insere o passo pedido; no motor LLM o achado é informação: o modelo decide, com UMA volta
-de lembrete se encerrar sem chamar o agente pedido, e o achado ignorado de novo fica contado (`need_ignored`).
+No motor de tabela o código insere o passo pedido; no motor LLM o achado é informação: o modelo recebe todo achado e
+decide, com UMA volta de lembrete se encerrar sem chamar o agente de um achado que a regra do domínio (`needs_for`)
+liga à pergunta, e o achado ignorado de novo fica contado (`need_ignored`). Fora da regra, sem lembrete (`seen`).
 """
 import json
 import threading
@@ -88,8 +89,8 @@ def test_raw_tool_need_counts_when_the_domain_has_no_filter(monkeypatch):
 
 
 def test_domain_filter_decides_no_symptom_no_faq(monkeypatch):
-    """Com `needs_for` o domínio é o filtro: o `needs` cru da tool não entra por fora dele. Medido no ensaio: lido cru,
-    32 das 75 inserções por achado foram em mensagens sem palavra de sintoma ("Show me my last 5 transactions")."""
+    """Motor de tabela: com `needs_for` o domínio é o filtro e o `needs` cru da tool não entra por fora dele. Medido no
+    ensaio: lido cru, 32 das 75 inserções por achado foram em mensagens sem palavra de sintoma (pedido de extrato)."""
     _records_with_raw_need(monkeypatch, why="achado cru da tool", hint="dica crua")
     plain = supervisor.run(["records"], ctx("Onde está meu pedido 1002?"))  # sem pergunta de prazo: sem achado
     assert plain.route == ["records"] and plain.replans == [] and plain.results[0].needs == []
@@ -229,6 +230,46 @@ def test_finding_of_the_step_run_before_the_model_is_also_the_model_to_decide(mo
     assert "Achado sem resposta" in msgs.sent[1]["messages"][-1]["content"]  # encerrou sem o faq: o lembrete
     assert out.route == ["records", "faq"] and out.replans == [] and _outcome(out) == "reminded"
     assert [supervisor.step_view(r).get("decided_by") for r in out.results] == ["code", "llm"]
+
+
+def test_llm_engine_gets_the_finding_the_rule_left_out_and_decides(monkeypatch):
+    """O achado que a tool devolveu chega ao supervisor LLM mesmo sem a pergunta que a regra do domínio pede (aqui, de
+    prazo): quem decide é o modelo. Sem lembrete (a regra não o liga à pergunta): ou o modelo deixa de lado (`seen`) ou
+    chama o faq por conta própria (`called`). O motor de tabela, onde quem decide é o código, segue com a regra.
+    Medido na bateria ao vivo do ensaio: a regex de sintoma barrava 43 dos 91 achados das tools, inclusive sintoma real
+    escrito de outro jeito, e o modelo nem ficava sabendo."""
+    plain = "Onde está meu pedido 1002?"
+    raw = {"agent": "faq", "why": "achado cru da tool", "hint": "dica crua"}
+    seen = _records_with_raw_need(monkeypatch, why=raw["why"], hint=raw["hint"])
+    table = supervisor.run(["records"], ctx(plain))
+    assert table.engine == "table" and table.route == ["records"] and table.results[0].needs == []
+    new_trace_id()
+    llm, msgs = fake_llm([RECORDS_CALL, resp("end_turn", text("Seu pedido 1002 está em separação."))])
+    use_llm(monkeypatch, llm)
+    left = supervisor.run(["records"], ctx(plain))
+    assert json.loads(msgs.sent[1]["messages"][-1]["content"][0]["content"])["needs"] == [raw]
+    assert len(msgs.sent) == 2 and left.route == ["records"] and _outcome(left) == "seen" and not seen
+    new_trace_id()
+    llm, msgs = fake_llm([RECORDS_CALL, FAQ_CALL, resp("end_turn", text(FINAL))])
+    use_llm(monkeypatch, llm)
+    called = supervisor.run(["records"], ctx(plain))
+    assert called.route == ["records", "faq"] and _outcome(called) == "called" and called.answer == FINAL
+    assert called.replans == ["records:need->faq (achado cru da tool)"]
+    assert [supervisor.step_view(r).get("decided_by") for r in called.results] == ["llm", "llm"]
+
+
+def test_llm_engine_reminds_only_of_the_finding_the_rule_ties_to_the_question(monkeypatch):
+    """Com a pergunta de prazo a regra liga o achado à pergunta: o modelo recebe o da regra e o cru juntos, e encerrar
+    sem o faq dá a volta de lembrete (o que a regra decide no motor LLM é só o que o código cobra)."""
+    _records_with_raw_need(monkeypatch, why="achado cru da tool", hint="dica crua")
+    new_trace_id()
+    plain_answer = resp("end_turn", text("Em separação."))
+    llm, msgs = fake_llm([RECORDS_CALL, plain_answer, plain_answer])
+    use_llm(monkeypatch, llm)
+    out = supervisor.run(["records"], ctx(ASK))
+    assert json.loads(msgs.sent[1]["messages"][-1]["content"][0]["content"])["needs"] == [
+        {"agent": "faq", "why": f"{WHY}; achado cru da tool", "hint": f"{HINT}; dica crua"}]
+    assert "Achado sem resposta" in msgs.sent[2]["messages"][-1]["content"] and _outcome(out) == "ignored"
 
 
 def test_llm_engine_no_needs_mode_hides_the_finding_and_does_not_remind(monkeypatch):

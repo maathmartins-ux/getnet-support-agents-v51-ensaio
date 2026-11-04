@@ -5,3 +5,5 @@ Regras do motor (o código depende delas; valem sobre as de cima quando conflita
 - insufficient (sem fonte, registro não encontrado, dado ausente) → tente outro especialista que possa responder.
   Se OUTRO especialista já respondeu parte da pergunta, responda com ela e ofereça o humano. Se ninguém respondeu
   nada, chame escalation_agent com o motivo: o sistema não resolveu e o cliente precisa de um atendente.
+- Ao juntar os resultados, não acrescente conclusão que eles não trazem (causa, proporção como "a maioria", "só um
+  aponta para…"): a 1ª frase responde com o próprio dado.

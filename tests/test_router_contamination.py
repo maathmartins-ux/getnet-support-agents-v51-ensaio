@@ -73,7 +73,7 @@ def contaminated_examples(examples: list[str], heldout: list[dict]) -> list[tupl
 
 # Prompt do domínio × perguntas de avaliação. Rodada 10: o faq.md do domínio trazia a regra 'Conta para receber
 # ("preciso de conta bancária?", "do I need a bank account?")', com a frase do official-04 e o fato que ele confere;
-# a régua leu como regra sob medida para a prova. Splits que medem o sistema: os oficiais e todo held-out.
+# uma regra sob medida para a prova. Splits que medem o sistema: os oficiais e todo held-out.
 EVAL_SPLITS = ("official", "official-var")
 
 

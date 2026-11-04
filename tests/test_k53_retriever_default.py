@@ -65,9 +65,9 @@ def test_get_retriever_builds_the_default_bundle(monkeypatch):
         monkeypatch.delenv(var, raising=False)
     built = {}
 
-    def hybrid(directory, stamp, model, fusion="rrf", dedup=True):
+    def hybrid(directory, stamp, model, fusion="rrf", dedup=True, windows=False):
         built["embed"], built["fusion"] = model, fusion
-        return rag.HybridRetriever(rag.get_index(), ConceptEmbedder(), fusion)
+        return rag.HybridRetriever(rag.get_index(), ConceptEmbedder(), fusion, windows)
 
     class Scorer:
         name = "fake-cross"
@@ -82,7 +82,8 @@ def test_get_retriever_builds_the_default_bundle(monkeypatch):
     monkeypatch.setattr(rag, "_hybrid_for", hybrid)
     monkeypatch.setattr(rag, "_cross_for", cross)
     r = rag.get_retriever()
-    # padrão do kit desde a rodada 10: a nota do cross só decide o portão, a ordem fica a do denso (":base")
-    assert r.name == "dense+cross:base" and r.pool == 10 and r.chars == 600 and r.fallback == ""
+    # padrão do kit desde a rodada 10: a nota do cross só decide o portão, a ordem fica a do denso (":base"); desde a
+    # rodada 12, o denso com janelas
+    assert r.name == "dense+windows+cross:base" and r.pool == 10 and r.chars == 600 and r.fallback == ""
     assert built == {"embed": "intfloat/multilingual-e5-large", "fusion": "dense",
                      "cross": "BAAI/bge-reranker-v2-m3-int8"}

@@ -147,9 +147,11 @@ ELIGIBLE_STATUS: dict[str, set[str]] = {"refund_record": {"enviado", "entregue"}
 # --- achados que pedem outro especialista (replanejamento por ACHADO, não só por falha) ---------------------
 # Contrato: um agente devolve AgentResult.needs = [{"agent", "why", "hint"}]; uma tool pode devolver "needs" no
 # próprio resultado; e `needs_for(result, ctx)` (opcional) deriva o achado do resultado de tool, o que cobre o
-# caminho com LLM do records. Com `needs_for` definido ele é o filtro: o "needs" cru das tools só entra pelo que ele
-# devolver (se ele lê esse "needs", leia o de todos os resultados, não só o do 1º). O supervisor LLM recebe o achado e
-# decide; o motor de tabela insere o passo se ALLOWED[de] tiver o agente e houver orçamento.
+# caminho com LLM do records. `needs_for` é a REGRA do código sobre o achado (ex.: só com sintoma na pergunta): no
+# motor de tabela o "needs" cru das tools só entra pelo que ela devolver (se ela lê esse "needs", leia o de todos os
+# resultados, não só o do 1º) e o código insere o passo se ALLOWED[de] tiver o agente e houver orçamento. O supervisor
+# LLM recebe TODO achado (o cru das tools e o da regra) e decide; ali a regra só escolhe o achado que ganha a volta de
+# lembrete. Achado que importa ao modelo mesmo fora da regra vai no "needs" da tool, não só em `needs_for`.
 # Exemplo (caso "dependent"): "Quando chega meu pedido 1002?" → o records vê "em separação" (ainda não saiu) →
 # a resposta só fica completa com o prazo da política de entrega → precisa do faq. Pedido "entregue": sem need.
 # Getnet: terminal offline → manual de conexão (knowledge); regra por modelo → modelo do terminal (support).

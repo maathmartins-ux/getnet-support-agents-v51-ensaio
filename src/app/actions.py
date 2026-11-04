@@ -141,6 +141,32 @@ def confirm_action(action_id: str, user_id: str) -> dict:
     return result
 
 
+# Aviso ao cliente quando o operador decide: no idioma da conversa e com a ação em palavras. Antes saía só em
+# português e com o nome interno da tool ("Sua solicitação (request_receivables_advance) foi aprovada...").
+_DECIDED = {
+    "pt": {"request": "Sua solicitação", "done": "foi aprovada por um atendente e executada",
+           "failed": "foi aprovada por um atendente, mas a execução falhou",
+           "rejected": "foi recusada por um atendente", "note": "Observação do atendente"},
+    "en": {"request": "Your request", "done": "was approved by an agent and carried out",
+           "failed": "was approved by an agent, but it failed to run", "rejected": "was declined by an agent",
+           "note": "Agent's note"},
+}
+
+
+def _decision_notice(action: dict, outcome: str, note: str) -> str:
+    """Texto da decisão para a conversa. A ação vai pelas palavras do domínio (`LABELS` da tool, app/capabilities.py)
+    e pelo número da proposta que o cliente viu; o idioma é o das falas do cliente, como na retomada (resume.py)."""
+    from .capabilities import label
+    from .router import detect_language
+
+    said = [m["content"] for m in get_store().history(action["conversation_id"], limit=12) if m["role"] == "user"]
+    language = detect_language(" ".join(said[-3:])) if said else "pt"
+    t = _DECIDED[language]
+    what = ", ".join(x for x in (label(action["tool"], language), action["id"]) if x)
+    text = f"{t['request']} ({what}) {t[outcome]}."
+    return f"{text} {t['note']}: {note}" if note else text
+
+
 def decide_action(action_id: str, operator: str, approve: bool, note: str = "") -> dict | None:
     """Decisão do operador num caso de aprovação. None = ação inexistente ou já decidida."""
     store = get_store()
@@ -151,20 +177,19 @@ def decide_action(action_id: str, operator: str, approve: bool, note: str = "") 
         result = _execute(action, frm="awaiting_operator")
         if result is None:
             return None
+        outcome = "done" if result.get("ok") else "failed"
         status = "aprovada e executada" if result.get("ok") else "aprovada, mas falhou"
     else:
         if not store.claim_action(action_id, frm="awaiting_operator", to="rejected"):
             return None
-        result, status = None, "recusada"
+        result, outcome, status = None, "rejected", "recusada"
     store.update_action(action_id, approved_by=operator)
     METRICS.inc("approvals_decided_total", tool=action["tool"], approved=str(approve).lower())
-    if action.get("ticket_id"):
+    if action.get("ticket_id"):  # nota do caso: é da fila do operador, não do cliente
         store.close_ticket(action["ticket_id"], note or status, operator, status="answered")
     if action["conversation_id"]:  # o cliente vê o desfecho na conversa, sem precisar perguntar
-        text = f"Sua solicitação ({action['tool']}) foi {status} por um atendente."
-        if note:
-            text += f" Observação: {note}"
-        store.add_message(action["conversation_id"], action["user_id"], "assistant", text, "approval")
+        store.add_message(action["conversation_id"], action["user_id"], "assistant",
+                          _decision_notice(action, outcome, note), "approval")
     return {"action": store.get_action(action_id), "result": result}
 
 

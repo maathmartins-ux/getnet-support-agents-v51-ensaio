@@ -62,7 +62,10 @@ def test_build_passes_the_measured_order_and_names_it(monkeypatch):
     assert rv.build(cfg, Fx()).order == "base"
     assert rv.build({**cfg, "rerank_order": None}, Fx()).order == "cross"
     assert rv.config_name(cfg) == "bm25+cross:base" and rv.config_name({**cfg, "rerank_order": None}) == "bm25+cross"
-    assert [rv.config_name(c) for c in rv.FAST_CONFIGS] == ["bm25", "dense", "dense+cross", "dense+cross:base"]
+    # rodada 12: o cross mede o denso com janelas (o pacote do kit); o denso sem e com janelas, sem cross, ficam como
+    # referência barata
+    assert [rv.config_name(c) for c in rv.FAST_CONFIGS] == ["bm25", "dense", "dense+windows", "dense+windows+cross",
+                                                            "dense+windows+cross:base"]
 
 
 def _row(mrr, recall, p95, gate=None, rerank_gate=None, **config):

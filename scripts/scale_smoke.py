@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import secrets
 import subprocess
 import sys
 import threading
@@ -25,7 +26,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from check import cloud_build_args  # noqa: E402
 
 IMAGE, PROJECT, PORT = "app-scale", "scale", int(os.getenv("SCALE_PORT", "8080"))
-SECRET = "scale-secret-only-for-the-replica-smoke"
+# Segredo do JWT das réplicas: o SCALE_AUTH_SECRET do ambiente ou um aleatório por execução, nunca escrito no
+# repositório (o compose não tem padrão e recusa subir sem ele). As réplicas e o token do teste usam o mesmo valor.
+SECRET = os.getenv("SCALE_AUTH_SECRET") or secrets.token_urlsafe(48)
 COMPOSE = ["docker", "compose", "-f", str(ROOT / "docker-compose.scale.yml"), "-p", PROJECT]
 ENV = {**os.environ, "SCALE_IMAGE": IMAGE, "SCALE_AUTH_SECRET": SECRET, "SCALE_PORT": str(PORT)}
 
@@ -36,6 +39,8 @@ def sh(cmd: list[str]) -> subprocess.CompletedProcess:
 
 def token(user: str) -> str:
     os.environ["AUTH_SECRET"] = SECRET
+    for name in ("AUTH_KEYS", "AUTH_ACTIVE_KID"):  # as réplicas só recebem o AUTH_SECRET: o token sai da mesma chave
+        os.environ.pop(name, None)
     sys.path.insert(0, str(ROOT / "src"))
     from app.auth import issue_token
 
@@ -142,6 +147,9 @@ def main() -> int:
     finally:
         if not args.keep:
             sh([*COMPOSE, "down", "-v"])
+        else:  # o compose pede SCALE_AUTH_SECRET em todo comando; para derrubar, qualquer valor serve
+            print(f"réplicas de pé (--keep). Derrubar: SCALE_AUTH_SECRET=x docker compose -f docker-compose.scale.yml "
+                  f"-p {PROJECT} down -v")
     print("| teste de réplicas | resultado | detalhe |\n|---|---|---|")
     for name, ok, detail in rows:
         print(f"| {name} | {'PASS' if ok else 'FAIL'} | {detail} |")

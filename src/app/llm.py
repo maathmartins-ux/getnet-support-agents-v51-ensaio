@@ -121,6 +121,7 @@ class AnthropicLLM:
         output_config = {"effort": self.effort, **kwargs.pop("output_config", {})}
         if self.thinking:
             kwargs["thinking"] = self.thinking
+        kwargs = with_prompt_cache(kwargs)  # depois da chave do cassete (_call): a gravação não muda
         # role no span: a latência por papel (supervisor, agent, claims...) sai direto do log, sem cruzar com o cassete
         with span("llm", model=self.model, effort=self.effort, role=self.role or "?") as fields:
             try:
@@ -167,7 +168,10 @@ class AnthropicLLM:
             return self.client.messages.create(**kwargs)
 
     def _checked(self, resp):
-        record_llm_usage(self.model, resp.usage.input_tokens, resp.usage.output_tokens)
+        usage = resp.usage
+        record_llm_usage(self.model, usage.input_tokens, usage.output_tokens,
+                         cache_write=getattr(usage, "cache_creation_input_tokens", 0) or 0,
+                         cache_read=getattr(usage, "cache_read_input_tokens", 0) or 0)
         if resp.stop_reason == "refusal":
             raise self._fail("refusal", "refusal")
         return resp
@@ -184,6 +188,30 @@ class AnthropicLLM:
     def create(self, system: str, messages: list, tools: list[dict], max_tokens: int = 8192):
         """Uma volta do loop manual de tool use: devolve a resposta bruta (o chamador executa as tools)."""
         return self._call(max_tokens=max_tokens, system=system, messages=messages, tools=tools)
+
+
+def prompt_cache_enabled() -> bool:
+    return os.getenv("LLM_PROMPT_CACHE", "on").strip().lower() not in ("off", "0", "false", "no")
+
+
+def with_prompt_cache(kwargs: dict) -> dict:
+    """Marcas de cache de prompt no pedido (skill claude-api: o cache é casamento de prefixo, tools → system →
+    mensagens; até 4 marcas). Cada papel tem tools e system fixos (o system só muda por idioma ou usuário), então:
+    - marca no fim do system: tools + system lidos do cache entre conversas e casos (o pedido seguinte do mesmo
+      papel paga 0,1× a entrada nesse trecho em vez de 1×);
+    - no laço de tool use (pedido com tools), marca automática no fim da conversa: cada volta do laço lê do cache a
+      volta anterior inteira. Pedido de uma volta só (sem tools) não leva essa marca, porque o fim dele é único (a
+      pergunta) e a escrita (1,25×) nunca seria lida.
+    `LLM_PROMPT_CACHE=off` desliga. O prompt abaixo do mínimo cacheável do modelo segue sem cache, sem erro."""
+    if not prompt_cache_enabled():
+        return kwargs
+    out = dict(kwargs)
+    system = out.get("system")
+    if isinstance(system, str) and system.strip():
+        out["system"] = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
+    if out.get("tools"):
+        out["cache_control"] = {"type": "ephemeral"}
+    return out
 
 
 @lru_cache(maxsize=16)

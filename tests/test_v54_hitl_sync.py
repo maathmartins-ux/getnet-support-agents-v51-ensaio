@@ -3,17 +3,27 @@
 Operador simulado numa thread, pelo mesmo endpoint do console (/handoffs/{id}/reply). Dentro do prazo: a resposta e o
 passo pendente (faq) saem NO MESMO turno e a retomada assíncrona não manda a mensagem de novo. Fora do prazo: nada
 muda, o caso segue assíncrono e a retomada de sempre leva a resposta.
+Com o supervisor LLM (cliente falso), a resposta do atendente volta ao laço como resultado do passo "human": o modelo
+pode chamar um especialista com o que ele disse e redige a resposta final, que o código confere; sem LLM, template.
 """
+import json
+import re
 import threading
 import time
+import uuid
 
+from fakes import fake_llm, resp, text, tool_use
 from fastapi.testclient import TestClient
 
 from app import cases, hitl_sync, supervisor
-from app.agents import AgentResult, faq_agent
+from app.agents import AgentResult, Context, faq_agent
 from app.api import app
 from app.auth import issue_token
+from app.domain import example
+from app.llm import LLMError
+from app.observability import new_trace_id
 from app.store import get_store
+from evals import operator_sim
 
 client = TestClient(app)
 OP = {"X-Operator-Token": "test-operator"}
@@ -154,3 +164,112 @@ def test_operator_answer_turn_keeps_each_step_once(monkeypatch):
     answer = r["answer"]
     assert answer.count("Consultei um atendente humano") == 1 and "tarde demais" not in answer
     assert not supervisor._OFFERS_HUMAN.search(answer.split("Consultei um atendente humano", 1)[1])
+
+
+# --- com o supervisor LLM: a resposta do atendente volta ao laço ------------------------------------------------
+FACT = "Verifiquei: o pedido atrasado é o 1002, que ainda está em separação."
+TICKET = re.compile(r"T-[0-9a-f]{8}")
+ESCALATE = resp("tool_use", tool_use("escalation_agent", {"reason": "o cliente pediu um atendente"}))
+HANDED = resp("end_turn", text("Encaminhei seu caso a um atendente humano."))  # a redação de antes da resposta dele
+
+
+def _ticket(kwargs: dict) -> str:
+    return TICKET.search(json.dumps(kwargs["messages"], ensure_ascii=False, default=str)).group()
+
+
+def _writes(final: str):
+    """Volta do modelo que redige a resposta final com o protocolo que leu na réplica do laço."""
+    return lambda kwargs: resp("end_turn", text(final.format(ticket=_ticket(kwargs))))
+
+
+def _with_operator(monkeypatch, script: list, plan: tuple = ("escalation",), intent: str = "human_request",
+                   message: str = "Quero falar com um atendente: um pedido meu atrasou"):
+    """Turno com o supervisor LLM falso (os especialistas seguem offline) e a operadora simulada no prazo."""
+    new_trace_id()
+    llm, msgs = fake_llm(script)
+    monkeypatch.setattr(supervisor, "get_llm", lambda role="agent": llm)
+    monkeypatch.setenv("SUPERVISOR_FAST", "off")
+    ctx = Context(text=message, language="pt", user_id="u1", conversation_id=f"c-{uuid.uuid4().hex[:8]}",
+                  intent=intent)
+    sim = operator_sim.Operator(FACT, 0.1, operator_sim.reply_direct(), seen=operator_sim.open_handoffs()).start()
+    with hitl_sync.override(5, 0.05):
+        out = supervisor.run(list(plan), ctx)
+    ticket = next(r.handoff.ticket_id for r in out.results if r.handoff and r.handoff.ticket_id)
+    state = sim.finish(ticket)
+    assert state["status"] == 200 and state["clock"] == "wait"  # respondeu durante a espera do turno
+    return out, msgs, ticket
+
+
+def test_with_the_llm_the_operator_answer_returns_to_the_loop_and_feeds_a_step(monkeypatch):
+    """O cliente não diz qual pedido; o atendente diz. O modelo lê a resposta dele como resultado do passo human,
+    chama o records com esse id (passo do modelo, desvio "human->records") e redige a resposta final, com o dado do
+    records e o protocolo. Antes: a resposta ia colada no template e o modelo nunca a lia."""
+    asked = {}
+
+    def records(c):
+        asked["request"] = c.facts["ask"]["records"]
+        rid = re.search(r"\d{4}", asked["request"]).group()
+        found = example._lookup(rid, c.user_id)
+        return AgentResult("records", "ok", text=f"Pedido {rid}: {found['data']['status']}.",
+                           evidence=[json.dumps(found, ensure_ascii=False)], facts={"record_id": rid})
+
+    monkeypatch.setitem(supervisor.AGENTS, "records", records)
+    lookup = resp("tool_use", tool_use("records_agent", {"request": "status do pedido 1002"}, "tu2"))
+    final = "Consultei um atendente humano (protocolo {ticket}): o pedido atrasado é o 1002, que segue em separação."
+    out, msgs, ticket = _with_operator(monkeypatch, [ESCALATE, HANDED, lookup, _writes(final)])
+    assert len(msgs.sent) == 4 and asked == {"request": "status do pedido 1002"}
+    note = msgs.sent[2]["messages"][0]["content"]  # 1ª mensagem da réplica do laço
+    assert "- escalation_agent → " in note and "- human → " in note and FACT in note and ticket in note
+    assert "Rode só os passos que faltam" not in note  # o bloco da retomada assíncrona fica para a retomada
+    assert operator_sim.EVAL_OPERATOR not in note  # a identidade do operador é da auditoria, não do texto ao cliente
+    assert [t["name"] for t in msgs.sent[2]["tools"]] == [t["name"] for t in supervisor.TOOLS]
+    assert out.route == ["escalation", "human", "records"]
+    assert [(v["agent"], v.get("decided_by")) for v in map(supervisor.step_view, out.results)] == [
+        ("escalation", "llm"), ("human", "operator"), ("records", "llm")]
+    assert out.replans == ["escalation->human (resposta em 5s de espera)", "human->records (plano: [])"]
+    assert out.answer == final.format(ticket=ticket) and "Resposta do atendente:" not in out.answer
+    assert supervisor.step_view(out.results[0])["answered_live"] is True
+
+
+def test_with_the_llm_the_step_left_for_after_the_human_runs_in_the_loop(monkeypatch):
+    """Plano de 2 passos em que o modelo escalou depois do records: o faq que ficou para depois do atendente roda na
+    réplica do laço, pedido pelo modelo (o plano continuou: "human->faq (no mesmo turno)")."""
+    script = [resp("tool_use", tool_use("records_agent", {"request": "pedido atrasado"})),
+              resp("tool_use", tool_use("escalation_agent", {"reason": "atraso sem prazo"}, "tu2")), HANDED,
+              resp("tool_use", tool_use("faq_agent", {"query": "prazo de entrega"}, "tu3")),
+              _writes("Consultei um atendente humano (protocolo {ticket}). " + FACT)]
+    out, msgs, ticket = _with_operator(monkeypatch, script, plan=("records", "faq"), intent="multi")
+    note = msgs.sent[3]["messages"][0]["content"]
+    assert "Plano sugerido pelo router: ['faq']" in note and "(faq_agent)" in note and "- records_agent → " in note
+    assert out.route == ["records", "escalation", "human", "faq"]
+    assert out.replans == ["records->escalation (plano: ['faq'])", "escalation->human (resposta em 5s de espera)",
+                           "human->faq (no mesmo turno)"]
+    assert [supervisor.step_view(r).get("decided_by") for r in out.results] == ["llm", "llm", "operator", "llm"]
+    assert ticket in out.answer and FACT in out.answer
+
+
+def test_with_the_llm_the_model_may_only_write_and_cannot_call_the_human_again(monkeypatch):
+    final = "Consultei um atendente humano (protocolo {ticket}). " + FACT
+    out, msgs, ticket = _with_operator(monkeypatch, [ESCALATE, HANDED, _writes(final)])
+    assert len(msgs.sent) == 3 and out.route == ["escalation", "human"]
+    assert out.replans == ["escalation->human (resposta em 5s de espera)"] and out.answer == final.format(ticket=ticket)
+    again = resp("tool_use", tool_use("escalation_agent", {"reason": "de novo"}, "tu2"))
+    out, msgs, ticket = _with_operator(monkeypatch, [ESCALATE, HANDED, again, _writes(final)])
+    refused = msgs.sent[3]["messages"][-1]["content"][0]
+    assert refused["is_error"] and "human->escalation_agent" in refused["content"]  # uma réplica, sem novo humano
+    assert out.route == ["escalation", "human"] and out.answer == final.format(ticket=ticket)
+
+
+def test_the_code_checks_the_written_answer_and_the_template_is_the_fallback(monkeypatch):
+    """Sem o protocolo, a frase CONSULTED vem antes da redação; redação que oferece o atendente de novo, LLM caído na
+    réplica ou orçamento do turno esgotado dão a composição por template, a mesma de sem LLM."""
+    out, _, ticket = _with_operator(monkeypatch, [ESCALATE, HANDED, resp("end_turn", text(f"Segundo ele: {FACT}"))])
+    assert out.answer == f"{supervisor.CONSULTED['pt'].format(ticket=ticket)}\n\nSegundo ele: {FACT}"
+    offer = resp("end_turn", text(f"{FACT} Se quiser, posso encaminhar você a outro atendente."))
+    for last in (offer, LLMError("api_status_529", "api_status")):
+        out, msgs, ticket = _with_operator(monkeypatch, [ESCALATE, HANDED, last])
+        assert out.answer == f"{supervisor.CONSULTED['pt'].format(ticket=ticket)}\n\nResposta do atendente: {FACT}"
+        assert out.route == ["escalation", "human"] and len(msgs.sent) == 3
+    monkeypatch.setenv("MAX_MODEL_CALLS", "2")  # o turno gastou as 2 chamadas antes do atendente
+    out, msgs, ticket = _with_operator(monkeypatch, [ESCALATE, HANDED])
+    assert len(msgs.sent) == 2 and out.answer.endswith(f"Resposta do atendente: {FACT}")

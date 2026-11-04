@@ -88,10 +88,10 @@ def _slash_values(a: str, b: str, year: str | None) -> set[str]:
 
 
 # Data e hora ISO das tools ("2026-11-03T09:16:00"): o "T" colava na hora e o "09" não era lido como número; a resposta
-# "às 09:16" virava "às [valor não confirmado]:16" (casos memory-07/08, nas 3 rodadas).
+# "às 09:16" virava "às [valor não confirmado]:16" (medido em 2 casos de memória ao vivo, nas 3 repetições).
 _ISO_T = re.compile(r"(\d{4}-\d{2}-\d{2})T(?=\d)")
 # Número dentro de identificador da tool ("last_7_days", "d_plus_30"): o "_" colava o número na palavra e a resposta
-# "últimos 7 dias" virava tarja (heldout H1-29/35/37 ao vivo).
+# "últimos 7 dias" virava tarja (medido em 3 perguntas do held-out, ao vivo).
 _SNAKE_NUM = re.compile(r"(?<=[A-Za-z])_(\d+)(?=_|\b)")
 
 

@@ -15,7 +15,11 @@ class FakeMessages:
 
     def create(self, **kwargs):
         # cópia rasa da lista: o loop continua anexando na mesma lista depois desta chamada
-        self.sent.append({**kwargs, "messages": list(kwargs.get("messages", []))})
+        sent = {**kwargs, "messages": list(kwargs.get("messages", []))}
+        if isinstance(kwargs.get("system"), list):  # cache de prompt: o texto que o modelo lê vem em blocos
+            sent["system_raw"] = kwargs["system"]
+            sent["system"] = "".join(b.get("text", "") for b in kwargs["system"])
+        self.sent.append(sent)
         item = self.script.pop(0)
         if isinstance(item, Exception):
             raise item

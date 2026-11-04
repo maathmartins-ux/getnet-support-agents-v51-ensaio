@@ -196,16 +196,68 @@ class Store:
         return row["user_id"] if row else None
 
     # --- memória de longo prazo por usuário ------------------------------------------------
+    # A coluna `summary` guarda o perfil (JSON de app/memory.py, com conversa de origem e data por item) ou, em banco
+    # de versão anterior, a string antiga dos últimos assuntos: memory.Profile.loads lê as duas, sem migração.
     def user_summary(self, user_id: str) -> str:
+        """O que está gravado para o usuário, como texto ("" = nada)."""
         with self._db() as conn:
             row = conn.execute("SELECT summary FROM user_memory WHERE user_id = ?", (user_id,)).fetchone()
         return row["summary"] if row else ""
 
     def set_user_summary(self, user_id: str, summary: str) -> None:
+        """Formato antigo (texto com teto). O atendimento grava o perfil por `update_user_profile`."""
         with self._db() as conn:
             conn.execute("INSERT INTO user_memory (user_id, summary, updated_at) VALUES (?, ?, ?) "
                          "ON CONFLICT(user_id) DO UPDATE SET summary = excluded.summary, "
                          "updated_at = excluded.updated_at", (user_id, summary[:1000], time.time()))
+
+    def user_profile(self, user_id: str) -> dict | None:
+        """{"raw", "updated_at"} do perfil gravado, ou None."""
+        with self._db() as conn:
+            row = conn.execute("SELECT summary, updated_at FROM user_memory WHERE user_id = ?", (user_id,)).fetchone()
+        return {"raw": row["summary"], "updated_at": row["updated_at"]} if row else None
+
+    def update_user_profile(self, user_id: str, change) -> None:
+        """Lê, muda e grava o perfil numa transação travada pelo usuário (SQLite: o arquivo; Postgres: só esta chave).
+
+        `change(raw | None, updated_at | None)` devolve o texto novo, ou None para apagar a linha. Sem a trava, duas
+        conversas do mesmo cliente em réplicas diferentes liam o mesmo perfil e a segunda gravação apagava a primeira.
+        O texto vai inteiro (sem corte): o teto de itens é de app/memory.py, e JSON cortado seria perfil perdido.
+        """
+        with self._db() as conn:
+            self._lock_key(conn, f"user_memory:{user_id}")
+            row = conn.execute("SELECT summary, updated_at FROM user_memory WHERE user_id = ?", (user_id,)).fetchone()
+            new = change(row["summary"] if row else None, row["updated_at"] if row else None)
+            if new is None:
+                if row:
+                    conn.execute("DELETE FROM user_memory WHERE user_id = ?", (user_id,))
+                return
+            conn.execute(_upsert("user_memory", "user_id", "summary", "updated_at"), (user_id, new, time.time()))
+
+    def _prune_profile(self, conn, user_id: str, *, lock: bool = True, **rule) -> tuple[int, int]:
+        """Dentro de uma transação aberta: tira do perfil do usuário os itens que `rule` manda (memory.prune_profile).
+        Devolve (linhas apagadas, itens tirados).
+
+        Com `lock` (apagamento a pedido), a trava do usuário: um turno em outra conversa dele não regrava, depois, o
+        que acabou de sair. Sem ela (retenção: passa por todos os perfis numa transação só, e no Postgres uma trava
+        consultiva por usuário, presa até o fim da transação, esgotaria a tabela de travas), a gravação é condicional
+        ao texto lido: se um turno gravou no meio, ele vence e o corte fica para a próxima purga."""
+        from . import memory  # import tardio: memory não importa o store
+
+        if lock:
+            self._lock_open(conn, f"user_memory:{user_id}")
+        row = conn.execute("SELECT summary, updated_at FROM user_memory WHERE user_id = ?", (user_id,)).fetchone()
+        if not row:
+            return 0, 0
+        kept, removed = memory.prune_profile(row["summary"], updated_at=row["updated_at"], **rule)
+        if not removed:
+            return 0, 0
+        if kept is None:
+            cur = conn.execute("DELETE FROM user_memory WHERE user_id = ? AND summary = ?", (user_id, row["summary"]))
+            return (1, removed) if cur.rowcount == 1 else (0, 0)
+        cur = conn.execute("UPDATE user_memory SET summary = ? WHERE user_id = ? AND summary = ?",
+                           (kept, user_id, row["summary"]))
+        return (0, removed) if cur.rowcount == 1 else (0, 0)
 
     # --- fila humana: handoff e aprovação -----------------------------------------------------
     def open_ticket(self, conversation_id: str, user_id: str, reason: str, summary: str,
@@ -365,6 +417,9 @@ class Store:
     def _lock_key(self, conn, key: str) -> None:
         self._begin(conn)  # SQLite: trava o arquivo inteiro; o Postgres trava só a chave (store_pg)
 
+    def _lock_open(self, conn, key: str) -> None:
+        """Trava `key` numa transação JÁ aberta. SQLite: nada a fazer, o BEGIN IMMEDIATE dela já trava o arquivo."""
+
     def rate_reset(self) -> None:
         with self._db() as conn:
             conn.execute("DELETE FROM rate_hits")
@@ -464,9 +519,10 @@ class Store:
     def delete_conversation(self, conversation_id: str, user_id: str, actor: str | None = None) -> dict | None:
         """Apaga a conversa do titular (mensagens, casos, ações, registros de atendimento e feedback).
 
-        None se a conversa não existe ou é de outra pessoa (o chamador responde 404 nos dois casos). A memória de
-        longo prazo do usuário também é apagada: ela guarda trechos (mascarados) de qualquer conversa dele e não
-        dá para separar só os desta. Tudo numa transação, com a entrada de auditoria junto.
+        None se a conversa não existe ou é de outra pessoa (o chamador responde 404 nos dois casos). Da memória de
+        longo prazo do usuário saem os itens que vieram desta conversa (cada item do perfil guarda a origem) e os de
+        origem desconhecida (perfil no formato antigo, que não dá para separar por conversa); `user_memory` conta a
+        linha apagada (perfil vazio) e `user_memory_items` os itens tirados. Tudo numa transação, com a auditoria.
         """
         with self._db() as conn:
             self._begin(conn)
@@ -475,14 +531,16 @@ class Store:
             if not row or row["user_id"] != user_id:
                 return None
             counts = self._delete_conversation_rows(conn, conversation_id)
-            counts["user_memory"] = conn.execute("DELETE FROM user_memory WHERE user_id = ?", (user_id,)).rowcount
+            counts["user_memory"], counts["user_memory_items"] = self._prune_profile(
+                conn, user_id, conversations={conversation_id}, unknown_origin=True)
             self._audit(conn, actor or f"user:{user_id}", "conversation_deleted", conversation_id, counts)
         return counts
 
     def purge_older_than(self, days: float, actor: str = "system:retention", now: float | None = None) -> dict:
         """Retenção: apaga conversas sem atividade há `days` dias (menos as que têm caso humano aberto),
 
-        memória de longo prazo parada há `days` dias e registros soltos mais velhos que isso. Auditado.
+        memória de longo prazo parada há `days` dias e registros soltos mais velhos que isso. Do perfil que segue em
+        uso saem os itens mais velhos que o corte e os das conversas apagadas aqui. Auditado.
         """
         if days < 1:
             raise ValueError("retenção mínima de 1 dia (0 apagaria tudo por engano)")
@@ -510,6 +568,11 @@ class Store:
             totals["actions"] = totals.get("actions", 0) + conn.execute(
                 "DELETE FROM actions WHERE created_at < ? AND status != 'pending'", (cutoff,)).rowcount
             totals["user_memory"] = conn.execute("DELETE FROM user_memory WHERE updated_at < ?", (cutoff,)).rowcount
+            totals["user_memory_items"] = 0
+            for uid in [r["user_id"] for r in conn.execute("SELECT user_id FROM user_memory").fetchall()]:
+                rows, items = self._prune_profile(conn, uid, lock=False, conversations=set(old), before=cutoff)
+                totals["user_memory"] += rows
+                totals["user_memory_items"] += items
             self._audit(conn, actor, "retention_purge", None, {"days": days, **totals})
         return totals
 

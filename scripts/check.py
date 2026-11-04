@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import secrets
 import socket
 import subprocess
 import sys
@@ -71,7 +72,9 @@ def wait_health(url: str, timeout_s: float | None = None) -> dict | None:
     return None
 
 
-CHECK_SECRET = "check-secret-only-for-the-container-smoke"  # o container do smoke sobe com este AUTH_SECRET
+# o container do smoke sobe com este AUTH_SECRET: novo a cada execução (nenhum segredo literal no repositório) e o
+# mesmo valor assina o token de teste
+CHECK_SECRET = os.getenv("CHECK_AUTH_SECRET") or secrets.token_urlsafe(48)
 
 
 def mcp_smoke(port: int) -> tuple[str, bool, float, str]:

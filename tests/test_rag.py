@@ -37,7 +37,10 @@ def test_hybrid_is_deterministic():
 def test_flag_selects_retriever_and_degrades_without_fastembed(monkeypatch):
     assert get_retriever().name == "bm25"
     monkeypatch.setenv("RETRIEVER", "hybrid")
+    assert get_retriever(embedder=ConceptEmbedder()).name == "hybrid+windows"  # janelas: padrão do kit (rodada 12)
+    monkeypatch.setenv("RAG_WINDOWS", "off")
     assert get_retriever(embedder=ConceptEmbedder()).name == "hybrid"
+    monkeypatch.delenv("RAG_WINDOWS")
 
     def no_extra(*a, **k):
         raise ImportError("No module named 'fastembed'")

@@ -1,9 +1,10 @@
 # Overlay de produção endurecido. Uso:
 #   docker compose -f docker-compose.yml -f docker-compose.hardened.yml up -d --build
-# Exige no .env AUTH_SECRET, OPERATOR_TOKEN e METRICS_TOKEN fortes e OPERATOR_KEYS (chave pessoal por operador):
-# APP_ENV=production recusa subir sem eles (src/app/api.py, production_gaps).
+# Exige no .env AUTH_SECRET, OPERATOR_TOKEN e METRICS_TOKEN fortes, OPERATOR_KEYS (chave pessoal por operador) e
+# AUTH_MODE=required (o padrão): APP_ENV=production recusa subir sem eles (src/app/api.py, production_gaps).
 # Prova: tests/test_supply_chain.py::test_hardened_overlay (estrutura e memória),
-# tests/test_api.py::test_production_refuses_shared_operator_and_open_metrics e `docker compose ... config` no CI.
+# tests/test_api.py::test_production_refuses_shared_operator_and_open_metrics,
+# tests/test_api.py::test_production_refuses_demo_identity e `docker compose ... config` no CI.
 services:
   api:
     environment:

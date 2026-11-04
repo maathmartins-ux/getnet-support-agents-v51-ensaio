@@ -1,6 +1,6 @@
 """Rodada 11 (frente C2): documentos que se geram sozinhos e guardas de avaliação.
 
-A régua da rodada 10 leu os docs como contraditórios com o placar: FAILURE_MODES com "42 falhas em 281 execuções" (de
+Os docs gerados à mão contradiziam o placar: FAILURE_MODES com "42 falhas em 281 execuções" (de
 outra bateria; os resultados commitados davam 5 em 315), TIMESHEET parado em "446 min, 0 depois" (o git seguia por
 mais 47 commits), o §0 sem o custo por turno resolvido que o próprio README promete, e as tabelas do RESULTS sem
 explicação. Aqui: cada um desses arquivos sai de um gerador, o `fill_readme --check` reprova o que divergir, e o

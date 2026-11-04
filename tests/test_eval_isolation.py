@@ -62,3 +62,39 @@ def test_store_is_created_before_the_parallel_wave(monkeypatch, tmp_path):
     run(out=tmp_path / "latest.json", workers=4)
     created_in_worker = [p for p, main in first_init.items() if not main]
     assert first_init and not created_in_worker, created_in_worker
+
+
+def test_earlier_conversations_of_the_same_user_run_first_each_from_scratch():
+    """`earlier_conversations`: o caso de memória ENTRE conversas. Cada conversa anterior abre do zero, o turno avaliado
+    abre outra, e o que ele sabe delas vem só do perfil do usuário (na evidência da linha, sem as datas)."""
+    from evals import trace_stats
+
+    sent: list[tuple[str, str | None, str]] = []
+
+    class Spy:
+        inner = run_evals.Client(None)
+
+        def send(self, message, user_id, conversation_id):
+            got = self.inner.send(message, user_id, conversation_id)
+            sent.append((message, conversation_id, got["conversation_id"]))
+            return got
+
+    case = {"id": "mem-entre", "split": "memory", "user_id": "u1", "message": "Tem novidade?",
+            "earlier_conversations": [["Onde está meu pedido 1002?", "E o prazo de entrega?"],
+                                      ["Qual o horário de atendimento?"]],
+            "expect": {"intent": "faq"}}
+    row = run_evals.run_case(Spy(), case)
+    (m1, c1, got1), (_, c1b, got1b), (_, c2, got2), (m3, c3, got3) = sent
+    assert (m1, c1, c1b, c2, c3) == ("Onde está meu pedido 1002?", None, got1, None, None) and got1b == got1
+    assert len({got1, got2, got3}) == 3 and m3 == "Tem novidade?"  # três conversas: a avaliada é nova
+    memo = next(e for e in row["evidence"] if e.startswith("[memória de conversas anteriores]"))
+    assert "registro citado pelo cliente: 1002" in memo
+    assert run_evals.case_turns(case) == 4 and trace_stats.turns_by_case([case]) == {"mem-entre": 4}
+
+
+def test_malformed_earlier_conversations_fail_at_load(tmp_path):
+    bad = tmp_path / "cases.jsonl"
+    bad.write_text('{"id": "x", "split": "memory", "message": "oi", "expect": {}, '
+                   '"earlier_conversations": ["Onde está meu pedido?"]}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="earlier_conversations"):
+        run_evals.load_cases((bad,))

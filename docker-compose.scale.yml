@@ -7,7 +7,10 @@ services:
     image: ${SCALE_IMAGE:-app-scale}  # construída pelo scripts/scale_smoke.py (na nuvem, com o proxy do build)
     environment:
       AUTH_MODE: required
-      AUTH_SECRET: ${SCALE_AUTH_SECRET:-scale-secret-only-for-the-replica-smoke}
+      # Nenhum segredo no arquivo: o scripts/scale_smoke.py gera um aleatório a cada execução e o passa às 2 réplicas
+      # (e ao token do teste) por SCALE_AUTH_SECRET; sem a variável o compose recusa subir, em vez de usar um padrão.
+      # Prova: tests/test_no_literal_secrets.py::test_no_compose_file_ships_a_literal_secret
+      AUTH_SECRET: ${SCALE_AUTH_SECRET:?defina SCALE_AUTH_SECRET (o scripts/scale_smoke.py gera um a cada execução)}
       RATE_LIMIT_PER_MIN: "1000"
       SLA_CHECK_SECONDS: "0"
     volumes:

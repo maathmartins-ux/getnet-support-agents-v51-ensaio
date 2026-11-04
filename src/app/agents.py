@@ -10,9 +10,9 @@ supervisor junta depois, na ordem do plano. Nada de escrever em ctx dentro do ag
   comparação, até FAQ_MAX_SEARCHES por turno, em paralelo e fundidas por rodada na ordem do plano (top FAQ_TOP_K ao
   redator); com LLM, o redator ainda pode chamar a tool `search` dentro do mesmo teto, e leva 1 busca corretiva
   quando o plano já gastou o teto (comparação). Glossário pt<->en (data/glossary.json) nas duas vias.
-  Intent "general": câmbio (PTAX) e clima (Open-Meteo) consultados no código (app/live_data.py, texto bruto da
-  API como evidência); o resto, e qualquer falha da API, pela busca web, com os resultados da busca como evidência
-  e fonte (nunca a própria resposta).
+  Intent "general": com LLM, o MODELO escolhe a tool: `currency_rate` (PTAX) e `weather_forecast` (Open-Meteo),
+  validadas e executadas no código (app/live_data.py, texto bruto da API como evidência), ou a busca web do servidor
+  (resultados da busca como evidência e fonte, nunca a própria resposta). Sem LLM, o detector por regex decide.
 - records: tools com identidade do servidor; escrita só propõe (action_id + confirmação).
 - escalation: abre caso na fila persistida; operador responde em /operator (ou Telegram) e a conversa retoma.
 """
@@ -27,6 +27,7 @@ import unicodedata
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 
@@ -58,7 +59,8 @@ MIN_COSINE = 0.4
 COSINE_MARGIN = 0.15
 MAX_TOOL_ROUNDS = 3
 _PROMPTS = Path(__file__).parent / "prompts"
-# Busca web do servidor da Anthropic (o modelo decide a consulta; a API executa e devolve com citação).
+# Busca web do servidor da Anthropic (o modelo decide a consulta; a API executa e devolve com citação). No agente geral
+# ela vai ao lado das tools de câmbio e clima (FX_TOOL, WEATHER_TOOL): o modelo escolhe entre as três.
 # Variante 20260209 (filtro dinâmico) vale para Opus 5.5/Sonnet 5.5; modelo antigo ou Vertex: web_search_20250305.
 WEB_SEARCH = {"type": "web_search_20260209", "name": "web_search", "max_uses": 2}
 
@@ -295,61 +297,271 @@ def live_missing(text: str, live, language: str) -> list[str]:
             if not any(abs(n - value) <= tol + 1e-9 for n in nums)]
 
 
-def _live(ctx: Context, live: live_data.LiveResult) -> AgentResult:
-    """Câmbio/clima já consultados no código: o texto bruto da API é a evidência; o LLM (se houver) só redige.
+def live_musts(got: list) -> list[tuple[str, str, float, float]]:
+    """Valores obrigatórios do turno (`LiveResult.must`); com mais de uma consulta, o rótulo leva a moeda ou a cidade
+    (o pedido de reparo diz de qual consulta é o valor que faltou)."""
+    if len(got) == 1:
+        return list(got[0].must)
+    return [(f"{pt} ({live.subject})", f"{en} ({live.subject})", value, tol)
+            for live in got for pt, en, value, tol in live.must]
 
-    O código confere a redação: faltando um valor obrigatório (mínima, máxima, chance de chuva; venda e compra), o
-    LLM refaz uma vez com o que faltou; se ainda faltar, vale o texto pronto da consulta (`live_repair` no passo).
-    Medido: uma resposta em inglês omitiu a chance de chuva que estava na evidência, e o prompt já a pedia."""
-    template = live.text(ctx.language)
-    evidence = [*live.evidence, live.text_pt, live.text_en, f"Hoje é {_today()}"]
-    source = Source(id=live.url, title=live.source, url=live.url)
-    text, facts = template, {"live_data": live.kind, "web_search": False}
-    llm = get_llm("agent")
-    if llm.enabled:
-        framed = (f"<untrusted_content>\n{chr(10).join(live.evidence)}\n{template}\n</untrusted_content>\n\n"
-                  f"Pergunta: {ctx.text}{_lang_tail(ctx)}")
-        system = domain.prompt("live_data.md").format(language=ctx.language, today=_today())
-        try:
-            text = llm.complete(system, llm_history(ctx, framed), max_tokens=1024).text.strip() or template
-            missing = live_missing(text, live, ctx.language)
-            if missing:
-                ask = ("\n\nSua resposta anterior deixou de fora: " + ", ".join(missing)
-                       + ". Responda de novo trazendo esses valores do resultado acima.")
-                text = llm.complete(system, llm_history(ctx, framed + ask), max_tokens=1024).text.strip() or template
-                facts["live_repair"] = "llm"
-                if live_missing(text, live, ctx.language):
-                    text, facts["live_repair"] = template, "template"
-                METRICS.inc("live_data_repair_total", kind=live.kind, outcome=facts["live_repair"])
-        except LLMError:
-            text = template  # template já cita fonte e data
-    result = AgentResult("faq", "ok", text=text, sources=[source], evidence=evidence, facts=facts)
-    result.live_must = live.must  # fora de `facts` (que vai ao contexto dos agentes): a resposta final é conferida
+
+def _live(ctx: Context, got: list, text: str | None = None, calls: list | None = None,
+          facts: dict | None = None) -> AgentResult:
+    """Resposta de câmbio/clima: o texto bruto da API é a evidência e a consulta é a fonte.
+
+    Sem `text`, vale o texto pronto da consulta (motor sem LLM, LLM que caiu depois da consulta, ou redação que não
+    trouxe os valores nem depois do reparo). `live_must` vai fora de `facts` (que vai ao contexto dos agentes): a
+    resposta final do supervisor é conferida contra ele no pipeline."""
+    evidence = [e for live in got for e in (*live.evidence, live.text_pt, live.text_en)] + [f"Hoje é {_today()}"]
+    sources = list({live.url: Source(id=live.url, title=live.source, url=live.url) for live in got}.values())
+    base = {"live_data": "+".join(dict.fromkeys(live.kind for live in got)), "web_search": False}
+    result = AgentResult("faq", "ok", text=text or " ".join(live.text(ctx.language) for live in got), sources=sources,
+                         evidence=evidence, facts={**base, **(facts or {})}, tool_calls=list(calls or []))
+    result.live_must = live_musts(got)
+    return result
+
+
+# --- general: o MODELO escolhe a consulta ---------------------------------------------------------------------------
+# Câmbio e clima são tools de cliente ao lado da busca web do servidor: o modelo decide qual chamar (ou nenhuma); o
+# código valida a entrada (`live_args`), consulta a API (app/live_data.py) e devolve o texto bruto como tool_result.
+# Antes um detector por regex decidia no código e errava a pergunta fora do padrão (ensaio, rodada 11: "quanto ta a
+# libra hoje" e "weather like in Recife right now" foram à busca web e saíram sem o dado; "Bitcoin to US dollar" virou
+# a PTAX do dólar). O detector fica só para o motor sem LLM.
+FX_TOOL = {
+    "name": "currency_rate",
+    "description": ("Cotação oficial PTAX do Banco Central do Brasil: quanto vale 1 unidade de uma moeda estrangeira "
+                    "em reais, na compra e na venda, com a data do boletim. Chame para pergunta de câmbio, cotação ou "
+                    f"conversão para reais destas moedas: {', '.join(live_data.CURRENCIES)}. Sem `date` = hoje; fim "
+                    "de semana e feriado voltam com o último dia útil que teve boletim. Outra moeda ou ativo (ex.: "
+                    "bitcoin) não é desta tool: use a busca web."),
+    "input_schema": {"type": "object", "additionalProperties": False, "required": ["currency"], "properties": {
+        "currency": {"type": "string", "enum": list(live_data.CURRENCIES),
+                     "description": "código ISO 4217 da moeda (ex.: USD = dólar, EUR = euro, GBP = libra)"},
+        "date": {"type": "string", "description": "dia da cotação no formato AAAA-MM-DD, até hoje; omita para hoje"}}},
+}
+WEATHER_TOOL = {
+    "name": "weather_forecast",
+    "description": ("Previsão do tempo de uma cidade (Open-Meteo; wttr.in quando a primeira não responde): mínima, "
+                    "máxima, chance de chuva e o céu do dia. Chame para pergunta de clima, chuva ou temperatura de "
+                    "uma cidade hoje, amanhã ou depois de amanhã."),
+    "input_schema": {"type": "object", "additionalProperties": False, "required": ["city"], "properties": {
+        "city": {"type": "string", "description": "nome da cidade, sem estado nem país (ex.: Porto Alegre)"},
+        "day": {"type": "string", "enum": list(live_data.DAYS), "description": "dia da previsão; omita para hoje"}}},
+}
+LIVE_TOOLS = (FX_TOOL, WEATHER_TOOL)
+MAX_LIVE_CALLS = 3  # consultas ao vivo por turno ("dólar, euro e libra"); além disso, o modelo responde com o que tem
+GENERAL_ROUNDS = 5  # voltas do loop: escolha, consulta, redação e 1 reparo, com folga para 2 voltas de tool
+MAX_CITY = 80
+_CITY_NAME = re.compile(r"[^\W\d_]+(?:[ '’.-]+[^\W\d_]+)*\.?")  # letras de qualquer idioma: nada que mude a URL
+_DAY_ALIASES = {**{_fold(day): offset for day, offset in live_data.DAYS.items()},
+                "agora": 0, "today": 0, "now": 0, "tomorrow": 1, "day after tomorrow": 2}
+_NO_DATA = {"empty": {"fx": "a PTAX não publicou boletim dessa moeda na semana até a data pedida",
+                      "weather": "a fonte de clima não achou essa cidade (confira o nome) ou não trouxe o dia pedido"},
+            "error": "a fonte não respondeu a tempo ou deu erro", "off": "a consulta ao vivo está desligada"}
+
+
+def _only(args: dict, allowed: set[str]) -> None:
+    extra = sorted(str(k) for k in set(args) - allowed)
+    if extra:
+        raise ValueError(f"campo fora do schema: {', '.join(extra)[:80]}")
+
+
+def live_args(name: str, args) -> dict:
+    """Entrada de `currency_rate`/`weather_forecast` validada no servidor (o schema orienta o modelo; quem confere é o
+    código). Devolve os argumentos normalizados; ValueError com o motivo, que volta ao modelo como tool_result de erro.
+    """
+    if not isinstance(args, dict):
+        raise ValueError("passe um objeto JSON com os campos da tool")
+    if name == FX_TOOL["name"]:
+        _only(args, {"currency", "date"})
+        code = str(args.get("currency") or "").strip().upper()
+        if code not in live_data.CURRENCIES:
+            raise ValueError(f"currency deve ser um destes códigos ISO 4217: {', '.join(live_data.CURRENCIES)} "
+                             "(outra moeda: use a busca web)")
+        out: dict = {"currency": code}
+        raw = str(args.get("date") or "").strip()
+        if raw and _DAY_ALIASES.get(_fold(raw)) != 0:  # "hoje"/"today" no lugar da data = omitida
+            try:
+                wanted = date.fromisoformat(raw)
+            except ValueError:
+                raise ValueError("date no formato AAAA-MM-DD (ou omita para hoje)") from None
+            if wanted > clock.today():
+                raise ValueError("date no futuro: a PTAX só tem cotação já publicada (omita para hoje)")
+            out["date"] = wanted.isoformat()
+        return out
+    if name == WEATHER_TOOL["name"]:
+        _only(args, {"city", "day"})
+        city = " ".join(str(args.get("city") or "").split(",")[0].split())  # "Porto Alegre, RS" → a cidade
+        if not city:
+            raise ValueError("city vazia: passe o nome da cidade")
+        if len(city) > MAX_CITY:
+            raise ValueError(f"city com mais de {MAX_CITY} caracteres: passe só o nome da cidade")
+        if not _CITY_NAME.fullmatch(city):
+            raise ValueError("city só com letras, espaço, hífen, apóstrofo ou ponto (o nome da cidade, sem número)")
+        day = " ".join(_fold(str(args.get("day") or "hoje")).split())
+        offset = _DAY_ALIASES.get(day)
+        if offset is None:  # data AAAA-MM-DD no lugar do dia: vale se cair em hoje, amanhã ou depois de amanhã
+            try:
+                offset = (date.fromisoformat(day) - clock.today()).days
+            except ValueError:
+                offset = None
+        if offset not in live_data.DAYS.values():
+            raise ValueError(f"day deve ser um destes: {', '.join(live_data.DAYS)} (ou omita para hoje)")
+        return {"city": city, "day": next(d for d, n in live_data.DAYS.items() if n == offset)}
+    raise ValueError(f"tool desconhecida: {name}")
+
+
+def _shown(raw) -> dict:
+    """Argumentos recusados como chegaram, curtos: vão ao caminho do caso."""
+    return {str(k)[:40]: str(v)[:80] for k, v in list(raw.items())[:4]} if isinstance(raw, dict) else {}
+
+
+@dataclass
+class _Turn:
+    """O que o loop do agente geral já trouxe; sobrevive a uma queda do LLM no meio do loop."""
+    got: list = field(default_factory=list)  # dados ao vivo consultados (LiveResult), na ordem
+    order: list = field(default_factory=list)  # tools na ordem em que o modelo chamou: ToolCall ou o server_tool_use
+    blocks: list = field(default_factory=list)  # conteúdo de todas as voltas: a evidência da busca web
+
+    def calls(self) -> list[ToolCall]:
+        """Tools do turno para o caminho do caso: as de dado ao vivo (executadas aqui) e a busca web do servidor, com
+        `ok` pelo resultado da busca (lista de páginas = ok; objeto de erro = falhou)."""
+        found = {getattr(b, "tool_use_id", None): isinstance(getattr(b, "content", None), list)
+                 for b in self.blocks if getattr(b, "type", None) == "web_search_tool_result"}
+        out = []
+        for c in self.order:
+            if isinstance(c, ToolCall):
+                out.append(c)
+                continue
+            query = c.input.get("query", "") if isinstance(getattr(c, "input", None), dict) else ""
+            out.append(ToolCall(name=WEB_SEARCH["name"], args={"query": str(query)[:200]}, ok=found.get(c.id, False)))
+        return out
+
+    def facts(self) -> dict:
+        """`live_tool`: o que o modelo escolheu (nomes na ordem, "+" entre eles; "none" = respondeu sem tool)."""
+        names = [c.name for c in self.calls()]
+        return {"web_search": WEB_SEARCH["name"] in names, "live_tool": "+".join(dict.fromkeys(names)) or "none"}
+
+
+def _live_tool_result(block, language: str, turn: _Turn) -> dict:
+    """Executa a tool de dado ao vivo que o modelo chamou: valida, consulta e devolve o tool_result (o texto bruto da
+    API entre <untrusted_content>, ou o motivo do erro com is_error)."""
+    name = str(getattr(block, "name", "") or "?")
+    raw = getattr(block, "input", None)
+    try:
+        if sum(isinstance(c, ToolCall) for c in turn.order) >= MAX_LIVE_CALLS:
+            raise ValueError(f"limite de {MAX_LIVE_CALLS} consultas ao vivo por turno: responda com o que já tem")
+        args = live_args(name, raw)
+    except ValueError as exc:
+        turn.order.append(ToolCall(name=name, args=_shown(raw), ok=False))
+        METRICS.inc("live_tool_calls_total", tool=name, outcome="invalid")
+        return {"type": "tool_result", "tool_use_id": block.id, "content": f"Entrada inválida: {exc}.",
+                "is_error": True}
+    if name == FX_TOOL["name"]:
+        kind = "fx"
+        live, outcome = live_data.fx_quote(args["currency"],
+                                           date.fromisoformat(args["date"]) if "date" in args else None)
+    else:
+        kind = "weather"
+        live, outcome = live_data.forecast(args["city"], live_data.DAYS[args["day"]])
+    turn.order.append(ToolCall(name=name, args=args, ok=live is not None))
+    METRICS.inc("live_tool_calls_total", tool=name, outcome=outcome)
+    if live is None:
+        why = _NO_DATA.get(outcome, _NO_DATA["error"])
+        why = why[kind] if isinstance(why, dict) else why
+        return {"type": "tool_result", "tool_use_id": block.id, "is_error": True,
+                "content": f"Sem dado: {why}. Não invente número: use a busca web ou diga ao cliente que não "
+                           "conseguiu o dado agora."}
+    turn.got.append(live)
+    # mesma moldura da redação de antes: o texto bruto (e o arredondado) da API, mais a frase pronta da consulta
+    return {"type": "tool_result", "tool_use_id": block.id, "is_error": False,
+            "content": f"<untrusted_content>\n{chr(10).join(live.evidence)}\n{live.text(language)}\n"
+                       "</untrusted_content>"}
+
+
+def _general_llm(ctx: Context, llm, turn: _Turn) -> AgentResult | None:
+    """Loop manual de tool use do agente geral: o modelo escolhe câmbio, clima, a busca web ou nenhuma tool.
+
+    pause_turn (busca web do servidor parada no meio) reenvia a volta, sem mensagem nova. Na resposta final com dado
+    ao vivo, o código confere os valores obrigatórios (`live_missing`): faltou, 1 volta a mais pede o que faltou;
+    ainda faltando, vale o texto pronto da consulta (`live_repair` no passo). Medido: uma resposta em inglês omitiu a
+    chance de chuva que estava no resultado, e o prompt já a pedia. None = o modelo não fechou a resposta."""
+    tools = [*LIVE_TOOLS, WEB_SEARCH] if live_data.enabled() else [WEB_SEARCH]
+    system = domain.prompt("general.md").format(language=ctx.language, today=_today())
+    messages: list = llm_history(ctx, ctx.text + _lang_tail(ctx))
+    repair = None
+    for _ in range(GENERAL_ROUNDS):
+        resp = llm.create(system, messages, tools, max_tokens=4096)
+        if resp.stop_reason == "max_tokens":
+            raise LLMError("resposta truncada em max_tokens", "max_tokens")
+        turn.blocks += list(resp.content)
+        turn.order += [b for b in resp.content
+                       if b.type == "server_tool_use" and getattr(b, "name", None) == WEB_SEARCH["name"]]
+        uses = [b for b in resp.content if b.type == "tool_use"]
+        if resp.stop_reason == "pause_turn" or (resp.stop_reason == "tool_use" and uses):
+            messages.append({"role": "assistant", "content": resp.content})  # conteúdo inteiro, sem editar
+            if uses:  # todos os resultados numa mensagem só
+                messages.append({"role": "user", "content": [_live_tool_result(b, ctx.language, turn) for b in uses]})
+            continue
+        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        if not text:
+            return None
+        if not turn.got:  # busca web (ou nenhuma tool): a evidência é o resultado da busca, nunca a própria resposta
+            evidence, sources = _web_evidence(turn.blocks)
+            if evidence:  # a data vai no prompt (general.md): dado nosso; busca com erro segue sem evidência
+                evidence.append(f"Hoje é {_today()}")
+            return AgentResult("faq", "ok", text=text, sources=sources, facts=turn.facts(), evidence=evidence,
+                               tool_calls=turn.calls())
+        missing = live_missing(text, live_musts(turn.got), ctx.language)
+        if missing and repair is None:
+            repair = "llm"
+            messages.append({"role": "assistant", "content": resp.content})
+            messages.append({"role": "user", "content": "Sua resposta anterior deixou de fora: " + ", ".join(missing)
+                             + ". Responda de novo trazendo esses valores do resultado da consulta."})
+            continue
+        if missing:
+            text, repair = None, "template"
+        return _general_live(ctx, turn, text, repair)
+    # voltas esgotadas: com o reparo pedido, vale o texto pronto da consulta; sem dado, o chamador decide
+    return _general_live(ctx, turn, None, "template") if turn.got and repair else None
+
+
+def _general_live(ctx: Context, turn: _Turn, text: str | None, repair: str | None = None) -> AgentResult:
+    """Resposta com dado ao vivo do loop: a da consulta (`_live`) mais o que a busca web do mesmo turno trouxe."""
+    facts = turn.facts()
+    if repair:
+        facts["live_repair"] = repair
+        METRICS.inc("live_data_repair_total", kind="+".join(dict.fromkeys(live.kind for live in turn.got)),
+                    outcome=repair)
+    result = _live(ctx, turn.got, text=text, calls=turn.calls(), facts=facts)
+    evidence, sources = _web_evidence(turn.blocks)
+    result.evidence = [*evidence, *result.evidence]
+    result.sources += [s for s in sources if s.id not in {x.id for x in result.sources}]
     return result
 
 
 def _general(ctx: Context) -> AgentResult:
-    """Pergunta geral: câmbio e clima pela API no código (live_data); o resto pela busca web com LLM; offline sem
-    dado ao vivo, resposta honesta sem número inventado."""
+    """Pergunta geral (clima, câmbio, notícia). Com LLM, o modelo escolhe a tool (`_general_llm`).
+
+    Sem LLM (offline, ou o LLM caiu antes de trazer dado), o detector por regex escolhe a consulta e vale o texto
+    pronto dela; sem dado ao vivo, resposta honesta sem número inventado."""
+    llm = get_llm("agent")
+    if llm.enabled:
+        turn = _Turn()
+        try:
+            result = _general_llm(ctx, llm, turn)
+            if result is not None:
+                return result
+        except LLMError:
+            pass
+        if turn.got:  # o LLM caiu depois da consulta que ele escolheu: o texto pronto dela, sem detector
+            return _general_live(ctx, turn, None)
     previous = next((m.get("content") for m in reversed(ctx.history or []) if m.get("role") == "user"
                      and (m.get("content") or "").strip() != ctx.text.strip()), None)
     live = live_data.lookup(ctx.text, previous=previous)
     if live:
-        return _live(ctx, live)
-    llm = get_llm("agent")
-    if llm.enabled:
-        try:
-            reply = llm.create(domain.prompt("general.md").format(language=ctx.language, today=_today()),
-                               llm_history(ctx, ctx.text + _lang_tail(ctx)), [WEB_SEARCH], max_tokens=4096)
-            text = "".join(b.text for b in reply.content if b.type == "text").strip()
-            if text:
-                evidence, sources = _web_evidence(reply.content)
-                if evidence:  # a data vai no prompt (general.md): dado nosso; busca com erro segue sem evidência
-                    evidence.append(f"Hoje é {_today()}")
-                return AgentResult("faq", "ok", text=text, sources=sources, facts={"web_search": True},
-                                   evidence=evidence)
-        except LLMError:
-            pass
+        return _live(ctx, [live])
     text = _t(ctx, "Não tenho acesso a dados em tempo real (clima, câmbio, notícias) neste modo, então não vou "
                    "chutar um número. Consulte uma fonte oficial.",
               "I don't have real-time data (weather, exchange rates, news) in this mode, so I won't guess a "

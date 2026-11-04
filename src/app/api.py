@@ -4,7 +4,7 @@ Cliente: POST /chat · GET /conversations/{id} · POST /actions/{id}/confirm · 
   AUTH_MODE=required → identidade só do Bearer JWT assinado (corpo ignorado).
   AUTH_MODE=demo     → Bearer válido vence; sem ele, user_id do corpo (identity_verified=false,
                        rate limit por IP). Ver docs/adr/0001-auth-mode-demo.md.
-Operador (X-Operator-Token = chave pessoal ou token compartilhado "admin"):
+Operador (X-Operator-Token = chave pessoal ou token compartilhado "admin", que não aprova risco alto):
   GET /operator (console) · GET /handoffs · POST /handoffs/{id}/reply (retoma a conversa na hora)
   POST /actions/{id}/approve | /reject (ação de risco alto) · POST /handoffs/sla-check · GET /analytics
 MCP (JWT obrigatório; mesma cota do /chat): /mcp — ferramentas ask, search_knowledge e crm_tool para qualquer
@@ -13,7 +13,8 @@ Telegram (opcional): POST /telegram/webhook — resposta do operador pelo chat v
 LGPD: DELETE /me/conversations/{id} (titular, pelo token) · POST /admin/retention/purge (operador) · GET /audit
 Infra: GET /health (vivo, com contagem de dados) · GET /ready (pronto: índice, banco gravável, LLM, orçamento; 503
   com o motivo) · GET /metrics (Bearer METRICS_TOKEN quando definido)
-Produção (APP_ENV=production): não sobe com segredo fraco, sem OPERATOR_KEYS ou sem METRICS_TOKEN forte.
+Produção (APP_ENV=production): não sobe com segredo fraco, sem OPERATOR_KEYS, sem METRICS_TOKEN forte ou com
+  AUTH_MODE=demo.
 """
 from __future__ import annotations
 
@@ -76,14 +77,19 @@ def insecure_defaults() -> list[str]:
 
 
 def production_gaps() -> list[str]:
-    """O que a produção exige além do segredo forte; no dev os dois seguem opcionais (o /health mostra operator_auth).
+    """O que a produção exige além do segredo forte; no dev os três seguem opcionais (o /health mostra operator_auth e
+    auth_mode).
 
-    OPERATOR_KEYS: sem chave pessoal, o OPERATOR_TOKEN compartilhado vale como "admin" e com ele se aprova escrita de
-    risco alto, purga a retenção e lê a auditoria, gravado sem o nome de uma pessoa. METRICS_TOKEN: sem ele (ou curto),
-    o /metrics responde a qualquer um na porta da API, e o proxy reverso na frente o repassaria.
+    OPERATOR_KEYS: sem chave pessoal, o OPERATOR_TOKEN compartilhado vale como "admin" e com ele se purga a retenção e
+    se lê a auditoria, gravado sem o nome de uma pessoa (aprovar escrita de risco alto exige chave pessoal sempre).
+    METRICS_TOKEN: sem ele (ou curto), o /metrics responde a qualquer um na porta da API, e o proxy reverso na frente o
+    repassaria. AUTH_MODE=demo: sem Bearer, o user_id do corpo (/chat) ou da query (/conversations,
+    /actions/{id}/confirm) vira a identidade, e quem troca o user_id lê a conversa e confirma a ação de outro cliente;
+    em produção a identidade vem só do JWT.
     """
     gaps = [] if operator_keys() else ["OPERATOR_KEYS"]
-    return gaps + (["METRICS_TOKEN"] if _weak_token(metrics_token()) else [])
+    gaps += ["METRICS_TOKEN"] if _weak_token(metrics_token()) else []
+    return gaps + (["AUTH_MODE=demo"] if auth_mode() == "demo" else [])  # o modo efetivo, o mesmo que _identity lê
 
 
 def refuse_insecure_production() -> list[str]:
@@ -304,6 +310,11 @@ def confirm(action_id: str, user_id: str | None = None, authorization: str | Non
 @app.post("/actions/{action_id}/approve")
 def approve(action_id: str, x_operator_token: str | None = Header(default=None)) -> dict:
     operator = _require_operator(x_operator_token)
+    if operator == "admin":
+        # Quatro olhos com dono: o token compartilhado (só fora de produção) lê a fila, responde e rejeita, mas não
+        # executa escrita de risco alto; a aprovação exige chave pessoal (OPERATOR_KEYS), com nome na auditoria.
+        get_store().audit("operator:admin", "action_approve_refused_shared_token", action_id)
+        raise HTTPException(403, "aprovar ação de risco alto exige chave pessoal de operador (OPERATOR_KEYS)")
     out = decide_action(action_id, operator, approve=True)
     if out is None:
         raise HTTPException(409, "ação inexistente ou já decidida")
