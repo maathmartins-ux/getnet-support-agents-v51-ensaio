@@ -23,13 +23,16 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 <!-- scorecard:begin -->
 | medida | valor | como se mede |
 |---|---:|---|
-| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.97 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
+| Oficiais resolvidas (sem humano + todo fato + fonte) | 0.90 | resposta sem humano, com todo fato de referência do cenário e com fonte (os 10 do enunciado) |
 | Oficiais resolvidas: pass^k (todas as rodadas) | 0.90 | o mesmo, em todas as rodadas de cada cenário |
-| Juiz: respostas oficiais fundamentadas | 1.00 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
+| Juiz: respostas oficiais fundamentadas | 0.93 | juiz LLM com o texto das fontes: cada afirmação apoiada nelas |
 | Juiz: respostas oficiais úteis (helpful) | 1.00 | juiz LLM: a resposta resolve o que o lojista perguntou |
-| Memória ao vivo: pass@1 | 0.98 | conversas de vários turnos: o fato do turno anterior chega à resposta |
-| Busca: Recall@3 | 0.88 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
-| Busca: MRR | 0.84 | posição média da primeira página certa (1 = sempre em primeiro) |
+| Memória ao vivo: pass@1 | 0.92 | conversas de vários turnos: o fato do turno anterior chega à resposta |
+| Humano no laço: resposta do operador no mesmo turno (split hitl) | 1.00 | operadora simulada responde o caso aberto no turno dentro da espera: a resposta dela e os passos pendentes saem no mesmo turno (a que chega depois vai pela retomada, uma vez só) |
+| Busca: Recall@3 | 0.92 | perguntas rotuladas olhando a fonte: a página certa entre as 3 primeiras |
+| Busca: MRR | 0.86 | posição média da primeira página certa (1 = sempre em primeiro) |
+| Turnos resolvidos sem humano (ao vivo, todos os splits) | 0.88 | todas as execuções ao vivo, de todos os splits: resposta sem pedir humano e sem erro (recusa do guardrail conta; o fato se confere só nas oficiais resolvidas) |
+| Custo por turno resolvido sem humano (ao vivo) | US$ 0.0484 | gasto ao vivo de todos os splits (inclusive turnos que foram ao humano e turnos anteriores das conversas) ÷ as execuções resolvidas da linha acima |
 <!-- scorecard:end -->
 
 ### 0.1 Mapeamento do desafio
@@ -83,7 +86,7 @@ curl -s -X POST localhost:8000/auth/logout -H "Authorization: Bearer $TOKEN"   #
 <!-- quickstart:begin -->
 ```bash
 # 1º caso oficial (official-01, evals/cases.jsonl), como o cliente cliente1988, com o $TOKEN do passo Entrar
-# (atalho de teste, sem senha: TOKEN=$(python -m app.auth cliente1988))
+# (atalho de teste, sem senha: TOKEN=$(docker compose exec -T api python -m app.auth cliente1988))
 curl -s -X POST localhost:8000/chat -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" -d '{"message": "What'\''s the difference between the Get Clássica and the Get Smart?"}'
 ```
@@ -168,6 +171,7 @@ Na Getnet, o Knowledge também atende o geral (clima Open-Meteo e câmbio PTAX/B
 - **Storage**: trechos em JSONL versionado em `data/` (id, URL, `fetched_at`, sha256); vetores do denso em cache no
   disco.
 <!-- retriever:begin -->
+- **Retrieval** (`src/app/rag.py`; frase gerada de `data/retriever.json` por `scripts/fill_readme.py`): `dense+cross:base`: denso `multilingual-e5-large` + cross-encoder `bge-reranker-v2-m3-int8` (top-10, 600 caracteres por trecho) — ordem do denso; nota do cross só no portão sem fonte (nota >= -4.986): o redator lê os trechos na ordem do denso. Portão medido: responde 100% das perguntas com fonte e recusa 91% das sem fonte (48 × 22); sem o cross, o do denso responde 92% e recusa 86%. Custo a mais por busca: +1027 ms no p50 (1092 × 65 ms) e +841 MB de RAM. Reordenar pela nota foi medido e não ganhou: Recall@5 0.927 reordenando × 0.938 na ordem do denso. Escolha gravada por `run_evals --choose-retriever --apply` em 2026-11-04T06:52:47+00:00 (commit `ee44b31-dirty`); vale sobre o `KIT_RETRIEVER` de `src/app/config.py`.
 <!-- retriever:end -->
 - **Como a busca foi escolhida e medida:** a escolha (`dense+cross:base`, com o pool, o tamanho do trecho e o limiar
   do portão) foi gravada em `data/retriever.json` por `python -m evals.run_evals --choose-retriever --fast --apply`,
@@ -359,7 +363,6 @@ e como comparar pela primeira entrega.
 | hora (UTC; Brasília = UTC−3) | min | commit |
 |---|---:|---|
 | 12:15:01 | 0 | chore: repositório (antes do relógio) |
-| 13:48:57 | 94 | spec: oficiais (10 casos com expect.facts e expect.entities) |
 | 13:50:15 | 95 | spec: taxonomia, desempates, parcial, standalone; casos replan 20, dependent 11, parallel 4, approval 4, memory 16 |
 | 14:10:29 | 115 | eval: fumaça ao vivo official repeat 1 (10/10 intent, 0 handoff, US$ 0,195, 0 erros; 01/04/06 parciais) |
 | 14:13:58 | 119 | eval: rodada 1 ao vivo, splits completos antes do OOM (approval 4, parallel 4, partial 5; status complete) |
@@ -377,9 +380,10 @@ e como comparar pela primeira entrega.
 | 22:32:42 | 618 | eval: offline com a ordem do denso e o portão pela nota do cross (gate de intenção 90,5%) |
 | 23:21:59 | 667 | eval offline no código atual (corpus com quebra de linha, cartão com listas fechadas, buscador dense+cross:base) |
 | 02:16:03 | 841 | eval: bateria integral ao vivo da rodada 10 no código 35020c4 (12 splits complete, US$ 13,73 de conversa) |
-| 03:24:43 | 910 | reports: check.py --docker --scale completo e verde no código final (ccde68e) |
+| 07:15:56 | 1141 | eval offline no commit dos prompts novos (gate verde) |
+| 07:16:55 | 1142 | live_eval: lotes cegos do held-out em heldout_blind.d/ entram na bateria (kit) |
 
-Do primeiro ao último commit: **910 min**, 136 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **1142 min**, 149 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
@@ -387,7 +391,7 @@ Do primeiro ao último commit: **910 min**, 136 commits (aqui os 20 marcos; todo
 ## 9. Limitações e próximos passos
 
 - CRM de teste simulado (clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (`_deposit_date` em `src/app/domain/challenge/tools.py`) e a fila do operador.
-- **Busca:** o gold de busca (`evals/retrieval.d/`) foi rotulado às cegas por dois rotuladores LLM independentes, sem revisão humana; as perguntas de página são cópia de perguntas do site (as de cabeçalho, banner ou tela saíram do gold) e as perguntas sem fonte são fáceis (nenhuma é de produto real com o fato ausente do corpus); Recall, MRR e a separação com × sem fonte na linha "Retrieval ativo" do bloco offline e no bloco de busca de `docs/RESULTS.md` (gerados). Get Clássica e Get Smart não têm página própria no site (`/get-smart/` redireciona para imagem), nem a antecipação de recebíveis (o slug `antecipacao` é a FAQ da Reserva Financeira, `docs/SOURCES.md`). **Validação humana:** um rotulador e quase nenhuma reprovação humana: juiz × humano sai "não validado" pela regra fixada antes (bloco humano de `docs/RESULTS.md`, que diz de que bateria são os rótulos); rótulo de resposta que mudou depois sai da conta e é listado, e as páginas novas congelam o texto rotulado em `evals/validation/`; a página 3 de rotulagem (duas pessoas, com parte sorteada) foi publicada e aguarda os rótulos. **Portão sem fonte:** pela nota do cross-encoder, calibrado com as poucas perguntas sem fonte do gold (IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha (sem o classificador LLM) não fecha todos os ataques do red team (taxa por família ASI no bloco do red team de `docs/RESULTS.md`, gerado); o ao vivo soma o classificador LLM. **Latência:** o bloco de traces mede o turno sob a carga da bateria (conversas
+- **Busca:** o gold de busca (`evals/retrieval.d/`) foi rotulado às cegas por dois rotuladores LLM independentes, sem revisão humana; as perguntas de página são cópia de perguntas do site (as de cabeçalho, banner ou tela saíram do gold) e as perguntas sem fonte são fáceis (nenhuma é de produto real com o fato ausente do corpus); Recall, MRR e a separação com × sem fonte na linha "Retrieval ativo" do bloco offline e no bloco de busca de `docs/RESULTS.md` (gerados). Get Clássica e Get Smart não têm página própria no site (`/get-smart/` redireciona para imagem): os recursos da Get Clássica estão num trecho da página de taxas misturado com a tabela de taxas do Get Tap, que a busca densa deixa fora dos 10 candidatos do cross-encoder; por isso o official-01 compara preços e os recursos da Get Smart e diz que as fontes não trazem os da Clássica (o fato de referência dos recursos da Clássica reprova as 3 rodadas; corrigir = recortar os cartões de produto dessa página em trechos próprios), nem a antecipação de recebíveis (o slug `antecipacao` é a FAQ da Reserva Financeira, `docs/SOURCES.md`). **Validação humana:** um rotulador e quase nenhuma reprovação humana: juiz × humano sai "não validado" pela regra fixada antes (bloco humano de `docs/RESULTS.md`, que diz de que bateria são os rótulos); rótulo de resposta que mudou depois sai da conta e é listado, e as páginas novas congelam o texto rotulado em `evals/validation/`; a página 4 de rotulagem (duas pessoas; respostas da bateria final, com parte sorteada, da checagem automática e adulteradas de propósito; congelada em `evals/validation/`) foi publicada e aguarda os rótulos. **Portão sem fonte:** pela nota do cross-encoder, calibrado com as poucas perguntas sem fonte do gold (IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha (sem o classificador LLM) não fecha todos os ataques do red team (taxa por família ASI no bloco do red team de `docs/RESULTS.md`, gerado); o ao vivo soma o classificador LLM. **Latência:** o bloco de traces mede o turno sob a carga da bateria (conversas
   ao mesmo tempo no processo, gravadas em `concurrency`), não o de uma conversa sozinha. **Resposta primeiro:** a
   ressalva de abertura sai quando a frase citada logo depois já responde e outra frase ainda diz o que as fontes
   não trazem (`pipeline.answer_first`); quando a ressalva é a única ausência, ela fica primeiro, porque é a
