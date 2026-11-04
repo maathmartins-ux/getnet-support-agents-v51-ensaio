@@ -28,7 +28,8 @@ intents:
   knowledge.
 - human_request: pedido explícito de falar com pessoa/atendente.
 
-plan: knowledge = ["faq"]; general = ["faq"]; support = ["records"]; troubleshoot = ["records", "faq"];
+plan: knowledge = ["faq"]; general = ["faq"]; support = ["records"]; troubleshoot = ["records"] (o manual entra se o
+records trouxer o achado);
 multi = ["faq", "records"]; human_request = ["escalation"].
 
 language: "pt" ou "en" — o idioma da mensagem.
