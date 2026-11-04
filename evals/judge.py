@@ -19,8 +19,12 @@ com JUDGE_BASE_URL, JUDGE_MODEL e JUDGE_API_KEY (qualquer /chat/completions comp
 gerador é declarado no relatório (`same_family`), porque modelo tende a aprovar texto da própria família.
 
 Adulteradas (`python -m evals.judge --perturbed`): julga evals/results/perturbed.json (evals/perturb.py; gera se
-faltar) e grava evals/results/judge_perturbed.json, nunca o judge.json: resposta adulterada de propósito não entra
-em taxa nenhuma da manchete. É o que o relatório humano compara com as pessoas nas adulteradas (evals.label).
+faltar) e grava evals/results/judge_perturbed.json, nunca o judge.json: resposta com defeito plantado não entra
+em taxa nenhuma da manchete. É o que o relatório humano compara com as pessoas nas adulteradas (evals.label); com
+elas na conta, o juiz × pessoas só sai validado se, além do resto da regra, houver >= VALIDATION_MIN_REAL_NEGATIVES
+negativos de respostas reais e o juiz os reprovar com TNR >= VALIDATION_MIN_RATE (validation, PLANTED_RULE). Resposta
+real só entra na validação se foi escolhida sem depender do juiz — sorteio ou checagem automática; a que entrou porque
+o juiz a reprovou não mede o juiz (ele a reprova por construção) e sai à parte, como diagnóstico (SELECTION_RULE).
 """
 from __future__ import annotations
 
@@ -105,10 +109,29 @@ CANARIES = [
 ]
 
 
-def _today() -> str:
+def judge_date(row: dict | None = None, report: dict | None = None) -> str:
+    """Dia em que a resposta foi GERADA, no fuso do negócio (app.clock): o juiz confere "hoje/amanhã/ontem" contra
+    ele, nunca contra o relógio de quando julga. Medido: bateria às 23h de Brasília julgada já depois da meia-noite
+    UTC deu "fonte velha apresentada como atual" em todo caso com data relativa. Ordem: `business_date` da linha →
+    `recorded_at` do relatório (UTC, convertido para o fuso do negócio) → hoje do negócio."""
     import datetime
 
-    return datetime.date.today().isoformat()
+    from app import clock
+
+    if row and row.get("business_date"):
+        return str(row["business_date"])
+    stamp = (report or {}).get("recorded_at")
+    if stamp:
+        try:
+            when = datetime.datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+            return when.astimezone(clock.tz()).date().isoformat()
+        except ValueError:
+            pass
+    return clock.today().isoformat()
+
+
+def _today() -> str:
+    return judge_date()
 
 
 def verdict_fails(v: dict) -> bool:
@@ -245,20 +268,68 @@ def by_failure_type(pairs: list[tuple[str, str]]) -> dict:
 
 
 VALIDATION_MIN_CASES, VALIDATION_MIN_RATE = 10, 0.8
+# Com respostas de defeito plantado no bloco (evals/perturb.py), o total só valida se também houver este mínimo de
+# negativos de respostas REAIS e o juiz os reprovar com TNR >= VALIDATION_MIN_RATE: o plantado mede o juiz nos defeitos
+# que o gerador sabe fazer, e só o negativo real mostra que ele reprova o erro que o sistema comete de fato. Contar os
+# reais não basta: 3 que o juiz aprova somados a 15 plantadas que ele reprova dão TNR 0,83 no total. Com 1 ou 2, um
+# acerto isolado decidiria. Esta parte entrou depois do resto da regra: na rodada 10 (03/11/2026), após a revisão
+# adversarial da validação com plantadas; é mais estrita que a de antes (só tira a validação, nunca a dá).
+VALIDATION_MIN_REAL_NEGATIVES = 3
+PLANTED_RULE = (f"com respostas de defeito plantado no bloco, também >= {VALIDATION_MIN_REAL_NEGATIVES} negativos de "
+                f"respostas reais e TNR >= {VALIDATION_MIN_RATE} neles")
+# Por que cada resposta REAL rotulada entrou na amostra (evals/label.py grava na exportação e na página; coluna
+# `selecao` do CSV). Só a escolha que não depende do juiz mede o juiz: a página 2 (`--suspects`) traz casos que o
+# próprio juiz reprovou, e o TNR dele nesses negativos é ~1 por construção (circular); positivo escolhido assim pesa o
+# TPR para baixo pelo mesmo viés. Rótulo sem o motivo gravado (de antes do registro) não prova a escolha: fica fora.
+# Não é da regra fixada antes de medir (entrou na 2ª revisão da rodada 10): o RESULTS a diz como acrescentada depois.
+SELECTED_RANDOM, SELECTED_CHECK, SELECTED_JUDGE, SELECTED_UNKNOWN = "aleatoria", "checagem", "juiz", "desconhecida"
+SELECTED_PLANTED = "plantada"  # resposta com defeito plantado (evals/perturb.py): escolhida pelo gerador, não pelo juiz
+INDEPENDENT_SELECTION = frozenset({SELECTED_RANDOM, SELECTED_CHECK, SELECTED_PLANTED})
+SELECTION_RULE = ("só conta resposta real que entrou na amostra sem depender do juiz (sorteio ou checagem automática "
+                  "que falhou); a escolhida porque o juiz a reprovou e a sem o motivo da escolha gravado (seleção "
+                  "desconhecida) ficam fora da validação, inclusive do mínimo de negativos reais, e saem à parte como "
+                  "diagnóstico")
 
 
-def validation(stats: dict) -> dict:
-    """Regra fixada ANTES de medir (evals/README.md): o juiz só vale como medida com >= 10
+def validation(stats: dict, real: dict | None = None, left: dict[str, dict] | None = None) -> dict:
+    """Regra fixada ANTES de medir (aqui; o fluxo humano em evals/label.py): o juiz só vale como medida com >= 10
     positivos e >= 10 negativos humanos e TPR e TNR >= 0,8; senão é "não validado" e roda só como checagem de
-    regressão — o README escreve isso com a regra que o validaria, em vez de publicar a nota do juiz como verdade."""
+    regressão — o README escreve isso com a regra que o validaria, em vez de publicar a nota do juiz como verdade.
+
+    `real`: com respostas de defeito plantado no bloco, o tpr_tnr só das respostas REAIS dele (None = bloco sem
+    plantada). Aí o total só valida se, além do resto, houver >= VALIDATION_MIN_REAL_NEGATIVES negativos reais E o juiz
+    os reprovar com TNR >= VALIDATION_MIN_RATE (PLANTED_RULE; a parte acrescentada depois da revisão, mais estrita, vai
+    em `planted_rule`, à parte de `rule`, que é só a fixada antes de medir). Se só ela falta, `planted_only` diz
+    "validado só com negativos plantados" e `validated` fica False.
+
+    `left` (rótulos de pessoas): {motivo: tpr_tnr} das respostas reais que ficaram FORA de `stats` e de `real` pela
+    escolha (SELECTION_RULE: escolhidas pelo juiz, SELECTED_JUDGE, ou de seleção desconhecida, SELECTED_UNKNOWN).
+    Quem chama tira essas respostas antes (evals.label.judge_vs_humans), e elas nunca contam aqui: nem nos 10 por
+    classe, nem nos negativos reais, nem nos TNR; saem em `left_out` (diagnóstico, não validação) e a regra em
+    `selection_rule`, também acrescentada depois da medida."""
     pos, neg, tpr, tnr = stats.get("positives", 0), stats.get("negatives", 0), stats.get("tpr"), stats.get("tnr")
     missing = []
     if pos < VALIDATION_MIN_CASES or neg < VALIDATION_MIN_CASES:
         missing.append(f">= {VALIDATION_MIN_CASES} positivos e negativos humanos (tem {pos} e {neg})")
     if tpr is None or tpr < VALIDATION_MIN_RATE or tnr is None or tnr < VALIDATION_MIN_RATE:
         missing.append(f"TPR e TNR >= {VALIDATION_MIN_RATE} (tem {tpr} e {tnr})")
-    return {"validated": not missing, "missing": missing,
-            "rule": f">= {VALIDATION_MIN_CASES} por classe e TPR, TNR >= {VALIDATION_MIN_RATE}"}
+    rule = f">= {VALIDATION_MIN_CASES} por classe e TPR, TNR >= {VALIDATION_MIN_RATE}"
+    out: dict = {"validated": not missing, "missing": missing, "rule": rule}
+    if real is not None:
+        n, real_tnr = real.get("negatives", 0), real.get("tnr")
+        short = []
+        if n < VALIDATION_MIN_REAL_NEGATIVES:
+            short.append(f">= {VALIDATION_MIN_REAL_NEGATIVES} negativos de respostas reais (tem {n})")
+        if n and (real_tnr is None or real_tnr < VALIDATION_MIN_RATE):  # sem negativo real, o TNR nem existe
+            short.append(f"TNR >= {VALIDATION_MIN_RATE} nos negativos de respostas reais (tem {real_tnr})")
+        out = {"validated": not missing and not short, "planted_only": not missing and bool(short),
+               "missing": missing + short, "real_negatives": n, "real_tnr": real_tnr, "rule": rule,
+               "planted_rule": PLANTED_RULE}
+    if left is not None:
+        out["selection_rule"] = SELECTION_RULE
+        out["left_out"] = {k: {x: v.get(x) for x in ("positives", "negatives", "tpr", "tnr")}
+                           for k, v in sorted(left.items()) if v.get("positives") or v.get("negatives")}
+    return out
 
 
 HUMAN_LABELS_MISSING = "rótulos de pessoas (campo labeler: \"human:<nome>\"); estes vêm da SPEC ou de modelo"
@@ -308,7 +379,7 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
             return max(0.0, counted)
         return (reply.input_tokens * price[0] + reply.output_tokens * price[1]) / 1_000_000
 
-    def judge_one(item: dict, question: str, answer: str) -> dict:
+    def judge_one(item: dict, question: str, answer: str, today: str | None = None) -> dict:
         with calls_lock:
             spent = spent_box[0]
             est = max(USD_PER_CALL, spent / calls[0] if calls[0] else 0.0)
@@ -321,7 +392,7 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
         # com `context` a evidência inteira já está nas fontes: aqui só as chamadas (sem repetir o texto)
         tools = _tool_text(item.get("tool_calls"), None if context else item.get("evidence"))
         # a data de hoje: sem ela o juiz não tem como ver fonte velha apresentada como atual (stale_source)
-        prompt = (f"Data de hoje: {_today()}\n\nPergunta: {question}\n\n{who}"
+        prompt = (f"Data de hoje: {today or judge_date(item)}\n\nPergunta: {question}\n\n{who}"
                   f"Fontes:\n{sources}\n\n"
                   f"Dados de ferramenta:\n{tools}\n\n"
                   f"Resposta: {answer}")
@@ -375,14 +446,15 @@ def run(llm, inputs: list[Path], calibration: Path | None = None, max_usd: float
         for path in inputs:
             if fresh is not None and path.name not in fresh:
                 continue
-            for r in json.loads(path.read_text(encoding="utf-8"))["rows"]:
+            report_in = json.loads(path.read_text(encoding="utf-8"))
+            for r in report_in["rows"]:
                 if r.get("answer") and (path.name, r["id"], r.get("run", 0)) not in done:
-                    pending.append((path.name, r))
+                    pending.append((path.name, r, judge_date(r, report_in)))
 
-        def one(item: tuple[str, dict]) -> tuple[str, dict, dict | None]:
-            name, r = item
+        def one(item: tuple[str, dict, str]) -> tuple[str, dict, dict | None]:
+            name, r, day = item
             try:
-                return name, r, judge_one(r, r["message"], r["answer"])
+                return name, r, judge_one(r, r["message"], r["answer"], day)
             except LLMError as exc:
                 # O juiz pode recusar julgar um caso do split hard (pergunta maliciosa de propósito); sem isto, a
                 # recusa derrubava a rodada inteira. Recusa é do CASO: anota e segue.
@@ -538,11 +610,16 @@ def main(argv: list[str] | None = None) -> int:
                     help="continua um judge.json interrompido (aborted_*): não paga de novo o que já foi julgado")
     ap.add_argument("--revalidate", action="store_true",
                     help="reaplica a regra de validação (origem dos rótulos) ao judge.json existente, sem chamar o LLM")
+    ap.add_argument("--rejudge-dated", action="store_true",
+                    help="julga de novo, com a data do negócio de cada resposta, os vereditos reprovados e os de "
+                         "resposta com data relativa; os outros ficam (canários e calibração reaproveitados)")
     ap.add_argument("--perturbed", action="store_true",
                     help="julga evals/results/perturbed.json (gera se faltar) → judge_perturbed.json, fora da manchete")
     args = ap.parse_args(argv)
     if args.perturbed:
         return _main_perturbed(args.max_usd)
+    if args.rejudge_dated:
+        return _main_rejudge_dated(args.max_usd)
     if args.revalidate:
         report = json.loads(OUT.read_text(encoding="utf-8"))
         cal = report.get("calibration") or {}
@@ -576,6 +653,41 @@ def main(argv: list[str] | None = None) -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({k: v for k, v in report.items() if k != "verdicts"}, ensure_ascii=False))
+    return 0
+
+
+_DATED = __import__("re").compile(
+    r"(?i)\b(?:hoje|amanh[ãa]|ontem|anteontem|today|tomorrow|yesterday|tonight|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}(?:/\d{2,4})?)\b")
+
+
+def rejudge_plan(report: dict, rows: dict[tuple[str, str, int], dict]) -> tuple[list[dict], list[dict]]:
+    """(vereditos que ficam, vereditos a julgar de novo): de novo os reprovados e os de resposta com data relativa
+    ou data explícita (onde o dia que o juiz assume muda o veredito); os outros não dependem da data."""
+    keep, again = [], []
+    for v in report.get("verdicts", []):
+        row = rows.get((v.get("source"), v.get("id"), v.get("run", 0))) or {}
+        dated = bool(_DATED.search(str(row.get("answer") or "")))
+        (again if (verdict_fails(v) or not v.get("helpful", True) or dated) else keep).append(v)
+    return keep, again
+
+
+def _main_rejudge_dated(max_usd: float | None) -> int:
+    from app.llm import get_judge_llm
+
+    old = json.loads(OUT.read_text(encoding="utf-8"))
+    inputs = [RESULTS_DIR / n for n in old.get("live_files", []) if (RESULTS_DIR / n).exists()]
+    rows = {}
+    for path in inputs:
+        for r in json.loads(path.read_text(encoding="utf-8")).get("rows", []):
+            rows[(path.name, r["id"], r.get("run", 0))] = r
+    keep, again = rejudge_plan(old, rows)
+    print(f"rejulgar {len(again)} de {len(keep) + len(again)} vereditos (reprovados ou com data)")
+    report = run(get_judge_llm(), inputs, max_usd=max_usd, previous={**old, "verdicts": keep}, reuse_trust=True)
+    report["spent_usd"] = round(float(old.get("spent_usd") or 0.0) + float(report.get("spent_usd") or 0.0), 6)
+    report["rejudged_dated"] = len(again)
+    OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(json.dumps({k: v for k, v in report.items() if k not in ("verdicts", "calibration_pairs", "canaries")},
+                     ensure_ascii=False)[:1500])
     return 0
 
 

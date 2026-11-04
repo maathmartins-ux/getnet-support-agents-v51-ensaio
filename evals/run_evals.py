@@ -420,7 +420,7 @@ def run_case(client, case: dict, db: str | None = None, scope: str | None = None
     ms = (time.perf_counter() - t0) * 1000
     # `ms` cronometra a conversa inteira (turnos de `before` inclusos); `turn_ms` só o último turno (None = crash)
     row = {"id": case["id"], "split": case["split"], "message": case["message"], "ms": round(ms, 1),
-           "turn_ms": turn_ms, "expected_intent": case["expect"].get("intent"),
+           "turn_ms": turn_ms, "business_date": _business_date(), "expected_intent": case["expect"].get("intent"),
            "checks": score(case, got) if not crash else {"intent": False}, "crash": crash,
            "got_intent": got.get("intent"), "route": got.get("route", []), "replans": got.get("replans", []),
            "engine": got.get("engine"), "answer": got.get("answer", ""),
@@ -1018,6 +1018,13 @@ def floors_of(report: dict) -> dict:
     st = report.get("stability") or {}
     floors.update({k: round(100 * st[k], 1) for k in FLOOR_KEYS_EXTRA if st.get(k) is not None})
     return {**floors, "max_crashes": m.get("crashes", 0)}
+
+
+def _business_date() -> str:
+    """Dia do negócio em que o caso rodou (app.clock): o juiz confere "hoje/amanhã/ontem" contra ele."""
+    from app import clock
+
+    return clock.today().isoformat()
 
 
 def records_cassette(out: Path | None) -> bool:

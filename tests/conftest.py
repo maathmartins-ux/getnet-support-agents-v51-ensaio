@@ -22,7 +22,7 @@ from app import notify, observability
 from app.auth import LIMITER
 from app.config import ROOT
 from app.observability import configure_otel
-from evals import judge, run_evals
+from evals import judge, label, run_evals
 
 # Dados do kit: os testes do kit nunca leem o que o domínio troca no relógio (data/, retrieval, calibração).
 # Sem isso, trocar só os dados quebrava 24 de 187 testes.
@@ -87,6 +87,10 @@ def isolated_env(tmp_path, monkeypatch, pg_schema):
     monkeypatch.setattr(run_evals, "RESULTS_DIR", tmp_path / "results")
     monkeypatch.setattr(run_evals, "RESULTS", tmp_path / "results" / "latest.json")
     monkeypatch.setattr(judge, "CALIBRATION", KIT_DATA / "judge_calibration.jsonl")
+    # o sal das páginas cegas de verdade (var/rotulagem_salt.json) nunca recebe sal de teste, nem o registro do motivo
+    # da escolha das páginas (evals/human_selection.json, que vai para o git) recebe página de teste
+    monkeypatch.setattr(label, "SALT_FILE", tmp_path / "var" / "rotulagem_salt.json")
+    monkeypatch.setattr(label, "SELECTION_FILE", tmp_path / "human_selection.json")
     monkeypatch.setenv("DB_PATH", str(tmp_path / "test.db"))
     if pg_schema:
         monkeypatch.setenv("DATABASE_URL", pg_schema)

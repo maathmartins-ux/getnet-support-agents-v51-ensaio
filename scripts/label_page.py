@@ -3,12 +3,23 @@
   python scripts/label_page.py --n 10 --raters Matheus,Bianca [--out var/rotulagem.html]
 
 `--heldout`: só o held-out cego (o passa/falha humano é a medida ponta a ponta; `evals.label --report` dá `heldout`).
-`--perturb N`: além das `--n` reais, N respostas adulteradas de propósito (evals/results/perturbed.json, de
-evals/perturb.py; gera se faltar), equilibradas por tipo, embaralhadas com as reais e nunca ao lado da própria
-original. Com elas, todo id da página vira cego (evals.label.page_id): nem a tela, nem o HTML, nem o texto de
-"Copiar minhas respostas" dizem qual é adulterada; a saída do script dá só quantas entraram, por tipo.
+`--perturb N`: além das `--n` reais, N respostas com um defeito plantado (evals/results/perturbed.json, de
+evals/perturb.py; gera se faltar), equilibradas por tipo, embaralhadas com as reais, nunca ao lado da própria
+original nem repetindo uma que alguém desta página já rotulou. Com elas, todo id da página vira cego
+(evals.label.page_id, HMAC com sal novo da página em var/rotulagem_salt.json) e a escolha e a ordem das adulteradas
+são sorteadas com o mesmo sal: nem a tela, nem o HTML, nem o texto de "Copiar minhas respostas" dizem qual é
+adulterada. O sal protege o id e a posição (sem ele, o código não refaz nem um nem outro); o texto das adulteradas está
+em evals/results/perturbed.json, e quem abre o arquivo vê quais são: quem rotula não abre o repositório. A saída do
+script dá só quantas entraram, por tipo. Recusa (sai com 2) se alguma adulterada saiu de uma resposta ao vivo que
+mudou depois (bateria nova): regenere com `python -m evals.perturb --force` e `python -m evals.judge --perturbed`.
 A amostra é a MESMA de `python -m evals.label --export N` (mesma função, mesma seed): pergunta, resposta, o que o
-redator consultou (`context`) e os links das fontes; nunca a nota automática nem o veredito do juiz. A sessão publica
+redator consultou (`context`) e os links das fontes; nunca a nota automática nem o veredito do juiz.
+`--suspects K`: até K das `--n` com falha suspeita, as da checagem automática antes das do juiz, e o resto sorteado
+antes delas. Por que cada resposta real entrou (sorteio, checagem, juiz) vai para evals/human_selection.json pela
+amostra da página, nunca para o HTML; a importação passa o motivo ao CSV de cada pessoa, e só o que não dependeu do
+juiz valida o juiz (evals.judge.SELECTION_RULE): para a página 2 valer como validação, `--n` maior que `--suspects`
+(parte sorteada) ou suspeitas da checagem. A saída diz quantas por motivo e avisa quando nenhuma independe do juiz.
+A sessão publica
 com `capabilities: {db: {rules: RULES}, user: {}, sample: {}}` (regras abaixo: cada pessoa grava e lê só a própria
 ficha, o dono lê todas; sample = botão "Traduzir" em conversa em inglês),
 cada pessoa faz os 2 exemplos de treino (gabarito na tela, fora da conta) e marca as situações no celular; a sessão
@@ -163,39 +174,85 @@ def answer_lang(row: dict) -> str:
     return row.get("language_detected") or detect_text_language(row.get("answer") or "", 1) or ""
 
 
-def mix_perturbed(picked: list[dict], k: int, seed: int, results: Path, splits: set[str] | None,
-                  fresh: bool) -> list[dict]:
-    """As reais sorteadas + até k adulteradas (evals.perturb.pick), embaralhadas. A amostra real não muda (a mesma
-    do `--export`); a adulterada nunca vem de uma original que já está na página, e prefere original que ninguém
-    rotulou ainda (quem viu a resposta certa reconheceria a diferença de memória)."""
+class StalePerturbed(ValueError):
+    """perturbed.json saiu de respostas ao vivo que mudaram depois: a cópia não é mais "a resposta real com um
+    defeito", e juiz e rótulo dela falariam de outra resposta."""
+
+
+def perturbed_pool(results: Path, splits: set[str] | None) -> list[dict]:
+    """As adulteradas de perturbed.json (gera se faltar) dos splits pedidos. StalePerturbed se alguma saiu de resposta
+    que mudou depois da geração (perturb.stale): conferido antes de criar o sal, para não deixar sal órfão."""
     from evals import label, perturb
 
-    pool = [r for r in perturb.ensure(results) if not splits or r.get("original_split") in splits]
-    seen = label.labeled_ids()
+    rows = perturb.ensure(results)
+    if old := perturb.stale(rows, label.load_rows(results)):
+        raise StalePerturbed(f"{len(old)} de {len(rows)} respostas de {perturb.FILE} saíram de uma resposta ao vivo "
+                             "que mudou depois da geração (ou de arquivo sem a impressão digital da original): rode "
+                             "`python -m evals.perturb --force` e `python -m evals.judge --perturbed` antes da página")
+    return [r for r in rows if not splits or r.get("original_split") in splits]
+
+
+def mix_perturbed(picked: list[dict], pool: list[dict], k: int, salt: str, seed: int = 7, fresh: bool = False,
+                  raters: list[str] | None = None, base: Path | None = None) -> list[dict]:
+    """As reais sorteadas + até k adulteradas do `pool` (evals.perturb.pick), embaralhadas. A amostra real não muda (a
+    mesma do `--export`); a adulterada nunca vem de uma original que já está na página, nunca é uma que alguém de
+    `raters` já rotulou (sem `raters`, qualquer pessoa), e prefere original que ninguém rotulou ainda (quem viu a
+    resposta certa reconheceria a diferença de memória). A escolha e a mistura são sorteadas com o `salt` da página:
+    com a seed só (fixa, no código), a posição de cada adulterada se refaria sem o sal, e o id cego não esconderia
+    nada."""
+    from evals import label, perturb
+
+    base = base or label.HERE
+    seen = label.labeled_ids(base)
+    mine = label.labeled_by(raters, base) if raters else seen
     extra = perturb.pick(pool, k, seed, exclude_originals={r["id"] for r in picked},
-                         exclude=seen if fresh else frozenset(), avoid_originals=seen)
+                         exclude=mine | (seen if fresh else set()), avoid_originals=seen, salt=salt)
     out = picked + extra
-    random.Random(f"{seed}:mistura").shuffle(out)
+    random.Random(f"{salt}:mistura").shuffle(out)
     return out
 
 
+def sample_id(rows: list[dict]) -> str:
+    """A `sample` da página (o que ela grava em cada ficha): impressão digital dos ids, na ordem em que aparecem."""
+    return hashlib.sha256(json.dumps([r["id"] for r in rows]).encode()).hexdigest()[:12]
+
+
 def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] | None = None,
-          suspects: int = 0, fresh: bool = False, perturb: int = 0) -> list[dict]:
-    """Mesma amostra do `evals.label --export` (com `splits`, a mesma função sobre as linhas desses splits).
-    `suspects`: até N casos com falha suspeita na amostra (negativos para medir o TNR do juiz); `fresh`: sem os já
-    rotulados; `perturb`: mais até N adulteradas declaradas (mix_perturbed), e então todo id é cego."""
+          suspects: int = 0, fresh: bool = False, perturb: int = 0, raters: list[str] | None = None,
+          salt: str | None = None, base: Path | None = None) -> list[dict]:
+    """Os itens de build, sem o motivo da escolha."""
+    return build(n, seed, results, splits, suspects, fresh, perturb, raters, salt, base)[0]
+
+
+def build(n: int, seed: int = 7, results: Path | None = None, splits: set[str] | None = None,
+          suspects: int = 0, fresh: bool = False, perturb: int = 0, raters: list[str] | None = None,
+          salt: str | None = None, base: Path | None = None) -> tuple[list[dict], dict[str, str]]:
+    """(itens da página, {id do caso: motivo da escolha} das reais). Mesma amostra do `evals.label --export` (com
+    `splits`, a mesma função sobre as linhas desses splits). `suspects`: até N casos com falha suspeita na amostra
+    (negativos para medir o TNR do juiz; evals.label.pick_sample); `fresh`: sem os já rotulados; `perturb`: mais até N
+    adulteradas declaradas (mix_perturbed), e então todo id é cego e a mistura é sorteada com `salt` ou um sal novo
+    guardado (evals.label.new_salt): o mesmo sal dá a mesma página; `base`: onde ficam os human_labels*.csv. O motivo
+    fica registrado pela `sample` da página (evals.label.record_selection) antes de alguém rotular, fora do HTML."""
     from evals import label
 
     results = results or label.RESULTS
+    base = base or label.HERE
     rows = label.load_rows(results)
     if splits:
         rows = [r for r in rows if r.get("split") in splits]
     before = _before()
     out = []
-    picked = (label.enriched_sample(rows, n, seed, suspects, label.labeled_ids() if fresh else None)
-              if suspects or fresh else label.sample(rows, n, seed))
+    if suspects or fresh:  # as suspeitas pelo judge.json desta pasta de resultados
+        chosen = label.pick_sample(rows, n, seed, suspects, label.labeled_ids(base) if fresh else None,
+                                   label.suspected_ids(rows, results / "judge.json"))
+    else:
+        chosen = [(r, label.SELECTED_RANDOM) for r in label.sample(rows, n, seed)]
+    picked = [r for r, _ in chosen]
+    reasons = {r["id"]: why for r, why in chosen}
     if perturb:
-        picked = mix_perturbed(picked, perturb, seed, results, splits, fresh)
+        pool = perturbed_pool(results, splits)
+        salt = salt or label.new_salt("página")  # só depois da conferência: página recusada não deixa sal órfão
+        picked = mix_perturbed(picked, pool, perturb, salt, seed, fresh, raters, base)
     for r in picked:
         seen, sources = set(), []
         for s in r.get("sources") or []:
@@ -205,14 +262,16 @@ def items(n: int, seed: int = 7, results: Path | None = None, splits: set[str] |
         ctx = r.get("context") or "\n".join(r.get("evidence") or [])
         ids = {str(s.get("id")): s.get("url") for s in r.get("sources") or [] if isinstance(s, dict) and s.get("id")}
         # adulterada: os turnos anteriores são os da original (é a mesma conversa, com a resposta trocada)
-        out.append({"id": label.page_id(r["id"]) if perturb else r["id"], "question": r.get("message") or "",
+        out.append({"id": label.page_id(r["id"], salt) if salt else r["id"], "question": r.get("message") or "",
                     "answer": r.get("answer") or "", "before": before.get(r.get("original_id") or r["id"], []),
                     "source_urls": ids,
                     "evidence": str(ctx)[:EVIDENCE_CHARS], "blocks": evidence_blocks(r), "sources": sources,
                     # pergunta 3 da página: o idioma da pergunta e o da resposta lado a lado (sem os dois à vista,
                     # quem rotula marca resposta em inglês certa como idioma errado)
                     "lang": question_lang(r), "answer_lang": answer_lang(r)})
-    return out
+    if out:
+        label.record_selection(sample_id(out), reasons)
+    return out, reasons
 
 
 # Treino com gabarito: 2 exemplos antes das situações, um certo e um errado, que ensinam as duas armadilhas que
@@ -238,8 +297,7 @@ PRACTICE = [
 
 
 def render(rows: list[dict], raters: list[str], practice: list[dict] | None = None) -> str:
-    sample = hashlib.sha256(json.dumps([r["id"] for r in rows]).encode()).hexdigest()[:12]
-    data = json.dumps({"items": rows, "raters": raters, "sample": sample,
+    data = json.dumps({"items": rows, "raters": raters, "sample": sample_id(rows),
                        "practice": PRACTICE if practice is None else practice}, ensure_ascii=False)
     data = data.replace("</", "<\\/")  # nada dentro do JSON fecha o <script>
     return TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/", data)
@@ -253,7 +311,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--heldout", action="store_true",
                     help="só o held-out (live_heldout.json): o passa/falha humano às cegas é a medida ponta a ponta")
     ap.add_argument("--suspects", type=int, default=0,
-                    help="até N casos com falha suspeita (checagem ou juiz) na amostra: negativos para o TNR do juiz")
+                    help="até N das --n com falha suspeita (checagem automática antes do juiz): negativos para o TNR "
+                         "do juiz; só os da checagem e os sorteados validam o juiz (use --n maior que --suspects)")
     ap.add_argument("--fresh", action="store_true", help="sem os casos já rotulados (human_labels*.csv)")
     ap.add_argument("--perturb", type=int, default=0, metavar="N",
                     help="mais N respostas adulteradas de propósito (evals/results/perturbed.json; gera se faltar), "
@@ -265,16 +324,29 @@ def main(argv: list[str] | None = None) -> int:
     if len(raters) < 2:
         ap.error("a avaliação independente pede 2+ pessoas")
     splits = {"heldout"} if args.heldout else ({x.strip() for x in args.splits.split(",")} if args.splits else None)
-    rows = items(args.n, args.seed, splits=splits, suspects=args.suspects, fresh=args.fresh, perturb=args.perturb)
+    try:
+        rows, reasons = build(args.n, args.seed, splits=splits, suspects=args.suspects, fresh=args.fresh,
+                              perturb=args.perturb, raters=raters)
+    except StalePerturbed as exc:  # nada é gravado: página com cópia de resposta velha não sai
+        print(f"ERRO: {exc}", file=sys.stderr)
+        return 2
     if args.heldout and not rows:
         ap.error("sem linhas do held-out em evals/results/live_heldout.json: rode o held-out ao vivo antes")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(rows, raters), encoding="utf-8")
     info = {"out": str(args.out), "items": len(rows), "raters": raters,
-            "capabilities": {"db": {"rules": RULES}, "user": {}, "sample": {}}}
+            "capabilities": {"db": {"rules": RULES}, "user": {}, "sample": {}},
+            # quantas reais por motivo da escolha (nunca quais: quem roda o script pode ser quem rotula)
+            "selecao": {why: list(reasons.values()).count(why) for why in sorted(set(reasons.values()))}}
     if args.perturb:
         info["adulteradas"] = _perturbed_counts(rows)
     print(json.dumps(info, ensure_ascii=False))
+    from evals import label
+
+    if args.suspects and not {label.SELECTED_RANDOM, label.SELECTED_CHECK} & set(reasons.values()):
+        print("AVISO: nenhuma resposta real desta página entrou sem depender do juiz (sorteio ou checagem automática): "
+              "os rótulos dela não validam o juiz, só servem de diagnóstico (evals.judge.SELECTION_RULE). Use --n "
+              "maior que --suspects para ter uma parte sorteada.", file=sys.stderr)
     return 0
 
 
@@ -282,8 +354,9 @@ def _perturbed_counts(rows: list[dict]) -> dict:
     """Quantas adulteradas entraram, por tipo (nunca quais: quem roda o script pode ser quem rotula)."""
     from evals import label, perturb
 
-    kinds = {label.page_id(r["id"]): r.get("perturbation") for r in perturb.load(label.RESULTS)}
-    got = [kinds[r["id"]] for r in rows if r["id"] in kinds]
+    kinds = {r["id"]: r.get("perturbation") for r in perturb.load(label.RESULTS)}
+    back = label.unblind(kinds)
+    got = [kinds[back[r["id"]]] for r in rows if r["id"] in back]
     return {"total": len(got), "por_tipo": {t: got.count(t) for t in perturb.TYPES}}
 
 

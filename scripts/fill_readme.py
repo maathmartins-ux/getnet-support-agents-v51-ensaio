@@ -197,26 +197,46 @@ def _kinds(counts: dict | None) -> str:
     return ", ".join(f"{k} {v}" for k, v in (counts or {}).items() if v) or "—"
 
 
+PLANTED = ("Respostas com um defeito plantado (número trocado ou afirmação sem base contra a evidência; fato de "
+           "referência removido)")
+# As duas leituras do "juiz reprova" (evals.label.JUDGE_READINGS), na ordem em que entraram, numa linha só
+READINGS = "antes (só não fundamentada, idioma ou vazamento) → depois (+ não atende ao pedido, a em vigor)"
+
+
+def _two(before: int | None, after: int, n: int) -> str:
+    """Antes → depois ("1/3 → 3/3"); relatório antigo, sem a leitura de antes, só a em vigor."""
+    return f"{after}/{n}" if before is None else f"{before}/{n} → {after}/{n}"
+
+
 def _perturbed_lines(ad: dict | None) -> list[str]:
-    """Adulteradas de propósito declaradas: quantas entraram na rotulagem e de que tipos, quanto cada pessoa e o
-    juiz reprovaram. Relatório sem o bloco (antigo, ou sem adulteradas): nada."""
+    """Respostas com um defeito plantado, declaradas: quantas entraram na rotulagem e de que tipos, quanto cada pessoa
+    reprovou e quanto o juiz reprovou de cada tipo (o total misturaria o tipo que é negativo garantido com o que não
+    é), nas duas leituras do "juiz reprova" lado a lado. Relatório sem o bloco (antigo, ou sem adulteradas): nada."""
     if not ad:
         return []
     src = f"`evals/results/{ad.get('arquivo', 'perturbed.json')}`, geradas por `evals/perturb.py`"
     if ad.get("rotuladas"):
         who = "; ".join(f"`{n}` reprovou {r['reprovou']}/{r['rotuladas']}" for n, r in (ad.get("humano") or {}).items())
         kinds = _kinds(ad.get("rotuladas_por_tipo"))
-        out = [f"Adulteradas de propósito: **{ad['rotuladas']}** respostas erradas em relação à própria evidência "
-               f"entraram na rotulagem misturadas às reais, sem marca na página ({kinds}; declaradas em {src}). "
-               f"Quem rotulou: {who}."]
+        # a página pega um tipo por vez e, quando um acaba, os outros completam: a composição real vai escrita
+        made, shown = ad.get("por_tipo") or {}, ad.get("rotuladas_por_tipo") or {}
+        uneven = ""
+        if made and len({v for v in shown.values()}) > 1:
+            rare = min(made, key=lambda k: made[k])
+            few = f"só {made[rare]} respostas aceitaram {rare}" if made[rare] else f"nenhuma resposta aceitou {rare}"
+            uneven = f"; {few}, e os outros tipos completam a página"
+        out = [f"{PLANTED}: **{ad['rotuladas']}** entraram na rotulagem misturadas às reais, sem marca na página "
+               f"(composição real: {kinds}, de {ad.get('geradas', 0)} geradas: {_kinds(made)}{uneven}; declaradas em "
+               f"{src}). Quem rotulou: {who}."]
     else:
-        out = [f"Adulteradas de propósito: {ad.get('geradas', 0)} geradas ({_kinds(ad.get('por_tipo'))}; {src}), "
-               "ainda não rotuladas."]
+        out = [f"{PLANTED}: {ad.get('geradas', 0)} geradas ({_kinds(ad.get('por_tipo'))}; {src}), ainda não rotuladas."]
     if jd := ad.get("juiz"):
-        per = ", ".join(f"{k} {v['reprovou']}/{v['julgadas']}" for k, v in (jd.get("por_tipo") or {}).items()
-                        if v.get("julgadas"))
-        out.append(f"- juiz em todas as {jd['julgadas']} adulteradas (sem depender de rótulo): reprovou "
-                   f"**{jd['reprovou']}/{jd['julgadas']}** ({per}).")
+        types = {k: v for k, v in (jd.get("por_tipo") or {}).items() if v.get("julgadas")}
+        per = "; ".join(f"{k} {_two(v.get('reprovou_antes'), v['reprovou'], v['julgadas'])}" for k, v in types.items())
+        both = any("reprovou_antes" in v for v in types.values())
+        out.append(f"- juiz nas {jd['julgadas']} com defeito plantado (sem depender de rótulo), reprova por tipo"
+                   f"{', ' + READINGS if both else ''}: {per}. fato_removido não é negativo garantido: sem o fato a "
+                   "resposta pode continuar servindo, e quem decide é a pessoa.")
     if ad.get("fora_da_conta"):
         out.append(f"- fora da conta (resposta rotulada ≠ a de hoje em perturbed.json): "
                    f"{', '.join(ad['fora_da_conta'])}.")
@@ -225,26 +245,79 @@ def _perturbed_lines(ad: dict | None) -> list[str]:
     return out
 
 
+# Por que a resposta entrou na amostra (evals.judge SELECTED_*), como o RESULTS escreve
+SELECTION_NAMES = {"aleatoria": "sorteio", "checagem": "checagem automática", "plantada": "defeito plantado"}
+LEFT_NAMES = {"juiz": "escolhidas porque o juiz as reprovou",
+              "desconhecida": "de seleção desconhecida (rótulos de antes do registro do motivo da escolha: não contam "
+                              "para validar, nem para o mínimo de negativos reais)"}
+
+
 def _judge_human_lines(jx: dict | None) -> list[str]:
-    """Juiz × humano com a regra fixada antes de medir: no total e, com adulteradas, só nas reais e só nelas."""
+    """Juiz × humano com a regra fixada antes de medir (e as partes acrescentadas depois das revisões, ditas como tal):
+    no total (com a composição pela escolha e a dos negativos, e o TNR do juiz nos reais: plantado não vale por real)
+    e, com adulteradas, só nas reais e só nelas; nas reais e nas plantadas, as duas leituras do "juiz reprova". O que
+    entrou na amostra pelo juiz, ou sem o motivo gravado, sai numa linha à parte: diagnóstico, nunca validação."""
     if not jx:
         return []
 
-    def one(b: dict) -> str:
+    def one(b: dict, total: bool = False) -> str:
         v = b.get("validacao") or {}
-        verdict = "**validado**" if v.get("validated") else f"não validado (falta: {'; '.join(v.get('missing', []))})"
-        return (f"{b['casos']} respostas (a pessoa aprova {b['positives']} e reprova {b['negatives']}) · "
-                f"concordância {b['concordancia']} · TPR {b['tpr']} · TNR {b['tnr']} → {verdict}")
+        missing = "; ".join(v.get("missing", []))
+        if v.get("validated"):
+            verdict = "**validado**"
+        elif v.get("planted_only"):  # passaria só com os plantados: nunca sai como validado
+            verdict = f"validado só com negativos plantados (com respostas reais: não validado; falta: {missing})"
+        else:
+            verdict = f"não validado (falta: {missing})"
+        if not b["casos"]:
+            return f"nenhuma resposta rotulada entrou na amostra sem depender do juiz → {verdict}"
+        neg, real_tnr, why = f"reprova {b['negatives']}", "", ""
+        if total and b.get("negativos_plantados") is not None:
+            neg += f": {b['negativos_reais']} reais + {b['negativos_plantados']} plantadas"
+            if b.get("negativos_reais"):  # sem negativo real, o TNR deles nem existe
+                real_tnr = f" (nos {b['negativos_reais']} negativos reais: {b.get('tnr_nos_reais')})"
+        if total and (sel := b.get("selecao")):
+            why = ", escolhidas sem depender do juiz (" + ", ".join(
+                f"{name} {sel[k]}" for k, name in SELECTION_NAMES.items() if sel.get(k)) + ")"
+        return (f"{b['casos']} respostas (a pessoa aprova {b['positives']} e {neg}){why} · "
+                f"concordância {b['concordancia']} · TPR {b['tpr']} · TNR {b['tnr']}{real_tnr} → {verdict}")
 
-    rule = (jx.get("validacao") or {}).get("rule", "")
+    v = jx.get("validacao") or {}
+    rule = v.get("rule", "")
+    if v.get("planted_rule"):  # a parte das plantadas veio depois da medida: nunca sai como "fixada antes"
+        rule += f"; acrescentada depois da revisão, mais estrita: {v['planted_rule']}"
+    if v.get("selection_rule"):  # e a da escolha, na revisão seguinte
+        rule += f"; acrescentada depois da 2ª revisão: {v['selection_rule']}"
     head = f"veredito do juiz: {jx['veredito_do_juiz']}; " if jx.get("veredito_do_juiz") else ""
-    out = [f"Juiz × humano ({head}regra fixada antes: {rule}): {one(jx)}."]
+    out = [f"Juiz × humano ({head}regra fixada antes: {rule}): {one(jx, total=True)}."]
+    if left := jx.get("fora_da_validacao"):
+        out.append("- fora da validação (diagnóstico, não validação): " + "; ".join(
+            f"{b['casos']} {LEFT_NAMES.get(k, k)} — a pessoa reprova {b['negatives']} (TNR do juiz nelas {b['tnr']})"
+            f" e aprova {b['positives']} (TPR {b['tpr']})" for k, b in left.items()) + ".")
     # sem adulterada rotulada, "só reais" repetiria o total
-    for key, name in (("reais", "só reais"), ("adulteradas", "só adulteradas")) if jx.get("adulteradas") else ():
+    for key, name in (("reais", "só reais"), ("adulteradas", "só as de defeito plantado")) \
+            if jx.get("adulteradas") else ():
         if b := jx.get(key):
             kinds = "; ".join(f"{k}: a pessoa reprovou {t['humano_reprova']}/{t['casos']}, o juiz "
-                              f"{t['juiz_reprova']}/{t['casos']}" for k, t in (b.get("por_tipo") or {}).items())
-            out.append(f"- {name}: {one(b)}" + (f" ({kinds})" if kinds else "") + ".")
+                              f"{t['juiz_reprova']}/{t['casos']}"
+                              + (f" (antes {t['juiz_reprova_antes']}/{t['casos']})"
+                                 if "juiz_reprova_antes" in t else "")
+                              for k, t in (b.get("por_tipo") or {}).items())
+            line = f"- {name}: {one(b)}" + (f" ({kinds})" if kinds else "")
+            if key == "adulteradas" and (lp := jx.get("leituras_plantadas")):
+                a, d = lp["antes"], lp["depois"]
+                line += (f"; \"juiz reprova\" nas duas leituras: antes (só não fundamentada, idioma ou vazamento) "
+                         f"{a['juiz_reprova']}/{a['casos']} · concordância {a['concordancia']} · TNR {a['tnr']}; "
+                         f"depois (+ não atende ao pedido, a em vigor) {d['juiz_reprova']}/{d['casos']} · concordância "
+                         f"{d['concordancia']} · TNR {d['tnr']}")
+            out.append(line + ".")
+    if lr := jx.get("leituras_reais"):  # a definição ganhou o `helpful` depois de uma medida: as duas, lado a lado
+        a, d = lr["antes"], lr["depois"]
+        out.append(f"- \"juiz reprova\" nas respostas reais, as duas leituras: antes, se {a['regra']} → juiz "
+                   f"reprova {a['juiz_reprova']}/{a['casos']} · concordância {a['concordancia']} · TPR {a['tpr']} · "
+                   f"TNR {a['tnr']}; depois, se {d['regra']} → juiz reprova {d['juiz_reprova']}/{d['casos']} · "
+                   f"concordância {d['concordancia']} · TPR {d['tpr']} · TNR {d['tnr']}. Em vigor: a de "
+                   f"{lr['em_vigor']}, porque {lr['por_que']}.")
     return out  # o aviso de juiz das adulteradas velho ou não rodado já sai nas linhas das adulteradas
 
 

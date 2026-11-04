@@ -11,7 +11,8 @@ def test_judge_vs_humans_uses_consensus_then_agreement(tmp_path):
         {"id": "c", "run": 0, "grounded": False},
         {"id": "a", "run": 1, "grounded": False}]}), encoding="utf-8")
     by_rater = {"bianca": {"a": True, "b": False, "c": True}, "matheus": {"a": True, "b": False, "c": False}}
-    out = label.judge_vs_humans(by_rater, {"c": {"v": "fail"}}, tmp_path)
+    out = label.judge_vs_humans(by_rater, {"c": {"v": "fail"}}, tmp_path,
+                                selection={i: judge.SELECTED_RANDOM for i in "abc"})  # as 3 sorteadas
     assert out["casos"] == 3 and out["concordancia"] == 1.0  # b: idioma errado reprova; c: consenso diz falha
     assert out["validacao"]["validated"] is False  # 3 casos: abaixo de 10 por classe
     assert label.judge_vs_humans({"x": {"z": True}}, None, tmp_path) is None

@@ -33,33 +33,65 @@ Veredito automático de uma linha = todas as checagens True. Passa humano = a re
 idioma da pergunta (decisão do dono, sem ver a nota automática). Relatório: concordância, kappa de Cohen, e onde
 humano e automático divergem (esses casos mostram o que a checagem automática não enxerga).
 
-Adulteradas de propósito (evals/perturb.py; `scripts/label_page.py --perturb N`): respostas reais com um defeito
-declarado (número trocado, afirmação sem base, fato removido), em evals/results/perturbed.json, entram na página
-misturadas às reais; com elas, TODO id da página é cego (page_id), e a importação volta ao id do caso. Sem elas o
-TNR do juiz contra pessoas não se mede (quase toda resposta real passa). O relatório separa: humano × automático e
-humano × humano só nas reais (a adulterada não é resposta do sistema nem passou pelas checagens); juiz × humano no
-total, só nas reais e só nas adulteradas, com a mesma regra de validação; e quanto cada pessoa e o juiz reprovaram
-das adulteradas (o juiz no conjunto todo, sem depender de rótulo). Rótulo de adulterada cuja resposta não bate com a
-de perturbed.json (arquivo regerado depois) fica fora da conta, listado.
+Adulteradas (evals/perturb.py; `scripts/label_page.py --perturb N`): respostas reais com um defeito plantado
+(número trocado ou afirmação sem base contra a evidência; fato de referência removido), em
+evals/results/perturbed.json, entram na página misturadas às reais; com elas, TODO id da página é cego (page_id:
+HMAC com um sal aleatório da página, guardado em var/rotulagem_salt.json, fora do git), a mistura é embaralhada com o
+mesmo sal, e a importação volta ao id do caso por ele (id que nenhum sal guardado explica sai listado, nunca
+descartado em silêncio). O sal protege o id e a posição; o texto das adulteradas está em perturbed.json, e por isso
+quem rotula não abre o repositório. Sem elas o TNR do juiz contra pessoas não se mede (quase toda resposta real
+passa). O relatório separa: humano × automático e humano × humano só nas reais (a adulterada não é resposta do sistema
+nem passou pelas checagens); juiz × humano no total (com a composição: negativos reais + plantados), só nas reais e
+só nas adulteradas, com a mesma regra de validação — e o total só sai validado se, além do resto, houver >=
+evals.judge.VALIDATION_MIN_REAL_NEGATIVES negativos reais e o juiz os reprovar com TNR >=
+evals.judge.VALIDATION_MIN_RATE (evals.judge.PLANTED_RULE; senão é "validado só com negativos plantados", que com
+respostas reais é não validado); quanto cada pessoa e o juiz reprovaram das adulteradas (o juiz no conjunto todo, por
+tipo, sem depender de rótulo). Rótulo de adulterada cuja resposta não bate com a de perturbed.json (arquivo regerado
+depois) fica fora da conta, listado.
+
+"Juiz reprova" (judge_passes) segue as 3 perguntas da página: não fundamentada, idioma errado, vazamento OU não útil.
+A parte do "não útil" entrou depois de uma medida, e o relatório traz as duas leituras lado a lado, nas respostas
+reais (`leituras_reais`) e nas adulteradas (`leituras_plantadas`, e por tipo): antes = só evals.judge.verdict_fails
+(judge_passes_before); depois = + helpful, a em vigor.
+
+Motivo da escolha (coluna `selecao` do CSV): por que cada resposta real entrou na amostra — `aleatoria` (sorteio),
+`checagem` (uma checagem automática falhou) ou `juiz` (o juiz a reprovou: `--suspects` da página). A exportação grava
+no CSV; a página grava em evals/human_selection.json (por amostra, fora do HTML: quem rotula não sabe o que o juiz
+achou) e a importação passa para o CSV de cada pessoa. O juiz × humano só valida com o que não dependeu do juiz
+(evals.judge.SELECTION_RULE): o juiz reprova por construção o negativo que ele mesmo escolheu. Rótulo sem o motivo
+(de antes do registro) é `desconhecida` e também fica fora, à parte, com o escolhido pelo juiz (`fora_da_validacao`).
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
+import datetime
 import hashlib
+import hmac
 import json
+import os
 import random
+import secrets
 import sys
 from collections import defaultdict
+from collections.abc import Callable, Iterable
 from pathlib import Path
+
+from evals.judge import SELECTED_CHECK, SELECTED_JUDGE, SELECTED_PLANTED, SELECTED_RANDOM, SELECTED_UNKNOWN
 
 HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results"
 CSV_PATH = HERE / "human_labels.csv"
 OUT = RESULTS / "human_review.json"
+# Sais das páginas cegas: fora do git (var/ está no .gitignore) e de tudo que a página mostra.
+SALT_FILE = HERE.parent / "var" / "rotulagem_salt.json"
+# Motivo da escolha de cada resposta real, por página (record_selection): no git, com os rótulos; nunca na página.
+SELECTION_FILE = HERE / "human_selection.json"
 FIELDS = ["id", "split", "pergunta", "resposta", "fontes", "ferramentas", "humano", "nota", "tipo_falha",
-          "c1", "c2", "c3"]  # c1..c3: resposta de cada pergunta da página (sim/nao/naosei), vazio no --mark
+          "c1", "c2", "c3",  # c1..c3: resposta de cada pergunta da página (sim/nao/naosei), vazio no --mark
+          "selecao"]  # por que a resposta entrou na amostra (SELECTED_*); vazio = rótulo de antes do registro
 QUESTIONS = {"c1": "responde o que o cliente perguntou", "c2": "tem algo na resposta que não aparece no que ele tinha",
              "c3": "está no mesmo idioma da pergunta"}
 CONSENSUS = HERE / "human_consensus.json"
@@ -77,11 +109,54 @@ def csv_path(rater: str | None = None, base: Path = HERE) -> Path:
     return base / f"human_labels.{rater.lower()}.csv"
 
 
-def page_id(case_id: str) -> str:
-    """Id cego da página com adulteradas: real e adulterada ganham o mesmo formato (nada no id, nem no texto de
-    "Copiar minhas respostas", diz qual é qual) e a importação volta ao id do caso pelo mesmo cálculo, sem tabela
-    guardada fora do repositório."""
-    return "r" + hashlib.sha256(f"rotulagem:{case_id}".encode()).hexdigest()[:10]
+def page_id(case_id: str, salt: str) -> str:
+    """Id cego da página com adulteradas: HMAC-SHA256 do id do caso com o sal da página. Real e adulterada ganham o
+    mesmo formato (nada no id, nem no texto de "Copiar minhas respostas", diz qual é qual) e, sem o sal, o código não
+    refaz o caminho de volta do id (com hash sem segredo, bastava aplicar a função aos ids de perturbed.json); a ordem
+    da mistura é sorteada com o mesmo sal (scripts/label_page.py). O sal protege o id e a posição, não o texto: quem
+    abre evals/results/perturbed.json vê as adulteradas, e por isso quem rotula não abre o repositório. Sal aleatório
+    por página (new_salt), fora do que o rotulador vê; a importação usa o mesmo."""
+    return "r" + hmac.new(salt.encode("utf-8"), case_id.encode("utf-8"), hashlib.sha256).hexdigest()[:10]
+
+
+def _salts(path: Path) -> list[dict]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [e for e in data.get("salts") or [] if isinstance(e, dict) and e.get("salt")]
+
+
+def new_salt(use: str, path: Path | None = None) -> str:
+    """Sal novo para uma página ou rodada de consenso (`use` diz qual), acrescentado aos guardados: a importação de
+    uma página antiga continua achando o dela. Arquivo só do dono (0600) desde o primeiro byte, gravado de uma vez:
+    num temporário criado já com 0600 e trocado por os.replace (atômico). Gravar no lugar e só depois dar chmod
+    deixaria o sal legível pelos outros entre as duas chamadas, e uma queda no meio truncaria os sais das páginas
+    antigas (a importação delas perderia o caminho de volta)."""
+    path = path or SALT_FILE
+    salt = secrets.token_hex(16)
+    when = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
+    entries = [*_salts(path), {"salt": salt, "uso": use, "em": when}]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.{secrets.token_hex(4)}.tmp")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps({"salts": entries}, ensure_ascii=False, indent=1))
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            tmp.unlink()
+        raise
+    return salt
+
+
+def unblind(ids: Iterable[str], path: Path | None = None) -> dict[str, str]:
+    """{id cego: id do caso} com cada sal guardado (cada página tem o seu)."""
+    ids = list(ids)
+    return {page_id(i, e["salt"]): i for e in _salts(path or SALT_FILE) for i in ids}
 
 
 def tool_names(row: dict) -> list[str]:
@@ -104,16 +179,55 @@ def load_rows(results: Path = RESULTS) -> list[dict]:
     return rows
 
 
+def _check_failed(row: dict) -> bool:
+    return bool(row.get("crash")) or any(v is False for v in (row.get("checks") or {}).values())
+
+
 def suspected_ids(rows: list[dict], judge_path: Path | None = None) -> set[str]:
     """Casos com falha suspeita (alguma checagem automática falhou ou o juiz reprovou). Servem para enriquecer a
-    amostra humana com negativos: com 1 falha em 18 rótulos, o TNR do juiz não se mede (pede ~20 de cada classe)."""
-    out = {r["id"] for r in rows if r.get("crash") or any(v is False for v in (r.get("checks") or {}).values())}
+    amostra humana com negativos: com 1 falha em 18 rótulos, o TNR do juiz não se mede (pede ~20 de cada classe). Só
+    os da checagem validam o juiz: o que entrou porque o juiz reprovou, ele reprova por construção (_suspect_reason)."""
+    out = {r["id"] for r in rows if _check_failed(r)}
     jp = judge_path or (RESULTS / "judge.json")
     if jp.exists():
         for v in json.loads(jp.read_text(encoding="utf-8")).get("verdicts", []):
             if not v.get("grounded", True) or not v.get("helpful", True):
                 out.add(v["id"])
     return out
+
+
+def _suspect_reason(row: dict) -> str:
+    """Por que a suspeita entrou: checagem automática que falhou (entraria sem o juiz) ou, senão, o juiz."""
+    return SELECTED_CHECK if _check_failed(row) else SELECTED_JUDGE
+
+
+def pick_sample(rows: list[dict], n: int, seed: int = 7, suspects: int = 0, exclude: set[str] | None = None,
+                suspect_ids: set[str] | None = None) -> list[tuple[dict, str]]:
+    """(linha, motivo da escolha) de até `n` casos: até `suspects` com falha suspeita e o resto sorteado por split, sem
+    os `exclude`; a ordem é embaralhada e a página nunca mostra o motivo (quem rotula não vê o veredito automático).
+
+    O sorteio vem primeiro, entre todas as linhas: sorteado depois, ele perderia justo as que o juiz reprovou e
+    mediria o juiz numa amostra limpa delas (o TPR subiria pela escolha). As suspeitas saem do que sobrou, as da
+    checagem automática antes das do juiz (só aquelas validam o juiz, evals.judge.SELECTION_RULE); suspeita que o
+    sorteio já trouxe conta como sorteada. Se o sorteio levou suspeitas, o resto da página sai de outro sorteio."""
+    rows = [r for r in rows if r["id"] not in (exclude or set())]
+    bad = suspect_ids if suspect_ids is not None else suspected_ids(rows)
+    size = min(n, len(rows))
+    k = min(suspects, size, sum(r["id"] in bad for r in rows))
+    drawn = sample(rows, size - k, seed)
+    got = [(r, SELECTED_RANDOM) for r in drawn]
+    taken = {r["id"] for r in drawn}
+    rng = random.Random(seed)
+    pool = [r for r in rows if r["id"] in bad and r["id"] not in taken]
+    rng.shuffle(pool)
+    pool.sort(key=lambda r: _suspect_reason(r) != SELECTED_CHECK)  # estável: dentro de cada motivo, a ordem sorteada
+    got += [(r, _suspect_reason(r)) for r in pool[:k]]
+    if len(got) < size:
+        taken |= {r["id"] for r, _ in got}
+        got += [(r, SELECTED_RANDOM) for r in sample([r for r in rows if r["id"] not in taken], size - len(got),
+                                                     seed + 1)]
+    rng.shuffle(got)
+    return got
 
 
 def labeled_ids(base: Path = HERE) -> set[str]:
@@ -124,20 +238,20 @@ def labeled_ids(base: Path = HERE) -> set[str]:
     return out
 
 
+def labeled_by(raters: Iterable[str], base: Path = HERE) -> set[str]:
+    """Ids que estas pessoas já viram (o arquivo de cada uma; "dono" é o arquivo sem nome)."""
+    files = label_files(base)
+    out: set[str] = set()
+    for name in raters:
+        if path := files.get(name.strip().lower()):
+            out |= {r["id"] for r in read_labels(path) if r.get("id")}
+    return out
+
+
 def enriched_sample(rows: list[dict], n: int, seed: int = 7, suspects: int = 0, exclude: set[str] | None = None,
                     suspect_ids: set[str] | None = None) -> list[dict]:
-    """Até `suspects` casos com falha suspeita + o resto estratificado, sem os `exclude`. A página nunca mostra qual
-    é qual (quem rotula não vê o veredito automático), e a ordem é embaralhada."""
-    rows = [r for r in rows if r["id"] not in (exclude or set())]
-    bad = suspect_ids if suspect_ids is not None else suspected_ids(rows)
-    rng = random.Random(seed)
-    pool = [r for r in rows if r["id"] in bad]
-    rng.shuffle(pool)
-    picked = pool[:min(suspects, n)]
-    rest = sample([r for r in rows if r["id"] not in {p["id"] for p in picked}], n - len(picked), seed)
-    out = picked + rest
-    rng.shuffle(out)
-    return out
+    """As linhas de pick_sample, sem o motivo."""
+    return [r for r, _ in pick_sample(rows, n, seed, suspects, exclude, suspect_ids)]
 
 
 def sample(rows: list[dict], n: int, seed: int = 7) -> list[dict]:
@@ -160,10 +274,11 @@ def sample(rows: list[dict], n: int, seed: int = 7) -> list[dict]:
 def export(n: int, results: Path = RESULTS, path: Path = CSV_PATH, seed: int = 7,
            splits: set[str] | None = None) -> int:
     rows = [r for r in load_rows(results) if not splits or r.get("split") in splits]
-    return _write_csv(path, sample(rows, n, seed))
+    picked = sample(rows, n, seed)
+    return _write_csv(path, picked, {r["id"]: SELECTED_RANDOM for r in picked})
 
 
-def _write_csv(path: Path, rows: list[dict]) -> int:
+def _write_csv(path: Path, rows: list[dict], reasons: dict[str, str] | None = None) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=FIELDS)
@@ -179,9 +294,59 @@ def _write_csv(path: Path, rows: list[dict]) -> int:
                     "ferramentas": " ".join(tool_names(r)),
                     "humano": "",
                     "nota": "",
+                    "selecao": (reasons or {}).get(r["id"], ""),
                 }
             )
     return len(rows)
+
+
+# Do motivo que menos depende do juiz ao que mais: o caso rotulado em mais de uma página fica com o primeiro.
+_RANK = {SELECTED_RANDOM: 0, SELECTED_CHECK: 1, SELECTED_PLANTED: 1, SELECTED_JUDGE: 2}
+
+
+def best_reason(*reasons: str | None) -> str:
+    """O motivo de um caso visto em mais de uma página ou por mais de uma pessoa: o que menos depende do juiz (sorteado
+    numa página, entrou na amostra sem ele, ainda que outra o trouxesse pelo juiz); nenhum conhecido = desconhecida."""
+    known = [r for r in reasons if r in _RANK]
+    return min(known, key=_RANK.__getitem__) if known else SELECTED_UNKNOWN
+
+
+def record_selection(sample_id: str, reasons: dict[str, str], path: Path | None = None) -> None:
+    """Grava, antes de alguém rotular, por que cada resposta REAL da página `sample_id` (o `sample` que a página
+    guarda em cada ficha) entrou nela: a importação passa o motivo para o CSV de cada pessoa. Fica fora da página (ela
+    diria a quem rotula quais o juiz reprovou) e vai para o git com os rótulos; a mesma página gerada de novo troca só
+    a entrada dela. Gravado num temporário trocado de uma vez: queda no meio não perde as páginas de antes."""
+    path = path or SELECTION_FILE
+    try:
+        pages = json.loads(path.read_text(encoding="utf-8")).get("paginas") or []
+    except (OSError, ValueError):
+        pages = []
+    when = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
+    pages = [p for p in pages if isinstance(p, dict) and p.get("amostra") != sample_id]
+    pages.append({"amostra": sample_id, "em": when, "motivos": dict(sorted(reasons.items()))})
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.{secrets.token_hex(4)}.tmp")
+    try:
+        tmp.write_text(json.dumps({"paginas": pages}, ensure_ascii=False, indent=1), encoding="utf-8")
+        os.replace(tmp, path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            tmp.unlink()
+        raise
+
+
+def page_selection(sample_id: str | None, path: Path | None = None) -> dict[str, str]:
+    """{id do caso: motivo} da página `sample_id`; vazio se ela não registrou (rótulo de seleção desconhecida)."""
+    if not sample_id:
+        return {}
+    try:
+        pages = json.loads((path or SELECTION_FILE).read_text(encoding="utf-8")).get("paginas") or []
+    except (OSError, ValueError):
+        return {}
+    for p in reversed(pages):
+        if isinstance(p, dict) and p.get("amostra") == sample_id:
+            return {str(k): str(v) for k, v in (p.get("motivos") or {}).items()}
+    return {}
 
 
 def read_labels(path: Path = CSV_PATH) -> list[dict]:
@@ -216,30 +381,44 @@ def import_page(dump: Path, n: int | None = None, seed: int = 7, results: Path =
     """Fichas da página de rotulagem (scripts/label_page.py; a sessão lê `rotulos` com ArtifactData) → um CSV por
     pessoa, pelo mesmo caminho do --mark. Aceita a lista de documentos como vier ({"documents": [...]}, lista de
     {"data": {...}} ou de fichas). Nota: "fail:<tipo> <comentário>", como no --mark. Id cego (página com
-    adulteradas) volta ao id do caso; a adulterada entra no CSV com a resposta adulterada, a que a pessoa viu."""
+    adulteradas) volta ao id do caso pelos sais guardados (unblind); a adulterada entra no CSV com a resposta
+    adulterada, a que a pessoa viu. Devolve {pessoa: rótulos gravados}; marcação cujo id não é de caso nenhum (sal
+    da página perdido, página de outra rodada) não some: vai listada em `nao_mapeados` ({pessoa: [ids]}) e no aviso.
+    O motivo da escolha de cada resposta (coluna `selecao`) sai do registro da página pela `sample` da ficha
+    (page_selection); ficha sem `sample` ou página sem registro dá `desconhecida`, que não valida o juiz."""
     from evals import perturb
 
     raw = json.loads(dump.read_text(encoding="utf-8"))
     docs = raw.get("documents", raw.get("docs", [])) if isinstance(raw, dict) else raw
-    done: dict[str, int] = {}
+    done: dict = {}
+    unmapped: dict[str, list[str]] = {}
     live = {r["id"]: r for r in load_rows(results)}
+    planted = {r["id"] for r in perturb.load(results)}
     live.update({r["id"]: r for r in perturb.load(results)})
-    blind = {page_id(i): i for i in live}
+    blind = unblind(live)
     for doc in docs:
         data = doc.get("data", doc) if isinstance(doc, dict) else {}
         rater, marks = str(data.get("rater") or "").strip(), data.get("marks") or {}
         if not rater or not marks:
             continue
         marks = {blind.get(k, k): m for k, m in marks.items()}
+        if lost := sorted(k for k in marks if k not in live):
+            unmapped[rater] = lost
+            marks = {k: m for k, m in marks.items() if k in live}
+            if not marks:
+                done[rater] = 0
+                continue
+        chosen = page_selection(str(data.get("sample") or ""))
+        reasons = {i: SELECTED_PLANTED if i in planted else best_reason(chosen.get(i)) for i in marks}
         path = csv_path(rater, base)
         if not path.exists():  # o CSV nasce das linhas que a página mostrou (com --splits a amostra é outra)
-            _write_csv(path, [live[i] for i in marks if i in live])
+            _write_csv(path, [live[i] for i in marks if i in live], reasons)
         else:  # 2ª página da mesma pessoa: as respostas novas entram no CSV dela (antes eram ignoradas)
             have = {r["id"] for r in read_labels(path)}
             new = [live[i] for i in marks if i in live and i not in have]
             if new:
                 old_rows = read_labels(path)
-                _write_csv(path, new)
+                _write_csv(path, new, reasons)
                 added = read_labels(path)
                 with path.open("w", encoding="utf-8", newline="") as fh:
                     w = csv.DictWriter(fh, fieldnames=FIELDS)
@@ -253,18 +432,28 @@ def import_page(dump: Path, n: int | None = None, seed: int = 7, results: Path =
             note = " ".join(x for x in (m.get("tipo") or "", (m.get("nota") or "").replace(":", " ")) if x)
             pairs.append(f"{case_id}={verdict}" + (f":{note}" if verdict == "fail" and note else ""))
         done[rater] = mark(pairs, path)
-        _set_questions(path, {i: m for i, m in marks.items() if isinstance(m, dict)})
+        _set_questions(path, {i: m for i, m in marks.items() if isinstance(m, dict)}, reasons)
+    if unmapped:
+        done["nao_mapeados"] = unmapped
+        lost_n = sum(map(len, unmapped.values()))
+        print(f"AVISO: {lost_n} marcação(ões) com id que não é de caso nenhum nem de página com sal guardado em "
+              f"{SALT_FILE.name} (fora da conta, listadas em nao_mapeados): "
+              + "; ".join(f"{r}: {', '.join(ids)}" for r, ids in unmapped.items()), file=sys.stderr)
     return done
 
 
-def _set_questions(path: Path, marks: dict[str, dict]) -> None:
-    """Grava no CSV a resposta de cada pergunta da página (c1..c3): a concordância por pergunta sai daqui."""
+def _set_questions(path: Path, marks: dict[str, dict], reasons: dict[str, str] | None = None) -> None:
+    """Grava no CSV a resposta de cada pergunta da página (c1..c3): a concordância por pergunta sai daqui. Com
+    `reasons`, também o motivo da escolha das respostas desta página (o que menos depende do juiz, se a pessoa já a
+    viu em outra página: best_reason)."""
     rows = read_labels(path)
     for r in rows:
         m = marks.get(r["id"]) or {}
         for q in QUESTIONS:
             if m.get(q) in ("sim", "nao", "naosei"):
                 r[q] = m[q]
+        if reasons and r["id"] in reasons:
+            r["selecao"] = best_reason(r.get("selecao"), reasons[r["id"]])
     with path.open("w", encoding="utf-8", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=FIELDS)
         w.writeheader()
@@ -278,8 +467,9 @@ def import_text(text: str, results: Path = RESULTS, base: Path = HERE) -> dict:
     for line in text.splitlines():
         line = line.strip()
         if line.startswith("CONFERENCIA "):
-            parts = line.split(maxsplit=2)
-            cur = {"rater": parts[2] if len(parts) > 2 else "", "marks": {}}
+            parts = line.split(maxsplit=2)  # "CONFERENCIA <amostra> <nome>": a amostra acha o motivo da escolha
+            cur = {"rater": parts[2] if len(parts) > 2 else "", "marks": {},
+                   "sample": parts[1] if len(parts) > 1 else ""}
             docs.append({"data": cur})
         elif cur is not None and "=" in line:
             head, *qs = line.split()  # "id=fail:tipo c1=sim c2=sim c3=sim" (a página escreve as perguntas também)
@@ -396,8 +586,8 @@ def between_humans(by_rater: dict[str, dict[str, bool]], answers: dict[str, dict
 def divergences(base: Path = HERE, out: Path | None = None, results: Path = RESULTS) -> list[dict]:
     """O que os dois primeiros rotuladores marcaram diferente (veredito ou qualquer pergunta), para a rodada de
     consenso; grava evals/human_divergences.md legível para quem não é da área, com o modelo das linhas de volta.
-    Com adulterada entre as divergências, o arquivo usa o id cego da página para todas (page_id): o rótulo combinado
-    entra no juiz × humano, e o "~p" no título diria às duas qual resposta foi plantada antes de elas decidirem."""
+    Com adulterada entre as divergências, o arquivo usa id cego para todas (page_id, com sal novo guardado): o rótulo
+    combinado entra no juiz × humano, e o "~p" no título diria às duas qual resposta foi plantada antes de decidirem."""
     from evals import perturb
 
     files = label_files(base)
@@ -415,10 +605,10 @@ def divergences(base: Path = HERE, out: Path | None = None, results: Path = RESU
                           "veredito": {names[0]: a[i]["humano"], names[1]: b[i]["humano"]}, "perguntas": qs})
     word = {"pass": "certa", "fail": "errada", "sim": "sim", "nao": "não"}
     planted = {r["id"] for r in perturb.load(results)}
-    blind = any(d["id"] in planted for d in found)
+    salt = new_salt("consenso") if any(d["id"] in planted for d in found) else None
 
     def shown(case_id: str) -> str:
-        return page_id(case_id) if blind else case_id
+        return page_id(case_id, salt) if salt else case_id
 
     lines = [f"# Rodada de consenso ({names[0]} × {names[1]})", "",
              f"{len(found)} situações com marcação diferente. Leiam juntos cada uma (~20 s cada) e digam o rótulo "
@@ -439,11 +629,11 @@ def divergences(base: Path = HERE, out: Path | None = None, results: Path = RESU
 def import_consensus(text: str, base: Path = HERE, results: Path = RESULTS) -> dict:
     """Linhas `id=pass|fail[:tipo]` ou `id=diverge` (a linha "CONSENSO" e o resto são ignorados) →
     evals/human_consensus.json, que o --report usa no "depois do consenso". Id cego (divergências com adulterada)
-    volta ao id do caso."""
+    volta ao id do caso pelos sais guardados."""
     from evals import perturb
 
     known = [r["id"] for r in load_rows(results)] + [r["id"] for r in perturb.load(results)]
-    alias = {page_id(i): i for i in known}
+    alias = unblind(known)
     got: dict[str, dict] = {}
     for line in text.splitlines():
         line = line.strip().strip("`")
@@ -490,13 +680,22 @@ def _load_consensus(base: Path) -> dict | None:
 
 JUDGE_FILE, JUDGE_PERTURBED = "judge.json", "judge_perturbed.json"
 JUDGE_VERDICT = "fundamentada, útil, no idioma da pergunta e sem vazamento — as 3 perguntas da página"
+# As duas leituras do "juiz reprova", lado a lado nas respostas reais: o `helpful` entrou na definição depois de uma
+# medida, e trocar a régua depois de ver o número sem mostrar a de antes é caminho bifurcado.
+JUDGE_READINGS = {"antes": "não fundamentada, idioma errado ou vazamento (evals.judge.verdict_fails)",
+                  "depois": "não fundamentada, idioma errado, vazamento ou não atende ao pedido (+ helpful=False: as "
+                            "3 perguntas da página)"}
+JUDGE_READING_WHY = ("a pessoa reprova se qualquer das 3 perguntas da página sai ruim, e a 1ª é se a resposta "
+                     "atende ao pedido: sem o `helpful`, a resposta fundamentada que não atende contaria como erro do "
+                     "juiz, quando é só critério diferente")
 
 
 def judge_passes(v: dict) -> bool:
     """O juiz aprova pela mesma régua da pessoa. A página reprova se qualquer pergunta sai ruim: não responde ao
     pedido (c1), algo sem base (c2), idioma diferente (c3). O juiz responde as mesmas três em `helpful`, `grounded` e
     `language_ok` (mais o vazamento); deixar `helpful` de fora faria a resposta fundamentada que não atende ao pedido
-    (ex.: fato_removido) aparecer como erro do juiz, quando é só critério diferente. Campo ausente não reprova."""
+    (ex.: fato_removido) aparecer como erro do juiz, quando é só critério diferente. Campo ausente não reprova. A
+    leitura sem o `helpful` continua no relatório, ao lado (JUDGE_READINGS)."""
     from evals.judge import verdict_fails
 
     return not verdict_fails(v) and v.get("helpful", True) is not False
@@ -550,45 +749,95 @@ def _human_labels(by_rater: dict[str, dict[str, bool]], consensus: dict | None) 
     return human
 
 
+def judge_passes_before(v: dict) -> bool:
+    """A leitura de antes do "juiz reprova" (JUDGE_READINGS["antes"]): só evals.judge.verdict_fails, sem o `helpful`."""
+    from evals.judge import verdict_fails
+
+    return not verdict_fails(v)
+
+
 def judge_vs_humans(by_rater: dict[str, dict[str, bool]], consensus: dict | None,
-                    results: Path = RESULTS, perturbed: dict[str, dict] | None = None) -> dict | None:
+                    results: Path = RESULTS, perturbed: dict[str, dict] | None = None,
+                    selection: dict[str, str] | None = None) -> dict | None:
     """Juiz × humanos em respostas reais (método do rótulo em trace real) e nas adulteradas declaradas: o veredito
     do juiz pela régua da pessoa (judge_passes) contra o humano — o consenso quando houver, senão a concordância dos
     dois, senão o 1º rotulador. Complementa a calibração em casos construídos (judge.json `calibration`), que mede
     outra coisa: casos escritos à mão, com a evidência escrita à mão. Mesma regra de validação, fixada antes de medir
     (evals.judge.validation), no total, só nas reais e só nas adulteradas (`perturbed`: {id: linha de
-    perturbed.json}; o juiz delas vem de judge_perturbed.json, nunca do judge.json da manchete)."""
-    from evals.judge import tpr_tnr, validation
+    perturbed.json}; o juiz delas vem de judge_perturbed.json, nunca do judge.json da manchete). Bloco com adulterada
+    traz a composição dos negativos (`negativos_reais` + `negativos_plantados`) e o TNR do juiz nos reais
+    (`tnr_nos_reais`), e só valida se o juiz reprovar o mínimo de negativos reais (evals.judge.PLANTED_RULE, a parte
+    que entrou depois da revisão). As duas leituras do "juiz reprova" (JUDGE_READINGS: sem e com o `helpful`) saem
+    lado a lado nas reais (`leituras_reais`) e nas adulteradas (`leituras_plantadas`; por tipo, `juiz_reprova_antes`
+    ao lado de `juiz_reprova` em `adulteradas.por_tipo`): fato_removido é o tipo em que as duas mais se afastam.
+
+    `selection` ({id: motivo da escolha}, do CSV: report): todo bloco de validação conta só resposta real escolhida
+    sem depender do juiz (evals.judge.SELECTION_RULE) — positivos, negativos, `negativos_reais` e `tnr_nos_reais`. A
+    escolhida porque o juiz reprovou e a sem motivo gravado (id fora de `selection`: `desconhecida`) saem em
+    `fora_da_validacao`, por motivo, com o TNR do juiz nelas (diagnóstico, não validação); `selecao` dá a composição."""
+    from evals.judge import INDEPENDENT_SELECTION, tpr_tnr, validation
 
     pert = perturbed or {}
-    judge = {i: judge_passes(v) for i, v in (_first_run(results / JUDGE_FILE) or {}).items() if i not in pert}
+    verdicts = {i: v for i, v in (_first_run(results / JUDGE_FILE) or {}).items() if i not in pert}
     fake, stale = perturbed_verdicts(results, pert)
-    judge.update({i: judge_passes(v) for i, v in fake.items()})
+    verdicts.update(fake)
     human = _human_labels(by_rater, consensus)
-    pairs = {i: (judge[i], h) for i, h in sorted(human.items()) if i in judge}
-    if not pairs:
+    ids = [i for i in sorted(human) if i in verdicts]
+    if not ids:
         return None
+    chosen = {i: SELECTED_PLANTED if i in pert else best_reason((selection or {}).get(i)) for i in ids}
+    kept = [i for i in ids if chosen[i] in INDEPENDENT_SELECTION]
+    left = {m: [i for i in ids if chosen[i] == m] for m in (SELECTED_JUDGE, SELECTED_UNKNOWN)}
 
-    def block(ids: list[str]) -> dict | None:
-        ps = [pairs[i] for i in ids]
-        if not ps:
-            return None
+    def pairs(sub: list[str], passes: Callable[[dict], bool]) -> list[tuple[bool, bool]]:
+        return [(passes(verdicts[i]), human[i]) for i in sub]
+
+    def block(sub: list[str], passes: Callable[[dict], bool] = judge_passes, real_ones: bool = True) -> dict:
+        ps = pairs(sub, passes)
         stats = tpr_tnr(ps)
-        return {"casos": len(ps), "concordancia": round(sum(a == b for a, b in ps) / len(ps), 3), **stats,
-                "validacao": validation(stats)}
+        out = {"casos": len(ps), "concordancia": round(sum(a == b for a, b in ps) / len(ps), 3) if ps else None,
+               **stats, "juiz_reprova": sum(not j for j, _ in ps)}
+        real_stats = None
+        if any(i in pert for i in sub):  # plantado não vale por real: a composição vai junto da validação
+            real_stats = tpr_tnr([p for i, p in zip(sub, ps, strict=True) if i not in pert])
+            out |= {"negativos_reais": real_stats["negatives"],
+                    "negativos_plantados": stats["negatives"] - real_stats["negatives"],
+                    "tnr_nos_reais": real_stats["tnr"]}
+        # o que ficou fora pela escolha vai junto da regra, para o leitor ver que existe e não conta
+        out_left = {m: tpr_tnr(pairs(s, passes)) for m, s in left.items() if s} if real_ones else None
+        return {**out, "validacao": validation(stats, real_stats, out_left)}
 
-    out = {**block(list(pairs)), "veredito_do_juiz": JUDGE_VERDICT}
+    def readings(sub: list[str], real_ones: bool) -> dict:
+        return {"em_vigor": "depois", "por_que": JUDGE_READING_WHY,
+                "antes": {"regra": JUDGE_READINGS["antes"], **block(sub, judge_passes_before, real_ones)},
+                "depois": {"regra": JUDGE_READINGS["depois"], **block(sub, real_ones=real_ones)}}
+
+    real = [i for i in kept if i not in pert]
+    out = {**block(kept), "veredito_do_juiz": JUDGE_VERDICT,
+           "selecao": {m: n for m in (SELECTED_RANDOM, SELECTED_CHECK, SELECTED_PLANTED, SELECTED_JUDGE,
+                                      SELECTED_UNKNOWN) if (n := sum(c == m for c in chosen.values()))}}
+    if any(left.values()):
+        out["fora_da_validacao"] = {
+            m: {**block(s, real_ones=False), "humano_reprova": sum(not human[i] for i in s)}
+            for m, s in left.items() if s}
+        for b in out["fora_da_validacao"].values():
+            b.pop("validacao", None)  # diagnóstico: não tem regra de validação
+    if real:
+        out["leituras_reais"] = readings(real, True)
     if pert:
-        ids = [i for i in pairs if i in pert]
-        out["reais"] = block([i for i in pairs if i not in pert])
-        out["adulteradas"] = block(ids)
-        if out["adulteradas"]:
-            kinds: dict[str, list[tuple[bool, bool]]] = defaultdict(list)
-            for i in ids:
-                kinds[str(pert[i].get("perturbation"))].append(pairs[i])
+        planted_ids = [i for i in kept if i in pert]
+        out["reais"] = block(real) if real else None
+        out["adulteradas"] = block(planted_ids, real_ones=False) if planted_ids else None
+        if planted_ids:
+            out["leituras_plantadas"] = readings(planted_ids, False)
+            kinds: dict[str, list[str]] = defaultdict(list)
+            for i in planted_ids:
+                kinds[str(pert[i].get("perturbation"))].append(i)
             out["adulteradas"]["por_tipo"] = {
-                k: {"casos": len(ps), "humano_reprova": sum(not h for _, h in ps),
-                    "juiz_reprova": sum(not j for j, _ in ps)} for k, ps in sorted(kinds.items())}
+                k: {"casos": len(sub), "humano_reprova": sum(not human[i] for i in sub),
+                    "juiz_reprova": sum(not judge_passes(verdicts[i]) for i in sub),
+                    "juiz_reprova_antes": sum(not judge_passes_before(verdicts[i]) for i in sub)}
+                for k, sub in sorted(kinds.items())}
         if stale:
             out["aviso"] = stale
     return out
@@ -598,8 +847,9 @@ def perturbed_summary(pert: dict[str, dict], by_rater: dict[str, dict[str, bool]
                       results: Path = RESULTS) -> dict | None:
     """Quantas adulteradas existem e quantas entraram na rotulagem, de que tipos; quanto cada pessoa reprovou (a
     adulterada é também conferência de atenção de quem rotula) e quanto o juiz reprovou no conjunto inteiro, sem
-    depender de rótulo (é o canário em resposta real, com a evidência real). `dropped`: rótulos de adulterada cuja
-    resposta não é mais a de perturbed.json."""
+    depender de rótulo (é o canário em resposta real, com a evidência real), nas duas leituras do "juiz reprova"
+    (`reprovou` = a em vigor, judge_passes; `reprovou_antes` = só verdict_fails). `dropped`: rótulos de adulterada
+    cuja resposta não é mais a de perturbed.json."""
     from evals.perturb import FILE, TYPES
 
     if not pert:
@@ -612,12 +862,14 @@ def perturbed_summary(pert: dict[str, dict], by_rater: dict[str, dict[str, bool]
     fake, stale = perturbed_verdicts(results, pert)
     judge = None
     if fake:
-        per = {t: {"julgadas": 0, "reprovou": 0} for t in TYPES}
+        per = {t: {"julgadas": 0, "reprovou": 0, "reprovou_antes": 0} for t in TYPES}
         for i, v in fake.items():
-            k = per.setdefault(str(pert[i].get("perturbation")), {"julgadas": 0, "reprovou": 0})
+            k = per.setdefault(str(pert[i].get("perturbation")), {"julgadas": 0, "reprovou": 0, "reprovou_antes": 0})
             k["julgadas"] += 1
             k["reprovou"] += not judge_passes(v)
-        judge = {"julgadas": len(fake), "reprovou": sum(not judge_passes(v) for v in fake.values()), "por_tipo": per}
+            k["reprovou_antes"] += not judge_passes_before(v)
+        judge = {"julgadas": len(fake), "reprovou": sum(not judge_passes(v) for v in fake.values()),
+                 "reprovou_antes": sum(not judge_passes_before(v) for v in fake.values()), "por_tipo": per}
     return {"arquivo": FILE, "geradas": len(pert), "por_tipo": kinds(pert), "rotuladas": len(labeled),
             "rotuladas_por_tipo": kinds(labeled),
             "humano": {n: {"rotuladas": len(r), "reprovou": sum(not ok for ok in r.values())}
@@ -642,8 +894,11 @@ def report(results: Path = RESULTS, path: Path | None = None, out: Path = OUT, b
     answers: dict[str, dict[str, dict]] = {}
     per: dict[str, dict] = {}
     held: dict[str, dict | None] = {}
+    selection: dict[str, str] = {}  # motivo da escolha de cada caso, o que menos depende do juiz entre as pessoas
     for name, f in files.items():
         marked = [r for r in read_labels(f) if r["humano"] in ("pass", "fail")]
+        for r in marked:
+            selection[r["id"]] = best_reason(selection.get(r["id"]), r.get("selecao"))
         labeled = [r for r in marked if r["id"] in auto]
         if labeled:
             by_rater[name] = {r["id"]: r["humano"] == "pass" for r in labeled}
@@ -669,7 +924,7 @@ def report(results: Path = RESULTS, path: Path | None = None, out: Path = OUT, b
         "heldout": held.get(sorted(per)[0]) if per else None,
         # humano × humano só nas reais: negativo plantado (fácil de concordar) inflaria a concordância medida
         "entre_humanos": between_humans(by_rater, answers, consensus),
-        "juiz_x_humano": judge_vs_humans(every, consensus, results, pert),
+        "juiz_x_humano": judge_vs_humans(every, consensus, results, pert, selection),
         "adulteradas": perturbed_summary(pert, fake_by_rater, sorted(dropped), results),
         "aviso": None if first["rotulos"] >= 20 else f"só {first['rotulos']} rótulos: abaixo de 20 não dá para confiar",
     }
