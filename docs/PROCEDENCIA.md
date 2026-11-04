@@ -106,7 +106,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `evals/retrieval.d` | 0 | 81 | 0 | 0 |
 | `ops` | 669 | 2 | 1 | 1 |
 | `pyproject.toml` | 51 | 0 | 0 | 0 |
-| `reports` | 0 | 16 | 0 | 0 |
+| `reports` | 0 | 28 | 0 | 0 |
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
@@ -115,7 +115,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `tests` | 12008 | 3949 | 233 | 93 |
 | `tests/fixtures` | 70 | 0 | 0 | 0 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **15530** escritas no relógio (30% do total). Arquivos do kit alterados no relógio: 180. Fora da conta, por serem gerados: 152196 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **15542** escritas no relógio (30% do total). Arquivos do kit alterados no relógio: 180. Fora da conta, por serem gerados: 152196 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).
