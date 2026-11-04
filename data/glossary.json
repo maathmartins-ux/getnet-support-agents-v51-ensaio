@@ -1,9 +1,12 @@
 {
-  "_doc": "Glossário pt -> en do DESAFIO (agents.expand_query): chave = termo do corpus em português; valor = como o cliente pergunta em inglês. Preenchido pela frente K.",
+  "_doc": "Glossário pt -> en do DESAFIO (agents.expand_query): chave = termo do corpus em português; valor = como o cliente pergunta em inglês (texto ou lista; o 1º é a tradução pt -> en). Preenchido pela frente K; os 3 últimos e o \"POS terminal\" da maquininha vieram com os artigos da central de ajuda (grupo ajuda), conferidos no top-5 dos oficiais em inglês (scripts/official_check.py).",
   "antecipação": "receivables advance",
   "antecipação de recebíveis": "early receivables payment",
   "crediário": "store credit installment plan",
-  "maquininha": "card machine",
+  "maquininha": [
+    "card machine",
+    "POS terminal"
+  ],
   "parcelas": "installments",
   "parcelado": "installment payment",
   "link de pagamento": "payment link",
@@ -19,5 +22,15 @@
   "estorno": "refund",
   "aluguel": "rental",
   "comodato": "loan agreement",
-  "Get Conta": "bank account"
+  "Get Conta": "bank account",
+  "antecipação automática": [
+    "automatic advance",
+    "automatic receivables advance"
+  ],
+  "recebíveis": "receivables",
+  "problema de conexão": [
+    "connection problem",
+    "won't connect",
+    "can't connect"
+  ]
 }

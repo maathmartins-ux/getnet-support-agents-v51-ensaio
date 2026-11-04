@@ -1,25 +1,128 @@
 {
-  "_doc": "Páginas do site oficial da Getnet (site.getnet.com.br) para `python -m app.ingest` (frente K). Get Clássica/Get Smart não têm página própria com slug (get-smart redireciona para imagem); cobertas por todas-as-maquininhas, duvidas/get-smart e ofertas.",
-  "allowed_hosts": ["site.getnet.com.br"],
+  "_doc": "Páginas do site oficial da Getnet (site.getnet.com.br) para `python -m app.ingest` (frente K). Get Clássica/Get Smart não têm página própria com slug (get-smart redireciona para imagem); cobertas por todas-as-maquininhas, duvidas/get-smart e ofertas. Grupo `ajuda`: os artigos da central de ajuda (Get Ajuda), achados por `python scripts/ingest_render.py --discover --group ajuda` a partir do índice em `follow` (índice e categorias montados por JavaScript; o artigo tem o texto no HTML estático); só `follow` e `chrome` se editam à mão, `pages` é gravado pela descoberta; `chrome` = linhas da moldura que a regra de repetição não pega (variante do bloco de botões em 5 de 78 artigos), tiradas só quando a linha é igual. Saíram de `suporte` os 2 índices que davam 0 trechos (get-ajuda e get-ajuda-reserva-financeira: renderizados, só títulos e links das perguntas): o texto deles são os artigos do grupo `ajuda`.",
+  "allowed_hosts": [
+    "site.getnet.com.br"
+  ],
   "groups": {
-    "produtos": {"prefix": "prod", "pages": {
-      "todas-as-maquininhas": "https://site.getnet.com.br/todas-as-maquininhas/",
-      "ofertas-maquininha": "https://site.getnet.com.br/ofertas-maquininha-de-cartao-getnet-2/",
-      "pix": "https://site.getnet.com.br/pix/",
-      "get-conta": "https://site.getnet.com.br/conta-digital/",
-      "crediario": "https://site.getnet.com.br/crediario/",
-      "link-de-pagamento": "https://site.getnet.com.br/link-de-pagamento/",
-      "pagamentos-pelo-whatsapp": "https://site.getnet.com.br/pagamentos-pelo-whatsapp/",
-      "get-tap": "https://site.getnet.com.br/get-tap/",
-      "taxas": "https://site.getnet.com.br/taxas/"
-    }},
-    "suporte": {"prefix": "sup", "pages": {
-      "duvidas": "https://site.getnet.com.br/duvidas/",
-      "duvidas-get-smart": "https://site.getnet.com.br/duvidas/get-smart/",
-      "get-ajuda": "https://site.getnet.com.br/get-ajuda/",
-      "antecipacao": "https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/",
-      "reserva-financeira": "https://site.getnet.com.br/get-ajuda-reserva-financeira/",
-      "manual-maquinas": "https://site.getnet.com.br/boas-vindas/manual-maquinas/"
-    }}
+    "produtos": {
+      "prefix": "prod",
+      "pages": {
+        "todas-as-maquininhas": "https://site.getnet.com.br/todas-as-maquininhas/",
+        "ofertas-maquininha": "https://site.getnet.com.br/ofertas-maquininha-de-cartao-getnet-2/",
+        "pix": "https://site.getnet.com.br/pix/",
+        "get-conta": "https://site.getnet.com.br/conta-digital/",
+        "crediario": "https://site.getnet.com.br/crediario/",
+        "link-de-pagamento": "https://site.getnet.com.br/link-de-pagamento/",
+        "pagamentos-pelo-whatsapp": "https://site.getnet.com.br/pagamentos-pelo-whatsapp/",
+        "get-tap": "https://site.getnet.com.br/get-tap/",
+        "taxas": "https://site.getnet.com.br/taxas/"
+      }
+    },
+    "suporte": {
+      "prefix": "sup",
+      "pages": {
+        "duvidas": "https://site.getnet.com.br/duvidas/",
+        "duvidas-get-smart": "https://site.getnet.com.br/duvidas/get-smart/",
+        "antecipacao": "https://site.getnet.com.br/get-ajuda-reserva-financeira/antecipacao-reserva-financeira/",
+        "manual-maquinas": "https://site.getnet.com.br/boas-vindas/manual-maquinas/"
+      }
+    },
+    "ajuda": {
+      "prefix": "aj",
+      "follow": {
+        "from": [
+          "https://site.getnet.com.br/get-ajuda/"
+        ],
+        "path_prefix": "/get-ajuda-",
+        "depth": 2,
+        "max_pages": 300,
+        "pause_s": 1.0
+      },
+      "chrome": [
+        "Precisa de mais informações?",
+        "ACESSAR · Fale já · Vamos começar",
+        "Fale já · Vamos começar"
+      ],
+      "pages": {
+        "plugins-digitais-que-a-getnet-trabalha": "https://site.getnet.com.br/get-ajuda-ecommerce/plugins-digitais-que-a-getnet-trabalha/",
+        "erro-adq-4-83": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-4-83/",
+        "erro-adq-4-91": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-4-91/",
+        "erro-adq-1-50": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-50/",
+        "o-que-e-chargeback": "https://site.getnet.com.br/get-ajuda-chargeback/o-que-e-chargeback/",
+        "como-trocar-o-domicilio-bancario": "https://site.getnet.com.br/get-ajuda-cadastro/como-trocar-o-domicilio-bancario/",
+        "como-estornar-uma-venda-na-maquininha-getnet": "https://site.getnet.com.br/get-ajuda-chargeback/como-estornar-uma-venda-na-maquininha-getnet/",
+        "sobre-o-conciliador-essencial": "https://site.getnet.com.br/get-ajuda-conciliador-essencial/sobre-o-conciliador-essencial/",
+        "o-que-e-o-get-tap-e-como-funciona": "https://site.getnet.com.br/get-ajuda-get-tap/o-que-e-o-get-tap-e-como-funciona/",
+        "como-utilizar-o-get-tap": "https://site.getnet.com.br/get-ajuda-get-tap/como-utilizar-o-get-tap/",
+        "como-habilitar-e-vender-com-pix-no-get-tap": "https://site.getnet.com.br/get-ajuda-get-tap/como-habilitar-e-vender-com-pix-no-get-tap/",
+        "plano-de-recebimento-reduzido": "https://site.getnet.com.br/get-ajuda-receba-ja/plano-de-recebimento-reduzido/",
+        "sobre-o-conversor-de-moedas": "https://site.getnet.com.br/get-ajuda-conversor-de-moedas/sobre-o-conversor-de-moedas/",
+        "sobre-o-desligamento-da-recarga-de-celular": "https://site.getnet.com.br/get-ajuda-recarga-de-celular-pre-desligamento/sobre-o-desligamento-da-recarga-de-celular/",
+        "como-acessar-as-minhas-vendas-realizadas": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/como-acessar-as-minhas-vendas-realizadas/",
+        "como-consultar-os-status-das-minhas-vendas": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/como-consultar-os-status-das-minhas-vendas/",
+        "quais-possiveis-status-das-minhas-vendas": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/quais-possiveis-status-das-minhas-vendas/",
+        "como-fazer-uma-venda-na-maquininha-getnet": "https://site.getnet.com.br/get-ajuda-maquininha/como-fazer-uma-venda-na-maquininha-getnet/",
+        "como-pedir-uma-maquininha-adicional": "https://site.getnet.com.br/get-ajuda-maquininha/como-pedir-uma-maquininha-adicional/",
+        "como-habilitar-o-recebimento-de-vendas-via-pix-no-aplicativo-getnet-brasil": "https://site.getnet.com.br/get-ajuda-pix/como-habilitar-o-recebimento-de-vendas-via-pix-no-aplicativo-getnet-brasil/",
+        "como-fazer-uma-venda-com-pix-na-maquininha": "https://site.getnet.com.br/get-ajuda-pix/como-fazer-uma-venda-com-pix-na-maquininha/",
+        "como-utilizo-o-pix-por-biometria": "https://site.getnet.com.br/get-ajuda-pix/como-utilizo-o-pix-por-biometria/",
+        "como-atualizar-seus-dados-cadastrais-no-aplicativo-getnet-brasil": "https://site.getnet.com.br/get-ajuda-cadastro/como-atualizar-seus-dados-cadastrais-no-aplicativo-getnet-brasil/",
+        "como-finalizar-seu-cadastro-no-aplicativo-getnet-brasil-e-comecar-a-aceitar-pagamentos": "https://site.getnet.com.br/get-ajuda-cadastro/como-finalizar-seu-cadastro-no-aplicativo-getnet-brasil-e-comecar-a-aceitar-pagamentos/",
+        "o-que-e-a-get-conta": "https://site.getnet.com.br/get-ajuda-get-conta/o-que-e-a-get-conta/",
+        "como-acesso-a-minha-get-conta": "https://site.getnet.com.br/get-ajuda-get-conta/como-acesso-a-minha-get-conta/",
+        "como-realizo-uma-transferencia-e-quais-os-limites-diarios": "https://site.getnet.com.br/get-ajuda-get-conta/como-realizo-uma-transferencia-e-quais-os-limites-diarios/",
+        "como-configurar-o-wi-fi-na-sua-maquininha-getnet": "https://site.getnet.com.br/get-ajuda-configuracoes/como-configurar-o-wi-fi-na-sua-maquininha-getnet/",
+        "como-consultar-minhas-vendas": "https://site.getnet.com.br/get-ajuda-configuracoes/como-consultar-minhas-vendas/",
+        "funcionalidades-portal-minha-conta-e-app-getnet-brasil": "https://site.getnet.com.br/get-ajuda-configuracoes/funcionalidades-portal-minha-conta-e-app-getnet-brasil/",
+        "como-antecipar-sua-vendas-pelo-app": "https://site.getnet.com.br/get-ajuda-antecipacao-de-venda/como-antecipar-sua-vendas-pelo-app/",
+        "como-habilitar-antecipacao-automatica-pelo-portal": "https://site.getnet.com.br/get-ajuda-antecipacao-de-venda/como-habilitar-antecipacao-automatica-pelo-portal/",
+        "como-habilitar-antecipacao-automatica-pelo-app": "https://site.getnet.com.br/get-ajuda-antecipacao-de-venda/como-habilitar-antecipacao-automatica-pelo-app/",
+        "como-habilitar-vale-refeicao-va-e-vale-alimentacao-vr-no-aplicativo-getnet-brasil": "https://site.getnet.com.br/get-ajuda-voucher/como-habilitar-vale-refeicao-va-e-vale-alimentacao-vr-no-aplicativo-getnet-brasil/",
+        "o-que-e-o-pat": "https://site.getnet.com.br/get-ajuda-voucher/o-que-e-o-pat/",
+        "como-cancelar-produtos-e-servicos": "https://site.getnet.com.br/get-ajuda-cancelamento/como-cancelar-produtos-e-servicos/",
+        "como-cancelar-a-parceria": "https://site.getnet.com.br/get-ajuda-cancelamento/como-cancelar-a-parceria/",
+        "reserva-financeira": "https://site.getnet.com.br/get-ajuda-reserva-financeira/reserva-financeira/",
+        "como-acompanhar-entrega-get-mini": "https://site.getnet.com.br/get-ajuda-rastreamento/como-acompanhar-entrega-get-mini/",
+        "o-que-e-dirf": "https://site.getnet.com.br/get-ajuda-imposto-de-renda/o-que-e-dirf/",
+        "taxas-por-transacao": "https://site.getnet.com.br/get-ajuda-taxas/taxas-por-transacao/",
+        "descontinuacao-whatsapp-business": "https://site.getnet.com.br/get-ajuda-whatsapp-business/descontinuacao-whatsapp-business/",
+        "erro-adq-4-30": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-4-30/",
+        "erro-adq-4-23": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-4-23/",
+        "erro-adq-4-27": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-4-27/",
+        "erro-idl-1-04": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-idl-1-04/",
+        "erro-idl-1-36": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-idl-1-36/",
+        "erro-s-2074": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-s-2074/",
+        "erro-adq-1-02": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-02/",
+        "erro-adq-1-21": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-21/",
+        "erro-adq-3-30": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-3-30/",
+        "erro-adq-1-33": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-33/",
+        "erro-adq-1-07": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-07/",
+        "erro-idl-1-08": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-idl-1-08/",
+        "erro-adq-1-19": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-19/",
+        "erro-adq-1-06": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-06/",
+        "erro-adq-1-87": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-87/",
+        "erro-nfc": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-nfc/",
+        "erro-adq-1-18": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-18/",
+        "erro-adq-1-84": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-84/",
+        "erro-adq-1-85": "https://site.getnet.com.br/get-ajuda-erros-maquininha/erro-adq-1-85/",
+        "como-estornar-uma-venda-pelo-aplicativo-getnet-brasil": "https://site.getnet.com.br/get-ajuda-chargeback/como-estornar-uma-venda-pelo-aplicativo-getnet-brasil/",
+        "sobre-o-chargeback": "https://site.getnet.com.br/get-ajuda-chargeback/sobre-o-chargeback/",
+        "como-cancelar-minhas-vendas": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/como-cancelar-minhas-vendas/",
+        "como-exportar-minhas-vendas-pix": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/como-exportar-minhas-vendas-pix/",
+        "onde-consultar-uma-venda-cancelada": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/onde-consultar-uma-venda-cancelada/",
+        "entenda-o-que-e-venda-autorizada-aprovada-e-desfeita": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/entenda-o-que-e-venda-autorizada-aprovada-e-desfeita/",
+        "como-emitir-carta-status": "https://site.getnet.com.br/get-ajuda-gestao-de-vendas/como-emitir-carta-status/",
+        "solucoes-get-smart": "https://site.getnet.com.br/get-ajuda-maquininha/solucoes-get-smart/",
+        "como-acessa-o-manual-da-sua-maquininha-getnet": "https://site.getnet.com.br/get-ajuda-maquininha/como-acessa-o-manual-da-sua-maquininha-getnet/",
+        "simulador-calculadora-de-vendas": "https://site.getnet.com.br/get-ajuda-maquininha/simulador-calculadora-de-vendas/",
+        "como-solicitar-a-manutencao-da-maquininha-getnet": "https://site.getnet.com.br/get-ajuda-maquininha/como-solicitar-a-manutencao-da-maquininha-getnet/",
+        "como-habilitar-pix-pelo-portal": "https://site.getnet.com.br/get-ajuda-pix/como-habilitar-pix-pelo-portal/",
+        "como-desabilitar-o-recebimento-de-vendas-via-pix-no-aplicativo-getnet-brasil": "https://site.getnet.com.br/get-ajuda-pix/como-desabilitar-o-recebimento-de-vendas-via-pix-no-aplicativo-getnet-brasil/",
+        "como-redefinir-a-senha-aplicativo": "https://site.getnet.com.br/get-ajuda-cadastro/como-redefinir-a-senha-aplicativo/",
+        "como-cancelar-a-minha-get-conta": "https://site.getnet.com.br/get-ajuda-get-conta/como-cancelar-a-minha-get-conta/",
+        "o-que-e-tarifa-de-inatividade": "https://site.getnet.com.br/get-ajuda-get-conta/o-que-e-tarifa-de-inatividade/",
+        "configuracoes-da-sua-maquininha": "https://site.getnet.com.br/get-ajuda-configuracoes/configuracoes-da-sua-maquininha/"
+      }
+    }
   }
 }

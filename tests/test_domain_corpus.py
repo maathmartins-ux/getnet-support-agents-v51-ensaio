@@ -2,11 +2,12 @@
 
 import hashlib
 import json
+from collections import Counter
 
 import pytest
 
 from app.config import ROOT
-from app.ingest import MAX_CHARS, MIN_CHARS, is_allowed, load_sources
+from app.ingest import MAX_CHARS, MIN_CHARS, SHORT_PAGE, is_allowed, load_sources
 
 CORPUS = ROOT / "data" / "knowledge"
 
@@ -28,10 +29,20 @@ def test_corpus_is_literal_sized_hashed_and_from_allowed_hosts(corpus):
     hosts = load_sources(ROOT / "data" / "sources.json")["allowed_hosts"]
     ids = [d["id"] for d in corpus]
     assert len(ids) == len(set(ids)), "id duplicado no corpus"
+    per_url = Counter(d["url"] for d in corpus)
     for d in corpus:
         assert is_allowed(d["url"], hosts), d["url"]
-        assert MIN_CHARS <= len(d["text"]) <= MAX_CHARS, d["id"]
+        # artigo curto de central de ajuda (ingest.build no modo artigo) é 1 trecho só, abaixo do mínimo
+        low = SHORT_PAGE if per_url[d["url"]] == 1 else MIN_CHARS
+        assert low <= len(d["text"]) <= MAX_CHARS, d["id"]
         assert d["sha256"] == hashlib.sha256(d["text"].encode("utf-8")).hexdigest(), d["id"]
+
+
+def test_corpus_has_no_empty_page_file():
+    """Arquivo de página com 0 trecho (0 byte) foi apontado na avaliação cega da rodada 11 (get-ajuda.jsonl e
+    reserva-financeira.jsonl): página sem trecho sai de sources.json ou entra pela central de ajuda."""
+    empty = [str(f.relative_to(ROOT)) for f in sorted(CORPUS.rglob("*.jsonl")) if not f.read_text("utf-8").strip()]
+    assert not empty, empty
 
 
 def test_retrieval_questions_point_to_existing_ids(corpus):
