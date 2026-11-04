@@ -32,6 +32,48 @@ def test_extract_drops_chrome_and_scripts():
     assert extract(html) == ("T", ["Texto visível"])
 
 
+def test_h1_inside_header_is_the_page_title_line_but_the_rest_of_the_header_stays_out():
+    """Artigo de central de ajuda (tema de WordPress): o h1 mora no <header> do banner. Sem ele, os 22 artigos de
+    erro da maquininha tinham o mesmo texto ("Quando ocorre... Solução: 1. Clique na tecla de Função") e o dedupe
+    deixava 1 deles; o menu do cabeçalho do site continua fora."""
+    from app.ingest import extract_sections
+
+    html = ("<html><head><title>Erro ADQ 4-91 - Loja</title></head><body><header class='site'><nav>Menu · Entrar"
+            "</nav><p>Já é cliente?</p></header><header class='banner'><img alt=''><h1>Erro ADQ 4-91: erro na "
+            "aprovação</h1><p>subtítulo do banner</p></header><main><h2>Quando ocorre: na venda.</h2><p>1. Clique na "
+            "tecla de Função</p></main><svg><title>ícone</title></svg><title>Título repetido por JS</title></body>")
+    title, pairs = extract_sections(html)
+    assert title == "Erro ADQ 4-91 - Loja"  # só o 1º <title>; o do SVG e o repetido não grudam no título
+    assert [t for _, t in pairs] == ["Erro ADQ 4-91: erro na aprovação", "Quando ocorre: na venda.",
+                                     "1. Clique na tecla de Função"]
+    assert pairs[0][0] == "Erro ADQ 4-91: erro na aprovação"  # o h1 também é a seção da própria linha
+    torto = "<header><h1>Título sem fechar</header><p>Texto do corpo da página.</p>"  # HTML torto não pula o resto
+    assert [t for _, t in extract_sections(torto)[1]] == ["Título sem fechar", "Texto do corpo da página."]
+    assert extract_sections("<nav><header><h1>Logo</h1></header></nav><p>Corpo.</p>")[1] == [("", "Corpo.")]
+    # título curto não cola no botão do fim da moldura de cima (outra seção): "AVANÇAR · O que é DIRF" escapava
+    curto = "<div><p>Open</p><p>AVANÇAR</p></div><header><h1>O que é DIRF</h1></header><p>A DIRF é a declaração.</p>"
+    assert [t for _, t in extract_sections(curto)[1]] == ["Open · AVANÇAR", "O que é DIRF", "A DIRF é a declaração."]
+
+
+def test_listed_chrome_lines_leave_and_nothing_else_does(tmp_path):
+    """Variante do bloco de botões em poucas páginas ("ACESSAR · Fale já · Vamos começar" em 5 de 78; nas outras,
+    "Clique aqui · ...") escapa da regra de repetição: o grupo lista a linha em `chrome` e só a linha igual sai."""
+    body = " ".join(f"Passo {n} do artigo de ajuda sobre a maquininha." for n in range(9))
+    pages = {f"a{i}": f"https://loja.example.com/a{i}" for i in range(5)}
+
+    def fake_fetch(url, hosts):
+        first = "ACESSAR" if url.endswith("a0") else "Clique aqui"
+        return (f"<title>{url}</title><p>{body} Página {url}.</p><div><p>{first}</p><p>Fale já</p>"
+                f"<p>Vamos começar</p></div><p>Para cancelar o serviço {url[-2:]}, ligue 4002-4000.</p>")
+
+    default = build(pages, tmp_path / "padrao", HOSTS, "aj", fetcher=fake_fetch)
+    assert "ACESSAR · Fale já · Vamos começar" in default["a0"][-1]["text"]  # a variante escapava
+    out = build(pages, tmp_path / "lista", HOSTS, "aj", fetcher=fake_fetch,
+                drop={"ACESSAR · Fale já · Vamos começar", "Fale já"})
+    assert all("Fale já" not in r["text"] for recs in out.values() for r in recs)
+    assert all("4002-4000" in recs[-1]["text"] for recs in out.values())  # o resto fica
+
+
 def test_chunk_respects_bounds_and_is_literal():
     lines = [f"Frase número {i} sobre o prazo de entrega da loja." for i in range(60)]
     joined = "\n".join(lines)  # linhas do HTML seguem separadas por quebra de linha dentro do trecho
@@ -79,6 +121,27 @@ def test_build_drops_repeated_site_chrome_and_writes_jsonl(tmp_path):
     rows = [json.loads(line) for f in sorted(tmp_path.glob("*.jsonl")) for line in f.read_text("utf-8").splitlines()]
     assert sum(len(v) for v in out.values()) == len(rows) > 0
     assert all(menu not in r["text"] and r["id"].startswith("ajuda-") for r in rows)
+
+
+def test_page_without_chunks_leaves_no_file_and_article_mode_keeps_a_short_article(tmp_path):
+    """Página sem trecho não deixa arquivo de 0 byte (nem o velho); no modo artigo (central de ajuda), o
+    artigo inteiro entre SHORT_PAGE e MIN_CHARS vira 1 trecho em vez de sumir."""
+    from app.ingest import SHORT_PAGE
+
+    pages = {"curta": "https://loja.example.com/curta", "vazia": "https://loja.example.com/vazia"}
+    (tmp_path / "vazia.jsonl").write_text('{"id": "velho"}\n', encoding="utf-8")  # de uma ingestão anterior
+
+    def fake_fetch(url, hosts):
+        if "vazia" in url:
+            return "<title>V</title><p>Só uma frase de aviso.</p>"
+        return "<title>C</title><p>" + "Passo curto do artigo de ajuda. " * 8 + "</p>"
+
+    assert build(pages, tmp_path, HOSTS, "aj", fetcher=fake_fetch) == {"curta": [], "vazia": []}
+    assert not list(tmp_path.glob("*.jsonl"))
+    out = build(pages, tmp_path, HOSTS, "aj", fetcher=fake_fetch, articles=True)
+    assert [r["id"] for r in out["curta"]] == ["aj-curta-01"] and out["vazia"] == []
+    assert SHORT_PAGE <= len(out["curta"][0]["text"]) < MIN_CHARS
+    assert [p.name for p in tmp_path.glob("*.jsonl")] == ["curta.jsonl"]
 
 
 def test_short_table_cells_are_glued_and_repeated_price_table_is_kept_once(tmp_path):

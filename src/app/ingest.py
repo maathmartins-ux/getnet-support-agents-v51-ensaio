@@ -150,8 +150,12 @@ class _TextExtractor(HTMLParser):
         self.lines: list[tuple[str, str]] = []  # (seção, linha)
         self._buf: list[str] = []
         self._skip = 0
+        self._header = 0  # <header> abertos (também contam em _skip)
+        self._lifted = 0  # _skip guardado enquanto lê o h1 de dentro de um <header>
         self.title = ""
         self._in_title = False
+        self._title_done = False  # só o 1º <title> (o do <head>): o 2º, de JS ou de SVG, duplicava o título
+        self._extra_titles = 0  # <title> além do 1º: texto que não aparece na página, pulado como script
         self.section = ""
         self._heading: list[str] | None = None
         self._tables = 0
@@ -174,10 +178,20 @@ class _TextExtractor(HTMLParser):
             self._cell = None
 
     def handle_starttag(self, tag, attrs):
+        if tag == "h1" and self._skip and self._skip == self._header:
+            # h1 dentro de <header> (e de nada mais que se pula): é o título da página no banner do artigo (tema de
+            # WordPress, central de ajuda), não o menu. Medido no desafio: 79 de 80 artigos da central tinham o h1
+            # assim, e o trecho saía sem o nome do erro ("Erro ADQ 4-91") que o separa dos outros 21 erros.
+            self._lifted, self._skip = self._skip, 0
         if tag in SKIP_TAGS:
             self._skip += 1
+            self._header += tag == "header"
         elif tag == "title":
-            self._in_title = True
+            if self._title_done or self._skip:
+                self._skip += 1
+                self._extra_titles += 1
+            else:
+                self._in_title = True
         if self._table_depth and not self._skip:
             self._table_tag(tag, attrs)
             return
@@ -206,10 +220,20 @@ class _TextExtractor(HTMLParser):
             self._cell.append(" ")
 
     def handle_endtag(self, tag):
-        if tag in SKIP_TAGS and self._skip:
-            self._skip -= 1
+        if tag in SKIP_TAGS and (self._skip or self._lifted):
+            if self._skip:
+                self._skip -= 1
+            else:  # </header> antes do </h1> (HTML torto): fecha o que estava guardado
+                self._lifted -= 1
+            if tag == "header" and self._header:
+                self._header -= 1
         elif tag == "title":
-            self._in_title = False
+            if self._extra_titles:
+                self._extra_titles -= 1
+                self._skip -= bool(self._skip)
+            else:
+                self._title_done = self._title_done or self._in_title
+                self._in_title = False
         if self._table_depth and not self._skip:
             if tag == "table":
                 self._table_depth -= 1
@@ -227,6 +251,8 @@ class _TextExtractor(HTMLParser):
             self._heading = None
         if tag in BLOCK_TAGS:
             self._flush()
+        if tag == "h1" and self._lifted:  # fim do h1 do <header>: o resto do cabeçalho volta a ser pulado
+            self._skip, self._lifted = self._lifted, 0
 
     def handle_data(self, data):
         if self._in_title:
@@ -261,13 +287,18 @@ def glue_short(lines: list) -> list:
     ter linhas < 15 caracteres, e o cenário oficial "diferença entre Get Clássica e Get Smart" ficava sem fonte.
     Juntas, as células viram uma linha de tabela; menus juntos viram uma linha repetida em toda página e saem
     pela regra de repetição.
-    Aceita linhas soltas ou pares (seção, linha); a linha colada fica com a seção da primeira.
+    Aceita linhas soltas ou pares (seção, linha); a linha colada fica com a seção da primeira. Não cola através de
+    uma troca de seção: o título curto ("O que é DIRF", h1 do artigo) colava no botão do fim da moldura de cima
+    ("AVANÇAR · O que é DIRF") e a linha colada, única, escapava da regra de repetição.
     """
     pairs = [ln if isinstance(ln, tuple) else (None, ln) for ln in lines]
     out: list = []
     run: list[tuple] = []
     for item in [*pairs, None]:
         if item is not None and len(item[1]) < SHORT and not isinstance(item[1], TableLine):
+            if run and item[0] != run[0][0]:
+                out.append((run[0][0], " · ".join(t for _, t in run)))
+                run = []
             run.append(item)
             continue
         if run:
@@ -475,13 +506,23 @@ def fetch(url: str, allowed_hosts: set[str] | list[str]) -> str:
         return resp.read().decode("utf-8", errors="replace")
 
 
-def build(pages: dict[str, str], out_dir: Path, allowed_hosts, prefix: str = "doc",
-          fetcher=fetch) -> dict[str, list[dict]]:
+SHORT_PAGE = 200  # modo artigo: página inteira abaixo de MIN_CHARS e com isso ou mais vira 1 trecho
+
+
+def build(pages: dict[str, str], out_dir: Path, allowed_hosts, prefix: str = "doc", fetcher=fetch,
+          articles: bool = False, drop: frozenset[str] | set[str] = frozenset()) -> dict[str, list[dict]]:
     """Baixa, extrai e grava um grupo.
 
     Linha curta repetida em metade das páginas (ou 3+) é chrome do site (menu, cookie) e sai. Linha LONGA repetida
     (>= KEEP_REPEATED, ex.: tabela de preços que o site repete em toda página de produto) é conteúdo: fica só na
     primeira página em que aparece, em vez de sumir de todas.
+
+    `articles` (artigos de central de ajuda, scripts/ingest_render.py --discover): a página cujo texto inteiro fica
+    entre SHORT_PAGE e MIN_CHARS vira 1 trecho, em vez de nenhum. Medido no desafio: o erro S-2074 (título + 6
+    passos, 291 caracteres) é a resposta inteira e saía do corpus. `drop`: linhas de moldura que a regra de repetição
+    não pega (variante de bloco de botões em poucas páginas), listadas em `chrome` do grupo no sources.json; só a
+    linha inteira igual sai. Página sem trecho não deixa arquivo (o 0 byte de get-ajuda.jsonl foi apontado na
+    avaliação); um arquivo velho dela é apagado.
     """
     fetched_at = datetime.now(UTC).isoformat(timespec="seconds")
     parsed = {slug: (url, *extract_sections(fetcher(url, allowed_hosts))) for slug, url in pages.items()}
@@ -492,7 +533,7 @@ def build(pages: dict[str, str], out_dir: Path, allowed_hosts, prefix: str = "do
     kept_once: set[str] = set()
 
     def keep(line: str) -> bool:
-        if len(line) < SHORT:
+        if len(line) < SHORT or line in drop:
             return False
         if freq[line] < max(3, len(parsed) // 2):
             return True
@@ -502,7 +543,10 @@ def build(pages: dict[str, str], out_dir: Path, allowed_hosts, prefix: str = "do
         return False
 
     for slug, (url, title, pairs) in parsed.items():
-        chunks = chunk_sections([(sec, ln) for sec, ln in pairs if keep(ln)])
+        lines = [(sec, ln) for sec, ln in pairs if keep(ln)]
+        chunks = chunk_sections(lines)
+        if not chunks and articles and SHORT_PAGE <= len(whole := LINE_SEP.join(t for _, t in lines)) <= MAX_CHARS:
+            chunks = [(lines[0][0], whole)]
         recs = []
         for r in records(slug, url, title, [c for _, c in chunks], fetched_at, prefix,
                          contexts=[context(title, sec) for sec, _ in chunks]):
@@ -510,7 +554,11 @@ def build(pages: dict[str, str], out_dir: Path, allowed_hosts, prefix: str = "do
                 seen.add(r["sha256"])
                 recs.append(r)
         result[slug] = recs
-        with (out_dir / f"{slug}.jsonl").open("w", encoding="utf-8", newline="\n") as fh:
+        path = out_dir / f"{slug}.jsonl"
+        if not recs:
+            path.unlink(missing_ok=True)
+            continue
+        with path.open("w", encoding="utf-8", newline="\n") as fh:
             for r in recs:
                 fh.write(json.dumps(r, ensure_ascii=False) + "\n")
     return result
