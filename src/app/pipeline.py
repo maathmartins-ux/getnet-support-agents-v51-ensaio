@@ -160,6 +160,17 @@ def _fix_language(answer: str, final: _Check, *, ctx: Context, evidence: list[st
     return (fixed, after) if ok else (answer, final)
 
 
+def _lost_live_values(before: str, after: str, outcome, language: str) -> bool:
+    """A checagem de frases cortou um valor obrigatório do dado ao vivo que a resposta trazia antes dela?"""
+    from .agents import live_missing
+
+    for r in outcome.results:
+        must = getattr(r, "live_must", None)
+        if must and len(live_missing(after, must, language)) > len(live_missing(before, must, language)):
+            return True
+    return False
+
+
 def _drops_live_values(outcome, language: str) -> bool:
     """A resposta redigida pelo supervisor deixou de fora um valor obrigatório (mínima, máxima, chance de chuva; venda
     e compra) que o texto do especialista de dado ao vivo traz?"""
@@ -358,8 +369,19 @@ def _handle(req: ChatRequest, user_id: str, identity_verified: bool = True) -> C
         answer, evidence=evidence, said=said, ctx=ctx, outcome=outcome, handoff=handoff, route=route, public=public)
     # depois dos números: frase sem base e ação oferecida que não existe (CLAIMS_POLICY remove | flag | off)
     answer = _scrub_internal(answer, language)
+    blocked = any(r.agent == "hold" for r in outcome.results)
+    before_claims = answer
     answer, claim_report = claims.enforce(answer, evidence=evidence[:-1], question=verdict.text, card=card,
-                                          writes_blocked=any(r.agent == "hold" for r in outcome.results))
+                                          writes_blocked=blocked)
+    if _lost_live_values(before_claims, answer, outcome, language):
+        # a checagem de frases tirou, junto com um conselho sem base ("leve guarda-chuva"), a frase que trazia um valor
+        # obrigatório do dado ao vivo: vale o texto do especialista (que já passou pela conferência dos valores), com a
+        # mesma checagem de frases
+        METRICS.inc("claims_cut_live_value_total")
+        specialist = "\n\n".join(r.text for r in outcome.results if r.text)
+        answer, claim_report = claims.enforce(_scrub_internal(mask_output(specialist, public=public), language),
+                                              evidence=evidence[:-1], question=verdict.text, card=card,
+                                              writes_blocked=blocked)
     if case_action == "escalate":  # 2º ciclo sem sucesso: humano, com as tentativas, qualquer que seja o motivo
         if not handoff.required:
             ctx.handoff_reason = "unresolved_after_cycles"

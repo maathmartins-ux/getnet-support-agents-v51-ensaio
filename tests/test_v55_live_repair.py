@@ -77,3 +77,18 @@ def test_final_answer_that_drops_a_live_value_falls_back_to_the_specialist_text(
     plain = agents.AgentResult("faq", "ok", text="Texto sem dado ao vivo.")
     out.results, out.answer = [plain], "Qualquer coisa."
     assert not _drops_live_values(out, "pt")  # sem live_must: nada a conferir
+
+
+def test_claims_cut_that_takes_a_live_value_is_detected():
+    """A checagem de frases tirou a frase "78% de chuva, leve guarda-chuva": o valor obrigatório saiu junto."""
+    from app.pipeline import _lost_live_values
+    from app.supervisor import Outcome
+
+    r = agents.AgentResult("faq", "ok", text="Low 19 °C, high 24 °C, up to 81% chance of rain.")
+    r.live_must = _weather().must
+    out = Outcome(engine="llm")
+    out.results = [r]
+    before = "Low 19 °C and high 24 °C. Up to 81% chance of rain, so take an umbrella."
+    assert _lost_live_values(before, "Low 19 °C and high 24 °C.", out, "en")
+    assert not _lost_live_values(before, before, out, "en")
+    assert not _lost_live_values("Low 19 °C.", "Low 19 °C.", out, "en")  # já faltava antes: não foi a checagem
