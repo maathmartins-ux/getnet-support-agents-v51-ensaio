@@ -346,9 +346,9 @@ e como comparar pela primeira entrega.
 | 22:32:42 | 618 | eval: offline com a ordem do denso e o portão pela nota do cross (gate de intenção 90,5%) |
 | 23:21:59 | 667 | eval offline no código atual (corpus com quebra de linha, cartão com listas fechadas, buscador dense+cross:base) |
 | 02:16:03 | 841 | eval: bateria integral ao vivo da rodada 10 no código 35020c4 (12 splits complete, US$ 13,73 de conversa) |
-| 02:53:40 | 879 | docs: README sem afirmações velhas (check, ablação, red team), DEMO da bateria final; check espera 180 s pela 1ª subida do container |
+| 02:55:29 | 880 | fix: conferência da linha do tempo vale o total declarado (a tabela mostra só os marcos; kit 39d90dc) |
 
-Do primeiro ao último commit: **879 min**, 130 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **880 min**, 132 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>
