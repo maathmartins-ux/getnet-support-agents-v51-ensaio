@@ -25,3 +25,12 @@ parcial é texto fixo (`_offer_human_on_gap`), não depende da redação.
 fundamentadas 0,97, decisão do supervisor LLM nas 30 execuções; latência p50 ~15 s. Prova:
 `tests/test_supervisor_fast.py::test_single_step_confident_plan_skips_the_supervisor_llm` (atalho, quando ligado) e
 `tests/test_v54_rehearsal_guards.py::test_supervisor_llm_decides_every_turn_by_default`.
+
+**Adendo (rodada 11): achado como informação.** No motor LLM o `needs` não vira passo imposto: chega ao
+modelo no tool_result e o modelo decide; uma volta de lembrete se ele encerrar sem atender, e o achado ignorado de
+novo fica contado (`outcome: ignored`, `need_ignored`). Só o motor de tabela (offline, queda do LLM, atalho)
+insere, e ele segue a regra do supervisor quando outro especialista já respondeu (responde com ele e oferece o
+humano, em vez de escalar o turno). Motivo: as 3 réguas da rodada 10 viram 19% dos passos ao vivo inseridos pelo
+código, sem ganho na ablação. Prova:
+`tests/test_supervisor_needs_budget.py::test_llm_engine_reminds_once_when_the_model_ignores_the_finding` e
+`tests/test_supervisor_needs_budget.py::test_table_does_not_escalate_a_partial_turn_when_another_specialist_answered`.

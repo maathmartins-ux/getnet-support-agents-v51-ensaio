@@ -1,17 +1,20 @@
 # Modelo de ameaças (frente Q)
 
-Escopo: API `/chat` → guardrail → roteador → supervisor → agentes (faq/RAG, records/ferramentas, web) → resposta.
+Escopo: API `/chat` e o servidor MCP (`/mcp`: ask, search_knowledge, crm_tool) → guardrail → roteador → supervisor →
+agentes (faq/RAG, records/ferramentas, web) → resposta; console do operador (`/handoffs`, `/operator`) e `/metrics`.
 Fronteiras de confiança: cliente ↔ API (token), API ↔ LLM, agentes ↔ ferramentas do CRM, agentes ↔ web/base.
 
 ## STRIDE
 
 | ameaça | controle | arquivo | teste |
 |---|---|---|---|
-| S: identidade forjada no corpo | AUTH_MODE required: identidade só do token assinado | src/app/auth.py, src/app/api.py | tests/test_domain_http.py::test_bad_token_is_401, test_required_without_token_is_401 |
+| S: identidade forjada no corpo | AUTH_MODE required: identidade só do `sub` do JWT validado pelo PyJWT (o `alg` aceito é o da chave do `kid`; token malformado = 401) | src/app/auth.py, src/app/api.py | tests/test_domain_http.py::test_bad_token_is_401, test_required_without_token_is_401; tests/test_identity.py::test_signed_but_malformed_token_gets_401_not_500 |
 | T: injeção indireta altera instrução | documento com instrução embutida descartado na carga | src/app/guardrails.py (looks_like_injection), src/app/ingest.py | tests/test_domain_guardrails.py::test_indirect_injection_in_document_is_detected |
 | R: ação sem rastro | trilha de observabilidade e ações pendentes com aprovação | src/app/observability.py, src/app/actions.py | split approval (evals/cases.jsonl) |
+| R: aprovação anônima pelo token compartilhado (admin) | chave pessoal por operador (`OPERATOR_KEYS`, auditoria com o nome); `APP_ENV=production` não sobe sem ela | src/app/auth.py, src/app/api.py | tests/test_api.py::test_production_refuses_shared_operator_and_open_metrics |
 | I: vazamento de dado de outro cliente | regex other_user_data + escopo do user_id nas tools + máscara de PII | src/app/guardrails.py, src/app/tools.py | casos q-guard-07..11; juiz `leak` (calibração q-cal) |
-| D: abuso de volume | limite por IP no modo demo | src/app/api.py | tests/test_auth_modes.py (rate limit) |
+| I: `/metrics` exposto na borda | Bearer `METRICS_TOKEN` (obrigatório com `APP_ENV=production`; o Prometheus do overlay endurecido lê de segredo); só contadores agregados, sem `user_id` | src/app/api.py, ops/prometheus.hardened.yml | tests/test_api.py::test_production_refuses_shared_operator_and_open_metrics |
+| D: abuso de volume | rate limit por cliente que falha fechado, a mesma cota no `/chat` e nas ferramentas do `/mcp` (trocar de canal não dobra); limite por IP no modo demo | src/app/api.py, src/app/mcp_server.py | tests/test_auth_modes.py (rate limit); tests/test_mcp.py::test_mcp_tools_share_the_chat_rate_limit |
 | E: jailbreak para papel de admin | guardrail regex + LLM; ferramentas não têm operação de admin | src/app/guardrails.py | q-guard-03..06 |
 
 ## OWASP LLM Top 10 (2025)

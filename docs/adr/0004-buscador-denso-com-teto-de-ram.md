@@ -71,3 +71,12 @@ e não reprova); o teto de 4096 MB não foi testado contra uma falta real de mem
   diferenças são de 1 a 2 perguntas em 59: empate técnico com vantagem no recall, não uma vitória medida com folga.
 - O limiar da nota gravado na escolha vale só para a mesma busca (modelo, ordem, pool e caracteres); precedência
   ambiente → escolha → domínio, como os outros limiares.
+
+**Emenda (rodada 11): nota par a par e só o que o redator lê.** O cross-encoder int8 tem quantização dinâmica: a
+escala sai do lote inteiro, então a nota de um par mudava com os vizinhos (medido no corpus do ensaio, até 0,51 de
+diferença entre o lote de 10 e o de 5). Agora ele pontua um par por chamada e, na ordem `base`, só os k trechos
+devolvidos: a nota fica a mesma no agente, no eval e na calibração, e o custo do cross por consulta caiu de cerca de
+1,26 s para 0,42 s. Depois de mudar o buscador ou o cross, o limiar do portão se recalibra
+(`--calibrate-rerank-gate --apply`). As buscas do plano rodam em paralelo (`FAQ_SEARCH_PARALLEL`, padrão 2, que
+limita a RAM extra a 2 inferências) e o item Retrieval do README é gerado de `data/retriever.json` (bloco
+`retriever`). Prova: `tests/test_r11_cross_base_order.py::test_base_order_scores_only_the_k_returned_with_the_same_ids_and_notes`.

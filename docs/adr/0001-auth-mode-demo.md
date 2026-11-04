@@ -16,6 +16,8 @@ O compose padrão fica em `required`; o desafio que exige o payload literal sobe
 
 **Consequências.** O avaliador cola o payload do enunciado e funciona; ninguém confunde demo com
 segurança, porque a resposta diz `identity_verified=false`. Os dois modos têm teste
-(`tests/test_auth_modes.py`), incluindo o abuso de girar `user_id`. Em produção: `required` +
-JWT/OIDC no lugar do HMAC (a interface `verify_token -> user_id` é a mesma) e `APP_ENV=production`,
-que recusa subir com segredo padrão.
+(`tests/test_auth_modes.py`), incluindo o abuso de girar `user_id`. Em produção: `required` + o JWT do
+kit (PyJWT, EdDSA/RS256 com JWKS) ou o OIDC do provedor de identidade (a interface `verify_token -> user_id` é
+a mesma) e `APP_ENV=production`, que recusa subir com segredo padrão, sem chave pessoal de operador
+(`OPERATOR_KEYS`) e sem `METRICS_TOKEN` forte
+(`tests/test_api.py::test_production_refuses_shared_operator_and_open_metrics`).
