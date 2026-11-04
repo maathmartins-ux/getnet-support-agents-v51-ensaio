@@ -66,7 +66,7 @@ if (( DRY == 0 && ${AVAIL_GB:-99} < MIN_RAM )); then
 fi
 
 if [[ -z "$SPLITS" ]]; then  # todos os splits presentes nos casos, na ordem em que aparecem
-  SPLITS="$("$PY" -c "import json,pathlib; s=[]; [s.append(c['split']) for p in ['evals/cases.jsonl', *sorted(map(str, pathlib.Path('evals').glob('cases.d/*.jsonl'))), 'evals/heldout_blind.jsonl'] if pathlib.Path(p).exists() for c in map(json.loads, filter(str.strip, open(p, encoding='utf-8'))) if c['split'] not in s]; print(','.join(s))")"
+  SPLITS="$("$PY" -c "import json,pathlib; s=[]; [s.append(c['split']) for p in ['evals/cases.jsonl', *sorted(map(str, pathlib.Path('evals').glob('cases.d/*.jsonl'))), 'evals/heldout_blind.jsonl', *sorted(map(str, pathlib.Path('evals').glob('heldout_blind.d/*.jsonl')))] if pathlib.Path(p).exists() for c in map(json.loads, filter(str.strip, open(p, encoding='utf-8'))) if c['split'] not in s]; print(','.join(s))")"
 fi
 IFS=',' read -r -a LIST <<< "$SPLITS"
 CLEAN=()

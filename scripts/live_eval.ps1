@@ -39,7 +39,7 @@ $env:PYTHONIOENCODING = "utf-8"
 $Splits = @($Splits | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 if ($Splits.Count -eq 0) {
     # Todos os splits presentes nos casos, na ordem em que aparecem.
-    $Splits = & $py -c "import json,pathlib; s=[]; [s.append(c['split']) for p in ['evals/cases.jsonl', *sorted(map(str, pathlib.Path('evals').glob('cases.d/*.jsonl'))), 'evals/heldout_blind.jsonl'] if pathlib.Path(p).exists() for c in map(json.loads, filter(str.strip, open(p, encoding='utf-8'))) if c['split'] not in s]; print(' '.join(s))"
+    $Splits = & $py -c "import json,pathlib; s=[]; [s.append(c['split']) for p in ['evals/cases.jsonl', *sorted(map(str, pathlib.Path('evals').glob('cases.d/*.jsonl'))), 'evals/heldout_blind.jsonl', *sorted(map(str, pathlib.Path('evals').glob('heldout_blind.d/*.jsonl')))] if pathlib.Path(p).exists() for c in map(json.loads, filter(str.strip, open(p, encoding='utf-8'))) if c['split'] not in s]; print(' '.join(s))"
     $Splits = $Splits -split ' '
 }
 
