@@ -76,7 +76,7 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 |---|---:|---:|---:|---:|
 | `.claude` | 121 | 0 | 0 | 0 |
 | `.dockerignore` | 15 | 0 | 0 | 0 |
-| `.env.example` | 42 | 16 | 7 | 1 |
+| `.env.example` | 42 | 26 | 8 | 1 |
 | `.github` | 155 | 17 | 3 | 1 |
 | `.gitignore` | 7 | 3 | 0 | 1 |
 | `.gitleaks.toml` | 14 | 4 | 1 | 1 |
@@ -84,38 +84,40 @@ arquivos gerados, como `evals/results/`, ficam fora da conta):
 | `Dockerfile` | 72 | 7 | 5 | 1 |
 | `Makefile` | 38 | 2 | 2 | 1 |
 | `OWNERSHIP.json` | 89 | 0 | 0 | 0 |
-| `README.md` | 319 | 118 | 77 | 1 |
-| `data` | 34 | 409 | 32 | 4 |
+| `README.md` | 319 | 174 | 93 | 1 |
+| `data` | 34 | 431 | 32 | 4 |
 | `data/crm` | 0 | 30 | 0 | 0 |
 | `data/intent_examples.d` | 0 | 28 | 0 | 0 |
 | `data/knowledge` | 0 | 201 | 0 | 0 |
 | `docker-compose.demo.yml` | 10 | 0 | 0 | 0 |
-| `docker-compose.hardened.yml` | 37 | 0 | 0 | 0 |
+| `docker-compose.hardened.yml` | 37 | 23 | 7 | 1 |
 | `docker-compose.scale.yml` | 28 | 0 | 0 | 0 |
 | `docker-compose.yml` | 91 | 3 | 0 | 1 |
-| `docs` | 429 | 1247 | 28 | 5 |
-| `docs/adr` | 255 | 66 | 37 | 2 |
+| `docs` | 429 | 1297 | 32 | 6 |
+| `docs/adr` | 255 | 95 | 44 | 4 |
 | `docs/changelog.d` | 806 | 0 | 0 | 0 |
 | `docs/video` | 0 | 174 | 0 | 0 |
-| `evals` | 4993 | 2825 | 248 | 16 |
-| `evals/cases.d` | 0 | 66 | 0 | 0 |
-| `evals/cassettes` | 0 | 1466 | 0 | 0 |
+| `evals` | 4993 | 4266 | 361 | 16 |
+| `evals/cases.d` | 0 | 73 | 0 | 0 |
+| `evals/cassettes` | 0 | 1781 | 0 | 0 |
 | `evals/essential` | 0 | 1529 | 0 | 0 |
+| `evals/heldout_blind.d` | 0 | 40 | 0 | 0 |
 | `evals/judge_calibration.d` | 0 | 48 | 0 | 0 |
 | `evals/proxy` | 286 | 0 | 0 | 0 |
-| `evals/retrieval.d` | 0 | 81 | 0 | 0 |
-| `ops` | 669 | 2 | 1 | 1 |
-| `pyproject.toml` | 51 | 0 | 0 | 0 |
+| `evals/retrieval.d` | 0 | 70 | 0 | 0 |
+| `evals/validation` | 0 | 1970 | 0 | 0 |
+| `ops` | 669 | 140 | 1 | 2 |
+| `pyproject.toml` | 51 | 5 | 0 | 1 |
 | `reports` | 0 | 28 | 0 | 0 |
 | `requirements-dev.lock` | 252 | 0 | 0 | 0 |
 | `requirements-hybrid.lock` | 282 | 0 | 0 | 0 |
 | `requirements.lock` | 149 | 0 | 0 | 0 |
-| `scripts` | 4505 | 1064 | 385 | 26 |
-| `src/app` | 10844 | 2159 | 119 | 25 |
-| `tests` | 12008 | 3949 | 233 | 93 |
-| `tests/fixtures` | 70 | 0 | 0 | 0 |
+| `scripts` | 4505 | 1516 | 445 | 26 |
+| `src/app` | 10844 | 2926 | 306 | 28 |
+| `tests` | 12008 | 6653 | 294 | 97 |
+| `tests/fixtures` | 70 | 7 | 0 | 1 |
 
-Total: **36679** linhas do kit (commit `16ecd02`) e **15542** escritas no relógio (30% do total). Arquivos do kit alterados no relógio: 180. Fora da conta, por serem gerados: 152196 linhas em `evals/results/`.
+Total: **36679** linhas do kit (commit `16ecd02`) e **23567** escritas no relógio (39% do total). Arquivos do kit alterados no relógio: 194. Fora da conta, por serem gerados: 159924 linhas em `evals/results/`.
 <!-- kit:end -->
 
 Linha do tempo commit a commit, com as tags `clock-start` e `clock-end`: [TIMESHEET.md](TIMESHEET.md).

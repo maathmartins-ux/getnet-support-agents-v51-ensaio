@@ -363,11 +363,6 @@ e como comparar pela primeira entrega.
 | hora (UTC; Brasília = UTC−3) | min | commit |
 |---|---:|---|
 | 12:15:01 | 0 | chore: repositório (antes do relógio) |
-| 13:50:15 | 95 | spec: taxonomia, desempates, parcial, standalone; casos replan 20, dependent 11, parallel 4, approval 4, memory 16 |
-| 14:10:29 | 115 | eval: fumaça ao vivo official repeat 1 (10/10 intent, 0 handoff, US$ 0,195, 0 erros; 01/04/06 parciais) |
-| 14:13:58 | 119 | eval: rodada 1 ao vivo, splits completos antes do OOM (approval 4, parallel 4, partial 5; status complete) |
-| 14:14:17 | 119 | eval: gravações ao vivo (cassettes) de official, approval, parallel, partial para o replay no CI |
-| 14:27:04 | 132 | eval: rodada 1 ao vivo (official/memory repeat 3, real, official-var, hard, guardrail, heldout complete; juiz 266 casos, official fundamentadas 30/30; memória expects_fact 50%; replan e dependent abortaram por teto, fora) |
 | 15:57:49 | 223 | eval: confirmação ao vivo — memory repeat 3 complete (pass@1 0,92, fato da conversa 86,1%, números 100%); replan e dependent abortaram por cota (16/20 e 8/11), fora; juiz re-rodado (US$ 6,61) |
 | 16:54:26 | 279 | eval: confirmação v5.5 ao vivo, official repeat 3 com denso+cross (sem fallback): resolvidas 100%, pass^3 0,90, juiz fundamentadas 0,967 / úteis 1,00; official-02 run 0 com número sem base (clima não confirmado) |
 | 18:50:56 | 396 | eval: oficiais ao vivo (1fa7c26, repeat 3, denso+cross): resolvidas 29/30, pass^3 0,90, juiz fundamentadas 0,933 / úteis 1,00, sem tarja |
@@ -381,9 +376,14 @@ e como comparar pela primeira entrega.
 | 23:21:59 | 667 | eval offline no código atual (corpus com quebra de linha, cartão com listas fechadas, buscador dense+cross:base) |
 | 02:16:03 | 841 | eval: bateria integral ao vivo da rodada 10 no código 35020c4 (12 splits complete, US$ 13,73 de conversa) |
 | 07:15:56 | 1141 | eval offline no commit dos prompts novos (gate verde) |
-| 07:16:55 | 1142 | live_eval: lotes cegos do held-out em heldout_blind.d/ entram na bateria (kit) |
+| 07:33:45 | 1159 | eval: bateria integral ao vivo da rodada 11 no código ff8afed (14 splits complete, hitl e lote cego H3; US$ 15,33 de conversa) |
+| 07:40:08 | 1165 | eval: ablação ao vivo sem o achado nas 40 perguntas reais, no mesmo código da bateria (US$ 1,63) |
+| 07:40:08 | 1165 | eval: ablação em commits com o mesmo código sem AVISO; gold de busca citado onde está (kit 30e19cf) |
+| 07:45:05 | 1170 | eval: respostas adulteradas da bateria da rodada 11 com o juiz delas e a página 4 de rotulagem congelada (28 itens) |
+| 07:46:25 | 1171 | eval: relatório humano pela regra do mesmo texto (rótulos de outra bateria fora e listados) e eval offline no código atual |
+| 07:47:02 | 1172 | docs: DEMO dos oficiais regenerado da bateria da rodada 11 (ff8afed) |
 
-Do primeiro ao último commit: **1142 min**, 149 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
+Do primeiro ao último commit: **1172 min**, 158 commits (aqui os 20 marcos; todos em `docs/TIMESHEET.md`).
 <!-- timeline:end -->
 
 </details>

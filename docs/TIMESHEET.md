@@ -1,11 +1,11 @@
 # Linha do tempo (gerada do `git log`)
 
-Relógio: **446 min** de 03/11/2026 13:45:50 a 21:12:12 (commit de scaffold ('chore: scaffold') ao último commit; horário do commit, fuso UTC). 89 commits dentro do relógio, 0 depois (declarados abaixo).
+Relógio: **1081 min** de 03/11/2026 13:45:50 a 07:47:02 (commit de scaffold ('chore: scaffold') ao último commit; horário do commit, fuso UTC). 149 commits dentro do relógio, 0 depois e 1 antes (declarados abaixo).
 Maior rajada: 28 commits em até 10 min a partir de 13:48:57.
 
 | min | hora | autor | arquivos | commit | relógio |
 |---:|---|---|---:|---|---|
-| -90.8 | 12:15:01 | Claude | 1 | `c973f88` chore: repositório (antes do relógio) | dentro |
+| -90.8 | 12:15:01 | Claude | 1 | `c973f88` chore: repositório (antes do relógio) | antes do relógio |
 | 0.0 | 13:45:50 | Claude | 295 | `16ecd02` chore: scaffold from entregar-desafio-cronometrado kit v5.4.0 | dentro |
 | 3.1 | 13:48:57 | Claude | 24 | `c6d3a95` chore: pré-voo (domínio challenge no lugar; suíte 964 passed, 95 skipped) | dentro |
 | 3.1 | 13:48:57 | Claude | 2 | `92f6fda` spec: oficiais (10 casos com expect.facts e expect.entities) | dentro |
@@ -94,3 +94,66 @@ Maior rajada: 28 commits em até 10 min a partir de 13:48:57.
 | 442.4 | 21:08:15 | Claude | 25 | `8f72f8e` eval: bateria completa ao vivo no código final 8fc2c32 (12 splits complete, juiz 0,942/0,9 | dentro |
 | 443.6 | 21:09:29 | Claude | 3 | `b12e89a` domínio: 'preciso de conta?' responde com a Get Conta; clima sempre com temperaturas | dentro |
 | 446.4 | 21:12:12 | Claude | 4 | `3de0e10` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 455.0 | 21:20:50 | Claude | 13 | `3dd0695` eval: oficiais ao vivo 30/30 (pass^3 1,00, juiz 1,00/1,00) com fatos estritos; 2ª página d | dentro |
+| 455.0 | 21:20:51 | Claude | 2 | `cbe474c` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 455.8 | 21:21:40 | Claude | 2 | `6af380d` kit: replay das gravações no check; calibração do portão rerank com --apply | dentro |
+| 455.8 | 21:21:40 | Claude | 2 | `19c594c` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 463.9 | 21:29:45 | Claude | 21 | `bdcceac` docs: README sem contagem de rótulos escrita à mão; juiz 'não validado' coerente por split | dentro |
+| 463.9 | 21:29:45 | Claude | 2 | `ede6b08` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 485.9 | 21:51:46 | Claude | 11 | `25c7dd8` corpus: páginas que vinham vazias renderizadas (ofertas, WhatsApp, taxas: +23 trechos, ids | dentro |
+| 490.7 | 21:56:33 | Claude | 8 | `38e7863` README: §3 em uma linha por tema (tabela completa em docs/COBERTURA.md), linha do tempo só | dentro |
+| 490.7 | 21:56:34 | Claude | 2 | `6c8fca3` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 515.5 | 22:21:18 | Claude | 4 | `5102cfd` domínio: portão sem fonte recalibrado no corpus ampliado (--calibrate-rerank-gate --apply: | dentro |
+| 515.5 | 22:21:19 | Claude | 2 | `b52c8f4` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 526.3 | 22:32:08 | Claude | 17 | `2ee3bb9` busca: gold re-rotulado às cegas após o corpus ampliado (2 rotuladores, Jaccard 0,857); or | dentro |
+| 526.9 | 22:32:42 | Claude | 2 | `53a2e1e` eval: offline com a ordem do denso e o portão pela nota do cross (gate de intenção 90,5%) | dentro |
+| 526.9 | 22:32:43 | Claude | 1 | `bcf4dc4` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 541.8 | 22:47:39 | Claude | 7 | `1136604` kit: comparativo do buscador mede a ordem do denso com a nota do cross no portão | dentro |
+| 551.0 | 22:56:50 | Claude | 11 | `c3aaa79` kit: frentes k1 (juiz × adulteradas declaradas) e k5 (quem decidiu cada passo); escolha do | dentro |
+| 551.2 | 22:57:00 | Claude | 2 | `d153d86` busca: escolha gravada pelo --choose-retriever --fast (dense+cross:base), no formato padrã | dentro |
+| 566.4 | 23:12:16 | Claude | 20 | `2b6b920` corpus: quebra de linha entre os blocos da página; cartão com as listas fechadas das consu | dentro |
+| 566.9 | 23:12:46 | Claude | 1 | `3f59e89` gitignore: worktrees dos agentes (.claude/worktrees/), como no kit | dentro |
+| 576.1 | 23:21:59 | Claude | 1 | `ef0f16d` eval offline no código atual (corpus com quebra de linha, cartão com listas fechadas, busc | dentro |
+| 585.3 | 23:31:09 | Claude | 9 | `b7f4520` busca: as duas ordens medidas no caminho do agente; ADR 0004 com o critério novo e a ressa | dentro |
+| 592.0 | 23:37:50 | Claude | 3 | `320e7c5` prompts do domínio: taxa só do produto que o trecho nomeia; filtro limita a conclusão; hel | dentro |
+| 606.1 | 23:51:59 | Claude | 7 | `2e7a986` clima e câmbio conferidos; período com o padrão de cada consulta; pedido sem data no perío | dentro |
+| 617.6 | 00:03:29 | Claude | 5 | `0e877bf` kit 68ec1bf: resposta final conferida no dado ao vivo; fumaça não regrava o cassete do CI | dentro |
+| 624.1 | 00:09:59 | Claude | 9 | `f816673` relógio do negócio (kit bd5b04c) também nas tools do domínio: o dia do cliente, não o do s | dentro |
+| 631.3 | 00:17:08 | Claude | 4 | `8d0f480` kit d4c0849: checagem de frases não corta o valor obrigatório do dado ao vivo; prompts sem | dentro |
+| 639.4 | 00:25:15 | Claude | 8 | `c4416ed` kit 545d5e2: quem decidiu cada passo marcado na origem (router, código, supervisor LLM, op | dentro |
+| 645.3 | 00:31:09 | Claude | 3 | `b9b48ea` kit 1828639: ablação com juiz em arquivo próprio e linha gerada com × sem needs | dentro |
+| 724.7 | 01:50:32 | Claude | 3 | `35020c4` guardrail (kit 75c0432): famílias novas da regex como suspeita que o classificador decide; | dentro |
+| 750.2 | 02:16:03 | Claude | 30 | `a891a94` eval: bateria integral ao vivo da rodada 10 no código 35020c4 (12 splits complete, US$ 13, | dentro |
+| 751.8 | 02:17:39 | Claude | 10 | `318f3af` kit 97e2f9e: juiz com a data do negócio da resposta (--rejudge-dated); juiz × pessoas só c | dentro |
+| 758.9 | 02:24:41 | Claude | 5 | `b10d60f` juiz rejulgado com a data do negócio da resposta (131 de 310: reprovados ou com data); adu | dentro |
+| 761.4 | 02:27:12 | Claude | 6 | `e0951e4` ablação ao vivo sem needs nas 40 perguntas reais (complete) e transcrição HITL com pedido  | dentro |
+| 787.8 | 02:53:40 | Claude | 7 | `1d2850f` docs: README sem afirmações velhas (check, ablação, red team), DEMO da bateria final; chec | dentro |
+| 788.0 | 02:53:49 | Claude | 4 | `eaf1121` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 789.6 | 02:55:29 | Claude | 2 | `11daa65` fix: conferência da linha do tempo vale o total declarado (a tabela mostra só os marcos; k | dentro |
+| 789.7 | 02:55:30 | Claude | 3 | `a5d85b2` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 807.3 | 03:13:10 | Claude | 5 | `607621e` test: estouro de tempo do nó com folga e custo do guardrail por crescimento (kit e7b2e48,  | dentro |
+| 807.4 | 03:13:12 | Claude | 3 | `ccde68e` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 818.9 | 03:24:43 | Claude | 1 | `70cdeba` reports: check.py --docker --scale completo e verde no código final (ccde68e) | dentro |
+| 818.9 | 03:24:44 | Claude | 3 | `c7d2ef9` readme: números e linha do tempo (fill_readme, último passo) | dentro |
+| 988.3 | 06:14:08 | Claude | 2 | `1127d0e` domínio: get_terminal_status só manda offline_for_hours de terminal offline | dentro |
+| 988.3 | 06:14:08 | Claude | 1 | `d0990fa` domínio: regra do faq para "preciso de X?" sem frase de caso nem produto | dentro |
+| 988.7 | 06:14:31 | Claude | 3 | `e6a3fa6` casos: fatos de referência que não repetem a pergunta e recurso da Get Clássica no officia | dentro |
+| 988.7 | 06:14:31 | Claude | 2 | `7b45634` gold de busca: sem as perguntas de cabeçalho, banner e tela e sem as 2 linhas sem consenso | dentro |
+| 990.1 | 06:15:54 | Claude | 7 | `bfa9711` docs: busca na ordem do denso com o cross só no portão, procedência da escolha, held-out H | dentro |
+| 1048.8 | 07:14:39 | Claude | 89 | `da22b9e` motor do kit da rodada 11 (kit 84cc8b2): needs como informação, HITL medido, juiz honesto, | dentro |
+| 1048.8 | 07:14:39 | Claude | 7 | `0cd02da` domínio: troubleshoot começa pelo records e o manual vem do achado (decisão do supervisor  | dentro |
+| 1048.8 | 07:14:39 | Claude | 4 | `99fad2e` busca remedida no gold limpo (cross par a par, portão recalibrado) e eval offline do códig | dentro |
+| 1049.0 | 07:14:50 | Claude | 2 | `8d2ccfb` domínio: prompts do router e do supervisor com o plano novo do troubleshoot (records; o ma | dentro |
+| 1050.1 | 07:15:56 | Claude | 1 | `acc1886` eval offline no commit dos prompts novos (gate verde) | dentro |
+| 1051.1 | 07:16:55 | Claude | 2 | `ff8afed` live_eval: lotes cegos do held-out em heldout_blind.d/ entram na bateria (kit) | dentro |
+| 1067.9 | 07:33:45 | Claude | 5 | `013f59f` docs: COBERTURA, THREAT_MODEL e ADRs com os mecanismos da rodada 11 (achado como informaçã | dentro |
+| 1067.9 | 07:33:45 | Claude | 31 | `f39d9ff` eval: bateria integral ao vivo da rodada 11 no código ff8afed (14 splits complete, hitl e  | dentro |
+| 1074.3 | 07:40:08 | Claude | 2 | `b646926` eval: ablação ao vivo sem o achado nas 40 perguntas reais, no mesmo código da bateria (US$ | dentro |
+| 1074.3 | 07:40:08 | Claude | 3 | `c5a47f7` eval: ablação em commits com o mesmo código sem AVISO; gold de busca citado onde está (kit | dentro |
+| 1076.8 | 07:42:41 | Claude | 1 | `4552f7a` docs: transcrição HITL regravada ao vivo com o motor da rodada 11 (records → escalation →  | dentro |
+| 1079.2 | 07:45:05 | Claude | 4 | `0dd2d93` eval: respostas adulteradas da bateria da rodada 11 com o juiz delas e a página 4 de rotul | dentro |
+| 1080.6 | 07:46:25 | Claude | 2 | `b377217` eval: relatório humano pela regra do mesmo texto (rótulos de outra bateria fora e listados | dentro |
+| 1081.0 | 07:46:49 | Claude | 1 | `0b5ffec` docs: README com a página 4 de rotulagem e a causa do official-01 parcial (recursos da Get | dentro |
+| 1081.2 | 07:47:02 | Claude | 1 | `b3db638` docs: DEMO dos oficiais regenerado da bateria da rodada 11 (ff8afed) | dentro |
+
+Commits antes do relógio: anteriores ao início (o repositório antes do scaffold); não contam no tempo declarado.
