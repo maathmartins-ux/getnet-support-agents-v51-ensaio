@@ -42,4 +42,4 @@ Fronteiras de confiança: cliente ↔ API (token), API ↔ LLM, agentes ↔ ferr
 | ASI09 | exploração da confiança humana | ação irreversível pede aprovação | src/app/actions.py | q-guard-29; split approval |
 | ASI10 | agente desonesto / fuga do supervisor | guardrail não é pulável; ordem do usuário não muda o plano | src/app/supervisor.py | q-guard-32 |
 
-Lacuna medida: a camada regex offline deixa passar 9 de 32 ataques (ver docs/EVAL_STRATEGY.md).
+Lacuna medida: a camada regex offline (sem o classificador LLM) não fecha todos os ataques do red team; quantos passam, por família ASI, offline e ao vivo, está no bloco red team de `docs/SECURITY_ASI.md` e na linha do red team do bloco offline de `docs/RESULTS.md` (os dois gerados por `scripts/fill_readme.py`).

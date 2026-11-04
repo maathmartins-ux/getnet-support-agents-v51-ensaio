@@ -37,7 +37,7 @@ tabelas completas, em [docs/RESULTS.md](docs/RESULTS.md); o que veio do kit, em 
 | Requisito do enunciado | Implementação | Onde |
 |---|---|---|
 | Router Agent: entrada, decide o agente ou a sequência | router LLM (intenção, pergunta completa do turno, buscas) e supervisor LLM que observa cada resultado e decide o próximo passo | `src/app/router.py`, `src/app/supervisor.py` |
-| Knowledge Agent: RAG sobre o site + busca para o geral | busca densa + reranker nas páginas oficiais da Getnet, resposta só com fonte citada; clima e câmbio por ferramenta de dado ao vivo | `src/app/rag.py`, `src/app/agents.py`, `data/knowledge/` |
+| Knowledge Agent: RAG sobre o site + busca para o geral | busca densa nas páginas oficiais da Getnet (a nota do cross-encoder só decide o portão sem fonte), resposta só com fonte citada; clima e câmbio por ferramenta de dado ao vivo | `src/app/rag.py`, `src/app/agents.py`, `data/knowledge/` |
 | Customer Support Agent com ≥ 2 tools | `get_settlements`, `get_transactions`, `get_terminal_status`, `request_advance` sobre os dados do próprio lojista (identidade pelo token) | `src/app/domain/challenge/tools.py` |
 | Comunicação entre agentes | especialistas como ferramentas do supervisor, passos registrados por turno | `src/app/supervisor.py` (`steps`) |
 | `POST` com `{"message", "user_id"}` → JSON | `/chat` | `src/app/api.py` |
@@ -72,7 +72,7 @@ curl -s localhost:8000/health
 em `var/credentials.json`, fora do git):
 
 ```bash
-docker compose exec app python -m app.auth seed-passwords   # imprime usuário e senha de cada cliente de teste
+docker compose exec api python -m app.auth seed-passwords   # imprime usuário e senha de cada cliente de teste
 TOKEN=$(curl -s -X POST localhost:8000/auth/login -H "Content-Type: application/json" \
      -d '{"user_id": "<usuário>", "password": "<senha impressa acima>"}' | python -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
 curl -s -X POST localhost:8000/auth/logout -H "Authorization: Bearer $TOKEN"   # sair: revoga o token
@@ -122,12 +122,11 @@ flowchart LR
   R --> S{"Supervisor LLM decide todo turno<br/>tabela de transições só offline"}
   S <-->|"tool call ⇄ status ok · partial · insufficient · error"| W
   subgraph W["Especialistas sem estado, lote paralelo"]
-    A1["faq: denso + cross-encoder"]
+    A1["faq: busca densa<br/>nota do cross-encoder só no portão"]
     A2["records: tools com confirmação"]
     A3["escalation"]
   end
   S --> V["Conferência: claims + números<br/>contra fonte, tool e pergunta"]
-  F --> V
   V --> OUT["Resposta com fontes, tools e custo"] --> M
   A3 --> Q[("Caso + plano pendente")] --> OP["Operador: /operator ou Telegram<br/>espera no turno até 20 s"]
   OP -->|"resposta = evidência;<br/>o plano continua"| S
@@ -157,22 +156,33 @@ Na Getnet, o Knowledge também atende o geral (clima Open-Meteo e câmbio PTAX/B
 ### 2.2 RAG pipeline: ingestion → storage → retrieval → generation
 
 - **Ingestion** (`src/app/ingest.py`): baixa as páginas de `data/sources.json` (só hosts permitidos), recorta texto
-  visível em trechos literais de 300–800 caracteres; tabela inteira e rotulada; chrome do site e quase-duplicatas
-  saem. Por padrão **sem corte na troca de seção e sem o contexto "título › seção" no índice**: medidos no gold da
-  entrega anterior, os dois juntos tiraram Recall@3 de 0,82 para 0,747 (`INGEST_SECTION_CUT=on` e `RAG_CONTEXT=on`
-  religam).
+  visível em trechos literais (tamanho entre `MIN_CHARS` e `MAX_CHARS`); tabela inteira e rotulada; chrome do site e
+  quase-duplicatas saem. Por padrão **sem corte na troca de seção e sem o contexto "título › seção" no índice**: os
+  dois juntos derrubaram o Recall@3 no gold da entrega anterior (medida em [docs/KIT_CHANGELOG.md](docs/KIT_CHANGELOG.md);
+  `INGEST_SECTION_CUT=on` e `RAG_CONTEXT=on` religam).
 - **Storage**: trechos em JSONL versionado em `data/` (id, URL, `fetched_at`, sha256); vetores do denso em cache no
   disco.
-- **Retrieval** (`src/app/rag.py`): **denso (multilingual-e5-large) + cross-encoder (bge-reranker-v2-m3) sobre o
-  top-10, lendo 600 caracteres por trecho**, decidido por medida ANTES do relógio (`KIT_RETRIEVER` em
-  `src/app/config.py`; ninguém roda `--choose-retriever` no relógio). A 1ª busca usa as palavras do cliente; a
-  pergunta reescrita pelo router entra junto. Placar no **caminho do agente** (o que o redator recebe, com o
-  rerank): Recall@5 (o redator lê os 5 primeiros), MRR@10, rank do 1º trecho certo por pergunta e recorte por
-  origem; separação com × sem fonte pela nota do rerank (AUC no bloco de busca de `docs/RESULTS.md`, gerado). O portão "sem fonte" em uso
-  é a nota do cross-encoder (`MIN_RERANK`, calibrado por `retrieval_eval.rerank_gate`); sem rerank, vale o BM25.
-- **Generation** (`src/app/agents.py`, `src/app/prompts/faq.md`): o agente de conhecimento redige só com os trechos
-  aceitos e cita a fonte; responde o que a fonte cobre e diz o que falta (`partial`) ou vai ao humano (`insufficient`).
-  Corpus Getnet: as páginas de `data/sources.json` (site.getnet.com.br: maquininhas, Pix, conta digital, crediário, Link de Pagamento, taxas, dúvidas, antecipação, manual das máquinas), lista e datas em [docs/SOURCES.md](docs/SOURCES.md); buscador do kit sem troca no relógio; medida em §0.
+- **Retrieval** (`src/app/rag.py`): **denso (multilingual-e5-large); o redator lê os trechos na ordem do denso.** O
+  cross-encoder (bge-reranker-v2-m3) dá uma nota a cada trecho e essa nota só decide o portão "sem fonte"
+  (`MIN_RERANK`, calibrado por `retrieval_eval.rerank_gate`); ele não reordena. Essa escolha (`dense+cross:base`, com
+  o pool, o tamanho do trecho e o limiar do portão) foi gravada em `data/retriever.json` por
+  `python -m evals.run_evals --choose-retriever --fast --apply`, rodado fora do relógio do ensaio sobre o gold deste
+  domínio (`chosen_at` e `git_sha` no próprio arquivo). Ela vale sobre o pacote do kit (`KIT_RETRIEVER` em
+  `src/app/config.py`, que reordena pela nota), e o critério mudou depois de ver a medida (emenda do
+  [ADR 0004](docs/adr/0004-buscador-denso-com-teto-de-ram.md)). A 1ª busca usa as palavras do cliente; a pergunta
+  reescrita pelo router entra junto. Placar no **caminho do agente** (o que o redator recebe): Recall@5 (os trechos
+  que o redator lê), MRR@10, rank do 1º trecho certo por pergunta e recorte por origem; separação com × sem fonte
+  pela nota do cross-encoder. As configurações medidas (ordem do denso × ordem do cross, portão, latência, RAM) estão
+  no bloco de busca de `docs/RESULTS.md`, gerado de `data/retriever.json`. Sem rerank, o portão é o do BM25.
+- **Generation** (`src/app/agents.py`; prompt do domínio `src/app/domain/challenge_prompts/faq.md` mais o contrato do
+  motor `src/app/prompts/contract/faq.md`): o agente de conhecimento redige só com os trechos aceitos e cita a fonte;
+  responde o que a fonte cobre e diz o que falta (`partial`) ou vai ao humano (`insufficient`).
+  Corpus Getnet: as páginas de `data/sources.json` (site.getnet.com.br: maquininhas, Pix, conta digital, crediário,
+  Link de Pagamento, taxas, dúvidas, FAQ da Reserva Financeira, manual das máquinas), lista e datas em
+  [docs/SOURCES.md](docs/SOURCES.md). Antecipação de recebíveis não tem página de produto no site: o slug
+  `antecipacao` é a FAQ da Reserva Financeira (para onde `/antecipacao/` do site redireciona), e a definição e o
+  pedido de antecipação de vendas vêm das dúvidas gerais (`data/knowledge/suporte/duvidas.jsonl`), sem o valor da
+  taxa. Medida da busca em §0 e em `docs/RESULTS.md`.
 
 ### 2.3 Supervisão humana (o caminho do operador)
 
@@ -249,7 +259,7 @@ Uma linha por tema: o mecanismo, o código, a prova principal e o limite. A tabe
 | Business & Challenge Fit | os 10 cenários do enunciado são o split `official` (respostas reais em `docs/DEMO.md`); KPI: turnos resolvidos sem humano e custo por turno resolvido (§0) | `src/app/tools.py` | `evals/cases.jsonl` | mede os cenários do enunciado e perguntas reais coletadas, não tráfego de produção |
 | Agentic Reasoning & Orchestration | Supervisor LLM com agentes como tools, lê `insufficient`/`error` e replaneja; tabela PLANS/FALLBACK/ALLOWED/MAX_STEPS; agentes independentes em paralelo | `src/app/supervisor.py` | `tests/test_supervisor.py::test_llm_reads_insufficient_and_replans_to_escalation`, `tests/test_supervisor.py::test_llm_disallowed_transition_is_refused` (+1 em `docs/COBERTURA.md`) | `MAX_STEPS` e o orçamento por turno cortam planos longos (o resto vai ao humano); só transições listadas em `ALLOWED` do domínio |
 | ↳ Router (faz parte de Agentic Reasoning & Orchestration) | Haiku com JSON schema e few-shot dinâmico (8 exemplos mais parecidos); regra por frase + k-NN de n-gramas no offline; seguimento pela última fala com assunto | `src/app/router.py` | `tests/test_router.py::test_llm_failure_falls_back_to_rules`, `tests/test_router_knn.py::test_unseen_paraphrase_goes_to_right_intent` (+2 em `docs/COBERTURA.md`) | intenção fora dos exemplos do domínio cai no `DEFAULT_INTENT` |
-| Context, Knowledge & RAG | Denso (e5-large) + cross-encoder local (bge-reranker-v2-m3, top-10, 600 caracteres), **decidido por medida antes do relógio**… | `src/app/rag.py`, `src/app/grounding.py` | `tests/test_k53_retriever_default.py::test_without_choice_the_kit_default_is_dense_e5_plus_bge_cross_pool_10_600_chars`, `tests/test_ingest_defaults_v52.py::test_default_does_not_cut_on_section` (+8 em `docs/COBERTURA.md`) | gold de busca escrito pelo time, não pelo cliente |
+| Context, Knowledge & RAG | Denso (e5-large) na ordem do denso; a nota do cross-encoder local (bge-reranker-v2-m3) só decide o portão sem fonte (`dense+cross:base`, gravado em `data/retriever.json` pelo `--choose-retriever --fast --apply`, fora do relógio do ensaio, e que vale sobre o pacote do kit)… | `src/app/rag.py`, `src/app/grounding.py` | `tests/test_v55_rerank_order_choice.py::test_recorded_base_order_reaches_the_app_retriever`, `tests/test_k53_retriever_default.py::test_without_choice_the_kit_default_is_dense_e5_plus_bge_cross_pool_10_600_chars`, `tests/test_ingest_defaults_v52.py::test_default_does_not_cut_on_section` (+9 em `docs/COBERTURA.md`) | gold de busca escrito pelo time, não pelo cliente |
 | Tool & Action Engineering | JSON Schema, identidade do servidor, escrita com confirmação do dono; **risco alto com aprovação de operador (quatro olhos)**; ação pendente expira (TTL) | `src/app/actions.py`, `src/app/tools.py`, `src/app/mcp_server.py` | `tests/test_mcp.py::test_crm_tool_identity_comes_from_token_and_write_needs_confirmation`, `tests/test_mcp.py::test_anonymous_gets_401_before_the_protocol` (+4 em `docs/COBERTURA.md`) | sistema de registros simulado (dados de demonstração) |
 | Security & Identity | JWT HS256 com `exp`/`iss`/`aud`/`jti` e revogação; operador com chave pessoal (auditoria); rate limit no SQLite que falha fechado; `AUTH_MODE` required/demo | `src/app/auth.py`, `src/app/guardrails.py`, `src/app/store.py` | `tests/test_identity.py::test_expired_token_is_rejected`, `tests/test_identity.py::test_revoked_token_is_rejected_via_api` (+8 em `docs/COBERTURA.md`) | `AUTH_MODE=demo` aceita `user_id` do corpo (marcado `identity_verified=false`) |
 | Memory, State & Resilience | Histórico em SQLite (WAL, vários processos) com **resumo rolante** além da janela; memória de longo prazo por usuário; queda do LLM cai no determinístico | `src/app/store.py`, `src/app/pipeline.py` | `tests/test_memory_and_handoff.py::test_history_survives_restart`, `tests/test_analytics.py::test_rolling_digest_keeps_early_facts_beyond_the_window` (+4 em `docs/COBERTURA.md`) | SQLite só serve réplicas no mesmo host ([ADR 0002](docs/adr/0002-replicas-mesmo-host.md)) |
@@ -267,7 +277,7 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
 | Decisão | Alternativa descartada | Número que decidiu |
 |---|---|---|
 | **Supervisor LLM decide todo turno** (agentes como tools; [ADR 0005](docs/adr/0005-supervisor-em-todo-turno.md)) | atalho de 1 passo, em que a tabela escolhe o caminho dos casos mais comuns | a decisão fica observável em todo trace (30 de 30 oficiais decididos pelo supervisor); custo: 2 chamadas e alguns segundos a mais por turno de um passo; sem chave ou com falha do provedor, a mesma tabela de transições roda offline |
-| Busca **dense + cross-encoder** (e5-large + bge-reranker-v2-m3, top-10, 600 caracteres), **decidida por medida antes do relógio** ([ADR 0004](docs/adr/0004-buscador-denso-com-teto-de-ram.md)) | escolher o buscador no relógio (`--choose-retriever`) | no caminho do agente: Recall@3, Recall@5 e MRR no §0 (gerados de `evals/results/latest.json`); no relógio da V5 a escolha com 8 subagentes na mesma CPU foi o caminho crítico e mediu latência errada (p95 2,9–3,5 s × 1,1–1,25 s com a máquina parada) |
+| Busca **densa, com a nota do cross-encoder só no portão sem fonte** (`dense+cross:base`, e5-large + bge-reranker-v2-m3; [ADR 0004](docs/adr/0004-buscador-denso-com-teto-de-ram.md) e emenda), gravada em `data/retriever.json` por `--choose-retriever --fast --apply`, fora do relógio do ensaio | reordenar pela nota do cross (o pacote do kit, `KIT_RETRIEVER`); a grade completa do buscador no relógio | a ordem do denso põe mais trechos certos no que o redator lê, com MRR praticamente igual (tabela em `data/retriever.json` e no bloco de busca de `docs/RESULTS.md`, gerado); no caminho do agente, Recall@3, Recall@5 e MRR no §0 (gerados de `evals/results/latest.json`); a grade completa ficou de fora porque, no relógio da V5, com 8 subagentes na mesma CPU, foi o caminho crítico e mediu latência errada (p95 2,9–3,5 s × 1,1–1,25 s com a máquina parada) |
 | Híbrido BM25 + denso, pool 20 e trecho de 1000 caracteres **medidos e rejeitados** ([ADR 0008](docs/adr/0008-considerado-e-nao-feito.md)) | adotar a variante de maior Recall@3 | nenhuma ganha no top-5 que o redator lê sem custar latência: pool 20 0,842/0,921/0,776 com p95 6,1 s; 1000 caracteres 0,842/0,868/0,759; híbrido sem filtro de idioma tirou a fonte do official-04 nas 3 rodadas (oficiais 96,7% → 90%) |
 | **Humano só quando o sistema não resolve** ([ADR 0006](docs/adr/0006-humano-so-quando-nao-resolve.md)): resposta parcial oferece o humano; nada resolvido escala, garantido em código (`_enforce_escalation`) | deixar o LLM oferecer o humano em qualquer falta de fonte | a 1ª versão (falta de fonte vira oferta) derrubou o replan para 30%; com a regra em código: 95% |
 | **Especialistas sem estado** ([ADR 0007](docs/adr/0007-especialistas-sem-estado.md)): só o router lê o histórico; o especialista recebe a pergunta reescrita e o livro de fatos | cada especialista relê 10 turnos crus | memória pass@1 0,72 → 92,7% pelo resultado, fatos 100%; dependent 95% → 100% |
@@ -298,8 +308,12 @@ Cada decisão com a alternativa descartada e o número que a decidiu. Os número
   resolvidas** (sem humano + todo fato de referência + fonte), juiz no mesmo processo depois de cada split,
   cassete para o replay no CI (`--replay`, piso = taxas da gravação aceita).
 - **Humano**: análise de erros em ~60 traces reais (rascunho do modelo, edições do dono contadas, um modo de falha
-  por checagem) e held-out cego rotulado na página (passa/falha ponta a ponta; a intenção é diagnóstico).
-  Na linha do tempo abaixo (do `git log`): o relógio do ensaio e, depois dele, a bateria completa no código final, a rotulagem humana, a transcrição HITL ao vivo e o `check.py --docker --scale` completo no código final (resultado em [reports/verify.md](reports/verify.md)). Depois da bateria, o `src/` só mudou no caminho da espera síncrona do operador (`HITL_SYNC_WAIT_S`, desligada no eval) e a transcrição HITL foi gravada de novo depois dessa mudança.
+  por checagem) e held-out rotulado na página (passa/falha ponta a ponta; a intenção é diagnóstico).
+- **Held-out**: os lotes H1 e H2 (`evals/heldout_blind.jsonl`) viraram conjunto de desenvolvimento na rodada 10: as
+  afirmações sem base que o juiz achou neles foram lidas para corrigir quatro classes de erro (declarado em
+  [docs/EVAL_STRATEGY.md](docs/EVAL_STRATEGY.md)), e o número deles se lê como desenvolvimento, não como
+  generalização. O número cego passa a ser o de um lote cego novo, H3, que entra como split próprio.
+- **Linha do tempo**: na linha do tempo abaixo (do `git log`): o relógio do ensaio e, depois dele, a bateria completa no código final, a rotulagem humana, a transcrição HITL ao vivo e o `check.py --docker --scale` completo no código final (resultado em [reports/verify.md](reports/verify.md)). O commit de cada split ao vivo fica no próprio `evals/results/live_*.json` (`git_sha`); código que muda o pedido ao LLM depois da gravação aparece no replay do CI como aviso de regravar o split.
 
 ## 7. Perguntas da entrevista, respondidas
 
@@ -308,7 +322,7 @@ As perguntas que uma entrevista técnica faria, respondidas com o número medido
 | Pergunta | Resposta curta | Onde está a prova |
 |---|---|---|
 | Quais respostas oficiais o juiz reprova, e por quê, se intenção e ferramentas acertam? | as reprovadas e o motivo de cada uma estão em `evals/results/judge.json` (`verdicts`, campo `reason`) e no bloco do juiz de `docs/RESULTS.md` (gerado); o tipo mais comum é afirmação sem fonte, nunca número sem base | `evals/results/judge.json` |
-| O rerank tem ganho medido? Por que está (ou não) no caminho? | decidido antes do relógio pelo kit (`docs/adr/0004-buscador-denso-com-teto-de-ram.md`); no relógio só a qualidade no gold novo: ver §0 (Recall@3 e MRR do caminho do agente em `evals/results/latest.json`) | `docs/adr/0004-buscador-denso-com-teto-de-ram.md` |
+| O rerank tem ganho medido? Por que está (ou não) no caminho? | como reordenador, não: no gold deste domínio, reordenar pela nota do cross-encoder não ganhou da ordem do denso no que o redator lê, e a escolha gravada (`--choose-retriever --fast --apply`, fora do relógio do ensaio) ficou com a ordem do denso; a nota fica só no portão sem fonte. As duas ordens, o portão com e sem a nota, a latência e a RAM estão no bloco de busca de `docs/RESULTS.md` (gerado de `data/retriever.json`); a qualidade no caminho do agente, no §0 | `data/retriever.json`, `docs/adr/0004-buscador-denso-com-teto-de-ram.md` (emenda) |
 | Onde a memória perde informação? | a intenção do seguimento acerta nos casos de memória ao vivo; o que falta é pontual, não de rota (pass@1 e fato da conversa no §0, gerados) | §0 e `docs/RESULTS.md` |
 | Quanto do kit foi escrito depois das correções anteriores? | o motor inteiro; no relógio só o domínio Getnet (fluxo, tools, corpus, prompts, casos): `docs/PROCEDENCIA.md` e `docs/TIMESHEET.md` | `docs/PROCEDENCIA.md` |
 | Como medir o ganho do replanejamento em perguntas reais? | 40 perguntas reais do Reclame Aqui (`evals/real_questions.jsonl`) com e sem `needs` (`--ablate-replan --mode no_needs`), os 40 nos dois braços e no mesmo commit da bateria: aterradas, p50 e custo por caso no bloco do replanejamento de `docs/RESULTS.md` (gerado) | `evals/results/ablation_replan*.json` |
@@ -355,6 +369,6 @@ Do primeiro ao último commit: **910 min**, 136 commits (aqui os 20 marcos; todo
 
 ## 9. Limitações e próximos passos
 
-- CRM (2 clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (Pix D+0, débito D+1 útil, crédito D+30) e a fila do operador.
-- **Recall@3:** logo abaixo da meta no gold essencial de 2 rotuladores; o Recall@5, que o redator lê, passa; corrigir = páginas próprias de Get Clássica e Get Smart (o site não tem: `/get-smart/` redireciona para imagem). **Validação humana:** um rotulador e quase nenhuma reprovação humana: juiz × humano sai "não validado" pela regra fixada antes (bloco humano de `docs/RESULTS.md`); a página 3 de rotulagem (duas pessoas, com parte sorteada) foi publicada e aguarda os rótulos. **Portão sem fonte:** pela nota do cross-encoder, calibrado com as poucas perguntas sem fonte do gold (IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha (sem o classificador LLM) não fecha todos os ataques do red team (taxa por família ASI no bloco do red team de `docs/RESULTS.md`, gerado); o ao vivo soma o classificador LLM.
-- Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana no relógio (feita depois, pelo dono, sem rodada de consenso); análise de erros não revisada (J2 não aconteceu); rodada 1 começou no T+25 (o gate ficou verde, mas o `--calibrate-gate` não foi adotado) e o 1º processo foi morto por falta de memória (4 processos pesados ao mesmo tempo); replan e dependent abortaram por teto na rodada 1 e foram medidos depois, completos, na confirmação (cota com piso nos turnos); `check.py --docker --scale` não reconferido no relógio (rodou depois, no código final: `reports/verify.md`).
+- CRM de teste simulado (clientes, terminais, vendas e recusas em `data/crm/`), regra de depósito do CRM de teste (`_deposit_date` em `src/app/domain/challenge/tools.py`) e a fila do operador.
+- **Busca:** o gold de busca (`evals/retrieval.d/`) foi rotulado às cegas por dois rotuladores LLM independentes, sem revisão humana; as perguntas de página são cópia de perguntas do site (as de cabeçalho, banner ou tela saíram do gold) e as perguntas sem fonte são fáceis (nenhuma é de produto real com o fato ausente do corpus); Recall, MRR e a separação com × sem fonte na linha "Retrieval ativo" do bloco offline e no bloco de busca de `docs/RESULTS.md` (gerados). Get Clássica e Get Smart não têm página própria no site (`/get-smart/` redireciona para imagem), nem a antecipação de recebíveis (o slug `antecipacao` é a FAQ da Reserva Financeira, `docs/SOURCES.md`). **Validação humana:** um rotulador e quase nenhuma reprovação humana: juiz × humano sai "não validado" pela regra fixada antes (bloco humano de `docs/RESULTS.md`); a página 3 de rotulagem (duas pessoas, com parte sorteada) foi publicada e aguarda os rótulos. **Portão sem fonte:** pela nota do cross-encoder, calibrado com as poucas perguntas sem fonte do gold (IC largo, ver `docs/RESULTS.md`). **Guardrail offline:** a regex sozinha (sem o classificador LLM) não fecha todos os ataques do red team (taxa por família ASI no bloco do red team de `docs/RESULTS.md`, gerado); o ao vivo soma o classificador LLM.
+- Cortes do PLAYBOOK §2.1 que valeram: rotulagem humana no relógio (feita depois, pelo dono, sem rodada de consenso); análise de erros não revisada (J2 não aconteceu); a rodada 1 começou cedo (o gate ficou verde, mas o `--calibrate-gate` não foi adotado; hora na linha do tempo do §8) e o primeiro processo foi morto por falta de memória (processos pesados demais ao mesmo tempo); replan e dependent abortaram por teto na rodada 1 e foram medidos depois, completos, na confirmação (cota com piso nos turnos); `check.py --docker --scale` não reconferido no relógio (rodou depois, no código final: `reports/verify.md`).

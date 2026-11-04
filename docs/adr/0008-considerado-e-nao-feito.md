@@ -11,14 +11,16 @@ medida no relógio e responde "por que não X?" com número.
 | Rerank sobre 20 candidatos (pool 20) | 0,842 / 0,921 / 0,776, p95 6,1 s (× 2,8 s) | o dobro da latência sem ganho no top-5 |
 | Trecho de 1000 caracteres no rerank | 0,842 / 0,868 / 0,759 | piora as três medidas |
 | Híbrido com pool 20 e 1000 caracteres | 0,842 / 0,868 / 0,816, p95 7,0 s | MRR um pouco maior, Recall@5 menor e latência 2,5× |
-| Juiz de outra família de modelo | — (não medido) | o juiz do kit é validado contra humanos com regra fixada antes (TPR 0,875, TNR 1,0, kappa 0,875); a troca existe (`JUDGE_PROVIDER=openai_compat`), mas exige outra chave e outra calibração no relógio, e a validação humana é o que garante a medida |
-| Escolher o buscador no relógio (`--choose-retriever`) | V5: com 8 subagentes na mesma CPU, p95 do rerank 2,9–3,5 s × 1,1–1,25 s com a máquina parada; foi o caminho crítico | latência só se mede com a máquina parada: a escolha é do kit, antes do relógio (ADR 0004) |
+| Juiz de outra família de modelo | — (não medido) | o juiz foi calibrado só contra o gabarito escrito a partir da SPEC; contra pessoas, está "não validado" pela regra fixada antes de medir (bloco humano de `docs/RESULTS.md`, gerado) e conta só como regressão; a troca existe (`JUDGE_PROVIDER=openai_compat`), mas exige outra chave e outra calibração |
+| Grade completa do buscador no relógio (`--choose-retriever` sem `--fast`) | V5: com 8 subagentes na mesma CPU, p95 do rerank 2,9–3,5 s × 1,1–1,25 s com a máquina parada; foi o caminho crítico | latência só se mede com a máquina parada: o pacote vem do kit, medido antes do relógio (ADR 0004). Neste ensaio rodou só o `--choose-retriever --fast --apply` (as configurações finalistas), fora do relógio, que gravou a ordem do denso e o portão pela nota do cross em `data/retriever.json` (emenda do ADR 0004) |
 
-**Decisão.** Padrão mantido: denso (e5-large) + cross-encoder (bge-reranker-v2-m3), top-10, 600 caracteres; juiz
+**Decisão.** Padrão do kit mantido: denso (e5-large) + cross-encoder (bge-reranker-v2-m3), top-10, 600 caracteres;
+neste domínio vale a escolha de `data/retriever.json` (ordem do denso, nota do cross só no portão sem fonte). Juiz
 do kit com a regra de validação.
 
 **Consequências.** Nenhuma variante ganha no top-5 sem custar latência. O juiz da mesma família fica declarado como
-limite (README §3) e a validação contra humanos é a garantia.
+limite (README §3). Calibrado só contra o gabarito da SPEC e "não validado" contra pessoas pela regra fixada antes
+(bloco humano de `docs/RESULTS.md`), ele conta só como regressão, não como garantia da medida.
 
 **Números.** Variantes medidas no caminho do agente, gold da entrega anterior (38 perguntas), commit `29222e0`:
 pool 20 0,842/0,921/0,776 (6,1 s); 1000 caracteres 0,842/0,868/0,759; híbrido 10/600 0,895/0,895/0,794;

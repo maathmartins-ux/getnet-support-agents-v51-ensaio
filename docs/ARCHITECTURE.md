@@ -11,20 +11,25 @@ flowchart LR
   API --> G["Guardrails: PII, injeção<br/>src/app/guardrails.py"]
   G --> MEM[("Histórico, resumo, fatos<br/>src/app/memory.py · src/app/store.py")]
   MEM --> R["Router: intenção, plano,<br/>pergunta reescrita (standalone)<br/>src/app/router.py"]
-  R -->|"1 passo, confiança alta"| F["Atalho de 1 passo<br/>supervisor.fast_path"]
-  R -->|"2+ passos ou incerto"| S{"Supervisor: ALLOWED, MAX_STEPS,<br/>orçamento, replanejamento<br/>src/app/supervisor.py"}
-  F -->|"insufficient"| S
+  R -->|"todo turno (ADR 0005)"| S{"Supervisor LLM: ALLOWED, MAX_STEPS,<br/>orçamento, replanejamento<br/>src/app/supervisor.py"}
+  R -.->|"SUPERVISOR_FAST=on, desligado por padrão:<br/>1 passo, confiança alta"| F["Atalho de 1 passo<br/>supervisor.fast_path"]
+  F -.->|"insufficient"| S
   subgraph W["Especialistas sem estado: src/app/agents.py"]
     A1["faq: busca no corpus"]
     A2["records: tools do domínio<br/>src/app/domain/challenge/tools.py"]
     A3["escalation: abre caso"]
   end
   S <--> W
-  F <--> W
+  F -.-> W
   S --> V["Conferência de claims e números<br/>src/app/grounding.py · src/app/claims.py"]
-  F --> V
+  F -.-> V
   V --> OUT["Resposta + fontes + custo<br/>src/app/schemas.py"]
 ```
+
+- O supervisor LLM decide em todo turno ([ADR 0005](adr/0005-supervisor-em-todo-turno.md)): lê o status de cada
+  especialista e escolhe responder, chamar outro ou o humano. O atalho de 1 passo (linha pontilhada) só existe com
+  `SUPERVISOR_FAST=on`, desligado por padrão (`config.supervisor_fast`); sem chave ou com falha do provedor, a mesma
+  tabela de transições (`FALLBACK`, `ALLOWED`) roda offline.
 
 - O router é o único que lê o histórico; os especialistas recebem a pergunta reescrita e o livro de fatos
   (`agents.llm_history`, [ADR 0007](adr/0007-especialistas-sem-estado.md)).
@@ -40,17 +45,23 @@ flowchart LR
   SRC["data/sources.json<br/>hosts permitidos"] --> ING["Ingestão: texto visível,<br/>trechos 300–800 chars, dedupe<br/>src/app/ingest.py"]
   ING --> J[("Trechos JSONL versionados<br/>data/ (id, URL, fetched_at, sha256)")]
   J --> IDX["Vetores densos em cache<br/>src/app/rag.py"]
-  Q["Pergunta do lojista +<br/>pergunta reescrita do router"] --> RET["Denso + cross-encoder top-10<br/>KIT_RETRIEVER em src/app/config.py<br/>src/app/rag.py"]
+  Q["Pergunta do lojista +<br/>pergunta reescrita do router"] --> RET["Denso e5, na ordem do denso;<br/>cross-encoder só dá a nota<br/>escolha em data/retriever.json<br/>src/app/rag.py"]
   IDX --> RET
-  RET --> GATE{"Portão 'sem fonte'<br/>limiar por idioma<br/>agents.covered_hits"}
-  GATE -->|"aceito"| GEN["faq redige só com os trechos<br/>src/app/agents.py · src/app/prompts/faq.md"]
+  RET --> GATE{"Portão 'sem fonte'<br/>nota do cross-encoder (MIN_RERANK)<br/>agents.covered_hits"}
+  GATE -->|"aceito"| GEN["faq redige só com os trechos<br/>src/app/agents.py<br/>src/app/domain/challenge_prompts/faq.md<br/>+ src/app/prompts/contract/faq.md"]
   GATE -->|"sem fonte"| INS["insufficient → supervisor"]
   GEN --> CHK["Cada frase contra a fonte<br/>src/app/grounding.py"]
 ```
 
 - A busca é ação do especialista; o glossário expande a consulta (`agents.expand_query`).
-- BM25 só entra quando a pergunta está no idioma do corpus (`rag.lexical_fits`); escolha do buscador feita antes do
-  relógio ([ADR 0004](adr/0004-buscador-denso-com-teto-de-ram.md), [ADR 0008](adr/0008-considerado-e-nao-feito.md)).
+- BM25 só entra quando a pergunta está no idioma do corpus (`rag.lexical_fits`); sem nota do cross-encoder, o portão
+  volta ao limiar do BM25/cosseno (`agents.covered_hits`; a calibração é medida por idioma, `agents.gate_by_language`).
+- Busca em uso: `dense+cross:base` (ordem do denso; a nota do cross-encoder só no portão), gravada em
+  `data/retriever.json` por `python -m evals.run_evals --choose-retriever --fast --apply`, rodado fora do relógio do
+  ensaio sobre o gold deste domínio; ela vale sobre o pacote do kit (`KIT_RETRIEVER` em `src/app/config.py`, medido
+  antes do relógio, que reordena pela nota). Decisão e emenda do critério no
+  [ADR 0004](adr/0004-buscador-denso-com-teto-de-ram.md); variantes rejeitadas no
+  [ADR 0008](adr/0008-considerado-e-nao-feito.md).
 
 ## 3. HITL: humano só quando o sistema não resolve
 

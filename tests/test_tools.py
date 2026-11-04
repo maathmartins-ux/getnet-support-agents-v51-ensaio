@@ -79,6 +79,17 @@ def test_terminal_offline_emits_manual_need(d):
     assert "needs" not in d.TOOLS["get_terminal_status"]["fn"](terminal_id="T1988A", user_id="cliente1988")
 
 
+def test_only_offline_terminal_carries_offline_hours(d):
+    # medido: com o campo 0 no terminal online, o LLM escrevia "está offline há 0 hora" de um terminal online
+    items = {i["terminal_id"]: i for i in d.TOOLS["get_terminal_status"]["fn"](user_id="cliente1988")["data"]["items"]}
+    assert items["T1988A"]["status"] == "online" and "offline_for_hours" not in items["T1988A"]
+    assert items["T1988B"]["status"] == "offline" and items["T1988B"]["offline_for_hours"] == 5
+    from app import agents
+
+    res = d.records_offline(_ctx("Is terminal T1988A online?", "en"), agents)  # caminho sem LLM: online sem horas
+    assert "T1988A" in res.text and "is online" in res.text and " h " not in res.text
+
+
 def test_offline_records_language_and_needs(d):
     from app import agents
 
