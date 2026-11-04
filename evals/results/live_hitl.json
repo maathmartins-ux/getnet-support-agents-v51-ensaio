@@ -1,0 +1,4814 @@
+{
+  "mode": "in-process",
+  "provider": "anthropic",
+  "recorded_at": "2026-11-04T07:18:02Z",
+  "git_sha": "ff8afed",
+  "live": true,
+  "split": "hitl",
+  "status": "complete",
+  "spent_usd": 0.158844,
+  "max_usd": 0.331116,
+  "budget": {
+    "share": 0.331116,
+    "borrowed": 0.0,
+    "limit": 0.331116
+  },
+  "concurrency": {
+    "cases_at_once": 8,
+    "max_concurrent": 8,
+    "workers": 8,
+    "splits_in_process": 14,
+    "cpus": 4
+  },
+  "llm_errors": 0.0,
+  "gate": 0.9,
+  "intent_acc": 1.0,
+  "intent_ci": {
+    "k": 7,
+    "n": 7,
+    "lo": 64.6,
+    "hi": 100.0
+  },
+  "isolation": "db_per_case",
+  "coverage_min_score": {
+    "effective": 0.5,
+    "source": "MIN_SCORE"
+  },
+  "coverage_min_rerank": -4.986,
+  "gated_splits": [
+    "hitl"
+  ],
+  "ungated_splits": [
+    "hard",
+    "heldout",
+    "real"
+  ],
+  "passed": true,
+  "gate_red_team": null,
+  "resolved": {
+    "by_split": {}
+  },
+  "gate_resolved": null,
+  "metrics": {
+    "hitl": {
+      "cases": 7,
+      "resolved_acc": null,
+      "facts_acc": 100.0,
+      "intent_acc": 100.0,
+      "handoff_acc": 100.0,
+      "handoff_outcome_acc": 100.0,
+      "blocked_acc": null,
+      "language_acc": 100.0,
+      "tools_acc": 100.0,
+      "pending_action_acc": 100.0,
+      "replanned_acc": null,
+      "completed_acc": null,
+      "no_leak_acc": 100.0,
+      "numbers_acc": 100.0,
+      "memory_acc": null,
+      "claims_acc": 100.0,
+      "human_in_turn_acc": 100.0,
+      "human_once_acc": 100.0,
+      "language_undetected": 0,
+      "recall@3": null,
+      "mrr": null,
+      "p50_ms": 7214.4,
+      "p95_ms": 14654.8,
+      "cost_usd": 0.158844,
+      "crashes": 0,
+      "ci": {
+        "facts_acc": {
+          "k": 6,
+          "n": 6,
+          "lo": 61.0,
+          "hi": 100.0
+        },
+        "intent_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "handoff_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "handoff_outcome_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "language_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "tools_acc": {
+          "k": 1,
+          "n": 1,
+          "lo": 20.7,
+          "hi": 100.0
+        },
+        "pending_action_acc": {
+          "k": 1,
+          "n": 1,
+          "lo": 20.7,
+          "hi": 100.0
+        },
+        "no_leak_acc": {
+          "k": 6,
+          "n": 6,
+          "lo": 61.0,
+          "hi": 100.0
+        },
+        "numbers_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "claims_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "human_in_turn_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "human_once_acc": {
+          "k": 6,
+          "n": 6,
+          "lo": 61.0,
+          "hi": 100.0
+        }
+      }
+    },
+    "ALL": {
+      "cases": 7,
+      "resolved_acc": null,
+      "facts_acc": 100.0,
+      "intent_acc": 100.0,
+      "handoff_acc": 100.0,
+      "handoff_outcome_acc": 100.0,
+      "blocked_acc": null,
+      "language_acc": 100.0,
+      "tools_acc": 100.0,
+      "pending_action_acc": 100.0,
+      "replanned_acc": null,
+      "completed_acc": null,
+      "no_leak_acc": 100.0,
+      "numbers_acc": 100.0,
+      "memory_acc": null,
+      "claims_acc": 100.0,
+      "human_in_turn_acc": 100.0,
+      "human_once_acc": 100.0,
+      "language_undetected": 0,
+      "recall@3": null,
+      "mrr": null,
+      "p50_ms": 7214.4,
+      "p95_ms": 14654.8,
+      "cost_usd": 0.158844,
+      "crashes": 0,
+      "ci": {
+        "facts_acc": {
+          "k": 6,
+          "n": 6,
+          "lo": 61.0,
+          "hi": 100.0
+        },
+        "intent_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "handoff_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "handoff_outcome_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "language_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "tools_acc": {
+          "k": 1,
+          "n": 1,
+          "lo": 20.7,
+          "hi": 100.0
+        },
+        "pending_action_acc": {
+          "k": 1,
+          "n": 1,
+          "lo": 20.7,
+          "hi": 100.0
+        },
+        "no_leak_acc": {
+          "k": 6,
+          "n": 6,
+          "lo": 61.0,
+          "hi": 100.0
+        },
+        "numbers_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "claims_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "human_in_turn_acc": {
+          "k": 7,
+          "n": 7,
+          "lo": 64.6,
+          "hi": 100.0
+        },
+        "human_once_acc": {
+          "k": 6,
+          "n": 6,
+          "lo": 61.0,
+          "hi": 100.0
+        }
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "hitl-01",
+      "split": "hitl",
+      "message": "Quero falar com um atendente: a minha maquininha T1988B está sem sinal desde ontem",
+      "ms": 8588.8,
+      "turn_ms": 8582.8,
+      "business_date": "2026-11-04",
+      "expected_intent": "human_request",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "numbers": true,
+        "claims": true,
+        "facts": true,
+        "human_in_turn": true,
+        "human_once": true,
+        "no_leak": true
+      },
+      "crash": null,
+      "got_intent": "human_request",
+      "route": [
+        "router",
+        "escalation",
+        "human"
+      ],
+      "replans": [
+        "escalation->human (resposta em 10s de espera)"
+      ],
+      "engine": "llm",
+      "answer": "Consultei um atendente humano (protocolo T-d32525fa), que respondeu agora.\n\nResposta do atendente: Verifiquei a T1988B: o chip está sem sinal da operadora. Enviei um chip novo, que chega em 2 dias úteis.",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [],
+      "evidence": [
+        "Consultei um atendente humano (protocolo T-d32525fa), que respondeu agora.",
+        "Verifiquei a T1988B: o chip está sem sinal da operadora. Enviei um chip novo, que chega em 2 dias úteis.",
+        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "escalation",
+          "status": "ok",
+          "reason": null,
+          "ms": 7.4,
+          "tools": [],
+          "decided_by": "llm",
+          "operator": "operadora_eval",
+          "answered_live": true,
+          "ticket_id": "T-d32525fa"
+        },
+        {
+          "agent": "human",
+          "status": "ok",
+          "reason": null,
+          "ms": null,
+          "tools": [],
+          "decided_by": "operator",
+          "operator": "operadora_eval"
+        }
+      ],
+      "context": "- Consultei um atendente humano (protocolo T-d32525fa), que respondeu agora.\n- Verifiquei a T1988B: o chip está sem sinal da operadora. Enviei um chip novo, que chega em 2 dias úteis.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "pt",
+      "language_declared": "pt",
+      "language_detected": "pt",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": true,
+      "handoff_reason": "user_request",
+      "pending_action": null,
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "operator": {
+        "ticket": "T-d32525fa",
+        "status": 200,
+        "posted": true,
+        "clock": "wait",
+        "after_s": 2.0,
+        "wait_s": 10,
+        "resume_engine": "live_turn",
+        "error": null
+      },
+      "resumed": [],
+      "expected_human_in_turn": true,
+      "cost_usd": 0.015499,
+      "facts_missing": [],
+      "run": 0
+    },
+    {
+      "id": "hitl-02",
+      "split": "hitl",
+      "message": "I want to talk to a person about a charge I don't recognize on my statement",
+      "ms": 6097.8,
+      "turn_ms": 6095.9,
+      "business_date": "2026-11-04",
+      "expected_intent": "human_request",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "numbers": true,
+        "claims": true,
+        "facts": true,
+        "human_in_turn": true,
+        "human_once": true,
+        "no_leak": true
+      },
+      "crash": null,
+      "got_intent": "human_request",
+      "route": [
+        "router",
+        "escalation",
+        "human"
+      ],
+      "replans": [
+        "escalation->human (resposta em 10s de espera)"
+      ],
+      "engine": "llm",
+      "answer": "I checked with a human agent (ticket T-d14cb68f), who replied just now.\n\nAgent's reply: I checked it: the R$ 89,90 charge on 11/03 is the monthly rent of your card machine, and I opened a review of it.",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [],
+      "evidence": [
+        "I checked with a human agent (ticket T-d14cb68f), who replied just now.",
+        "I checked it: the R$ 89,90 charge on 11/03 is the monthly rent of your card machine, and I opened a review of it.",
+        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Values the lookups and actions accept (closed list: no other value is accepted): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "escalation",
+          "status": "ok",
+          "reason": null,
+          "ms": 7.7,
+          "tools": [],
+          "decided_by": "llm",
+          "operator": "operadora_eval",
+          "answered_live": true,
+          "ticket_id": "T-d14cb68f"
+        },
+        {
+          "agent": "human",
+          "status": "ok",
+          "reason": null,
+          "ms": null,
+          "tools": [],
+          "decided_by": "operator",
+          "operator": "operadora_eval"
+        }
+      ],
+      "context": "- I checked with a human agent (ticket T-d14cb68f), who replied just now.\n- I checked it: the R$ 89,90 charge on 11/03 is the monthly rent of your card machine, and I opened a review of it.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Values the lookups and actions accept (closed list: no other value is accepted): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "en",
+      "language_declared": "en",
+      "language_detected": "en",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": true,
+      "handoff_reason": "user_request",
+      "pending_action": null,
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "operator": {
+        "ticket": "T-d14cb68f",
+        "status": 200,
+        "posted": true,
+        "clock": "wait",
+        "after_s": 2.0,
+        "wait_s": 10,
+        "resume_engine": "live_turn",
+        "error": null
+      },
+      "resumed": [],
+      "expected_human_in_turn": true,
+      "cost_usd": 0.014451,
+      "facts_missing": [],
+      "run": 0
+    },
+    {
+      "id": "hitl-03",
+      "split": "hitl",
+      "message": "Me passa para um atendente, quero saber a taxa exata de antecipação do meu contrato",
+      "ms": 7214.4,
+      "turn_ms": 7212.6,
+      "business_date": "2026-11-04",
+      "expected_intent": "human_request",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "numbers": true,
+        "claims": true,
+        "facts": true,
+        "human_in_turn": true,
+        "human_once": true,
+        "no_leak": true
+      },
+      "crash": null,
+      "got_intent": "human_request",
+      "route": [
+        "router",
+        "escalation",
+        "human"
+      ],
+      "replans": [
+        "escalation->human (resposta em 10s de espera)"
+      ],
+      "engine": "llm",
+      "answer": "Consultei um atendente humano (protocolo T-929c19f2), que respondeu agora.\n\nResposta do atendente: A taxa de antecipação do seu contrato é 1,99% ao mês, já com o desconto do seu plano.",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [],
+      "evidence": [
+        "Consultei um atendente humano (protocolo T-929c19f2), que respondeu agora.",
+        "A taxa de antecipação do seu contrato é 1,99% ao mês, já com o desconto do seu plano.",
+        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "escalation",
+          "status": "ok",
+          "reason": null,
+          "ms": 13.9,
+          "tools": [],
+          "decided_by": "llm",
+          "operator": "operadora_eval",
+          "answered_live": true,
+          "ticket_id": "T-929c19f2"
+        },
+        {
+          "agent": "human",
+          "status": "ok",
+          "reason": null,
+          "ms": null,
+          "tools": [],
+          "decided_by": "operator",
+          "operator": "operadora_eval"
+        }
+      ],
+      "context": "- Consultei um atendente humano (protocolo T-929c19f2), que respondeu agora.\n- A taxa de antecipação do seu contrato é 1,99% ao mês, já com o desconto do seu plano.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "pt",
+      "language_declared": "pt",
+      "language_detected": "pt",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": true,
+      "handoff_reason": "user_request",
+      "pending_action": null,
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "operator": {
+        "ticket": "T-929c19f2",
+        "status": 200,
+        "posted": true,
+        "clock": "wait",
+        "after_s": 3.0,
+        "wait_s": 10,
+        "resume_engine": "live_turn",
+        "error": null
+      },
+      "resumed": [],
+      "expected_human_in_turn": true,
+      "cost_usd": 0.015387,
+      "facts_missing": [],
+      "run": 0
+    },
+    {
+      "id": "hitl-04",
+      "split": "hitl",
+      "message": "Quero falar com uma pessoa sobre o cancelamento do meu plano",
+      "ms": 5891.4,
+      "turn_ms": 5887.6,
+      "business_date": "2026-11-04",
+      "expected_intent": "human_request",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "numbers": true,
+        "claims": true,
+        "facts": true,
+        "human_in_turn": true,
+        "human_once": true,
+        "no_leak": true
+      },
+      "crash": null,
+      "got_intent": "human_request",
+      "route": [
+        "router",
+        "escalation"
+      ],
+      "replans": [],
+      "engine": "llm",
+      "answer": "Encaminhei seu pedido sobre o cancelamento do plano para um atendente humano. O protocolo é T-75a21e8a. A resposta do atendente vai aparecer nesta mesma conversa.",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [],
+      "evidence": [
+        "Encaminhei para um atendente humano (protocolo T-75a21e8a). A resposta aparece nesta conversa.",
+        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "escalation",
+          "status": "ok",
+          "reason": null,
+          "ms": 5.5,
+          "tools": [],
+          "decided_by": "llm",
+          "ticket_id": "T-75a21e8a"
+        }
+      ],
+      "context": "- Encaminhei para um atendente humano (protocolo T-75a21e8a). A resposta aparece nesta conversa.\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "pt",
+      "language_declared": "pt",
+      "language_detected": "pt",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": true,
+      "handoff_reason": "user_request",
+      "pending_action": null,
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "operator": {
+        "ticket": "T-75a21e8a",
+        "status": 200,
+        "posted": true,
+        "clock": "wait",
+        "after_s": 5.0,
+        "wait_s": 2,
+        "resume_engine": "llm",
+        "error": null
+      },
+      "resumed": [
+        "Seu pedido foi analisado pelo atendente: o cancelamento do seu plano foi registrado, e a última cobrança será feita em 05/12. Não há nenhuma ação necessária da sua parte neste momento. Se tiver outra dúvida, é só me dizer."
+      ],
+      "expected_human_in_turn": false,
+      "cost_usd": 0.014626,
+      "facts_missing": [],
+      "run": 0
+    },
+    {
+      "id": "hitl-05",
+      "split": "hitl",
+      "message": "Please connect me to an agent, my settlement didn't arrive",
+      "ms": 7076.6,
+      "turn_ms": 7070.5,
+      "business_date": "2026-11-04",
+      "expected_intent": "human_request",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "numbers": true,
+        "claims": true,
+        "facts": true,
+        "human_in_turn": true,
+        "human_once": true,
+        "no_leak": true
+      },
+      "crash": null,
+      "got_intent": "human_request",
+      "route": [
+        "router",
+        "escalation"
+      ],
+      "replans": [],
+      "engine": "llm",
+      "answer": "I've passed your case to a human agent. Your ticket number is T-7afaa693. The agent's reply will show up in this conversation. Your case is about a settlement that didn't arrive, and the agent will pick it up from there.",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [],
+      "evidence": [
+        "I've handed this to a human agent (ticket T-7afaa693). The reply will show up in this conversation.",
+        "[policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Values the lookups and actions accept (closed list: no other value is accepted): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "escalation",
+          "status": "ok",
+          "reason": null,
+          "ms": 7.6,
+          "tools": [],
+          "decided_by": "llm",
+          "ticket_id": "T-7afaa693"
+        }
+      ],
+      "context": "- I've handed this to a human agent (ticket T-7afaa693). The reply will show up in this conversation.\n- [policy:capabilities] Capabilities and action policy of this assistant (generated from the system's tool registry):\n- Lookups the assistant runs immediately, only on the authenticated customer's data: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Actions the assistant can PROPOSE; nothing runs until the customer confirms the proposal: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- High-risk actions: they need the customer's confirmation AND then the approval of a human agent (operator) before they run: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- An action proposal that is not confirmed expires after 15 minutes.\n- Hand the case to a human agent: opens a case with a ticket number; the agent's reply shows up in this same conversation.\n- A decision on an individual case (dispute, block or release of a held amount) belongs to a human agent; the assistant does not decide it.\n- Apart from these tools, the assistant does not carry out any action in the system.\n- Identifiers the lookups accept: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Values the lookups and actions accept (closed list: no other value is accepted): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "en",
+      "language_declared": "en",
+      "language_detected": "en",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": true,
+      "handoff_reason": "user_request",
+      "pending_action": null,
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "operator": {
+        "ticket": "T-7afaa693",
+        "status": 200,
+        "posted": true,
+        "clock": "wait",
+        "after_s": 5.0,
+        "wait_s": 2,
+        "resume_engine": "llm",
+        "error": null
+      },
+      "resumed": [
+        "The agent has reviewed your case: your settlement of R$ 1.250,00 was held by the bank and will be paid tomorrow morning. Your ticket number is T-7afaa693 if you need to refer back to it. There's nothing you need to do on your side right now."
+      ],
+      "expected_human_in_turn": false,
+      "cost_usd": 0.014441,
+      "facts_missing": [],
+      "run": 0
+    },
+    {
+      "id": "hitl-06",
+      "split": "hitl",
+      "message": "Não ficou claro para mim, quero falar com um atendente",
+      "ms": 13927.9,
+      "turn_ms": 5878.2,
+      "business_date": "2026-11-04",
+      "expected_intent": "human_request",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "numbers": true,
+        "claims": true,
+        "facts": true,
+        "human_in_turn": true,
+        "human_once": true,
+        "no_leak": true
+      },
+      "crash": null,
+      "got_intent": "human_request",
+      "route": [
+        "router",
+        "escalation",
+        "human"
+      ],
+      "replans": [
+        "escalation->human (resposta em 10s de espera)"
+      ],
+      "engine": "llm",
+      "answer": "Consultei um atendente humano (protocolo T-00024fbd), que respondeu agora.\n\nResposta do atendente: Confirmei com o financeiro: as vendas de ontem caem na sua Get Conta amanhã até as 9h.",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [],
+      "evidence": [
+        "Consultei um atendente humano (protocolo T-00024fbd), que respondeu agora.",
+        "Confirmei com o financeiro: as vendas de ontem caem na sua Get Conta amanhã até as 9h.",
+        "[memória da conversa] Fatos da conversa (extraídos por código das falas do cliente e dos resultados de ferramentas; valem mesmo que o resumo os omita):\n- Assunto atual: Quanto eu vendi ontem? (intenção: support)\n- Registros vistos nas ferramentas (referência; consulte de novo o que muda): TX1001 {method=debito, status=aprovada, amount=120.0, amount_brl=R$ 120,00, method_pt=débito, method_en=debit}; TX1002 {method=debito, status=aprovada, amount=80.5, amount_brl=R$ 80,50, method_pt=débito, method_en=debit}; TX1003 {method=credito, status=aprovada, amount=350.0, amount_brl=R$ 350,00, method_pt=crédito, method_en=credit}; TX1004 {method=credito, status=aprovada, amount=199.9, amount_brl=R$ 199,90, method_pt=crédito, method_en=credit}; TX1005 {method=pix, status=aprovada, amount=64.0, amount_brl=R$ 64,00, method_pt=Pix, method_en=Pix}; resumo:approved_count,approved_total,approved_total_brl,count,declined_count,declined_total,declined_total_brl {count=5, declined_count=0, approved_count=5, approved_total=814.4, declined_total=0, approved_total_brl=R$ 814,40, declined_total_brl=R$ 0,00}",
+        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "escalation",
+          "status": "ok",
+          "reason": null,
+          "ms": 5.5,
+          "tools": [],
+          "decided_by": "llm",
+          "operator": "operadora_eval",
+          "answered_live": true,
+          "ticket_id": "T-00024fbd"
+        },
+        {
+          "agent": "human",
+          "status": "ok",
+          "reason": null,
+          "ms": null,
+          "tools": [],
+          "decided_by": "operator",
+          "operator": "operadora_eval"
+        }
+      ],
+      "context": "- Consultei um atendente humano (protocolo T-00024fbd), que respondeu agora.\n- Confirmei com o financeiro: as vendas de ontem caem na sua Get Conta amanhã até as 9h.\n- [memória da conversa] Fatos da conversa (extraídos por código das falas do cliente e dos resultados de ferramentas; valem mesmo que o resumo os omita):\n- Assunto atual: Quanto eu vendi ontem? (intenção: support)\n- Registros vistos nas ferramentas (referência; consulte de novo o que muda): TX1001 {method=debito, status=aprovada, amount=120.0, amount_brl=R$ 120,00, method_pt=débito, method_en=debit}; TX1002 {method=debito, status=aprovada, amount=80.5, amount_brl=R$ 80,50, method_pt=débito, method_en=debit}; TX1003 {method=credito, status=aprovada, amount=350.0, amount_brl=R$ 350,00, method_pt=crédito, method_en=credit}; TX1004 {method=credito, status=aprovada, amount=199.9, amount_brl=R$ 199,90, method_pt=crédito, method_en=credit}; TX1005 {method=pix, status=aprovada, amount=64.0, amount_brl=R$ 64,00, method_pt=Pix, method_en=Pix}; resumo:approved_count,approved_total,approved_total_brl,count,declined_count,declined_total,declined_total_brl {count=5, declined_count=0, approved_count=5, approved_total=814.4, declined_total=0, approved_total_brl=R$ 814,40, declined_total_brl=R$ 0,00}\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "pt",
+      "language_declared": "pt",
+      "language_detected": "pt",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": true,
+      "handoff_reason": "user_request",
+      "pending_action": null,
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "operator": {
+        "ticket": "T-00024fbd",
+        "status": 200,
+        "posted": true,
+        "clock": "wait",
+        "after_s": 2.0,
+        "wait_s": 10,
+        "resume_engine": "live_turn",
+        "error": null
+      },
+      "resumed": [],
+      "expected_human_in_turn": true,
+      "cost_usd": 0.047831,
+      "facts_missing": [],
+      "run": 0
+    },
+    {
+      "id": "hitl-07",
+      "split": "hitl",
+      "message": "Quero antecipar agora os meus recebíveis do crédito",
+      "ms": 14654.8,
+      "turn_ms": 14640.3,
+      "business_date": "2026-11-04",
+      "expected_intent": "support",
+      "checks": {
+        "intent": true,
+        "route": true,
+        "handoff": true,
+        "handoff_outcome": true,
+        "language": true,
+        "tools": true,
+        "pending_action": true,
+        "numbers": true,
+        "claims": true,
+        "human_in_turn": true
+      },
+      "crash": null,
+      "got_intent": "support",
+      "route": [
+        "router",
+        "records"
+      ],
+      "replans": [],
+      "engine": "llm",
+      "answer": "Deixei pronta uma proposta de antecipação dos seus recebíveis de crédito (ID A-5c941ab6). Ela ainda não foi executada e só segue se você confirmar.\n\nVocê tem 3 vendas no crédito agendadas, num total de R$ 1.049,90:\n- R$ 500,00 (1 venda de 02/11), com depósito em 02/12/2026.\n- R$ 549,90 (2 vendas de 03/11), com depósito em 03/12/2026.\n\nSegundo a, a antecipação é uma ação de risco alto. Depois da sua confirmação, um atendente humano precisa aprovar antes de ela ser executada. A proposta expira em 15 minutos se não for confirmada.\n\nVocê confirma a antecipação?",
+      "source_ids": [],
+      "sources": [],
+      "tool_calls": [
+        {
+          "name": "get_settlements",
+          "args": {
+            "method": "credito",
+            "period": "last_7_days"
+          },
+          "ok": true
+        },
+        {
+          "name": "request_receivables_advance",
+          "args": {
+            "method": "credito"
+          },
+          "ok": false
+        }
+      ],
+      "evidence": [
+        "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-03\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-03\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}",
+        "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-5c941ab6\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}",
+        "[policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro."
+      ],
+      "steps": [
+        {
+          "agent": "records",
+          "status": "ok",
+          "reason": null,
+          "ms": 5634.4,
+          "tools": [
+            {
+              "name": "get_settlements",
+              "args": {
+                "method": "credito",
+                "period": "last_7_days"
+              },
+              "ok": true,
+              "preview": "{\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_"
+            },
+            {
+              "name": "request_receivables_advance",
+              "args": {
+                "method": "credito"
+              },
+              "ok": false,
+              "preview": "{\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-5c941ab6\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}"
+            }
+          ],
+          "decided_by": "llm",
+          "pending_action": "A-5c941ab6"
+        }
+      ],
+      "context": "- {\"ok\": true, \"data\": {\"period\": \"last_7_days\", \"items\": [{\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 1, \"total\": 500.0, \"sale_date\": {\"date\": \"2026-11-02\", \"relative_pt\": \"há 2 dias\", \"relative_en\": \"2 days ago\"}, \"deposit_date\": {\"date\": \"2026-12-02\", \"relative_pt\": \"em 28 dias\", \"relative_en\": \"in 28 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 500,00\"}, {\"method\": \"credito\", \"method_pt\": \"crédito\", \"method_en\": \"credit\", \"count\": 2, \"total\": 549.9, \"sale_date\": {\"date\": \"2026-11-03\", \"relative_pt\": \"ontem\", \"relative_en\": \"yesterday\"}, \"deposit_date\": {\"date\": \"2026-12-03\", \"relative_pt\": \"em 29 dias\", \"relative_en\": \"in 29 days\"}, \"status\": \"agendado\", \"total_brl\": \"R$ 549,90\"}], \"count\": 3, \"total\": 1049.9, \"total_brl\": \"R$ 1.049,90\", \"rule\": \"Pix D+0, débito D+1 dia útil, crédito D+30 (próximo dia útil)\"}, \"calculado_em_codigo\": [{\"lista\": \"items\", \"itens\": 2, \"soma\": {\"total\": 1049.9}}], \"nota_calculo\": \"Totais e contagens acima foram calculados em código: use-os, não some nem conte.\"}\n- {\"ok\": false, \"needs_confirmation\": true, \"action_id\": \"A-5c941ab6\", \"risk\": \"high\", \"args\": {\"method\": \"credito\"}}\n- [policy:capabilities] Capacidades e política de ações deste assistente (gerado do registro de ferramentas do sistema):\n- Consultas que o assistente executa na hora, só com dados do cliente autenticado: get_settlements (Agenda de depósitos das vendas aprovadas do cliente autenticado: datas de depósito (dia útil), totais e contagens já calculados.); get_transactions (Vendas e recusas do cliente autenticado, com o significado do código de recusa, contagens e totais calculados.); get_terminal_status (Terminais do cliente autenticado: conexão, sinal, último contato e há quanto tempo está offline.).\n- Ações que o assistente pode PROPOR; nada é executado antes de o cliente confirmar a proposta: open_support_ticket (Abre chamado técnico para um terminal do cliente. Exige confirmação.).\n- Ações de risco alto: exigem a confirmação do cliente E, depois, a aprovação de um atendente humano (operador) antes de executar: request_receivables_advance (Solicita antecipação dos recebíveis agendados. Exige confirmação do cliente e aprovação de um atendente.).\n- Proposta de ação não confirmada expira em 15 minutos.\n- Encaminhar para um atendente humano: abre um caso com protocolo; a resposta do atendente aparece nesta mesma conversa.\n- Decisão sobre caso individual (contestação, bloqueio ou liberação de valor retido) é de um atendente humano; o assistente não decide.\n- Fora dessas ferramentas, o assistente não executa nenhuma ação no sistema.\n- Identificadores que as consultas aceitam: transaction_id = Id da transação (ex.: TX1007) (ex.: TX0000); terminal_id = Id do terminal (ex.: T1988A) (ex.: T0000A).\n- Valores que as consultas e ações aceitam (lista fechada: outro valor não é aceito): get_settlements — period (padrão yesterday): yesterday | today | last_7_days; method: debito | credito | pix · get_transactions — status: all | approved | declined; period (padrão last_7_days): yesterday | today | last_7_days · request_receivables_advance — method: debito | credito | pix · open_support_ticket — reason: sem_conexao | sem_sinal | erro_transacao | outro.",
+      "unsupported_claims": [],
+      "claims_action": "none",
+      "expected_language": "pt",
+      "language_declared": "pt",
+      "language_detected": "pt",
+      "unsupported_numbers": [],
+      "user_id": "cliente1988",
+      "handoff_required": false,
+      "handoff_reason": null,
+      "pending_action": "A-5c941ab6",
+      "blocked": false,
+      "risk_flags": [],
+      "prompt_versions": {
+        "guardrail.md": "0cb0e155d7",
+        "records.md": "dba29138a1",
+        "router.md": "545f65df8f",
+        "supervisor.md": "60d5a0b0d3"
+      },
+      "expected_human_in_turn": false,
+      "cost_usd": 0.036609,
+      "run": 0
+    }
+  ],
+  "failures": [],
+  "stability": {
+    "runs": 1,
+    "pass_at_1": 1.0,
+    "pass_hat_k": 1.0,
+    "ci": {
+      "pass_at_1": {
+        "k": 7,
+        "n": 7,
+        "lo": 64.6,
+        "hi": 100.0
+      },
+      "pass_hat_k": {
+        "k": 7,
+        "n": 7,
+        "lo": 64.6,
+        "hi": 100.0
+      }
+    },
+    "unstable": [],
+    "by_case": {
+      "hitl-01": {
+        "passes": 1,
+        "runs": 1
+      },
+      "hitl-02": {
+        "passes": 1,
+        "runs": 1
+      },
+      "hitl-03": {
+        "passes": 1,
+        "runs": 1
+      },
+      "hitl-04": {
+        "passes": 1,
+        "runs": 1
+      },
+      "hitl-05": {
+        "passes": 1,
+        "runs": 1
+      },
+      "hitl-06": {
+        "passes": 1,
+        "runs": 1
+      },
+      "hitl-07": {
+        "passes": 1,
+        "runs": 1
+      }
+    }
+  },
+  "failure_matrix": {
+    "by_check": {},
+    "intent_confusion": {},
+    "intent_matrix": {
+      "human_request": {
+        "human_request": 6
+      },
+      "support": {
+        "support": 1
+      }
+    }
+  },
+  "memory_routing": {},
+  "gate_calibration": {
+    "positives": 48,
+    "negatives": 22,
+    "excluded_negatives": [],
+    "by_language": {
+      "current": {
+        "?": {
+          "positives": 1,
+          "negatives": 0,
+          "pos_answered": 1.0,
+          "neg_refused": null,
+          "pos_ci": {
+            "k": 1,
+            "n": 1,
+            "lo": 20.7,
+            "hi": 100.0
+          },
+          "neg_ci": null
+        },
+        "en": {
+          "positives": 6,
+          "negatives": 9,
+          "pos_answered": 0.5,
+          "neg_refused": 0.556,
+          "pos_ci": {
+            "k": 3,
+            "n": 6,
+            "lo": 18.8,
+            "hi": 81.2
+          },
+          "neg_ci": {
+            "k": 5,
+            "n": 9,
+            "lo": 26.7,
+            "hi": 81.1
+          }
+        },
+        "pt": {
+          "positives": 41,
+          "negatives": 13,
+          "pos_answered": 0.78,
+          "neg_refused": 0.0,
+          "pos_ci": {
+            "k": 32,
+            "n": 41,
+            "lo": 63.3,
+            "hi": 88.0
+          },
+          "neg_ci": {
+            "k": 0,
+            "n": 13,
+            "lo": 0.0,
+            "hi": 22.8
+          }
+        }
+      },
+      "best": {
+        "?": {
+          "positives": 1,
+          "negatives": 0,
+          "pos_answered": 1.0,
+          "neg_refused": null,
+          "pos_ci": {
+            "k": 1,
+            "n": 1,
+            "lo": 20.7,
+            "hi": 100.0
+          },
+          "neg_ci": null
+        },
+        "en": {
+          "positives": 6,
+          "negatives": 9,
+          "pos_answered": 0.333,
+          "neg_refused": 1.0,
+          "pos_ci": {
+            "k": 2,
+            "n": 6,
+            "lo": 9.7,
+            "hi": 70.0
+          },
+          "neg_ci": {
+            "k": 9,
+            "n": 9,
+            "lo": 70.1,
+            "hi": 100.0
+          }
+        },
+        "pt": {
+          "positives": 41,
+          "negatives": 13,
+          "pos_answered": 0.732,
+          "neg_refused": 0.769,
+          "pos_ci": {
+            "k": 30,
+            "n": 41,
+            "lo": 58.1,
+            "hi": 84.3
+          },
+          "neg_ci": {
+            "k": 10,
+            "n": 13,
+            "lo": 49.7,
+            "hi": 91.8
+          }
+        }
+      }
+    },
+    "customer_languages": [
+      "en",
+      "pt"
+    ],
+    "warnings": [],
+    "criterion": "max pos_answered com neg_refused >= 0.85; empate → menor limiar",
+    "neg_refusal_min": 0.85,
+    "current": 0.5,
+    "current_source": "MIN_SCORE",
+    "at_current": {
+      "threshold": 0.5,
+      "pos_answered": 0.75,
+      "neg_refused": 0.227,
+      "balanced_acc": 0.489,
+      "meets_floor": false,
+      "pos_ci": {
+        "k": 36,
+        "n": 48,
+        "lo": 61.2,
+        "hi": 85.1
+      },
+      "neg_ci": {
+        "k": 5,
+        "n": 22,
+        "lo": 10.1,
+        "hi": 43.4
+      }
+    },
+    "best": {
+      "threshold": 6.994,
+      "pos_answered": 0.688,
+      "neg_refused": 0.864,
+      "balanced_acc": 0.776,
+      "meets_floor": true,
+      "pos_ci": {
+        "k": 33,
+        "n": 48,
+        "lo": 54.7,
+        "hi": 80.1
+      },
+      "neg_ci": {
+        "k": 19,
+        "n": 22,
+        "lo": 66.7,
+        "hi": 95.3
+      }
+    },
+    "table": [
+      {
+        "threshold": 0.0,
+        "pos_answered": 0.75,
+        "neg_refused": 0.227,
+        "balanced_acc": 0.489,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 5,
+          "n": 22,
+          "lo": 10.1,
+          "hi": 43.4
+        }
+      },
+      {
+        "threshold": 0.5,
+        "pos_answered": 0.75,
+        "neg_refused": 0.227,
+        "balanced_acc": 0.489,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 5,
+          "n": 22,
+          "lo": 10.1,
+          "hi": 43.4
+        }
+      },
+      {
+        "threshold": 2.296,
+        "pos_answered": 0.75,
+        "neg_refused": 0.227,
+        "balanced_acc": 0.489,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 5,
+          "n": 22,
+          "lo": 10.1,
+          "hi": 43.4
+        }
+      },
+      {
+        "threshold": 2.304,
+        "pos_answered": 0.75,
+        "neg_refused": 0.227,
+        "balanced_acc": 0.489,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 5,
+          "n": 22,
+          "lo": 10.1,
+          "hi": 43.4
+        }
+      },
+      {
+        "threshold": 2.336,
+        "pos_answered": 0.75,
+        "neg_refused": 0.227,
+        "balanced_acc": 0.489,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 5,
+          "n": 22,
+          "lo": 10.1,
+          "hi": 43.4
+        }
+      },
+      {
+        "threshold": 2.539,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 2.545,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 2.731,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 2.732,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 3.709,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 3.879,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 4.061,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 4.334,
+        "pos_answered": 0.75,
+        "neg_refused": 0.273,
+        "balanced_acc": 0.511,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 6,
+          "n": 22,
+          "lo": 13.2,
+          "hi": 48.2
+        }
+      },
+      {
+        "threshold": 4.357,
+        "pos_answered": 0.75,
+        "neg_refused": 0.318,
+        "balanced_acc": 0.534,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 7,
+          "n": 22,
+          "lo": 16.4,
+          "hi": 52.7
+        }
+      },
+      {
+        "threshold": 4.384,
+        "pos_answered": 0.75,
+        "neg_refused": 0.318,
+        "balanced_acc": 0.534,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 7,
+          "n": 22,
+          "lo": 16.4,
+          "hi": 52.7
+        }
+      },
+      {
+        "threshold": 4.434,
+        "pos_answered": 0.75,
+        "neg_refused": 0.318,
+        "balanced_acc": 0.534,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 7,
+          "n": 22,
+          "lo": 16.4,
+          "hi": 52.7
+        }
+      },
+      {
+        "threshold": 4.492,
+        "pos_answered": 0.75,
+        "neg_refused": 0.318,
+        "balanced_acc": 0.534,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 7,
+          "n": 22,
+          "lo": 16.4,
+          "hi": 52.7
+        }
+      },
+      {
+        "threshold": 4.498,
+        "pos_answered": 0.75,
+        "neg_refused": 0.318,
+        "balanced_acc": 0.534,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 7,
+          "n": 22,
+          "lo": 16.4,
+          "hi": 52.7
+        }
+      },
+      {
+        "threshold": 4.538,
+        "pos_answered": 0.75,
+        "neg_refused": 0.409,
+        "balanced_acc": 0.58,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 9,
+          "n": 22,
+          "lo": 23.3,
+          "hi": 61.3
+        }
+      },
+      {
+        "threshold": 4.632,
+        "pos_answered": 0.75,
+        "neg_refused": 0.409,
+        "balanced_acc": 0.58,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 9,
+          "n": 22,
+          "lo": 23.3,
+          "hi": 61.3
+        }
+      },
+      {
+        "threshold": 4.646,
+        "pos_answered": 0.75,
+        "neg_refused": 0.409,
+        "balanced_acc": 0.58,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 9,
+          "n": 22,
+          "lo": 23.3,
+          "hi": 61.3
+        }
+      },
+      {
+        "threshold": 4.766,
+        "pos_answered": 0.75,
+        "neg_refused": 0.409,
+        "balanced_acc": 0.58,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 9,
+          "n": 22,
+          "lo": 23.3,
+          "hi": 61.3
+        }
+      },
+      {
+        "threshold": 4.806,
+        "pos_answered": 0.75,
+        "neg_refused": 0.409,
+        "balanced_acc": 0.58,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 9,
+          "n": 22,
+          "lo": 23.3,
+          "hi": 61.3
+        }
+      },
+      {
+        "threshold": 5.066,
+        "pos_answered": 0.75,
+        "neg_refused": 0.409,
+        "balanced_acc": 0.58,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 9,
+          "n": 22,
+          "lo": 23.3,
+          "hi": 61.3
+        }
+      },
+      {
+        "threshold": 5.082,
+        "pos_answered": 0.75,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.602,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.106,
+        "pos_answered": 0.75,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.602,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 36,
+          "n": 48,
+          "lo": 61.2,
+          "hi": 85.1
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.11,
+        "pos_answered": 0.729,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.592,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.191,
+        "pos_answered": 0.729,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.592,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.193,
+        "pos_answered": 0.729,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.592,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.229,
+        "pos_answered": 0.729,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.592,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.324,
+        "pos_answered": 0.729,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.592,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.343,
+        "pos_answered": 0.729,
+        "neg_refused": 0.455,
+        "balanced_acc": 0.592,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 10,
+          "n": 22,
+          "lo": 26.9,
+          "hi": 65.3
+        }
+      },
+      {
+        "threshold": 5.387,
+        "pos_answered": 0.729,
+        "neg_refused": 0.545,
+        "balanced_acc": 0.637,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 12,
+          "n": 22,
+          "lo": 34.7,
+          "hi": 73.1
+        }
+      },
+      {
+        "threshold": 5.451,
+        "pos_answered": 0.729,
+        "neg_refused": 0.591,
+        "balanced_acc": 0.66,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 13,
+          "n": 22,
+          "lo": 38.7,
+          "hi": 76.7
+        }
+      },
+      {
+        "threshold": 5.466,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.474,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.495,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.54,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.591,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.606,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.617,
+        "pos_answered": 0.729,
+        "neg_refused": 0.636,
+        "balanced_acc": 0.683,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 14,
+          "n": 22,
+          "lo": 43.0,
+          "hi": 80.3
+        }
+      },
+      {
+        "threshold": 5.62,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.623,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.659,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.804,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.817,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.862,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.868,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.894,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.898,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 5.926,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.003,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.039,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.058,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.1,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.155,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.194,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.199,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.216,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.252,
+        "pos_answered": 0.729,
+        "neg_refused": 0.682,
+        "balanced_acc": 0.705,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 15,
+          "n": 22,
+          "lo": 47.3,
+          "hi": 83.6
+        }
+      },
+      {
+        "threshold": 6.256,
+        "pos_answered": 0.729,
+        "neg_refused": 0.727,
+        "balanced_acc": 0.728,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 16,
+          "n": 22,
+          "lo": 51.8,
+          "hi": 86.8
+        }
+      },
+      {
+        "threshold": 6.284,
+        "pos_answered": 0.729,
+        "neg_refused": 0.773,
+        "balanced_acc": 0.751,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 17,
+          "n": 22,
+          "lo": 56.6,
+          "hi": 89.9
+        }
+      },
+      {
+        "threshold": 6.305,
+        "pos_answered": 0.729,
+        "neg_refused": 0.773,
+        "balanced_acc": 0.751,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 17,
+          "n": 22,
+          "lo": 56.6,
+          "hi": 89.9
+        }
+      },
+      {
+        "threshold": 6.342,
+        "pos_answered": 0.729,
+        "neg_refused": 0.773,
+        "balanced_acc": 0.751,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 17,
+          "n": 22,
+          "lo": 56.6,
+          "hi": 89.9
+        }
+      },
+      {
+        "threshold": 6.354,
+        "pos_answered": 0.729,
+        "neg_refused": 0.773,
+        "balanced_acc": 0.751,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 17,
+          "n": 22,
+          "lo": 56.6,
+          "hi": 89.9
+        }
+      },
+      {
+        "threshold": 6.564,
+        "pos_answered": 0.729,
+        "neg_refused": 0.773,
+        "balanced_acc": 0.751,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 35,
+          "n": 48,
+          "lo": 59.0,
+          "hi": 83.4
+        },
+        "neg_ci": {
+          "k": 17,
+          "n": 22,
+          "lo": 56.6,
+          "hi": 89.9
+        }
+      },
+      {
+        "threshold": 6.647,
+        "pos_answered": 0.708,
+        "neg_refused": 0.773,
+        "balanced_acc": 0.741,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 34,
+          "n": 48,
+          "lo": 56.8,
+          "hi": 81.8
+        },
+        "neg_ci": {
+          "k": 17,
+          "n": 22,
+          "lo": 56.6,
+          "hi": 89.9
+        }
+      },
+      {
+        "threshold": 6.67,
+        "pos_answered": 0.708,
+        "neg_refused": 0.818,
+        "balanced_acc": 0.763,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 34,
+          "n": 48,
+          "lo": 56.8,
+          "hi": 81.8
+        },
+        "neg_ci": {
+          "k": 18,
+          "n": 22,
+          "lo": 61.5,
+          "hi": 92.7
+        }
+      },
+      {
+        "threshold": 6.759,
+        "pos_answered": 0.688,
+        "neg_refused": 0.818,
+        "balanced_acc": 0.753,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 18,
+          "n": 22,
+          "lo": 61.5,
+          "hi": 92.7
+        }
+      },
+      {
+        "threshold": 6.788,
+        "pos_answered": 0.688,
+        "neg_refused": 0.818,
+        "balanced_acc": 0.753,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 18,
+          "n": 22,
+          "lo": 61.5,
+          "hi": 92.7
+        }
+      },
+      {
+        "threshold": 6.908,
+        "pos_answered": 0.688,
+        "neg_refused": 0.818,
+        "balanced_acc": 0.753,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 18,
+          "n": 22,
+          "lo": 61.5,
+          "hi": 92.7
+        }
+      },
+      {
+        "threshold": 6.914,
+        "pos_answered": 0.688,
+        "neg_refused": 0.818,
+        "balanced_acc": 0.753,
+        "meets_floor": false,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 18,
+          "n": 22,
+          "lo": 61.5,
+          "hi": 92.7
+        }
+      },
+      {
+        "threshold": 6.994,
+        "pos_answered": 0.688,
+        "neg_refused": 0.864,
+        "balanced_acc": 0.776,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        }
+      },
+      {
+        "threshold": 7.003,
+        "pos_answered": 0.688,
+        "neg_refused": 0.864,
+        "balanced_acc": 0.776,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        }
+      },
+      {
+        "threshold": 7.056,
+        "pos_answered": 0.688,
+        "neg_refused": 0.864,
+        "balanced_acc": 0.776,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 19,
+          "n": 22,
+          "lo": 66.7,
+          "hi": 95.3
+        }
+      },
+      {
+        "threshold": 7.184,
+        "pos_answered": 0.688,
+        "neg_refused": 0.909,
+        "balanced_acc": 0.798,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 20,
+          "n": 22,
+          "lo": 72.2,
+          "hi": 97.5
+        }
+      },
+      {
+        "threshold": 7.195,
+        "pos_answered": 0.688,
+        "neg_refused": 0.909,
+        "balanced_acc": 0.798,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 20,
+          "n": 22,
+          "lo": 72.2,
+          "hi": 97.5
+        }
+      },
+      {
+        "threshold": 7.287,
+        "pos_answered": 0.688,
+        "neg_refused": 0.955,
+        "balanced_acc": 0.821,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 33,
+          "n": 48,
+          "lo": 54.7,
+          "hi": 80.1
+        },
+        "neg_ci": {
+          "k": 21,
+          "n": 22,
+          "lo": 78.2,
+          "hi": 99.2
+        }
+      },
+      {
+        "threshold": 7.497,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.509,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.558,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.578,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.596,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.615,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.721,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.754,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 7.804,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.294,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.296,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.332,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.392,
+        "pos_answered": 0.667,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.833,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 32,
+          "n": 48,
+          "lo": 52.5,
+          "hi": 78.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.699,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.807,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.844,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.865,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 8.89,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.001,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.049,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.294,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.302,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.359,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.414,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.424,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.43,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.93,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.949,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 9.99,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.014,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.11,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.129,
+        "pos_answered": 0.646,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.823,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 31,
+          "n": 48,
+          "lo": 50.4,
+          "hi": 76.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.184,
+        "pos_answered": 0.604,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.802,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 29,
+          "n": 48,
+          "lo": 46.3,
+          "hi": 73.0
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.329,
+        "pos_answered": 0.604,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.802,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 29,
+          "n": 48,
+          "lo": 46.3,
+          "hi": 73.0
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.332,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.51,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.616,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.694,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.789,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.858,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.891,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.907,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 10.956,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.144,
+        "pos_answered": 0.583,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.792,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 28,
+          "n": 48,
+          "lo": 44.3,
+          "hi": 71.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.162,
+        "pos_answered": 0.562,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.781,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 27,
+          "n": 48,
+          "lo": 42.3,
+          "hi": 69.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.286,
+        "pos_answered": 0.562,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.781,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 27,
+          "n": 48,
+          "lo": 42.3,
+          "hi": 69.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.39,
+        "pos_answered": 0.562,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.781,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 27,
+          "n": 48,
+          "lo": 42.3,
+          "hi": 69.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.555,
+        "pos_answered": 0.542,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.771,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 26,
+          "n": 48,
+          "lo": 40.3,
+          "hi": 67.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.748,
+        "pos_answered": 0.542,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.771,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 26,
+          "n": 48,
+          "lo": 40.3,
+          "hi": 67.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 11.857,
+        "pos_answered": 0.542,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.771,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 26,
+          "n": 48,
+          "lo": 40.3,
+          "hi": 67.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 12.204,
+        "pos_answered": 0.542,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.771,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 26,
+          "n": 48,
+          "lo": 40.3,
+          "hi": 67.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 12.29,
+        "pos_answered": 0.542,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.771,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 26,
+          "n": 48,
+          "lo": 40.3,
+          "hi": 67.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 12.42,
+        "pos_answered": 0.542,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.771,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 26,
+          "n": 48,
+          "lo": 40.3,
+          "hi": 67.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 12.474,
+        "pos_answered": 0.5,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.75,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 24,
+          "n": 48,
+          "lo": 36.4,
+          "hi": 63.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 12.991,
+        "pos_answered": 0.5,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.75,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 24,
+          "n": 48,
+          "lo": 36.4,
+          "hi": 63.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.059,
+        "pos_answered": 0.5,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.75,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 24,
+          "n": 48,
+          "lo": 36.4,
+          "hi": 63.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.096,
+        "pos_answered": 0.5,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.75,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 24,
+          "n": 48,
+          "lo": 36.4,
+          "hi": 63.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.115,
+        "pos_answered": 0.479,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.74,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 23,
+          "n": 48,
+          "lo": 34.5,
+          "hi": 61.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.194,
+        "pos_answered": 0.479,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.74,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 23,
+          "n": 48,
+          "lo": 34.5,
+          "hi": 61.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.276,
+        "pos_answered": 0.479,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.74,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 23,
+          "n": 48,
+          "lo": 34.5,
+          "hi": 61.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.482,
+        "pos_answered": 0.479,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.74,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 23,
+          "n": 48,
+          "lo": 34.5,
+          "hi": 61.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.486,
+        "pos_answered": 0.458,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.729,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 22,
+          "n": 48,
+          "lo": 32.6,
+          "hi": 59.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.614,
+        "pos_answered": 0.458,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.729,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 22,
+          "n": 48,
+          "lo": 32.6,
+          "hi": 59.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 13.853,
+        "pos_answered": 0.458,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.729,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 22,
+          "n": 48,
+          "lo": 32.6,
+          "hi": 59.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 14.27,
+        "pos_answered": 0.438,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.719,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 21,
+          "n": 48,
+          "lo": 30.7,
+          "hi": 57.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 14.399,
+        "pos_answered": 0.438,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.719,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 21,
+          "n": 48,
+          "lo": 30.7,
+          "hi": 57.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 14.503,
+        "pos_answered": 0.438,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.719,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 21,
+          "n": 48,
+          "lo": 30.7,
+          "hi": 57.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 14.684,
+        "pos_answered": 0.438,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.719,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 21,
+          "n": 48,
+          "lo": 30.7,
+          "hi": 57.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 14.707,
+        "pos_answered": 0.438,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.719,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 21,
+          "n": 48,
+          "lo": 30.7,
+          "hi": 57.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 15.103,
+        "pos_answered": 0.417,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.708,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 20,
+          "n": 48,
+          "lo": 28.8,
+          "hi": 55.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 15.131,
+        "pos_answered": 0.417,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.708,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 20,
+          "n": 48,
+          "lo": 28.8,
+          "hi": 55.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 15.53,
+        "pos_answered": 0.417,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.708,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 20,
+          "n": 48,
+          "lo": 28.8,
+          "hi": 55.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 15.832,
+        "pos_answered": 0.417,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.708,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 20,
+          "n": 48,
+          "lo": 28.8,
+          "hi": 55.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 16.086,
+        "pos_answered": 0.417,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.708,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 20,
+          "n": 48,
+          "lo": 28.8,
+          "hi": 55.7
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 16.688,
+        "pos_answered": 0.375,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.688,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 18,
+          "n": 48,
+          "lo": 25.2,
+          "hi": 51.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 16.891,
+        "pos_answered": 0.375,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.688,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 18,
+          "n": 48,
+          "lo": 25.2,
+          "hi": 51.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 17.186,
+        "pos_answered": 0.354,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.677,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 17,
+          "n": 48,
+          "lo": 23.4,
+          "hi": 49.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 17.686,
+        "pos_answered": 0.354,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.677,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 17,
+          "n": 48,
+          "lo": 23.4,
+          "hi": 49.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 17.976,
+        "pos_answered": 0.354,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.677,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 17,
+          "n": 48,
+          "lo": 23.4,
+          "hi": 49.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 19.828,
+        "pos_answered": 0.333,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.667,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 16,
+          "n": 48,
+          "lo": 21.7,
+          "hi": 47.5
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 19.938,
+        "pos_answered": 0.312,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.656,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 15,
+          "n": 48,
+          "lo": 19.9,
+          "hi": 45.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 20.447,
+        "pos_answered": 0.292,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.646,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 14,
+          "n": 48,
+          "lo": 18.2,
+          "hi": 43.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 20.467,
+        "pos_answered": 0.271,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.635,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 13,
+          "n": 48,
+          "lo": 16.6,
+          "hi": 41.0
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 20.853,
+        "pos_answered": 0.25,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.625,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 12,
+          "n": 48,
+          "lo": 14.9,
+          "hi": 38.8
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 21.348,
+        "pos_answered": 0.25,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.625,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 12,
+          "n": 48,
+          "lo": 14.9,
+          "hi": 38.8
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 23.07,
+        "pos_answered": 0.25,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.625,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 12,
+          "n": 48,
+          "lo": 14.9,
+          "hi": 38.8
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 23.084,
+        "pos_answered": 0.229,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.615,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 11,
+          "n": 48,
+          "lo": 13.3,
+          "hi": 36.5
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 24.024,
+        "pos_answered": 0.229,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.615,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 11,
+          "n": 48,
+          "lo": 13.3,
+          "hi": 36.5
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 25.125,
+        "pos_answered": 0.208,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.604,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 10,
+          "n": 48,
+          "lo": 11.7,
+          "hi": 34.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 26.424,
+        "pos_answered": 0.208,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.604,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 10,
+          "n": 48,
+          "lo": 11.7,
+          "hi": 34.3
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 26.43,
+        "pos_answered": 0.188,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.594,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 9,
+          "n": 48,
+          "lo": 10.2,
+          "hi": 31.9
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 26.671,
+        "pos_answered": 0.188,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.594,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 9,
+          "n": 48,
+          "lo": 10.2,
+          "hi": 31.9
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 26.96,
+        "pos_answered": 0.167,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.583,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 8,
+          "n": 48,
+          "lo": 8.7,
+          "hi": 29.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 26.997,
+        "pos_answered": 0.167,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.583,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 8,
+          "n": 48,
+          "lo": 8.7,
+          "hi": 29.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 27.732,
+        "pos_answered": 0.146,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.573,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 7,
+          "n": 48,
+          "lo": 7.2,
+          "hi": 27.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 30.555,
+        "pos_answered": 0.146,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.573,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 7,
+          "n": 48,
+          "lo": 7.2,
+          "hi": 27.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 31.055,
+        "pos_answered": 0.104,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.552,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 5,
+          "n": 48,
+          "lo": 4.5,
+          "hi": 22.2
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 31.323,
+        "pos_answered": 0.083,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.542,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 4,
+          "n": 48,
+          "lo": 3.3,
+          "hi": 19.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 35.764,
+        "pos_answered": 0.083,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.542,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 4,
+          "n": 48,
+          "lo": 3.3,
+          "hi": 19.6
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 36.298,
+        "pos_answered": 0.062,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.531,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 3,
+          "n": 48,
+          "lo": 2.1,
+          "hi": 16.8
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 36.866,
+        "pos_answered": 0.062,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.531,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 3,
+          "n": 48,
+          "lo": 2.1,
+          "hi": 16.8
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 37.45,
+        "pos_answered": 0.042,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.521,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 2,
+          "n": 48,
+          "lo": 1.2,
+          "hi": 14.0
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 37.55,
+        "pos_answered": 0.042,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.521,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 2,
+          "n": 48,
+          "lo": 1.2,
+          "hi": 14.0
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      },
+      {
+        "threshold": 41.421,
+        "pos_answered": 0.0,
+        "neg_refused": 1.0,
+        "balanced_acc": 0.5,
+        "meets_floor": true,
+        "pos_ci": {
+          "k": 0,
+          "n": 48,
+          "lo": 0.0,
+          "hi": 7.4
+        },
+        "neg_ci": {
+          "k": 22,
+          "n": 22,
+          "lo": 85.1,
+          "hi": 100.0
+        }
+      }
+    ],
+    "retriever": "bm25"
+  },
+  "retrieval": {
+    "cases": 48,
+    "positives": 48,
+    "negatives": 22,
+    "recall@3": 0.917,
+    "mrr": 0.861,
+    "hit@3": 0.938,
+    "recall@5": 0.938,
+    "mrr@10": 0.866,
+    "first_gold_rank": {
+      "What's the difference between the Get Clássica and the Get Smart?": 1,
+      "Do I need a bank account to receive my sales via Pix?": 2,
+      "My card machine won't connect to the internet, what should I do?": 1,
+      "How does receivables advance (antecipação) work with Getnet?": 4,
+      "How many installments can I split a sale into with the crediário?": 2,
+      "Can I sell through WhatsApp using the Payment Link?": 1,
+      "Como eu contrato o Crediário e qual a taxa?": 1,
+      "Há alguma taxa extra para usar o Aplicativo Getnet Brasil?": 1,
+      "Como realizo o cancelamento de uma venda da Get Smart realizada em dias anteriores?": 1,
+      "Posso antecipar o valor da Reserva Financeira?": 1,
+      "Até quantas parcelas posso fazer e como sei os juros para informar ao meu cliente (portador do cartão)?": 1,
+      "Como faço para baixar o Aplicativo Getnet Brasil?": 1,
+      "Fiz uma venda duplicada na minha Get Smart, em menos de 5 minutos, preciso realizar o estorno?": 1,
+      "Quando a Reserva Financeira é liberada?": 1,
+      "Meu celular é compatível?": 1,
+      "Onde visualizo o pagamento e em que prazo eu recebo?": 1,
+      "Como proceder para que minha bateria da Get Smart se mantenha com uma boa duração?": 1,
+      "Como realizar pagamento por aproximação?": 1,
+      "A Reserva Financeira é permitida em caso de cancelamento de vendas?": 1,
+      "Qualquer estabelecimento pode ter o Crediário?": 1,
+      "A Get Smart aceita pagamento com auxilio emergencial?": 1,
+      "Quais tipos de pagamentos são aceitos na Get Smart?": 1,
+      "A Reserva Financeira é um valor extra que preciso pagar?": 1,
+      "E se eu não quiser ter o produto?": null,
+      "Como insiro o Chip na minha máquina?": 1,
+      "Quais bandeiras são aceitas na Get Smart?": 1,
+      "A Reserva Financeira impacta minhas vendas?": 1,
+      "Quais os benefícios do Chip Algar?": 1,
+      "Quais os diferenciais de uma Get Smart?": 1,
+      "O que é o Chip Algar?": 1,
+      "Qual tipo de negócio mais indicado para ter uma Get Smart?": 1,
+      "Quais bandeiras são consideradas para compor o faturamento mínimo estipulado pela condição comercial?": 1,
+      "O que é a Get Smart?": 1,
+      "As condições comerciais são cumulativas?": 1,
+      "Após receber a máquina, como eu começo a usar o Aplicativo que escolhi?": 1,
+      "O que acontecerá caso ocorra a contratação de uma nova condição comercial?": 1,
+      "Como é calculada a taxa de antecipação? Achei absurda.": 1,
+      "Não consigo habilitar o Pix na maquininha. Qual o passo a passo?": 3,
+      "Por que a Getnet não libera pagamento por Pix para mim?": 2,
+      "Como habilito o Pix na minha conta Getnet?": 1,
+      "Quero abrir a conta digital da Getnet. Como faço?": 2,
+      "Preciso ter conta no Santander para liberar o Pix na Getnet?": 2,
+      "Estou sendo cobrado depois de pedir o cancelamento da maquininha. Como resolvo?": 1,
+      "Fui cobrado de mensalidade na Getnet. Quando ela é cobrada e como evito?": 2,
+      "Me prometeram 2 meses sem aluguel da máquina e veio a cobrança. Como funciona a isenção?": 1,
+      "Como devolvo a máquina Getnet sem continuar sendo cobrado?": null,
+      "Como me defendo de um chargeback como lojista da Getnet?": 1,
+      "A Getnet bloqueou valores de vendas minhas. Por quê e quando liberam?": 1
+    },
+    "by_origin": {
+      "official": {
+        "cases": 6,
+        "recall@3": 0.833,
+        "recall@5": 0.917,
+        "mrr@10": 0.708
+      },
+      "page": {
+        "cases": 30,
+        "recall@3": 0.967,
+        "recall@5": 0.967,
+        "mrr@10": 0.967
+      },
+      "real": {
+        "cases": 12,
+        "recall@3": 0.833,
+        "recall@5": 0.875,
+        "mrr@10": 0.694
+      }
+    },
+    "hit@3_ci": {
+      "k": 45,
+      "n": 48,
+      "lo": 83.2,
+      "hi": 97.9
+    },
+    "ndcg@3": 0.86,
+    "page": {
+      "recall@3": 0.955,
+      "mrr": 0.965,
+      "hit@3": 1.0,
+      "hit@3_ci": {
+        "k": 48,
+        "n": 48,
+        "lo": 92.6,
+        "hi": 100.0
+      }
+    },
+    "latency_ms": {
+      "p50": 1167.0,
+      "p95": 2496.7,
+      "mean": 1327.4
+    },
+    "gate": {
+      "min_score": 0,
+      "min_cosine": 0.793,
+      "pos_answered": 0.938,
+      "neg_refused": 0.909,
+      "meets_floor": true,
+      "pos_ci": {
+        "k": 45,
+        "n": 48,
+        "lo": 83.2,
+        "hi": 97.9
+      },
+      "neg_ci": {
+        "k": 20,
+        "n": 22,
+        "lo": 72.2,
+        "hi": 97.5
+      },
+      "positives": 48,
+      "negatives": 22,
+      "neg_refusal_min": 0.85
+    },
+    "separation": {
+      "auc": 0.991,
+      "gap": -0.045,
+      "positives": 48,
+      "negatives": 22,
+      "enough": true,
+      "refused": {
+        "positives": 0,
+        "negatives": 20
+      }
+    },
+    "separation_rerank": {
+      "auc": 0.986,
+      "gap": -5.729,
+      "positives": 48,
+      "negatives": 22,
+      "enough": true,
+      "refused": {
+        "positives": 0,
+        "negatives": 20
+      }
+    },
+    "rerank_gate": {
+      "min_rerank": 1.419,
+      "pos_answered": 0.833,
+      "neg_refused": 1.0,
+      "meets_floor": true,
+      "pos_ci": {
+        "k": 40,
+        "n": 48,
+        "lo": 70.4,
+        "hi": 91.3
+      },
+      "neg_ci": {
+        "k": 2,
+        "n": 2,
+        "lo": 34.2,
+        "hi": 100.0
+      },
+      "positives": 48,
+      "negatives": 2,
+      "neg_refusal_min": 0.85,
+      "enough": false
+    },
+    "essential": 48,
+    "gold_unresolved": [],
+    "dedupe_aliases": 8,
+    "retriever": "dense+cross:base",
+    "fallback": "",
+    "path": "agente",
+    "base": {
+      "retriever": "dense",
+      "recall@3": 0.917,
+      "mrr": 0.858,
+      "recall@5": 0.938,
+      "mrr@10": 0.863
+    },
+    "requested": "dense"
+  },
+  "cassette": {
+    "file": "evals/cassettes/hitl.jsonl",
+    "requests": 41,
+    "errors": 0,
+    "repeat": 1,
+    "floors": {
+      "facts_acc": 100.0,
+      "intent_acc": 100.0,
+      "handoff_acc": 100.0,
+      "handoff_outcome_acc": 100.0,
+      "language_acc": 100.0,
+      "tools_acc": 100.0,
+      "pending_action_acc": 100.0,
+      "no_leak_acc": 100.0,
+      "numbers_acc": 100.0,
+      "claims_acc": 100.0,
+      "human_in_turn_acc": 100.0,
+      "human_once_acc": 100.0,
+      "pass_at_1": 100.0,
+      "max_crashes": 0
+    }
+  },
+  "judge": {
+    "status": "ran",
+    "file": "judge.json",
+    "verdicts": 7,
+    "grounded": 7,
+    "helpful": 7,
+    "judge_unreliable": false
+  }
+}
