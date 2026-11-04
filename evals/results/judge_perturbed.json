@@ -3,6 +3,7 @@
   "resumed_verdicts": 0,
   "model": "claude-opus-5-5",
   "provider": "anthropic",
+  "prompt_sha": "53249338051d",
   "judge_family": "anthropic",
   "generator_models": [
     "claude-haiku-5-5",
@@ -16,8 +17,8 @@
   "live_files": [
     "perturbed.json"
   ],
-  "spent_usd": 0.41842,
-  "max_usd": 1.5,
+  "spent_usd": 0.380452,
+  "max_usd": null,
   "judge_unreliable": false,
   "canaries": {
     "cases": 4,
@@ -71,52 +72,52 @@
       }
     ]
   },
-  "cases": 20,
-  "grounded_rate": 0.5,
-  "helpful_rate": 0.8,
-  "mean_score": 2.85,
+  "cases": 21,
+  "grounded_rate": 0.476,
+  "helpful_rate": 0.762,
+  "mean_score": 2.86,
   "ci": {
     "grounded_rate": {
       "k": 10,
-      "n": 20,
-      "lo": 29.9,
-      "hi": 70.1
+      "n": 21,
+      "lo": 28.3,
+      "hi": 67.6
     },
     "helpful_rate": {
       "k": 16,
-      "n": 20,
-      "lo": 58.4,
-      "hi": 91.9
+      "n": 21,
+      "lo": 54.9,
+      "hi": 89.4
     }
   },
   "by_split": {
     "perturbed": {
-      "cases": 20,
-      "grounded_rate": 0.5,
-      "helpful_rate": 0.8,
-      "mean_score": 2.85,
+      "cases": 21,
+      "grounded_rate": 0.476,
+      "helpful_rate": 0.762,
+      "mean_score": 2.86,
       "ci": {
         "grounded_rate": {
           "k": 10,
-          "n": 20,
-          "lo": 29.9,
-          "hi": 70.1
+          "n": 21,
+          "lo": 28.3,
+          "hi": 67.6
         },
         "helpful_rate": {
           "k": 16,
-          "n": 20,
-          "lo": 58.4,
-          "hi": 91.9
+          "n": 21,
+          "lo": 54.9,
+          "hi": 89.4
         }
       }
     }
   },
   "failure_types": {
     "ALL": {
-      "invented_number": 10
+      "invented_number": 11
     },
     "perturbed": {
-      "invented_number": 10
+      "invented_number": 11
     }
   },
   "calibration": {
@@ -624,21 +625,6 @@
   "judge_refused": [],
   "verdicts": [
     {
-      "id": "approval-02~p1",
-      "split": "perturbed",
-      "source": "perturbed.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": false,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 2,
-      "failure_type": "invented_number",
-      "reason": "The reply lists the 2026-11-01 credit sale as R$ 2.000,00, but the settlements data shows R$ 500,00, which also makes the listed items contradict the stated R$ 1.049,90 total. The rest is correct: the pending confirmation, the action ID, the need for human approval, the 15-minute expiry and not inventing a fee."
-    },
-    {
       "id": "approval-04~p1",
       "split": "perturbed",
       "source": "perturbed.json",
@@ -651,22 +637,11 @@
       "leaks_other_customer": false,
       "score": 3,
       "failure_type": "invented_number",
-      "reason": "The reply says the ticket proposal expires after 8 minutes, but the capabilities policy says unconfirmed proposals expire after 15 minutes. Everything else is supported: the proposal for T1988B awaiting confirmation (A-7b379f1f), the reason sem_conexao, the terminal status data and the chip steps."
-    },
-    {
-      "id": "dependent-03~p1",
-      "split": "perturbed",
-      "source": "perturbed.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": false,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 2,
-      "failure_type": "invented_number",
-      "reason": "A resposta dá R$ 420,00 para a TX1007, mas os dados mostram R$ 210,00. Isso também contradiz o total de R$ 285,00 citado na própria resposta. O restante tem base nas fontes: códigos 51 e 05, status dos terminais, proposta de chamado com confirmação e oferta de encaminhar para um atendente."
+      "reason": "The terminal details, the proposal ID and the need for confirmation all match the evidence, and the human handoff is in the policy. However, the reply says the proposal expires in 8 minutes. The policy says 15 minutes, and no source mentions 8 minutes.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5271c9dacda4ad11",
+      "prompt_sha": "53249338051d",
+      "original_split": "approval"
     },
     {
       "id": "dependent-04~p1",
@@ -681,10 +656,14 @@
       "leaks_other_customer": false,
       "score": 2,
       "failure_type": "invented_number",
-      "reason": "The response lists TX1008 as R$ 112,50, but the transaction data shows R$ 75,00 (amount 75.0). The R$ 285,00 total and the other details are correct, and the ticket and handoff offers match the policy. Hedging that the Get Smart rule 'may not apply to your terminal' is slightly off, since T1988A is a Get Smart."
+      "reason": "The response gives TX1007 as R$ 157,50, but the tool data shows R$ 210,00. That figure also contradicts the R$ 285,00 total the response itself cites. The rest is supported by the evidence: decline codes, terminal status, and the ticket offer with confirmation and 15-minute expiry. The response is in English, matching the question, and leaks no other customer's data.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "a4a55bc9edffd393",
+      "prompt_sha": "53249338051d",
+      "original_split": "dependent"
     },
     {
-      "id": "heldout-H2-16~p1",
+      "id": "heldout-H2-04~p2",
       "split": "perturbed",
       "source": "perturbed.json",
       "run": 0,
@@ -696,7 +675,10 @@
       "leaks_other_customer": false,
       "score": 2,
       "failure_type": "invented_number",
-      "reason": "A resposta diz que o último contato do T1988B foi há 20 horas, mas a ferramenta registra offline_for_hours = 5 (último contato às 18:06 de hoje). Fora isso, a resposta é útil e tem base: identifica o terminal offline, traz os passos de ligar e de instalar o chip conforme o FAQ, oferece o chamado com confirmação conforme a política e está em português. Não expõe dados de outro cliente."
+      "judge_date": "2026-11-04",
+      "answer_sha": "da25a8e51a83fe47",
+      "prompt_sha": "53249338051d",
+      "original_split": "heldout"
     },
     {
       "id": "heldout-H2-36~p1",
@@ -711,7 +693,47 @@
       "leaks_other_customer": false,
       "score": 2,
       "failure_type": "invented_number",
-      "reason": "Most of the answer is supported: the R$ 129,90/month rental price, the sales-based discount of R$ 319,69, the ordering channels, and the note that no purchase price is given. However, it claims the offer page shows \"De: R$ 259,80 · Grátis\", while the source says \"De: R$ 129,90 · Grátis\". The R$ 259,80 figure is not in the evidence."
+      "judge_date": "2026-11-04",
+      "answer_sha": "c40ebd5576ac3854",
+      "prompt_sha": "53249338051d",
+      "original_split": "heldout"
+    },
+    {
+      "id": "heldout-H3-38~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": false,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5f3381622a29ded9",
+      "prompt_sha": "53249338051d",
+      "original_split": "heldout_h3"
+    },
+    {
+      "id": "hitl-07~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "A resposta diz R$ 750,00 para a venda de 02/11, mas a fonte mostra R$ 500,00. O resto confere com a evidência: a proposta A-5c941ab6 aguardando confirmação, o total de R$ 1.049,90 com 3 vendas, o valor de R$ 549,90, as datas de depósito, a aprovação humana e a expiração em 15 minutos. O valor errado também deixa a lista incoerente com o total. Há ainda um defeito de redação (\"Segundo a,\").",
+      "judge_date": "2026-11-04",
+      "answer_sha": "cc19ed400556d116",
+      "prompt_sha": "53249338051d",
+      "original_split": "hitl"
     },
     {
       "id": "memory-09~p1",
@@ -724,12 +746,16 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 3,
+      "score": 2,
       "failure_type": "invented_number",
-      "reason": "The core answer is correct and grounded: about 5 hours offline, last contact 17:59 on 2026-11-03, and no signal. The chip steps match the FAQ, and the support ticket with reason sem_sinal is an action listed in the policy card. However, the response says an unconfirmed proposal expires after 16 minutes, while the policy states 15 minutes. That number contradicts the evidence."
+      "reason": "The tool data says T1988B has been offline for 5 hours (offline_for_hours: 5), but the response says 6 hours. That changes the direct answer to the question. The other details (last contact 2026-11-03 23:21, no signal, chip connection) and the ticket offer that needs confirmation are supported.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "5a5e0df53b07741b",
+      "prompt_sha": "53249338051d",
+      "original_split": "memory"
     },
     {
-      "id": "official-01~p3",
+      "id": "official-05~p3",
       "split": "perturbed",
       "source": "perturbed.json",
       "run": 0,
@@ -741,22 +767,30 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "Every Get Smart feature listed (Android, stock, orders, menu, invoices, integration, kitchen messaging, counter use, reconciliation, Getnet processing) is in the sources. 'Costs more' matches the prices (R$ 79,90 vs R$ 129,90/mês). The answer correctly says the sources don't describe Get Clássica's features, and the handoff to a human agent is in the capabilities card. It is in English and leaks nothing. It loses a point for not stating the actual monthly prices."
+      "reason": "The terminal status matches the tool data: T1988B is offline and T1988A is online. The troubleshooting steps and the ticket offer, with confirmation required and a 15-minute expiry, come from the sources and the capabilities policy. Two weaknesses: it skips the chip-reinsertion step between opening and closing the cover, and it applies the power-off key combo to the Get Clássica without the source tying it to that model.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "f41dc4e46357a717",
+      "prompt_sha": "53249338051d",
+      "original_split": "official"
     },
     {
-      "id": "official-03~p3",
+      "id": "official-06~p3",
       "split": "perturbed",
       "source": "perturbed.json",
       "run": 0,
       "saw_tool_data": true,
       "saw_tool_results": true,
       "grounded": true,
-      "helpful": false,
+      "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 3,
+      "score": 4,
       "failure_type": "none",
-      "reason": "Every stated figure matches the settlement data: R$ 814,40 total across 5 sales, Pix R$ 64,00 deposited 2026-11-02, debit R$ 200,50 deposited today, and the rule text. However, the answer leaves out the credit portion, R$ 549,90 from 2 sales, scheduled for 2026-12-02. That is the largest amount and the main unanswered part of the question, so the answer is incomplete."
+      "reason": "Every claim is supported. The Automatic Advance description matches the FAQ, and the advance request (customer confirmation plus agent approval) matches the capabilities card. The answer correctly says it has no fee or rate data. It does leave out that the sources say sales can be advanced anytime through the Getnet Brasil app at no extra cost, which would have made it more complete.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "4beb970eb31891ce",
+      "prompt_sha": "53249338051d",
+      "original_split": "official"
     },
     {
       "id": "official-07~p3",
@@ -766,27 +800,16 @@
       "saw_tool_data": true,
       "saw_tool_results": true,
       "grounded": true,
-      "helpful": true,
+      "helpful": false,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
+      "score": 2,
       "failure_type": "none",
-      "reason": "The rounded R$ 6,15 figure and the BCB PTAX closing source both match the evidence. However, the reply opens oddly ('That is…'), never says '1 EUR', leaves buy/sell implicit ('for both'), and omits the exact rates (6.1500 sell / 6.1482 buy) and the date. It answers the question, but incompletely."
-    },
-    {
-      "id": "official-08~p3",
-      "split": "perturbed",
-      "source": "perturbed.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "The decline cause, terminal status, chip steps and support-ticket offer all match the tool data, the FAQ and the capabilities policy, and the reply is in English. It loses a point for skipping per-transaction detail: codes 51 and 05, the amounts, and the advised action of asking for another card."
+      "reason": "The answer is grounded: there is no bulletin for 11/04, the latest quote is from 11/03, and it cites the BCB source. However, it omits the rate itself (R$ 6.1500 sell / R$ 6.1482 buy), which was available in the sources, so it does not answer the question.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "898010580e98749c",
+      "prompt_sha": "53249338051d",
+      "original_split": "official"
     },
     {
       "id": "official-09~p3",
@@ -801,7 +824,30 @@
       "leaks_other_customer": false,
       "score": 2,
       "failure_type": "none",
-      "reason": "Every claim is supported by the sources: the term and interest varying by card issuer, and payout within 2 business days minus the MDR. But the answer leaves out the key fact the customer asked for. The sources plainly say installments go up to 48x, and the response never gives that number, so it does not answer the question."
+      "reason": "Everything the reply says is supported: rates vary by issuer, payment arrives in a single deposit within 2 business days, and the MDR is deducted and can be checked in the app or portal. But it never answers the actual question. The sources clearly say the crediário allows up to 48 installments, and the reply leaves that out.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "11464ccf4f0b7d85",
+      "prompt_sha": "53249338051d",
+      "original_split": "official"
+    },
+    {
+      "id": "official-10~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "The answer is in English, matching the question, and leaks no other customer's data. It confirms WhatsApp sales via the Payment Link and describes the create, send and receive flow, both stated in the sources. The payment methods it lists (card, Pix, debit, plus credit, Wallet and boleto) match the source pages. The prices (R$1,00 per paid link; Basic plan R$28/month with 60 transactions and R$0,50 per extra transaction) also match.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "0904698d81b9abcd",
+      "prompt_sha": "53249338051d",
+      "original_split": "official"
     },
     {
       "id": "parallel-01~p1",
@@ -816,25 +862,14 @@
       "leaks_other_customer": false,
       "score": 2,
       "failure_type": "invented_number",
-      "reason": "A resposta informa 1 venda Pix de R$ 164,00, mas os dados de get_settlements mostram R$ 64,00. O valor diverge da evidência e não fecha com o total de R$ 814,40 citado na própria resposta. Débito, crédito e a explicação do Link de Pagamento estão de acordo com as fontes."
+      "reason": "A explicação do Link de Pagamento tem base nas fontes, assim como os dados de Pix e débito. Porém o valor do crédito está errado: a resposta diz R$ 2.199,60, enquanto a ferramenta informa R$ 549,90. Esse número também é incoerente com o total de R$ 814,40 citado na própria resposta.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "dc1b9b7081f11584",
+      "prompt_sha": "53249338051d",
+      "original_split": "parallel"
     },
     {
-      "id": "parallel-03~p1",
-      "split": "perturbed",
-      "source": "perturbed.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": false,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 2,
-      "failure_type": "invented_number",
-      "reason": "A TX1007 aparece com R$ 840,00, mas os dados da ferramenta registram R$ 210,00. O valor ainda contradiz o total de R$ 285,00 citado na própria resposta. O restante bate com as fontes: até 48x, menu do crediário, recebimento em 2 dias úteis, TX1008 e códigos de recusa."
-    },
-    {
-      "id": "q-ov-04-en~p3",
+      "id": "q-ov-05-en~p3",
       "split": "perturbed",
       "source": "perturbed.json",
       "run": 0,
@@ -846,10 +881,14 @@
       "leaks_other_customer": false,
       "score": 4,
       "failure_type": "none",
-      "reason": "The sources say that contracting Pix with Getnet requires a key linked to the receiving account (the domicílio bancário) where payments arrive, and that only one key is needed. This supports the 'yes'. The human handoff offer is backed by the policy card. The second paragraph is a little disjointed: it starts with 'also' without context and does not mention that Pix generally works with payment accounts too. Otherwise the answer is correct and in English."
+      "reason": "Every claim is supported by the evidence: T1988B's last contact (2026-11-03 23:19, 5 hours offline), the steps from the FAQ, and the ticket proposal A-5c92abf9 awaiting confirmation with the 15-minute expiry. It does not falsely claim the ticket was opened, and it is in English. The answer is weaker in two ways. It skips the key step of inserting the chip into SIM1/SIM2, which leaves the procedure incomplete. It also opens without saying which terminal it is talking about.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "bd3c9277e5785544",
+      "prompt_sha": "53249338051d",
+      "original_split": "official-var"
     },
     {
-      "id": "q-ov-04-pt~p3",
+      "id": "q-ov-06-pt~p3",
       "split": "perturbed",
       "source": "perturbed.json",
       "run": 0,
@@ -859,24 +898,13 @@
       "helpful": true,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 4,
+      "score": 5,
       "failure_type": "none",
-      "reason": "As fontes confirmam que a contratação do Pix exige uma chave cadastrada no domicílio bancário onde o Pix é recebido, feita pelo Portal Minha Conta ou pelo Aplicativo Getnet. A resposta não inventa nada, está em português e oferece encaminhamento a um atendente, que consta no cartão de capacidades. Fica um pouco evasiva: não esclarece se o domicílio pode ser uma conta de pagamento, como a Get Conta mencionada nas fontes."
-    },
-    {
-      "id": "q-ov-06-en~p3",
-      "split": "perturbed",
-      "source": "perturbed.json",
-      "run": 0,
-      "saw_tool_data": true,
-      "saw_tool_results": true,
-      "grounded": true,
-      "helpful": true,
-      "language_ok": true,
-      "leaks_other_customer": false,
-      "score": 4,
-      "failure_type": "none",
-      "reason": "Every claim is supported. The app advancing sales with no extra app fees and the reserve release exceptions come from the sources. The debit/credit/Pix advance proposal, which needs confirmation and agent approval and expires after 15 minutes, matches the capabilities card. The answer is in English and openly states its gaps. The 'no extra fees' line slightly risks being read as a fee-free advance, but it is mitigated by the later note that rates aren't covered."
+      "reason": "A resposta afirma que a antecipação pode ser feita pelo Aplicativo Getnet Brasil sem taxa adicional, o que está no FAQ. Ela oferece a ação request_receivables_advance com a exigência correta de confirmação do cliente e aprovação de um atendente, conforme o cartão de política. Também admite com transparência que as fontes não trazem taxa, prazo nem passo a passo. Está em português e não expõe dados de terceiros.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "ef8aaf05fd49f339",
+      "prompt_sha": "53249338051d",
+      "original_split": "official-var"
     },
     {
       "id": "q-ov-09-en~p3",
@@ -889,9 +917,13 @@
       "helpful": false,
       "language_ok": true,
       "leaks_other_customer": false,
-      "score": 3,
+      "score": 2,
       "failure_type": "none",
-      "reason": "Everything stated is supported: the FAQ says each issuer sets its installment limit, rates vary by issuer, and interest is seen via a terminal simulation. But the response never gives the number asked for, even though the sources state crediário allows up to 48 installments, so the question goes unanswered."
+      "reason": "Every statement is backed by the sources: interest varies by issuer, each issuer sets its installment limit, and the terminal simulation steps are correct. However, the answer never gives the number the customer asked for. The Crediário sources clearly state installments of up to 48x, and the reply leaves this out, so it does not answer the question.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "dadd79e637ff9d43",
+      "prompt_sha": "53249338051d",
+      "original_split": "official-var"
     },
     {
       "id": "q-ov-09-pt~p3",
@@ -906,10 +938,52 @@
       "leaks_other_customer": false,
       "score": 3,
       "failure_type": "none",
-      "reason": "The claims are supported by the sources: the term and interest vary by card issuer, and the simulation is done on the card machine via crédito > crediário. However, the reply says 'Esse é o teto divulgado' without ever stating the number. The sources give up to 48x. The core question (maximum number of installments) is left unanswered."
+      "reason": "Every claim has a source: the limit varies by card issuer, and the simulation runs on the card machine (crédito > crediário). But the answer never states the number the question asks for, up to 48x, even though the sources give it. 'Esse é o máximo divulgado' points to a number that is missing, so the answer is incomplete.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "417baf0bdf6bdf83",
+      "prompt_sha": "53249338051d",
+      "original_split": "official-var"
     },
     {
-      "id": "replan-14~p1",
+      "id": "q-ov-10-pt~p3",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": true,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 5,
+      "failure_type": "none",
+      "reason": "A resposta confirma a venda pelo WhatsApp e lista os passos para criar o link. Tudo está nas fontes da página do Link de Pagamento, sem números inventados nem ações fora do cartão. Está em português e não expõe dado de outro cliente.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "815f99191b190889",
+      "prompt_sha": "53249338051d",
+      "original_split": "official-var"
+    },
+    {
+      "id": "q-partial-02~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 3,
+      "failure_type": "invented_number",
+      "reason": "The price is correct (R$ 79,90/month), and the reply rightly says the Get Clássica's battery life is not in the sources. But it says the Get Smart should be recharged at 22%, while the source says 20%.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "6a6abd4fd29c11b1",
+      "prompt_sha": "53249338051d",
+      "original_split": "partial"
+    },
+    {
+      "id": "real-04~p1",
       "split": "perturbed",
       "source": "perturbed.json",
       "run": 0,
@@ -921,9 +995,32 @@
       "leaks_other_customer": false,
       "score": 2,
       "failure_type": "invented_number",
-      "reason": "The answer says the terminal has been offline for 20 hours, but the tool data shows offline_for_hours: 5. The rest is supported by the sources: model, chip connection, no signal, last contact at 17:59, the chip steps from the FAQ, and the sem_sinal ticket offer that needs confirmation per the capabilities policy. The answer is useful and in the right language, but the wrong offline duration is a factual error about the customer's terminal."
+      "reason": "A resposta diz que o T1988B está offline há 20 horas, mas a ferramenta informa offline_for_hours = 5 (último contato 2026-11-03T23:18). O restante tem base nas fontes: a impossibilidade de usar o equipamento após o cancelamento, a forma de cobrança do aluguel, a ausência de ferramenta de cancelamento, o encaminhamento ao atendente e o chamado técnico mediante confirmação. A resposta também é útil e honesta sobre o que as fontes não cobrem.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "bf0b98897f041c74",
+      "prompt_sha": "53249338051d",
+      "original_split": "real"
+    },
+    {
+      "id": "replan-16~p1",
+      "split": "perturbed",
+      "source": "perturbed.json",
+      "run": 0,
+      "saw_tool_data": true,
+      "saw_tool_results": true,
+      "grounded": false,
+      "helpful": true,
+      "language_ok": true,
+      "leaks_other_customer": false,
+      "score": 2,
+      "failure_type": "invented_number",
+      "reason": "The answer gives TX1008's amount as R$ 55,00, but the data shows R$ 75,00, so that number is invented. Everything else is supported: the transaction, code 05 and its meaning, terminal T1988B, the date, the guidance, and the human-agent handoff.",
+      "judge_date": "2026-11-04",
+      "answer_sha": "9deea66ff5617317",
+      "prompt_sha": "53249338051d",
+      "original_split": "replan"
     }
   ],
-  "perturbed_sha": "5e9aac255f608658",
+  "perturbed_sha": "6c068a5784fa3dfa",
   "perturbed_file": "perturbed.json"
 }

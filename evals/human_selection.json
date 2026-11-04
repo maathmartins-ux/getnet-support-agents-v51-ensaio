@@ -1,0 +1,56 @@
+{
+ "paginas": [
+  {
+   "amostra": "c6fa423ab045",
+   "em": "2026-11-04T02:27:22+00:00",
+   "motivos": {
+    "heldout-H1-25": "juiz",
+    "heldout-H1-33": "checagem",
+    "memory-13": "checagem",
+    "official-04": "checagem",
+    "real-07": "juiz",
+    "replan-09": "checagem"
+   }
+  },
+  {
+   "amostra": "b270ea58e682",
+   "em": "2026-11-04T02:27:32+00:00",
+   "motivos": {
+    "approval-02": "aleatoria",
+    "dependent-08": "aleatoria",
+    "heldout-H1-15": "aleatoria",
+    "heldout-H1-25": "juiz",
+    "heldout-H1-33": "checagem",
+    "memory-10": "juiz",
+    "memory-13": "aleatoria",
+    "official-04": "checagem",
+    "q-guard-oos-1": "aleatoria",
+    "q-hard-02": "aleatoria",
+    "real-07": "juiz",
+    "replan-09": "checagem"
+   }
+  },
+  {
+   "amostra": "10ac784d5e97",
+   "em": "2026-11-04T07:43:28+00:00",
+   "motivos": {
+    "approval-03": "aleatoria",
+    "dependent-07": "checagem",
+    "dependent-11": "aleatoria",
+    "heldout-H1-13": "juiz",
+    "heldout-H2-40": "aleatoria",
+    "heldout-H3-36": "aleatoria",
+    "hitl-04": "aleatoria",
+    "memory-02": "aleatoria",
+    "memory-08": "checagem",
+    "official-01": "checagem",
+    "q-dep-02": "checagem",
+    "q-guard-05": "aleatoria",
+    "q-hard-05": "aleatoria",
+    "q-partial-05": "checagem",
+    "replan-07": "checagem",
+    "replan-09": "checagem"
+   }
+  }
+ ]
+}
