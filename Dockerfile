@@ -12,7 +12,7 @@ ARG EXTRAS="auto"
 ARG EMBED_MODEL=""
 
 # Estágio 1: só dependências exatas do lockfile (e o modelo, no híbrido), num venv isolado.
-FROM python:3.12-slim@sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159 AS build
+FROM python:3.15-slim@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928 AS build
 ARG EXTRAS
 ARG EMBED_MODEL
 COPY requirements.lock requirements-hybrid.lock /tmp/
@@ -36,7 +36,7 @@ RUN --mount=type=secret,id=proxy_ca,required=false \
     fi
 
 # Estágio 2: runtime sem pytest/ruff, sem compilador, usuário não-root.
-FROM python:3.12-slim@sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159
+FROM python:3.15-slim@sha256:65a65fc7b30b06cb6df4930fd4650697cb23f4c2698ab81fc87e4b031bc36928
 ARG EMBED_MODEL
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONPATH=/app/src \
